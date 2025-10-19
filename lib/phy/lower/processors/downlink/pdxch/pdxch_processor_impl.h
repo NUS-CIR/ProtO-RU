@@ -30,6 +30,7 @@
 #include "srsran/phy/lower/processors/downlink/pdxch/pdxch_processor_notifier.h"
 #include "srsran/phy/lower/processors/downlink/pdxch/pdxch_processor_request_handler.h"
 #include "srsran/phy/support/resource_grid_context.h"
+#include <srsran/srslog/logger.h>
 
 namespace srsran {
 
@@ -40,12 +41,14 @@ class pdxch_processor_impl : public pdxch_processor,
 {
 public:
   struct configuration {
+    srslog::basic_logger* logger;
     cyclic_prefix cp;
     unsigned      nof_tx_ports;
     unsigned      request_queue_size;
   };
 
   pdxch_processor_impl(std::unique_ptr<ofdm_symbol_modulator> modulator_, const configuration& config) :
+    logger(*config.logger),
     nof_symbols_per_slot(get_nsymb_per_slot(config.cp)),
     nof_tx_ports(config.nof_tx_ports),
     modulator(std::move(modulator_))
@@ -69,6 +72,7 @@ private:
   // See interface for documentation.
   void handle_request(const shared_resource_grid& grid, const resource_grid_context& context) override;
 
+  srslog::basic_logger&                  logger;
   unsigned                               nof_symbols_per_slot;
   unsigned                               nof_tx_ports;
   pdxch_processor_notifier*              notifier = nullptr;

@@ -1,25 +1,3 @@
-/*
- *
- * Copyright 2021-2025 Software Radio Systems Limited
- *
- * This file is part of srsRAN.
- *
- * srsRAN is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * srsRAN is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * A copy of the GNU Affero General Public License can be found in
- * the LICENSE file in the top-level directory of this distribution
- * and at http://www.gnu.org/licenses/.
- *
- */
-
 #pragma once
 
 #include "srsran/adt/blocking_queue.h"
@@ -31,6 +9,9 @@
 #include "srsran/phy/lower/processors/downlink/downlink_processor_baseband.h"
 #include "srsran/phy/lower/processors/uplink/uplink_processor_baseband.h"
 #include "srsran/phy/lower/sampling_rate.h"
+#include "srsran/ran/cyclic_prefix.h"
+#include "srsran/ran/slot_point.h"
+#include "srsran/srslog/logger.h"
 
 namespace srsran {
 
@@ -43,8 +24,14 @@ class lower_phy_baseband_processor : public lower_phy_controller
 public:
   /// Collects the parameters necessary to initialize the baseband adaptor, as well as injected dependencies.
   struct configuration {
+    /// Cyclic prefix.
+    cyclic_prefix cp;
+    /// Subcarrier spacing.
+    subcarrier_spacing scs;
     /// Sampling rate.
     sampling_rate srate;
+    /// Lower-PHY logger.
+    srslog::basic_logger* logger;
     /// \brief Receive task executor.
     ///
     /// Receives baseband samples from the \ref baseband_gateway_receiver, reserves baseband buffers and pushes
@@ -177,15 +164,24 @@ private:
 
   /// \brief Processes downlink baseband.
   /// \param[in] timestamp Current processing time.
-  void dl_process(baseband_gateway_timestamp timestamp);
+  void dl_process(baseband_gateway_timestamp timestamp, uint32_t offset);
 
   /// Processes uplink baseband.
-  void ul_process();
+  void ul_process(uint32_t offset);
 
+  subcarrier_spacing                                                         scs;
   sampling_rate                                                              srate;
+  unsigned                                                                   nof_samples_per_subframe;
+  unsigned                                                                   nof_slots_per_subframe;
+  unsigned                                                                   nof_symbols_per_slot;
+  unsigned                                                                   nof_symbols_per_sec;
+  const std::chrono::duration<double, std::nano>                             symbol_duration;
+  /// List of the symbol sizes in number samples for each symbol within the subframe.
+  std::vector<unsigned>                                                      symbol_sizes;
   unsigned                                                                   tx_buffer_size;
   unsigned                                                                   rx_buffer_size;
   std::chrono::nanoseconds                                                   cpu_throttling_time;
+  srslog::basic_logger&                                                      logger;
   task_executor&                                                             rx_executor;
   task_executor&                                                             tx_executor;
   task_executor&                                                             uplink_executor;
@@ -202,6 +198,7 @@ private:
   internal_fsm                                                               rx_state;
   std::atomic<baseband_gateway_timestamp>                                    last_rx_timestamp;
   std::optional<std::chrono::time_point<std::chrono::high_resolution_clock>> last_tx_time;
+  
 };
 
 } // namespace srsran

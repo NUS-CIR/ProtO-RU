@@ -23,7 +23,10 @@
 #pragma once
 
 #include "srsran/ran/bs_channel_bandwidth.h"
+#include "srsran/ran/subcarrier_spacing.h"
+#include "srsran/ran/nr_band.h"
 #include "srsran/srslog/srslog.h"
+#include "./helpers/ru_config.h"
 #include <string>
 #include <vector>
 
@@ -43,6 +46,10 @@ struct ru_emulator_ofh_appconfig {
   std::chrono::microseconds T2a_max_up{300};
   /// T2a minimum parameter for downlink User-Plane in microseconds.
   std::chrono::microseconds T2a_min_up{85};
+  /// Ta3 maximum parameter for uplink User-Plane in microseconds.
+  std::chrono::microseconds Ta3_max_up{300};
+  /// Ta3 minimum parameter for uplink User-Plane in microseconds.
+  std::chrono::microseconds Ta3_min_up{85};
   /// Ethernet network interface name or PCI bus identifier.
   std::string network_interface;
   /// RU emulator MAC address.
@@ -54,17 +61,39 @@ struct ru_emulator_ofh_appconfig {
   /// Promiscuous mode flag.
   bool enable_promiscuous = false;
   /// RU Uplink ports.
-  std::vector<unsigned> ru_ul_port_id = {0, 1};
+  std::vector<unsigned> ru_ul_port_id = {0};
   /// RU Downlink ports.
-  std::vector<unsigned> ru_dl_port_id = {0, 1, 2, 3};
+  std::vector<unsigned> ru_dl_port_id = {0};
   /// RU PRACH ports.
-  std::vector<unsigned> ru_prach_port_id = {4, 5};
+  std::vector<unsigned> ru_prach_port_id = {4};
   /// RU emulator operating bandwidth.
   bs_channel_bandwidth bandwidth = srsran::bs_channel_bandwidth::MHz100;
   /// Uplink compression method.
   std::string ul_compr_method = "bfp";
   /// Uplink compression bitwidth.
   unsigned ul_compr_bitwidth = 9;
+  /// Downlink compression method.
+  std::string dl_compr_method = "bfp";
+  /// Downlink compression bitwidth.
+  unsigned dl_compr_bitwidth = 9;
+  /// Downlink static compression header flag.
+  bool is_downlink_static_comp_hdr_enabled = true;
+  /// Uplink static compression header flag.
+  bool is_uplink_static_comp_hdr_enabled = true;
+  /// IQ data scaling to be applied prior to Downlink data compression.
+  float iq_scaling = 1.0F;
+  /// max DL processing delay in slots
+  unsigned max_proc_delay = 5;
+  /// DL ARFCN of "F_REF", which is the RF reference frequency, as per TS 38.104, Section 5.4.2.1.
+  unsigned dl_arfcn;
+  /// Common subcarrier spacing for the entire resource grid. It must be supported by the band SS raster.
+  subcarrier_spacing common_scs = subcarrier_spacing::kHz15;
+  /// NR band.
+  std::optional<nr_band> band;
+  /// Number of antennas in downlink.
+  unsigned nof_antennas_dl = 1;
+  /// Number of antennas in uplink.
+  unsigned nof_antennas_ul = 1;
 };
 
 /// RU emulator logging parameters.
@@ -87,6 +116,8 @@ struct ru_emulator_appconfig {
   ru_emulator_log_appconfig log_cfg;
   /// Individual RU emulators configurations.
   std::vector<ru_emulator_ofh_appconfig> ru_cfg = {{}};
+  /// sdr RU Configs.
+  ru_sdr_unit_config sdr_unit_config;
   /// DPDK configuration.
   std::optional<ru_emulator_dpdk_appconfig> dpdk_config;
 };

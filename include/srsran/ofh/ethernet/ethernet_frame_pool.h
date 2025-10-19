@@ -243,31 +243,27 @@ class eth_frame_pool
 
     pool_entry(units::bytes mtu, unsigned num_of_frames)
     {
-      // DL C-Plane storage.
-      buffers.emplace_back(NUM_CP_MESSAGES_TO_RETURN, mtu.value(), ofh::MAX_NOF_SUPPORTED_EAXC);
-      // UL C-Plane storage.
-      buffers.emplace_back(NUM_CP_MESSAGES_TO_RETURN, mtu.value(), ofh::MAX_NOF_SUPPORTED_EAXC * 2);
-      // U-Plane storage.
+      // U-Plane iq_data storage.
+      buffers.emplace_back(num_of_frames, mtu.value(), ofh::MAX_NOF_SUPPORTED_EAXC);
+      // U-Plane PRACH storage.
       buffers.emplace_back(num_of_frames, mtu.value(), ofh::MAX_NOF_SUPPORTED_EAXC);
     }
 
     /// Returns frame buffers for the given OFH type and given direction.
     frame_buffer_array& get_ofh_type_buffers(ofh::message_type type, ofh::data_direction dir)
     {
-      unsigned index = static_cast<unsigned>(type) * 2;
-      if (dir == ofh::data_direction::uplink) {
-        index += 1;
-      }
+      srsran_assert(dir==ofh::data_direction::uplink && (type==ofh::message_type::uplane_prach || type==ofh::message_type::user_plane),
+                    "Only uplink U-Plane and PRACH are supported in eth_frame_pool.");
+      unsigned index = type==ofh::message_type::user_plane? 0 : 1;
       return buffers[index];
     }
 
     /// Returns frame buffers for the given OFH type and given direction.
     const frame_buffer_array& get_ofh_type_buffers(ofh::message_type type, ofh::data_direction dir) const
     {
-      unsigned index = static_cast<unsigned>(type) * 2;
-      if (dir == ofh::data_direction::uplink) {
-        index += 1;
-      }
+      srsran_assert(dir==ofh::data_direction::uplink && (type==ofh::message_type::uplane_prach || type==ofh::message_type::user_plane),
+                    "Only uplink U-Plane and PRACH are supported in eth_frame_pool.");
+      unsigned index = type==ofh::message_type::user_plane? 0 : 1;
       return buffers[index];
     }
 

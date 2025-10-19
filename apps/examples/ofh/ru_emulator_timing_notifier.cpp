@@ -28,40 +28,6 @@
 using namespace srsran;
 using namespace ofh;
 
-/// Difference between Unix seconds to GPS seconds.
-/// GPS epoch: 1980.1.6 00:00:00 (UTC); Unix time epoch: 1970:1.1 00:00:00 UTC
-/// Last leap second added in 31st Dec 2016 by IERS.
-/// 1970:1.1 - 1980.1.6: 3657 days
-/// 3657*24*3600=315 964 800 seconds (Unix seconds value at 1980.1.6 00:00:00 (UTC))
-/// There are 18 leap seconds inserted after 1980.1.6 00:00:00 (UTC), which means GPS is 18 seconds larger.
-static constexpr uint64_t UNIX_TO_GPS_SECONDS_OFFSET = 315964800ULL - 18ULL;
-
-/// Offset for converting from UTC to GPS time including Alpha and Beta parameters.
-static std::chrono::nanoseconds gps_offset;
-
-namespace {
-
-/// A GPS clock implementation.
-struct gps_clock {
-  using duration   = std::chrono::nanoseconds;
-  using rep        = duration::rep;
-  using period     = duration::period;
-  using time_point = std::chrono::time_point<gps_clock>;
-  // static constexpr bool is_steady = false;
-
-  static time_point now()
-  {
-    ::timespec ts;
-    ::clock_gettime(CLOCK_REALTIME, &ts);
-
-    time_point now(std::chrono::seconds(ts.tv_sec) + std::chrono::nanoseconds(ts.tv_nsec));
-
-    return now - gps_offset;
-  }
-};
-
-} // namespace
-
 /// Calculates the fractional part inside a second from the given time point.
 static std::chrono::nanoseconds calculate_ns_fraction_from(gps_clock::time_point tp)
 {
@@ -94,10 +60,11 @@ static unsigned circular_distance(unsigned cur, unsigned prev, unsigned size)
 }
 
 ru_emulator_timing_notifier::ru_emulator_timing_notifier(srslog::basic_logger&  logger_,
-                                                         srsran::task_executor& executor_) :
+                                                         srsran::task_executor& executor_,
+                                                         subcarrier_spacing     scs_) :
   logger(logger_),
   executor(executor_),
-  scs(subcarrier_spacing::kHz30),
+  scs(scs_),
   nof_symbols_per_slot(get_nsymb_per_slot(cyclic_prefix::NORMAL)),
   nof_symbols_per_sec(nof_symbols_per_slot * get_nof_slots_per_subframe(scs) * NOF_SUBFRAMES_PER_FRAME * 100),
   nof_slots_per_system_frame(slot_point(scs, 0).nof_slots_per_system_frame()),

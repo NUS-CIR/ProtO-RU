@@ -27,12 +27,15 @@
 #include "srsran/phy/lower/processors/uplink/puxch/puxch_processor_factories.h"
 #include "srsran/phy/lower/processors/uplink/uplink_processor.h"
 #include "srsran/phy/lower/sampling_rate.h"
+#include "srsran/srslog/srslog.h"
 #include <memory>
 
 namespace srsran {
 
 /// Describes a sector configuration.
 struct uplink_processor_configuration {
+  /// low-PHY logger.
+  srslog::basic_logger* logger;
   /// Sector identifier.
   unsigned sector_id;
   /// Subcarrier spacing.

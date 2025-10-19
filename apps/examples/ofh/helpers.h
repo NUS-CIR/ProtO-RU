@@ -26,8 +26,73 @@
 #include "srsran/ofh/ethernet/ethernet_mac_address.h"
 #include "srsran/ran/bs_channel_bandwidth.h"
 #include "srsran/ru/ofh/ru_ofh_configuration.h"
+#include <fstream>
 
 namespace srsran {
+
+// inline void print_iq_samples_hex(const cbf16_t* data, std::size_t count) {
+//   std::string filepath = "/tmp/RU_iq_samples" + std::to_string(file_count++) + ".txt";
+//   std::ofstream out(filepath, std::ios::out);
+
+//   const unsigned char* p = reinterpret_cast<const unsigned char*>(data);
+//   const std::size_t nbytes = count * sizeof(cbf16_t);
+
+//   // 备份/设置格式
+//   std::ios old_state(nullptr);
+//   old_state.copyfmt(out);
+//   out << std::hex << std::setfill('0') << std::uppercase;
+
+//   for (std::size_t i = 0; i < nbytes; ++i) {
+//       if (i % 16 == 0) {
+//           if (i) out << '\n';
+//           out << std::setw(8) << i << "  ";
+//       }
+//       out << std::setw(2) << static_cast<unsigned>(p[i]) << ' ';
+//   }
+//   if (nbytes) out << '\n';
+//   out.copyfmt(old_state);
+//   fmt::print("new packet\n");
+//   return;
+// }
+// inline void print_iq_samples(span<const cbf16_t> iq_samples, unsigned file_count) {
+//   std::string filepath = "/tmp/RU_samples" + std::to_string(file_count) + ".txt";
+//   std::ofstream ofs(filepath, std::ios::out);
+
+//   for (size_t i = 0; i < iq_samples.size(); ++i) {
+//         const auto& sample = iq_samples[i];
+        
+//         float real_val = to_float(sample.real);
+//         float imag_val = to_float(sample.imag);
+//         ofs << fmt::format("Sample {} : real= {}, imag = {}\n", i, real_val, imag_val);
+//   }
+
+//   fmt::print("New packet\n");
+// }
+
+// static void dump_hex(span<uint8_t> packet)
+// {
+//   std::string tmp_file = "/tmp/RU_Prach" + std::to_string(file_count++) + ".txt";
+//   std::ofstream ofs(tmp_file, std::ios::out);
+//   for (size_t i = 0; i < packet.size(); ++i) {
+//       ofs << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(packet[i]) << " ";
+//       if ((i + 1) % 16 == 0) {
+//           ofs << "\n";
+//       }
+//   }
+//   fmt::print("new packet\n");
+//   ofs << std::dec;
+//   ofs.close();
+// }
+
+/// Compare two mac addresses.
+inline bool compare_mac_addresses(const ether::mac_address& mac_src, const ether::mac_address& mac_dst){
+  unsigned i = 0;
+  bool flag = true;
+  for(;i< ether::ETH_ADDR_LEN; i++){
+    flag =  mac_src[i]==mac_dst[i];
+  }
+  return flag;
+}
 
 /// Parses the string containing Ethernet MAC address.
 inline bool parse_mac_address(const std::string& mac_str, ether::mac_address& mac)

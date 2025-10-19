@@ -24,6 +24,7 @@
 #include "srsran/phy/lower/lower_phy_rx_symbol_context.h"
 #include "srsran/phy/support/resource_grid_context.h"
 #include "srsran/phy/support/resource_grid_writer.h"
+#include "srsran/adt/gps_clock.h" 
 
 using namespace srsran;
 
@@ -36,7 +37,8 @@ bool puxch_processor_impl::process_symbol(const baseband_gateway_buffer_reader& 
   if (context.slot != current_slot) {
     // Update slot.
     current_slot = context.slot;
-
+    // slot_point ofh_slot = gps_clock::get_ofh_slot_now();
+    // logger.warning("[{}] : UL new slot {}", ofh_slot, current_slot);
     // Exchange an empty request with the current slot with a stored request.
     auto request = requests.exchange({context.slot, shared_resource_grid()});
 
@@ -67,6 +69,7 @@ bool puxch_processor_impl::process_symbol(const baseband_gateway_buffer_reader& 
 
   // Demodulate each of the ports.
   for (unsigned i_port = 0; i_port != nof_rx_ports; ++i_port) {
+    // logger.warning("here");
     demodulator->demodulate(
         current_grid.get().get_writer(), samples.get_channel_buffer(i_port), i_port, symbol_index_subframe);
   }

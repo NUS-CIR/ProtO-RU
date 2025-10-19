@@ -43,10 +43,14 @@ public:
   ///
   /// \param[out] buffer    Buffer to store the processed baseband samples.
   /// \param[in]  timestamp Time instant in which the first sample in the buffer is transmitted.
+  /// \param[in]  offset    Time difference in slots between gps clock and usrp. 
   /// \return Metadata about the contents of the output buffer.
   /// \remark The number of channels in \c buffer must be equal to the number of transmit ports for the sector.
   virtual baseband_gateway_transmitter_metadata process(baseband_gateway_buffer_writer& buffer,
-                                                        baseband_gateway_timestamp      timestamp) = 0;
+                                                        baseband_gateway_timestamp      timestamp,
+                                                        uint32_t offset) = 0;
+  // virtual baseband_gateway_transmitter_metadata process(baseband_gateway_buffer_writer& buffer,
+  //                                                       baseband_gateway_timestamp      timestamp) = 0;
 };
 
 } // namespace srsran

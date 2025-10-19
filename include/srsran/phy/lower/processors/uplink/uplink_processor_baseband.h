@@ -44,7 +44,8 @@ public:
   /// \param[in] buffer    Baseband samples to process.
   /// \param[in] timestamp Time instant in which the first sample was captured.
   /// \remark The number of channels in \c buffer must be equal to the number of receive ports for the sector.
-  virtual void process(const baseband_gateway_buffer_reader& buffer, baseband_gateway_timestamp timestamp) = 0;
+  virtual void process(const baseband_gateway_buffer_reader& buffer, baseband_gateway_timestamp timestamp, uint32_t offset) = 0;
+  // virtual void process(const baseband_gateway_buffer_reader& buffer, baseband_gateway_timestamp timestamp) = 0;
 };
 
 } // namespace srsran

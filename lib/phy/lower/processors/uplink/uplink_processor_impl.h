@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../baseband_cfo_processor.h"
+#include "srsran/ran/tdd/tdd_ul_dl_config.h"
 #include "srsran/adt/tensor.h"
 #include "srsran/gateways/baseband/buffer/baseband_gateway_buffer_dynamic.h"
 #include "srsran/phy/lower/processors/uplink/prach/prach_processor.h"
@@ -33,6 +34,7 @@
 #include "srsran/ran/cyclic_prefix.h"
 #include "srsran/ran/slot_point.h"
 #include "srsran/support/srsran_assert.h"
+#include "srsran/srslog/srslog.h"
 #include <memory>
 
 namespace srsran {
@@ -43,6 +45,8 @@ class lower_phy_uplink_processor_impl : public lower_phy_uplink_processor, priva
 public:
   /// Configuration parameters.
   struct configuration {
+    /// low-PHY logger.
+    srslog::basic_logger* logger;
     /// Sector identifier.
     unsigned sector_id;
     /// Subcarrier spacing.
@@ -92,23 +96,25 @@ public:
 
 private:
   // See interface for documentation.
-  void process(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp) override;
+  void process(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp, uint32_t offset) override;
 
   /// \brief Processes samples in alignment state.
   /// \param[in] samples   Input baseband samples.
   /// \param[in] timestamp Time instant in which the first sample within \c samples was received.
-  void process_alignment(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp);
+  void process_alignment(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp, uint32_t offset);
 
   /// \brief Processes a symbol boundary.
   /// \param[in] samples   Input baseband samples.
   /// \param[in] timestamp Time instant in which the first sample within \c samples was received.
-  void process_symbol_boundary(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp);
+  void process_symbol_boundary(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp, uint32_t offset);
 
   /// \brief Collects symbol samples.
   /// \param[in] samples   Input baseband samples.
   /// \param[in] timestamp Time instant in which the first sample within \c samples was received.
-  void process_collecting(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp);
+  void process_collecting(const baseband_gateway_buffer_reader& samples, baseband_gateway_timestamp timestamp, uint32_t offset);
 
+  /// low-PHY logger.
+  srslog::basic_logger& logger;
   /// Finite state machine state.
   fsm_states state = fsm_states::alignment;
   /// Sector identifier.
@@ -150,6 +156,7 @@ private:
   uplink_processor_notifier* notifier = nullptr;
   /// Carrier Frequency Offset processor.
   baseband_cfo_processor cfo_processor;
+  tdd_ul_dl_config_common tdd_cfg = {subcarrier_spacing::kHz30, {5, 3, 10, 1, 2}};
 };
 
 } // namespace srsran

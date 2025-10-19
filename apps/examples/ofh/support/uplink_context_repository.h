@@ -1,0 +1,124 @@
+/*
+ *
+ * Copyright 2021-2025 Software Radio Systems Limited
+ *
+ * This file is part of srsRAN.
+ *
+ * srsRAN is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * srsRAN is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * A copy of the GNU Affero General Public License can be found in
+ * the LICENSE file in the top-level directory of this distribution
+ * and at http://www.gnu.org/licenses/.
+ *
+ */
+
+#pragma once
+
+#include "context_repository_helpers.h"
+#include "srsran/adt/expected.h"
+#include "srsran/ofh/ofh_constants.h"
+#include "srsran/ofh/serdes/ofh_cplane_message_properties.h"
+#include "srsran/ran/slot_pdu_capacity_constants.h"
+#include <array>
+#include <mutex>
+#include <vector>
+
+namespace srsran {
+namespace ofh {
+
+/// Uplink Control-Plane context.
+struct ul_cplane_context {
+  /// Control-Plane radio application header.
+  cplane_radio_application_header radio_hdr;
+  /// Starting PRB of data section.
+  uint16_t prb_start;
+  /// Number of contiguous PRBs per data section.
+  unsigned nof_prb;
+  /// Number of symbols.
+  uint8_t nof_symbols;
+  /// Section ID.
+  uint16_t section_id;
+};
+
+/// Uplink Control-Plane context repository.
+class uplink_cplane_context_repository
+{
+  using repo_entry = std::array<ul_cplane_context, MAX_SUPPORTED_EAXC_ID_VALUE>;
+
+  std::vector<repo_entry> repo;
+  //: TODO: make this lock free
+  mutable std::mutex mutex;
+  srslog::basic_logger& logger = srslog::fetch_basic_logger("UplinkContextRepo");
+
+  /// Returns the entry of the repository for the given slot and eAxC.
+  ul_cplane_context& entry(slot_point slot, unsigned eaxc)
+  {
+    unsigned index = calculate_repository_index(slot, repo.size());
+    return repo[index][eaxc];
+  }
+
+  /// Returns the entry of the repository for the given slot and eAxC.
+  const ul_cplane_context& entry(slot_point slot, unsigned eaxc) const
+  {
+    unsigned index = calculate_repository_index(slot, repo.size());
+    return repo[index][eaxc];
+  }
+
+public:
+  explicit uplink_cplane_context_repository(unsigned size_) : repo(size_)
+  {
+    static_assert(MAX_PRACH_OCCASIONS_PER_SLOT == 1,
+                  "Uplink Control-Plane context repository only supports one context per slot and eAxC");
+  }
+
+  /// Add the given context to the repo at the given slot and eAxC.
+  void add(slot_point slot, unsigned eaxc, const ul_cplane_context& context)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    entry(slot, eaxc) = context;
+    // fmt::print("UL context added! slot {}, nof_symbols = {}, symbol_start = {}, nof_prbs = {}, prb_start = {}\n", context.radio_hdr.slot, context.nof_symbols, context.radio_hdr.start_symbol, context.nof_prb, context.prb_start);
+  }
+
+  /// Returns a context that matches the given slot, symbol, filter index and eAxC or an error if it does not exist in
+  /// the repository.
+  expected<ul_cplane_context> get(slot_point slot, unsigned symbol, filter_index_type filter_index, unsigned eaxc) const
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+
+    const ul_cplane_context& cp_param = entry(slot, eaxc);
+    if (symbol >= cp_param.radio_hdr.start_symbol &&
+        symbol < (cp_param.radio_hdr.start_symbol + cp_param.nof_symbols) &&
+        filter_index == cp_param.radio_hdr.filter_index) {
+      return cp_param;
+    }
+
+    return make_unexpected(default_error_t{});
+  }
+
+  /// Returns a context that matches the given slot, symbol, filter index and eAxC or an error if it does not exist in
+  /// the repository.
+  expected<ul_cplane_context> get(slot_point slot, unsigned symbol, unsigned eaxc) const
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    // fmt::print("getting for slot {}, symbol {}\n", slot, symbol);
+    const ul_cplane_context& cp_param = entry(slot, eaxc);
+    if (symbol >= cp_param.radio_hdr.start_symbol &&
+        symbol < (cp_param.radio_hdr.start_symbol + cp_param.nof_symbols)) {
+      // fmt::print("success on slot {}, symbol {}\n", slot, symbol);
+      return cp_param;
+    }
+
+    return make_unexpected(default_error_t{});
+  }
+};
+
+} // namespace ofh
+} // namespace srsran

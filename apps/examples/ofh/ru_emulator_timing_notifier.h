@@ -25,7 +25,9 @@
 #include "srsran/ofh/timing/ofh_ota_symbol_boundary_notifier_manager.h"
 #include "srsran/srslog/logger.h"
 #include "srsran/support/executors/task_executor.h"
+#include "srsran/adt/gps_clock.h"
 #include <atomic>
+
 
 namespace srsran {
 
@@ -47,7 +49,7 @@ class ru_emulator_timing_notifier : public ofh::ota_symbol_boundary_notifier_man
   std::atomic<worker_status>                      status{worker_status::idle};
 
 public:
-  ru_emulator_timing_notifier(srslog::basic_logger& logger_, task_executor& executor_);
+  ru_emulator_timing_notifier(srslog::basic_logger& logger_, task_executor& executor_, subcarrier_spacing scs_);
 
   /// Starts operation of the timing notifier.
   void start();

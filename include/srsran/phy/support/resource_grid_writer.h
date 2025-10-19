@@ -106,6 +106,8 @@ public:
   /// \param[in] l    OFDM symbol index.
   /// \return Resource grid view.
   virtual span<cbf16_t> get_view(unsigned port, unsigned l) = 0;
+
+  virtual void clear_empty(unsigned port) = 0;
 };
 
 } // namespace srsran

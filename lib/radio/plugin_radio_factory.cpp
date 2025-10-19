@@ -65,6 +65,7 @@ public:
     return session->get_baseband_gateway(stream_id);
   }
   baseband_gateway_timestamp read_current_time() override { return session->read_current_time(); }
+  double get_actual_srate() override { return session->get_actual_srate(); }
   void                       start(baseband_gateway_timestamp init_time) override { session->start(init_time); }
   void                       stop() override { session->stop(); }
 

@@ -47,6 +47,8 @@ struct uplane_message_params {
   section_type sect_type;
   /// IQ data compression parameters.
   ru_compression_params compression_params;
+  /// Section ID.
+  uint16_t section_id;
 };
 
 } // namespace ofh

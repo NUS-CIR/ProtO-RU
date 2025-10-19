@@ -106,6 +106,7 @@ struct single_worker {
   /// OS priority of the worker thread.
   os_thread_realtime_priority prio = os_thread_realtime_priority::no_realtime();
   /// Bit mask to set worker cpu affinity.
+  // os_sched_affinity_bitmask mask = [](){ os_sched_affinity_bitmask m; m.fill(5,16); return m; }();
   os_sched_affinity_bitmask mask = {};
   /// Non null in case tracing of the worker executors is enabled.
   file_event_tracer<true>* tracer = nullptr;

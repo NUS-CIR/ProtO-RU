@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <iostream>
 #include "srsran/phy/lower/lower_phy_error_notifier.h"
 #include "srsran/phy/lower/lower_phy_metrics_notifier.h"
 #include "srsran/phy/lower/lower_phy_rx_symbol_notifier.h"

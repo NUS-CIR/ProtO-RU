@@ -44,7 +44,7 @@ resource_grid_pool_impl::resource_grid_pool_impl(task_executor*                 
     grids_str_zero[i_grid]     = "set_all_zero#" + std::to_string(i_grid);
     grids_str_reserved[i_grid] = "rg_reserved#" + std::to_string(i_grid);
   }
-
+  // fmt::print("grids.size = {}\n", grids.size());
   // All grids scopes must be zero.
   std::fill(grids_scope_count.begin(), grids_scope_count.end(), ref_counter_available);
 }
@@ -107,12 +107,14 @@ void resource_grid_pool_impl::notify_release_scope(unsigned identifier)
 
   // Skip zeroing if the grid is empty.
   if (grids[identifier]->get_reader().is_empty()) {
+    // fmt::print("empty grid\n");
     grids_scope_count[identifier] = ref_counter_available;
     return;
   }
 
   // If the pool is not configured with an asynchronous executor, it skips the zeroing process.
   if (async_executor == nullptr) {
+    // fmt::print("Resource grid pool is not configured with an asynchronous executor. Skipping zeroing.\n");
     grids_scope_count[identifier] = ref_counter_available;
     return;
   }
@@ -120,7 +122,7 @@ void resource_grid_pool_impl::notify_release_scope(unsigned identifier)
   // Create lambda function for setting the grid to zero.
   auto set_all_zero_func = [this, identifier]() {
     trace_point tp = l1_tracer.now();
-
+    // fmt::print("Doing set_all_zero\n");
     // Set grid to zero.
     grids[identifier]->set_all_zero();
 

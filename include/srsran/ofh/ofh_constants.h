@@ -28,7 +28,7 @@ namespace srsran {
 namespace ofh {
 
 /// Open Fronthaul message type.
-enum class message_type { control_plane, user_plane, num_ofh_types };
+enum class message_type { control_plane, user_plane, uplane_prach, num_ofh_types };
 
 /// Maximum number of supported eAxC. Implementation defined.
 constexpr unsigned MAX_NOF_SUPPORTED_EAXC = 4;

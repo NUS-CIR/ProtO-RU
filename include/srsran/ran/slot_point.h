@@ -33,6 +33,7 @@ constexpr uint32_t NOF_SUBFRAMES_PER_FRAME = 10;
 
 /// Number of system Frame Number values.
 constexpr size_t NOF_SFNS = 1024;
+constexpr size_t NOF_OFH_SFNS = 256;
 
 /// Duration of a subframe in milliseconds.
 constexpr uint32_t SUBFRAME_DURATION_MSEC = 1;

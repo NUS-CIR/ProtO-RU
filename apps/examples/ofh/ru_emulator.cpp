@@ -27,16 +27,44 @@
 #include "ru_emulator_seq_id_checker.h"
 #include "ru_emulator_timing_notifier.h"
 #include "ru_emulator_transceiver.h"
+#include "lower_phy_factory.h"
+#include "upper_phy_fake.h"
+#include "ru_ofh_transmitter.h"
+#include "../radio/radio_notifier_sample.h"
+#include "ru_rx_symbol_handler.h"
 #include "srsran/adt/circular_map.h"
 #include "srsran/adt/expected.h"
 #include "srsran/adt/to_array.h"
+#include "srsran/adt/gps_clock.h"
+#include "srsran/du/du_cell_config.h"
+#include "./helpers/ru_config_translator.h"
+#include "./helpers/ru_config.h"
+#include "./helpers/worker_manager.h"
+#include "./helpers/data_flow_uplane_uplink_factory.h"
+#include "./helpers/timing_window_params.h"
+#include "./support/uplink_context_repository.h"
+#include "./support/prach_context_repository.h"
+#include "srsran/radio/radio_configuration.h"
+#include "srsran/radio/radio_factory.h"
+#include "srsran/support/executors/task_worker.h"
 #include "srsran/ofh/compression/compression_params.h"
+#include "srsran/ofh/compression/compression_factory.h"
+#include "srsran/phy/lower/lower_phy_controller.h"
+#include "srsran/phy/adapters/phy_error_adapter.h"
+#include "srsran/phy/adapters/phy_metrics_adapter.h"
+#include "srsran/phy/adapters/phy_rg_gateway_adapter.h"
+#include "srsran/phy/adapters/phy_rx_symbol_adapter.h"
+#include "srsran/phy/adapters/phy_rx_symbol_request_adapter.h"
+#include "srsran/phy/adapters/phy_timing_adapter.h"
+#include "./decoders/ofh_uplane_rx_symbol_data_flow_writer.h"
+
 #include "srsran/ofh/ecpri/ecpri_constants.h"
 #include "srsran/ofh/ecpri/ecpri_packet_properties.h"
 #include "srsran/ofh/ethernet/dpdk/dpdk_ethernet_factories.h"
 #include "srsran/ofh/ofh_constants.h"
 #include "srsran/ofh/ofh_factories.h"
 #include "srsran/ofh/serdes/ofh_message_properties.h"
+#include "srsran/ofh/serdes/ofh_serdes_factories.h"
 #include "srsran/ran/cyclic_prefix.h"
 #include "srsran/ran/resource_block.h"
 #include "srsran/ran/slot_point.h"
@@ -49,6 +77,7 @@
 #include "fmt/chrono.h"
 #include <arpa/inet.h>
 #include <random>
+#include <uhd/types/time_spec.hpp>
 #ifdef DPDK_FOUND
 #include "srsran/hal/dpdk/dpdk_eal_factory.h"
 #endif
@@ -60,43 +89,33 @@ using namespace ether;
 /// Ethernet packet size.
 static constexpr unsigned ETHERNET_FRAME_SIZE = 9000;
 
-/// Maximum number of symbols in a slot, considering normal cyclic prefix.
-static constexpr size_t MAX_NOF_SYMBOLS = get_nsymb_per_slot(cyclic_prefix::NORMAL);
-
 /// Depending on configured compression parameters one UL U-Plane message may occupy up to 2 Ethernet packets.
 static constexpr size_t MAX_NOF_PACKETS_PER_UPLANE_MESSAGE = 2;
 
 /// Supported values of udCmpHdr field used for UL U-Plane.
 static constexpr auto SUPPORTED_UL_CMPR_HDR = to_array<uint8_t>({0x00, 0x91});
 
-namespace {
+/// Flag that indicates if the application is running or being shutdown.
+static std::atomic<bool> is_app_running = {true};
 
-/// Structure storing the reception window timing parameters expressed in a number of symbols.
-struct ru_em_rx_window_timing_parameters {
-  /// Offset from the current OTA symbol to the start of DL Control-Plane reception window. Must be calculated based on
-  /// \c T2a_max_cp_dl parameter.
-  unsigned sym_cp_dl_start;
-  /// Offset from the current OTA symbol to end of DL Control-Plane message reception window. Must be calculated based
-  /// on \c T2a_min_cp_dl parameter.
-  unsigned sym_cp_dl_end;
-  /// Offset from the current OTA symbol to the start of UL Control-Plane reception window. Must be calculated based on
-  /// \c T2a_max_cp_ul parameter.
-  unsigned sym_cp_ul_start;
-  /// Offset from the current OTA symbol to the end of UL Control-Plane reception window. Must be calculated based on \c
-  /// T2a_min_cp_ul parameter.
-  unsigned sym_cp_ul_end;
-  /// Offset from the current OTA symbol to the start of DL User-Plane reception window. Must be calculated based on \c
-  /// T2a_max_up parameter.
-  unsigned sym_up_dl_start;
-  /// Offset from the current OTA symbol to the start of DL User-Plane reception window. Must be calculated based on \c
-  /// T2a_min_up parameter.
-  unsigned sym_up_dl_end;
-};
+//static unsigned duration_slots = 60000;
+
+namespace {
 
 /// RU emulator configuration structure.
 struct ru_emulator_config {
-  /// Static compression parameters.
-  ru_compression_params compr_params;
+  /// Sector id.
+  unsigned sector;
+  /// Static uplink compression parameters.
+  ru_compression_params ul_compr_params;
+  /// Static downlink compression parameters.
+  ru_compression_params dl_compr_params;
+  /// Flag that indicates if the uplink static compression header is enabled.
+  bool is_downlink_static_comp_hdr_enabled = true;
+  /// RU emulator operating bandwidth.
+  bs_channel_bandwidth bandwidth;
+  /// Subcarrier spacing.
+  subcarrier_spacing scs;
   /// Cell bandwidth in number of PRBs.
   unsigned nof_prb;
   /// RU emulator Ethernet MAC address.
@@ -106,11 +125,33 @@ struct ru_emulator_config {
   /// VLAN tag.
   unsigned vlan_tag;
   /// Timing parameters.
-  ru_em_rx_window_timing_parameters timing_params;
+  ru_window_timing_parameters timing_params;
+  /// Sdr radio unit configs
+  ru_sdr_unit_config sdr_unit_config;
+  /// TDD configuration
+  // std::optional<tdd_ul_dl_config_common> tdd_config;
   /// DL, UL and PRACH ports.
   std::vector<unsigned> dl_eaxc;
   std::vector<unsigned> ul_eaxc;
   std::vector<unsigned> prach_eaxc;
+  /// Size of UL/DL context repository.
+  unsigned repo_size;
+  /// timeing notifier and logger are deleted from struct `ru_generic_configuration`
+  /// Maximum number of PRACH concurrent requests.
+  unsigned max_nof_prach_concurrent_requests = 11;
+
+  /// Radio configuration.
+  radio_configuration::radio radio_cfg;
+  /// Lower PHY configurations. Was originally `std::vector<lower_phy_configuration>`
+  lower_phy_configuration lower_phy_config;
+  /// Fake Upper PHY configurations.
+  upper_phy_fake::configuration upper_fake_config;
+  /// Configurations to build uplink data flow.
+  uplink_data_flow_config ul_data_flow_config;
+  /// max DL processing delay in slots.
+  unsigned max_processing_delay_slot = 5;
+  /// Phy logger level. Default level: `warning`.
+  srslog::basic_levels phy_log_level = srslog::basic_levels::info;
 };
 
 /// RU emulator dependencies.
@@ -138,14 +179,19 @@ struct header_parameters {
 
 /// Aggregates information received in a message from DU.
 struct rx_message_info {
-  unsigned          eaxc;
-  data_direction    direction;
-  filter_index_type filter_index;
-  message_type      type;
-  slot_symbol_point symbol_point{{}, 0, MAX_NOF_SYMBOLS};
-  unsigned          nof_symbols;
-  uint8_t           compr_header;
-  uint8_t           seq_id;
+  unsigned            eaxc;
+  data_direction      direction;
+  filter_index_type   filter_index;
+  message_type        type;
+  slot_symbol_point   symbol_point{{}, 0, MAX_NOF_SYMBOLS};
+  unsigned            nof_symbols;
+  unsigned            nof_prbs;
+  uint16_t            prb_start;
+  subcarrier_spacing  scs;
+  uint8_t             compr_header;
+  uint8_t             seq_id;
+  uint16_t            section_id;
+  int                 freq_offset;
 };
 
 /// One symbol may require up to two byte buffers depending on configured compression parameters.
@@ -156,16 +202,44 @@ using eaxc_buffers = static_vector<symbol_buffer, MAX_NOF_SYMBOLS>;
 
 } // namespace
 
+/*
+static unsigned get_statistics_time_interval_in_slots(unsigned interval_seconds, subcarrier_spacing scs)
+{
+  return get_nof_slots_per_subframe(scs) * SUBFRAME_DURATION_MSEC * 1000 * interval_seconds;
+}
+*/
+
+static std::unique_ptr<radio_session> build_radio(task_executor&              executor,
+                                                  radio_notification_handler& radio_handler,
+                                                  radio_configuration::radio& config,
+                                                  const std::string&          device_driver)
+{
+  print_available_radio_factories();
+
+  std::unique_ptr<radio_factory> factory = create_radio_factory(device_driver);
+  if (!factory) {
+  return nullptr;
+  }
+  /*
+  if (!factory->get_configuration_validator().is_configuration_valid(config)) {
+  report_error("Invalid radio configuration.\n");
+  }*/
+
+  return factory->create(config, executor, radio_handler);
+}
+
 /// Returns structure with RU emulators dependencies.
 static ru_emulator_dependencies resolve_ru_emulator_dependencies(srslog::basic_logger&    logger,
                                                                  task_executor&           executor,
-                                                                 ru_emulator_transceiver& transceiver)
+                                                                 ru_emulator_transceiver& transceiver
+                                                                )
 {
   ru_emulator_dependencies dependencies;
 
   dependencies.logger      = &logger;
   dependencies.executor    = &executor;
   dependencies.transceiver = &transceiver;
+  //dependencies.rx_symbol_writer = &rx_symbol_writer;
   dependencies.dl_cp_seq_id_checker =
       std::make_unique<ru_emulator_seq_id_checker>("DL CP", logger, ofh::create_sequence_id_checker());
   dependencies.dl_up_seq_id_checker =
@@ -178,139 +252,47 @@ static ru_emulator_dependencies resolve_ru_emulator_dependencies(srslog::basic_l
   return dependencies;
 }
 
-/// Fills the given array with random bytes.
-static void fill_random_data(span<uint8_t> frame, unsigned seed)
-{
-  std::mt19937                           rgen(seed);
-  std::uniform_int_distribution<uint8_t> dist{0, 255};
-  std::generate(frame.begin(), frame.end(), [&]() { return dist(rgen); });
+/// @brief Generate uplink data flow configurations from ru configurations.
+/// @return struct 'uplink_data_flow_config'.
+uplink_data_flow_config generate_uplink_data_config(ru_emulator_config emu_cfg, ru_emulator_ofh_appconfig ru_cfg){
+  uplink_data_flow_config config;
+  config.bw                                 = emu_cfg.bandwidth;
+  config.sector                             = emu_cfg.sector;
+  config.scs                                = emu_cfg.lower_phy_config.scs;
+  config.cp                                 = emu_cfg.lower_phy_config.cp;
+  config.mac_dst_address                    = emu_cfg.du_mac;
+  config.mac_src_address                    = emu_cfg.ru_mac;
+  config.mtu_size                           = units::bytes{ETHERNET_FRAME_SIZE};
+  config.tci_cp                             = emu_cfg.vlan_tag;
+  config.tci_up                             = emu_cfg.vlan_tag;
+  config.ru_working_bw                      = emu_cfg.bandwidth;
+  config.ul_compr_params                    = emu_cfg.ul_compr_params;
+  config.is_uplink_static_compr_hdr_enabled = ru_cfg.is_uplink_static_comp_hdr_enabled;
+  config.iq_scaling                         = ru_cfg.iq_scaling;
+  auto n = emu_cfg.ul_eaxc.size();
+  auto m = emu_cfg.prach_eaxc.size();
+  srsran_assert(n <= MAX_NOF_SUPPORTED_EAXC, "Number of exac ({}) exceeds threshold of supported exac.", n);
+  srsran_assert(m <= MAX_NOF_SUPPORTED_EAXC, "Number of prach exac ({}) exceeds threshold of supported exac.", m);
+  config.ul_eaxc.assign(emu_cfg.ul_eaxc.begin(), emu_cfg.ul_eaxc.end());
+  config.prach_eaxc.assign(emu_cfg.prach_eaxc.begin(), emu_cfg.prach_eaxc.end());
+  return config;
 }
 
-/// Fills static OFH header parameters given the static RU config.
-static void set_static_header_params(span<uint8_t> frame, header_parameters params, const ru_emulator_config& cfg)
-{
-  static const uint8_t hdr_template[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x81, 0x00, 0x00, 0x02, 0xae, 0xfe, 0x10, 0x00, 0x1d, 0xea, 0x00, 0x00,
-                                         0x00, 0x80, 0x10, 0xee, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x91, 0x00};
-
-  // Copy default header.
-  std::memcpy(frame.data(), hdr_template, sizeof(hdr_template));
-
-  // Set MAC addresses.
-  std::memcpy(&frame[0], cfg.du_mac.data(), ETH_ADDR_LEN);
-  std::memcpy(&frame[ETH_ADDR_LEN], cfg.ru_mac.data(), ETH_ADDR_LEN);
-
-  // Set VLAN tag.
-  uint16_t net_bytes = htons(uint16_t(cfg.vlan_tag));
-  std::memcpy(&frame[14], &net_bytes, sizeof(net_bytes));
-
-  // Set correct payload size.
-  uint16_t payload_size = ::htons(params.payload_size);
-  std::memcpy(&frame[20], &payload_size, sizeof(uint16_t));
-
-  // Set port ID.
-  frame[23] = params.port;
-
-  // Set start PRB and number of PRBs.
-  frame[31] = uint8_t(params.start_prb >> 8u) & 0x3;
-  frame[32] = uint8_t(params.start_prb);
-  frame[33] = uint8_t((params.nof_prbs == cfg.nof_prb) ? 0 : params.nof_prbs);
-
-  // Set compression header.
-  uint8_t octet = 0U;
-  octet |= uint8_t(cfg.compr_params.data_width) << 4U;
-  octet |= uint8_t(to_value(cfg.compr_params.type));
-  frame[34] = octet;
-}
-
-/// Returns pre-generated test data for each symbol for each configured eAxC.
-static std::vector<eaxc_buffers> generate_test_data(const ru_emulator_config& cfg, span<const unsigned> ul_eaxc)
-{
-  // Vector of bytes for each frame (up to 2) of each OFDM symbol of each eAxC.
-  std::vector<eaxc_buffers> test_data;
-
-  const units::bytes ecpri_iq_data_header_size(8);
-  const units::bytes ofh_header_size(10);
-  const units::bytes ether_header_size(18);
-
-  unsigned headers_size = (ether_header_size + ecpri_iq_data_header_size + ofh_header_size).value();
-  // Size in bytes of one PRB using the given static compression parameters.
-  units::bytes prb_size = units::bits(cfg.compr_params.data_width * NOF_SUBCARRIERS_PER_RB * 2 +
-                                      (cfg.compr_params.type == compression_type::BFP ? 8 : 0))
-                              .round_up_to_bytes();
-  unsigned iq_data_size = cfg.nof_prb * prb_size.value();
-
-  // It is assumed that maximum 2 packets required to send symbol data for antenna.
-  unsigned nof_frames = ((headers_size + iq_data_size) > ETHERNET_FRAME_SIZE) ? 2u : 1u;
-  // Save number of PRBs to be sent in each allocated frame.
-  std::vector<unsigned> nof_frame_prbs;
-  if (nof_frames == 1) {
-    nof_frame_prbs.push_back(cfg.nof_prb);
-  } else {
-    unsigned nof_prbs_first  = (ETHERNET_FRAME_SIZE - headers_size) / prb_size.value();
-    unsigned nof_prbs_second = cfg.nof_prb - nof_prbs_first;
-    nof_frame_prbs.push_back(nof_prbs_first);
-    nof_frame_prbs.push_back(nof_prbs_second);
+/// @brief Checks if the dst MAC address of the received packet matches the RU's MAC address.
+/// @param packet The packet received on Ethernet port.
+/// @param logger RU emulator logger.
+/// @param ru_mac RU emulator's MAC address.
+/// @return True if matches. False otherwise.
+static bool valid_mac_addr(span<const uint8_t> packet, srslog::basic_logger& logger, const mac_address& ru_mac){
+  mac_address mac{};
+  std::memcpy(mac.data(), packet.data(), mac.size());
+  // Drop packets that are not destinated to this RU.
+  if (!compare_mac_addresses(mac, ru_mac)){
+    logger.debug("Dropping packet as it is not destinated to the RU");
+    return false;
   }
 
-  // Initializes IQ data and Ethernet packet headers for all configured eAxCs (timestamp and sequence index
-  // will be updated on every transmission).
-  for (unsigned port = 0, last = ul_eaxc.size(); port != last; ++port) {
-    test_data.emplace_back();
-    auto& eaxc_frames = test_data.back();
-
-    for (unsigned symbol = 0, end = MAX_NOF_SYMBOLS; symbol != end; ++symbol) {
-      eaxc_frames.emplace_back();
-      auto& symbol_frames = eaxc_frames.back();
-
-      unsigned start_prb = 0;
-      for (unsigned j = 0; j != nof_frames; ++j) {
-        unsigned data_size = nof_frame_prbs[j] * prb_size.value();
-
-        symbol_frames.emplace_back();
-        std::vector<uint8_t>& frame = symbol_frames.back();
-        frame.resize(headers_size + data_size);
-
-        // Prepare header.
-        span<uint8_t>     frame_header(frame.data(), headers_size);
-        header_parameters params;
-        params.port         = port;
-        params.payload_size = data_size + ofh_header_size.value() + ecpri::ECPRI_COMMON_HEADER_SIZE.value();
-        params.start_prb    = start_prb;
-        params.nof_prbs     = nof_frame_prbs[j];
-
-        set_static_header_params(frame_header, params, cfg);
-
-        // Prepare IQ data.
-        fill_random_data(span<uint8_t>(frame).last(data_size), ul_eaxc[port] + symbol);
-
-        start_prb += nof_frame_prbs[j];
-      }
-    }
-  }
-  return test_data;
-}
-
-/// Converts timing parameters expressed in microseconds into the ones expressed in number of OFDM symbols.
-static ru_em_rx_window_timing_parameters rx_timing_window_params_us_to_symbols(std::chrono::microseconds T2a_max_cp_dl,
-                                                                               std::chrono::microseconds T2a_min_cp_dl,
-                                                                               std::chrono::microseconds T2a_max_cp_ul,
-                                                                               std::chrono::microseconds T2a_min_cp_ul,
-                                                                               std::chrono::microseconds T2a_max_up,
-                                                                               std::chrono::microseconds T2a_min_up)
-{
-  std::chrono::duration<double, std::nano> symbol_duration(
-      (1e6 / (MAX_NOF_SYMBOLS * get_nof_slots_per_subframe(subcarrier_spacing::kHz30))));
-
-  ru_em_rx_window_timing_parameters rx_window_timing_params;
-  rx_window_timing_params.sym_cp_dl_start = std::floor(T2a_max_cp_dl / symbol_duration);
-  rx_window_timing_params.sym_cp_dl_end   = std::ceil(T2a_min_cp_dl / symbol_duration);
-  rx_window_timing_params.sym_cp_ul_start = std::floor(T2a_max_cp_ul / symbol_duration);
-  rx_window_timing_params.sym_cp_ul_end   = std::ceil(T2a_min_cp_ul / symbol_duration);
-  rx_window_timing_params.sym_up_dl_start = std::floor(T2a_max_up / symbol_duration);
-  rx_window_timing_params.sym_up_dl_end   = std::ceil(T2a_min_up / symbol_duration);
-
-  return rx_window_timing_params;
+  return true;
 }
 
 /// \brief Checks whether received OFH packet should be dropped or processed by the RU emulator.
@@ -319,9 +301,10 @@ static ru_em_rx_window_timing_parameters rx_timing_window_params_us_to_symbols(s
 ///
 /// \param packet A packet received on Ethernet port.
 /// \param logger RU emulator's logger instance.
+/// \param ru_mac RU emulator's MAC address.
 ///
 /// \return true if packet should be dropped, false otherwise.
-static bool should_packet_be_dropped(span<const uint8_t> packet, srslog::basic_logger& logger)
+static bool should_packet_be_dropped(span<const uint8_t> packet, srslog::basic_logger& logger, const mac_address& ru_mac)
 {
   // Drop non OFH packet.
   if (packet.size() < 26) {
@@ -346,7 +329,7 @@ static bool should_packet_be_dropped(span<const uint8_t> packet, srslog::basic_l
 /// \param logger        RU emulator's logger instance.
 ///
 /// \return true if passed message was decoded successfully, false otherwise.
-static bool decode_rx_message(rx_message_info& message_info, span<const uint8_t> packet, srslog::basic_logger& logger)
+static bool decode_rx_message(rx_message_info& message_info, span<const uint8_t> packet, ru_emulator_config& cfg, srslog::basic_logger& logger)
 {
   // Decode and check the filter index in the byte 26, bits 0-3.
   auto filter_index = static_cast<filter_index_type>(packet[22] & 0x0f);
@@ -370,7 +353,11 @@ static bool decode_rx_message(rx_message_info& message_info, span<const uint8_t>
   message_info.direction = static_cast<data_direction>((packet[22] & 0x80) >> 7u);
   logger.debug("Packet direction is {}", message_info.direction == data_direction::uplink ? "uplink" : "downlink");
 
-  // Peek the timestamp.
+  // Peek the eAxC.
+  message_info.eaxc = packet[19];
+  // Peek sequence identifier.
+  message_info.seq_id = packet[20];
+  // Peek the timestamp. 'symbol_id' also serves as 'start_symbol' in cp packets.
   unsigned slot_id           = 0;
   unsigned symbol_id         = 0;
   uint8_t  frame             = packet[23];
@@ -382,26 +369,49 @@ static bool decode_rx_message(rx_message_info& message_info, span<const uint8_t>
   slot_id |= slot_and_symbol >> 6;
   symbol_id = slot_and_symbol & 0x3f;
 
-  auto slot                 = slot_point(to_numerology_value(subcarrier_spacing::kHz30), frame, subframe, slot_id);
+  auto slot                 = slot_point(to_numerology_value(cfg.scs), frame, subframe, slot_id);
   message_info.symbol_point = {slot, symbol_id, MAX_NOF_SYMBOLS};
 
-  // Peek number of symbols.
-  message_info.nof_symbols = (packet[35] & 0xf);
-
-  // Peek the eAxC.
-  message_info.eaxc = packet[19];
-
-  // Peek sequence identifier.
-  message_info.seq_id = packet[20];
-
-  // Peek compression header.
-  message_info.compr_header = packet[28];
-
+  if( message_info.type == message_type::control_plane) {
+    /// Section 1 Uplink C-Plane packet.
+    if(!is_a_prach_message(message_info.filter_index)){
+      // Peek number of PRBs.
+      message_info.nof_prbs = packet[33];
+      // Peek start_prb.
+      message_info.prb_start = ((uint16_t)packet[31]<<8 | (uint16_t)packet[32]) & 0x03ff;
+      // Peek number of symbols.
+      message_info.nof_symbols = (packet[35] & 0xf);
+      // Peek compression header.
+      message_info.compr_header = packet[28];
+      // Peek section id.
+      message_info.section_id = (uint16_t(packet[30])<<4) | (uint16_t(packet[31])>>4);
+    }
+    /// Section 3 Uplink PRACH packet.
+    else{
+      message_info.nof_prbs = packet[37];
+      message_info.prb_start = ((uint16_t)packet[35]<<8 | (uint16_t)packet[36]) & 0x03ff;
+      message_info.nof_symbols = packet[39] & 0xf;
+      // Peek subcarrier spacing.
+      message_info.scs = static_cast<subcarrier_spacing>(packet[30] & 0x0f);
+      message_info.compr_header = packet[33];
+      message_info.section_id = (uint16_t(packet[34])<<4) | (uint16_t(packet[35])>>4);
+      // Peek frequency offset.
+      uint32_t u_freq = uint32_t(packet[42])<<16 | uint32_t(packet[43])<<8 | uint32_t(packet[44]);
+      if(u_freq & 0x00800000) u_freq |= 0xff000000;
+      message_info.freq_offset = static_cast<int>(u_freq);
+    }
+  }
+  // if(message_info.type==message_type::control_plane) logger.warning("received {} C-Plane packet for Slot {}", 
+  //                                                                   message_info.direction==data_direction::uplink? "uplink":"downlink",
+  //                                                                   slot);  
+  // else{
+  //   logger.warning("received U-Plane packet for Slot {}, symbol {}", slot, symbol_id);
+  // }
   return true;
 }
 
 namespace {
-
+  using ::is_app_running;
 /// RU emulator receives OFH traffic and replies with UL packets to a DU.
 class ru_emulator : public frame_notifier
 {
@@ -410,17 +420,33 @@ class ru_emulator : public frame_notifier
   srslog::basic_logger&    logger;
   task_executor&           executor;
   ru_emulator_transceiver& transceiver;
-
   // RU emulator configuration.
-  const ru_emulator_config cfg;
+  ru_emulator_config cfg;
+
+  std::shared_ptr<ofh_transmitter_impl>  ofh_transmitter;
+  std::unique_ptr<lower_phy> low_phy;
+  std::unique_ptr<radio_session> radio;
+  std::unique_ptr<upper_phy_fake> upper_fake;
+  /// A repo to store downlink resource grids.
+  std::shared_ptr<downlink_context_repository> dl_context_repo;
+  /// A repo to store uplink contexts.
+  std::shared_ptr<uplink_cplane_context_repository> ul_context_repo;
+  /// A repo to store uplink PRACH contexts.
+  std::shared_ptr<uplink_cplane_context_repository> prach_cp_repo;
+  /// A repo to store PRACH buffer contexts.
+  std::shared_ptr<prach_context_repository> prach_context_repo;
+  /// Downlink resource grid pool.
+  std::unique_ptr<resource_grid_pool> dl_rg_pool;
+  /// Uplink PRACH buffer pool.
+  std::unique_ptr<prach_buffer_pool> prach_pool;
+  /// Uplink ethernet frame pool.
+  std::shared_ptr<ether::eth_frame_pool> ul_frame_pool;
 
   // Timing window checkers, store statistics of early/late/on-time packets.
   ru_emulator_rx_window_checker dl_cp_window_checker;
   ru_emulator_rx_window_checker dl_up_window_checker;
   ru_emulator_rx_window_checker ul_cp_window_checker;
-
-  // Pre-generated test data for each symbol for each configured eAxC.
-  std::vector<eaxc_buffers> test_data;
+  
   // Keeps track of last used seq_id for each eAxC.
   static_circular_map<unsigned, uint8_t, MAX_SUPPORTED_EAXC_ID_VALUE> seq_counters;
   // Stores the list of configured eAxC for uplink, downlink and PRACH.
@@ -434,18 +460,44 @@ class ru_emulator : public frame_notifier
   kpi_counter corrupt_counter;
   kpi_counter dropped_counter;
 
+
   // Sequence identifier checkers.
   std::unique_ptr<ru_emulator_seq_id_checker> dl_up_seq_id_checker;
   std::unique_ptr<ru_emulator_seq_id_checker> dl_cp_seq_id_checker;
   std::unique_ptr<ru_emulator_seq_id_checker> ul_cp_seq_id_checker;
   std::unique_ptr<ru_emulator_seq_id_checker> prach_seq_id_checker;
 
+  // Section data decoder.
+  std::unique_ptr<uplane_message_decoder> uplane_section_decoder;
+  // Writes IQ data received in an Open Fronthaul message to the corresponding resource grid.
+  uplane_rx_symbol_data_flow_writer rx_symbol_writer;
+  // Radio notification handler.
+  radio_notifier_spy notification_handler;
+  /// UL symbol handler that extracts iq samples from UL rg and then builds UL messages.
+  ru_rx_symbol_handler rx_symbol_handler;
+  // Create lower_phy adapters.
+  phy_error_adapter             error_adapter;
+  phy_metrics_adapter           metrics_adapter;
+  phy_rx_symbol_adapter         rx_symbol_adapter;
+  phy_rg_gateway_adapter        rg_gateway_adapter;
+  phy_timing_adapter            timing_adapter;
+  // This may be for uplink rx symbols.
+  phy_rx_symbol_request_adapter phy_rx_symbol_req_adapter;
+  unsigned tmp_file_counter = 0;
+
 public:
-  ru_emulator(ru_emulator_dependencies&& dependencies, ru_emulator_config cfg_) :
+  ru_emulator(ru_emulator_dependencies&& dependencies, ru_emulator_config cfg_, worker_manager& workers_) :
     logger(*dependencies.logger),
     executor(*dependencies.executor),
     transceiver(*dependencies.transceiver),
     cfg(cfg_),
+    dl_context_repo(std::make_shared<downlink_context_repository>(cfg.repo_size)),
+    ul_context_repo(std::make_shared<uplink_cplane_context_repository>(cfg.repo_size)),
+    prach_cp_repo(std::make_shared<uplink_cplane_context_repository>(cfg.repo_size)),
+    prach_context_repo(std::make_shared<prach_context_repository>(cfg.repo_size)),
+    dl_rg_pool(create_rg_pool(cfg.upper_fake_config, logger)),
+    prach_pool(create_prach_pool(cfg.upper_fake_config)),
+    ul_frame_pool(create_eth_frame_pool(cfg_.ul_data_flow_config, logger)),
     dl_cp_window_checker({cfg_.timing_params.sym_cp_dl_end, cfg_.timing_params.sym_cp_dl_start}),
     dl_up_window_checker({cfg_.timing_params.sym_up_dl_end, cfg_.timing_params.sym_up_dl_start}),
     ul_cp_window_checker({cfg_.timing_params.sym_cp_ul_end, cfg_.timing_params.sym_cp_ul_start}),
@@ -453,7 +505,13 @@ public:
     dl_up_seq_id_checker(std::move(dependencies.dl_up_seq_id_checker)),
     dl_cp_seq_id_checker(std::move(dependencies.dl_cp_seq_id_checker)),
     ul_cp_seq_id_checker(std::move(dependencies.ul_cp_seq_id_checker)),
-    prach_seq_id_checker(std::move(dependencies.prach_seq_id_checker))
+    prach_seq_id_checker(std::move(dependencies.prach_seq_id_checker)),
+
+    rx_symbol_writer(cfg.dl_eaxc, cfg_.sector, *dependencies.logger, dl_context_repo),
+    notification_handler(cfg.radio_cfg.log_level),
+    rx_symbol_handler(cfg.radio_cfg.log_level,  ul_context_repo, prach_cp_repo, cfg.ul_data_flow_config, ul_frame_pool, *workers_.lower_phy_ul_exec[cfg.sector]),
+    // rx_symbol_handler(cfg.radio_cfg.log_level),
+    error_adapter(*cfg.lower_phy_config.logger)
   {
     for (auto eaxc : cfg.dl_eaxc) {
       srsran_assert(eaxc <= MAX_SUPPORTED_EAXC_ID_VALUE, "Unsupported DL eAxC value requested");
@@ -471,7 +529,78 @@ public:
       prach_eaxc.push_back(eaxc);
     }
 
-    test_data = generate_test_data(cfg, ul_eaxc);
+    // Create radio.
+    radio = build_radio(*workers_.radio_exec, notification_handler, cfg.radio_cfg, cfg.sdr_unit_config.device_driver);
+    report_error_if_not(radio, "Unable to create radio session.");
+  
+    
+    // low_cfg is struct `lower_phy_configuration`.
+    lower_phy_configuration& low_cfg = cfg.lower_phy_config;
+    // Move the executors to `lower_phy_configuration`.
+    low_cfg.tx_task_executor         = workers_.lower_phy_tx_exec[cfg.sector];
+    low_cfg.rx_task_executor         = workers_.lower_phy_rx_exec[cfg.sector];
+    low_cfg.dl_task_executor         = workers_.lower_phy_dl_exec[cfg.sector];
+    low_cfg.ul_task_executor         = workers_.lower_phy_ul_exec[cfg.sector];
+    low_cfg.prach_async_executor     = workers_.lower_prach_exec[cfg.sector];
+
+    low_cfg.logger->set_level(cfg.phy_log_level);
+
+    ofh_transmitter = std::make_shared<ofh_transmitter_impl>(logger, cfg.timing_params, transceiver.get_transmitter(), ul_frame_pool);
+
+    low_cfg.error_notifier = &error_adapter;
+    low_cfg.metric_notifier = &metrics_adapter;
+    low_cfg.rx_symbol_notifier = &rx_symbol_adapter;
+    low_cfg.timing_notifier = &timing_adapter;
+
+    // Create lower_phy factory.
+    auto lphy_factory = create_lower_phy_factory(low_cfg, cfg.max_nof_prach_concurrent_requests);
+    report_error_if_not(lphy_factory, "Failed to create lower PHY factory.");
+
+    // Connect radio to lower_phy baseband gateway.
+    low_cfg.bb_gateway         = &radio->get_baseband_gateway(cfg.sector);
+    
+    // Create lower_phy.
+    low_phy = lphy_factory->create(low_cfg);
+    report_error_if_not(low_phy, "Unable to create lower PHY.");
+
+    // Create upper_fake.
+    cfg.upper_fake_config.gateway = &rg_gateway_adapter;
+    cfg.upper_fake_config.rx_symb_req_notifier = &phy_rx_symbol_req_adapter;
+    cfg.upper_fake_config.dl_slot_repo = dl_context_repo;
+    cfg.upper_fake_config.prach_context_repo = prach_context_repo;
+    
+    upper_fake = upper_phy_fake::create(cfg.upper_fake_config);
+
+    // See `radio_ssb.cpp`.
+    rx_symbol_adapter.connect(&rx_symbol_handler);
+    // To call `on_tti_boundary()`.
+    timing_adapter.connect(upper_fake.get());
+    // Connect the adaptors.
+    rg_gateway_adapter.connect(&low_phy->get_rg_handler());
+    // For uplink(?).
+    phy_rx_symbol_req_adapter.connect(&low_phy->get_request_handler());
+
+    std::array<std::unique_ptr<ofh::iq_decompressor>, ofh::NOF_COMPRESSION_TYPES_SUPPORTED> decompr;
+    for (unsigned i = 0; i != ofh::NOF_COMPRESSION_TYPES_SUPPORTED; ++i) {
+      decompr[i] = create_iq_decompressor(static_cast<ofh::compression_type>(i), logger);
+    }
+
+    uplane_section_decoder = (cfg.is_downlink_static_comp_hdr_enabled)
+                              ? ofh::create_static_compr_method_ofh_user_plane_packet_decoder(
+                                logger,
+                                cfg.scs,
+                                cyclic_prefix::NORMAL,
+                                cfg.nof_prb,
+                                cfg.sector,
+                                create_iq_decompressor_selector(std::move(decompr)),
+                                cfg.dl_compr_params)
+                              : ofh::create_dynamic_compr_method_ofh_user_plane_packet_decoder(
+                                logger,
+                                cfg.scs,
+                                cyclic_prefix::NORMAL,
+                                cfg.nof_prb,
+                                cfg.sector,
+                                create_iq_decompressor_selector(std::move(decompr)));
   }
 
   // See interface for documentation.
@@ -482,7 +611,49 @@ public:
     }
   }
 
-  void start() { transceiver.start(*this); }
+  void start() {
+    transceiver.start(*this); 
+    
+    // double                     delay_s      = 0.1;
+    baseband_gateway_timestamp radio_current_time = radio->read_current_time();
+    
+    fmt::print("radio_current_time = {}\n", radio_current_time);
+    baseband_gateway_timestamp radio_start_time = radio_current_time;//+ static_cast<uint64_t>(delay_s * cfg.radio_cfg.sampling_rate_hz);
+
+    
+    // Round start time to the next subframe.
+    uint64_t sf_duration = static_cast<uint64_t>(cfg.radio_cfg.sampling_rate_hz / 1e3);
+    radio_start_time           = divide_ceil(radio_start_time, sf_duration) * sf_duration;
+    
+    fmt::print("radio_start_time(real) : {}, {}(ticks)\n", uhd::time_spec_t::from_ticks(radio_start_time, radio->get_actual_srate()).get_real_secs(), radio_start_time);
+    // Start Processing.
+    radio->start(radio_start_time);
+    low_phy->get_controller().start(radio_start_time);
+    // Receive and transmit per block basis.
+    for (;is_app_running.load();) {
+      // Wait for PHY to detect a TTI boundary.
+      upper_fake->wait_tti_boundary();
+    }
+  }
+
+  void stop(){
+    transceiver.stop();
+
+    if (radio != nullptr) {
+      radio->stop();
+    }
+
+    upper_fake->stop();
+
+    if (low_phy != nullptr) {
+      low_phy->get_controller().stop();
+    }
+
+    low_phy.reset();
+    upper_fake.reset();
+    radio.reset();
+
+  }
 
   void print_statistics(unsigned emu_id)
   {
@@ -533,6 +704,7 @@ public:
     notifiers.push_back(&dl_up_window_checker);
     notifiers.push_back(&dl_cp_window_checker);
     notifiers.push_back(&ul_cp_window_checker);
+    notifiers.push_back(ofh_transmitter.get());
 
     return notifiers;
   }
@@ -543,12 +715,17 @@ private:
   {
     span<const uint8_t> payload = buffer.data();
 
-    if (should_packet_be_dropped(payload, logger)) {
+    // Filtering out packets that are not destinated to this RU.
+    if(!valid_mac_addr(payload, logger, cfg.ru_mac)) {
+      return;
+    }
+
+    if (should_packet_be_dropped(payload, logger, cfg.ru_mac)) {
       return dropped_counter.increment();
     }
 
     rx_message_info message_info;
-    if (!decode_rx_message(message_info, payload, logger)) {
+    if (!decode_rx_message(message_info, payload, cfg, logger)) {
       return corrupt_counter.increment();
     }
 
@@ -562,10 +739,151 @@ private:
     get_window_checker(message_info).update_rx_window_statistics(message_info.symbol_point);
     update_seq_id_statistics(message_info);
 
+    // decode message received from the DU.
+    decode_section_data(payload, message_info);
+
     // Send uplink packets.
-    if (is_ul_uplane_request(message_info)) {
-      generate_ul_uplane_messages(message_info);
+    if (is_ul_request(message_info)) {
+      enqueue_ul_context(message_info);
     }
+  }
+
+  /// @brief Enqueue uplink context info into 'ul_context_repo'.
+  /// @param message_info Packet header.
+  void enqueue_ul_context(const rx_message_info& message_info){
+    cplane_radio_application_header radio_hdr;
+    radio_hdr.direction         = message_info.direction;
+    radio_hdr.filter_index      = message_info.filter_index;
+    radio_hdr.slot              = message_info.symbol_point.get_slot();
+    radio_hdr.start_symbol      = message_info.symbol_point.get_symbol_index();
+
+    ul_cplane_context context;
+    context.radio_hdr         = radio_hdr;
+    context.nof_prb           = message_info.nof_prbs;
+    context.nof_symbols       = (uint8_t)message_info.nof_symbols;
+    context.prb_start         = message_info.prb_start;
+    context.section_id        = message_info.section_id;
+    
+    if(!is_a_prach_message(message_info.filter_index)){
+      ul_context_repo->add(radio_hdr.slot, message_info.eaxc, context);
+    }
+    else{
+      prach_cp_repo->add(radio_hdr.slot, message_info.eaxc, context);
+    }
+  }
+
+  /// @brief Decompress IQ data for further use.
+  /// @param packet OFH packet received from the DU
+  /// @param message_info Decoded packet headers, including compression header.
+  void decode_section_data(span<const uint8_t> packet, const rx_message_info& message_info){
+    if (message_info.direction == data_direction::downlink && message_info.type == message_type::control_plane){
+      // A new slot point for downlink.
+      slot_point slot = message_info.symbol_point.get_slot();
+      // Allocate a resource grid from the pool for writing.
+      shared_resource_grid rg = dl_rg_pool->allocate_resource_grid(slot);
+
+      // Send to dl_slot_repo.
+      resource_grid_context ctx = {slot, cfg.sector};
+      ofdm_symbol_range symbol_range = ofdm_symbol_range(message_info.symbol_point.get_symbol_index(), message_info.nof_symbols);
+      // logger.warning("DL slot {}: symbol [{}, {}]\n", slot, symbol_range.start(), symbol_range.stop());
+      const downlink_context& dl_ctx = dl_context_repo->get(slot, 0);
+      if(dl_ctx.empty()){
+        dl_context_repo->add(ctx, rg, symbol_range);
+      }
+    }
+    else if(message_info.direction == data_direction::downlink && message_info.type == message_type::user_plane){
+      uplane_message_decoder_results results;
+      if (!uplane_section_decoder->decode(results, packet.subspan(22, packet.size()-22))) {
+        logger.warning("Failure of decoding packets");
+      }
+      // Write to dl_slot_repo.
+      rx_symbol_writer.write_to_resource_grid(message_info.eaxc, results);
+      // if(message_info.symbol_point.get_slot().sfn()==90 && message_info.symbol_point.get_slot().subframe_slot_index()==0 &&
+      //    message_info.symbol_point.get_slot().subframe_index()==0 && message_info.symbol_point.get_symbol_index()==5){
+      //   // Print the 1st downlink uplane packet for varification.
+      //   print_1st_rx_packet(results);
+      //   dump_hex(packet);
+      // }
+    }
+    else if(is_a_prach_message(message_info.filter_index)){
+      // A new slot for uplink PRACH.
+      slot_point slot = message_info.symbol_point.get_slot();
+      // Calculate the PRACH frequency start in RBs.
+      double total_bw_Hz        
+              = 1000 * scs_to_khz(cfg.scs) * cfg.upper_fake_config.max_nof_prb * NOF_SUBCARRIERS_PER_RB;
+      double freq_offset_Hz     
+              = (ra_scs_to_Hz(to_ra_subcarrier_spacing(message_info.scs))/2) * static_cast<double>(message_info.freq_offset);
+      double offset_to_prach_Hz = total_bw_Hz/2 + freq_offset_Hz;
+      int prach_start_re 
+              = static_cast<unsigned>(offset_to_prach_Hz / ra_scs_to_Hz(to_ra_subcarrier_spacing(message_info.scs)));
+      unsigned K = (1000 * scs_to_khz(cfg.scs)) / ra_scs_to_Hz(to_ra_subcarrier_spacing(message_info.scs));
+      // Construct an empty PRACH buffer.
+      prach_buffer& buffer = prach_pool->get_prach_buffer();
+      // Construct a PRACH buffer context and add to the repo.
+      prach_buffer_context prach_ctx;
+      prach_ctx.sector                = cfg.sector;
+      prach_ctx.slot                  = slot;
+      unsigned n                      = cfg.prach_eaxc.size();
+      for(unsigned i=0; i<n; i++) prach_ctx.ports.push_back(i);
+      prach_ctx.start_symbol          = 0;
+      prach_ctx.format                = prach_format_type::B4;
+      prach_ctx.rb_offset             = uint16_t((prach_start_re / K) / NOF_SUBCARRIERS_PER_RB);   // prach_frequency_start
+      prach_ctx.nof_td_occasions      = 1;
+      prach_ctx.nof_fd_occasions      = 1;   // max_nof_fd_occasions = 1?
+      prach_ctx.nof_prb_ul_grid       = cfg.upper_fake_config.max_nof_prb;
+      prach_ctx.pusch_scs             = to_subcarrier_spacing(slot.numerology());
+      prach_ctx.root_sequence_index   = 1;
+      prach_ctx.restricted_set        = restricted_set_config::UNRESTRICTED;
+      prach_ctx.zero_correlation_zone = 0;
+      prach_ctx.start_preamble_index  = 0;
+      prach_ctx.nof_preamble_indices  = 64; 
+
+      prach_context ctx = prach_context_repo->get(slot);
+      if(ctx.empty()){
+        prach_context_repo->add(prach_ctx, buffer, message_info.symbol_point.get_symbol_index(), slot);
+      }
+    }
+    else return;
+  }
+
+  /// Print the 1st downlink uplane packet for varification.
+  void print_1st_rx_packet(srsran::ofh::uplane_message_decoder_results results) {
+    if (results.sections.empty()) {
+      std::cout << "No sections found in the received packet." << std::endl;
+      return;
+    }
+    // std::string tmp_file = "/tmp/RU_frame" + std::to_string(tmp_file_counter) + ".txt";
+    // std::ofstream ofs(tmp_file, std::ios::out);
+    // Sections
+    for (size_t sec_idx = 0; sec_idx < results.sections.size(); ++sec_idx) {
+      const auto& section = results.sections[sec_idx];
+      
+      // IQ samples in a section
+      for (size_t i = 0; i < section.iq_samples.size(); ++i) {
+        const auto& sample = section.iq_samples[i];
+        
+        float real_val = to_float(sample.real);
+        float imag_val = to_float(sample.imag);
+        // ofs << fmt::format("Sample {} : real= {}, imag = {}\n", i, real_val, imag_val);
+        fmt::print("Sample {} : real= {}, imag = {}\n", i, real_val, imag_val);
+      }
+    }
+    fmt::print("New packet:\n");
+  }
+
+  /// Dumps the content of the packet in hex format to a file.
+  void dump_hex(span<const uint8_t> packet)
+  {
+    std::string tmp_file = "/tmp/RU_frame" + std::to_string(tmp_file_counter++) + ".txt";
+    std::ofstream ofs(tmp_file, std::ios::out);
+    for (size_t i = 0; i < packet.size(); ++i) {
+        ofs << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(packet[i]) << " ";
+        if ((i + 1) % 16 == 0) {
+            ofs << "\n";
+        }
+    }
+    ofs << std::dec;
+    ofs.close();
   }
 
   /// Returns window checker for OFH messages of corresponding type given by \c message_info parameter.
@@ -585,10 +903,9 @@ private:
                                                                 : *dl_up_seq_id_checker;
   }
 
-  bool is_ul_uplane_request(const rx_message_info& message_info)
+  bool is_ul_request(const rx_message_info& message_info)
   {
-    return (message_info.direction == data_direction::uplink) && (message_info.type == message_type::control_plane) &&
-           !is_a_prach_message(message_info.filter_index);
+    return (message_info.direction == data_direction::uplink) && (message_info.type == message_type::control_plane);
   }
 
   /// Returns string containing sequence identifier errors for the given list of eAxCs collected by the specified
@@ -609,31 +926,6 @@ private:
   {
     get_sequence_id_checker(message_info)
         .update_statistics(message_info.eaxc, message_info.seq_id, message_info.symbol_point);
-  }
-
-  /// Generates UL U-Plane messages with correct headers based on received C-Plane message.
-  void generate_ul_uplane_messages(const rx_message_info& message_info)
-  {
-    static_vector<span<const uint8_t>, MAX_BURST_SIZE> frame_burst;
-
-    unsigned eaxc_idx    = std::distance(ul_eaxc.begin(), std::find(ul_eaxc.begin(), ul_eaxc.end(), message_info.eaxc));
-    auto&    eaxc_frames = test_data[eaxc_idx];
-
-    // Set correct header parameters and send UL U-Plane packets for each symbol.
-    for (unsigned symbol = message_info.symbol_point.get_symbol_index(), end = message_info.nof_symbols; symbol != end;
-         ++symbol) {
-      auto& symbol_frames = eaxc_frames[symbol];
-      // Set runtime header parameters.
-      for (auto& frame : symbol_frames) {
-        set_runtime_header_params(frame, message_info.symbol_point.get_slot(), symbol, message_info.eaxc);
-        frame_burst.emplace_back(frame.data(), frame.size());
-      }
-    }
-    // Send symbols.
-    transceiver.send(frame_burst);
-
-    // Increment TX_TOTAL counter.
-    tx_total_counter.increment(frame_burst.size());
   }
 
   /// \brief Validates decoded message parameters.
@@ -709,82 +1001,12 @@ private:
     frame[24]       = seq_id++;
   }
 };
-
-/// Manages the workers of the RU emulators.
-struct worker_manager {
-  static constexpr uint32_t task_worker_queue_size = 1024;
-
-  worker_manager(unsigned nof_emulators) { create_executors(nof_emulators); }
-
-  void create_executors(unsigned nof_emulators)
-  {
-    using namespace execution_config_helper;
-
-    for (unsigned i = 0; i != nof_emulators; ++i) {
-      // Executors for Open Fronthaul messages reception.
-      {
-        const std::string name      = "ru_rx_#" + std::to_string(i);
-        const std::string exec_name = "ru_rx_exec_#" + std::to_string(i);
-
-        const single_worker ru_worker{name,
-                                      {concurrent_queue_policy::lockfree_spsc, 2},
-                                      {{exec_name}},
-                                      std::chrono::microseconds{1},
-                                      os_thread_realtime_priority::max() - 1};
-        if (!exec_mng.add_execution_context(create_execution_context(ru_worker))) {
-          report_fatal_error("Failed to instantiate {} execution context", ru_worker.name);
-        }
-        ru_rx_exec.push_back(exec_mng.executors().at(exec_name));
-      }
-
-      // Executors for the RU emulators.
-      {
-        const std::string   name      = "ru_emu_#" + std::to_string(i);
-        const std::string   exec_name = "ru_emu_exec_#" + std::to_string(i);
-        const single_worker ru_worker{name,
-                                      {concurrent_queue_policy::lockfree_spsc, task_worker_queue_size},
-                                      {{exec_name}},
-                                      std::chrono::microseconds{1},
-                                      os_thread_realtime_priority::max() - 1};
-        if (!exec_mng.add_execution_context(create_execution_context(ru_worker))) {
-          report_fatal_error("Failed to instantiate {} execution context", ru_worker.name);
-        }
-        ru_emulators_exec.push_back(exec_mng.executors().at(exec_name));
-      }
-    }
-
-    // Timing executor.
-    {
-      const std::string name      = "ru_timing";
-      const std::string exec_name = "ru_timing_exec";
-
-      const single_worker ru_worker{name,
-                                    {concurrent_queue_policy::lockfree_spsc, 4},
-                                    {{exec_name}},
-                                    std::chrono::microseconds{0},
-                                    os_thread_realtime_priority::max() - 0};
-      if (!exec_mng.add_execution_context(create_execution_context(ru_worker))) {
-        report_fatal_error("Failed to instantiate {} execution context", ru_worker.name);
-      }
-      ru_timing_exec = exec_mng.executors().at(exec_name);
-    }
-  }
-
-  void stop() { exec_mng.stop(); }
-
-  task_execution_manager exec_mng;
-  task_executor*         ru_timing_exec = nullptr;
-
-  std::vector<task_executor*> ru_rx_exec;
-  std::vector<task_executor*> ru_emulators_exec;
-};
-
+ 
 } // namespace
 
 static std::string config_file;
 
-/// Flag that indicates if the application is running or being shutdown.
-static std::atomic<bool> is_app_running = {true};
+
 /// Maximum number of configuration files allowed to be concatenated in the command line.
 static constexpr unsigned MAX_CONFIG_FILES = 6;
 
@@ -851,11 +1073,19 @@ int main(int argc, char** argv)
   }
 #endif
   // Create workers and executors.
-  worker_manager workers(ru_emulator_parsed_cfg.ru_cfg.size());
+  worker_manager_config worker_manager_cfg;
+  worker_manager_cfg.nof_emulators = ru_emulator_parsed_cfg.ru_cfg.size();
+  fill_ru_worker_manager_config(worker_manager_cfg, ru_emulator_parsed_cfg.sdr_unit_config);
+  worker_manager workers{worker_manager_cfg};
 
   // Set up DPDK transceivers and create RU emulators.
   std::vector<std::unique_ptr<ru_emulator_transceiver>> transceivers;
   std::vector<std::unique_ptr<ru_emulator>>             ru_emulators;
+
+  // Create cells configs.
+  std::vector<srs_du::du_cell_config>                   du_cells;
+  du_cells.resize(ru_emulator_parsed_cfg.ru_cfg.size());
+  
 
   for (unsigned i = 0, e = ru_emulator_parsed_cfg.ru_cfg.size(); i != e; ++i) {
     ru_emulator_ofh_appconfig ru_cfg = ru_emulator_parsed_cfg.ru_cfg[i];
@@ -878,9 +1108,12 @@ int main(int argc, char** argv)
     }
 
     ru_emulator_config emu_cfg;
+    emu_cfg.bandwidth = ru_cfg.bandwidth;
     emu_cfg.nof_prb =
-        get_max_Nprb(bs_channel_bandwidth_to_MHz(ru_cfg.bandwidth), subcarrier_spacing::kHz30, frequency_range::FR1);
-    emu_cfg.compr_params = {to_compression_type(ru_cfg.ul_compr_method), ru_cfg.ul_compr_bitwidth};
+        get_max_Nprb(bs_channel_bandwidth_to_MHz(ru_cfg.bandwidth), ru_cfg.common_scs, frequency_range::FR1);
+    // Currently UL and DL use the same compression/decompression parameters.
+    emu_cfg.dl_compr_params = {to_compression_type(ru_cfg.dl_compr_method), ru_cfg.dl_compr_bitwidth};
+    emu_cfg.ul_compr_params = {to_compression_type(ru_cfg.ul_compr_method), ru_cfg.ul_compr_bitwidth};
     emu_cfg.vlan_tag     = ru_cfg.vlan_tag;
     if (!parse_mac_address(ru_cfg.ru_mac_address, emu_cfg.ru_mac)) {
       report_error("Invalid MAC address provided: '{}'", ru_cfg.ru_mac_address);
@@ -893,17 +1126,49 @@ int main(int argc, char** argv)
                                                                   ru_cfg.T2a_max_cp_ul,
                                                                   ru_cfg.T2a_min_cp_ul,
                                                                   ru_cfg.T2a_max_up,
-                                                                  ru_cfg.T2a_min_up);
+                                                                  ru_cfg.T2a_min_up,
+                                                                  ru_cfg.Ta3_max_up,
+                                                                  ru_cfg.Ta3_min_up,
+                                                                  ru_cfg.common_scs);
     emu_cfg.dl_eaxc       = ru_cfg.ru_dl_port_id;
     emu_cfg.ul_eaxc       = ru_cfg.ru_ul_port_id;
     emu_cfg.prach_eaxc    = ru_cfg.ru_prach_port_id;
+    emu_cfg.max_processing_delay_slot = ru_cfg.max_proc_delay;
+    emu_cfg.scs           = ru_cfg.common_scs;
+    // emu_cfg.tdd_config    = {ru_cfg.common_scs, {5, 3, 10, 1, 2}};
 
+    // unsigned repo_size = calculate_repository_size(ru_cfg.common_scs, emu_cfg.max_processing_delay_slot * 1024);
+    unsigned repo_size = calculate_repository_size(ru_cfg.common_scs, emu_cfg.max_processing_delay_slot * 512);
+    emu_cfg.repo_size = repo_size;
+    
+    emu_cfg.sdr_unit_config = ru_emulator_parsed_cfg.sdr_unit_config;
+
+    // Doing hard-coding right now.
+    srs_du::du_cell_config& du_cell = du_cells[i];
+    uint16_t bw = static_cast<uint16_t>(bs_channel_bandwidth_to_MHz(emu_cfg.bandwidth));
+    nr_band  band = ru_cfg.band ? ru_cfg.band.value() : band_helper::get_band_from_dl_arfcn(ru_cfg.dl_arfcn);
+
+    du_cell.scs_common = ru_cfg.common_scs;
+    du_cell.dl_carrier = {bw, ru_cfg.dl_arfcn, band, static_cast<uint16_t>(ru_cfg.nof_antennas_dl)};
+    du_cell.ul_carrier.arfcn_f_ref = band_helper::get_ul_arfcn_from_dl_arfcn(du_cell.dl_carrier.arfcn_f_ref, band);
+    du_cell.ul_carrier.nof_ant = static_cast<uint16_t>(ru_cfg.nof_antennas_ul);
+
+    generate_radio_config(emu_cfg.radio_cfg, emu_cfg.sdr_unit_config, {du_cells});
+
+    emu_cfg.upper_fake_config = generate_upper_part_configuraion(ru_cfg);
+
+    emu_cfg.lower_phy_config = generate_low_phy_config(du_cell, ru_emulator_parsed_cfg.sdr_unit_config, ru_cfg.max_proc_delay);
+    emu_cfg.ul_data_flow_config = generate_uplink_data_config(emu_cfg, ru_cfg);
+    emu_cfg.is_downlink_static_comp_hdr_enabled = ru_cfg.is_downlink_static_comp_hdr_enabled;
+    
+    // Here `i` serves as `sector_id`.
+    emu_cfg.sector = i;
     ru_emulators.push_back(std::make_unique<ru_emulator>(
-        resolve_ru_emulator_dependencies(logger, *workers.ru_emulators_exec[i], *transceivers[i]), emu_cfg));
+        resolve_ru_emulator_dependencies(logger, *workers.ru_emulators_exec[i], *transceivers[i]), emu_cfg, workers));
   }
 
   // Create timing worker.
-  ru_emulator_timing_notifier timing_notifier(logger, *workers.ru_timing_exec);
+  ru_emulator_timing_notifier timing_notifier(logger, *workers.ru_timing_exec, ru_emulator_parsed_cfg.ru_cfg[0].common_scs);
 
   // Subscribe RU emulator window checkers to the 'OTA symbol start' notifications.
   std::vector<ofh::ota_symbol_boundary_notifier*> ota_symbol_notifiers;
@@ -915,8 +1180,15 @@ int main(int argc, char** argv)
 
   // Start RU emulators.
   timing_notifier.start();
+
+  std::vector<std::thread> ru_threads;
+  ru_threads.reserve(ru_emulators.size());
+
   for (auto& ru : ru_emulators) {
-    ru->start();
+    ru_threads.emplace_back([ptr = ru.get()]{
+      ptr->start();
+    });
+    // ru->start();
   }
   fmt::print("Running. Waiting for incoming packets...\n");
 
@@ -951,9 +1223,18 @@ int main(int argc, char** argv)
   }
 
   timing_notifier.stop();
-  for (auto& txrx : transceivers) {
-    txrx->stop();
+  // for (auto& txrx : transceivers) {
+  //   txrx->stop();
+  // }
+
+  for (auto& ru : ru_emulators) {
+    ru->stop();
   }
+
+  for(auto& th : ru_threads){
+    if(th.joinable()) th.join();
+  }
+
   workers.stop();
   srslog::flush();
 

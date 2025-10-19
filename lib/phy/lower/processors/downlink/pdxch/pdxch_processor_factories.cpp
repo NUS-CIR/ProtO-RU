@@ -48,6 +48,7 @@ public:
     mod_config.center_freq_hz = config.center_freq_Hz;
 
     pdxch_processor_impl::configuration pdxch_config;
+    pdxch_config.logger             = config.logger;
     pdxch_config.cp                 = config.cp;
     pdxch_config.nof_tx_ports       = config.nof_tx_ports;
     pdxch_config.request_queue_size = request_queue_size;

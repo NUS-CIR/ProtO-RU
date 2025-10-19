@@ -54,7 +54,7 @@ private:
   /// Serializes compression header. Implementation depends on whether static or non-static IQ format is configured.
   virtual void serialize_compression_header(network_order_binary_serializer& serializer,
                                             const ru_compression_params&     params) = 0;
-
+                                            
 protected:
   const bool            ud_comp_length_support = false;
   srslog::basic_logger& logger;

@@ -136,6 +136,7 @@ public:
 
     // Prepare downlink processor configuration.
     downlink_processor_configuration dl_proc_config;
+    dl_proc_config.logger                  = config.logger;
     dl_proc_config.sector_id               = config.sector_id;
     dl_proc_config.scs                     = config.scs;
     dl_proc_config.cp                      = config.cp;
@@ -151,6 +152,7 @@ public:
 
     // Prepare uplink processor configuration.
     uplink_processor_configuration ul_proc_config;
+    ul_proc_config.logger              = config.logger;
     ul_proc_config.sector_id           = config.sector_id;
     ul_proc_config.scs                 = config.scs;
     ul_proc_config.cp                  = config.cp;
@@ -165,7 +167,10 @@ public:
 
     // Prepare processor baseband adaptor configuration.
     lower_phy_baseband_processor::configuration proc_bb_adaptor_config;
+    proc_bb_adaptor_config.cp                     = config.cp;
+    proc_bb_adaptor_config.scs                    = config.scs;
     proc_bb_adaptor_config.srate                  = config.srate;
+    proc_bb_adaptor_config.logger                 = config.logger;
     proc_bb_adaptor_config.rx_task_executor       = config.rx_task_executor;
     proc_bb_adaptor_config.tx_task_executor       = config.tx_task_executor;
     proc_bb_adaptor_config.ul_task_executor       = config.ul_task_executor;

@@ -42,6 +42,7 @@ public:
   {
     // Prepare PUxCH processor configuration.
     puxch_processor_configuration puxch_proc_config;
+    puxch_proc_config.logger            = config.logger;
     puxch_proc_config.cp                = config.cp;
     puxch_proc_config.scs               = config.scs;
     puxch_proc_config.srate             = config.rate;
@@ -52,6 +53,7 @@ public:
 
     // Prepare uplink processor configuration.
     lower_phy_uplink_processor_impl::configuration proc_config;
+    proc_config.logger       = config.logger;
     proc_config.sector_id    = config.sector_id;
     proc_config.scs          = config.scs;
     proc_config.cp           = config.cp;

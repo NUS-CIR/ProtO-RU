@@ -52,3 +52,8 @@ void socket_transceiver::send(span<span<const uint8_t>> frames)
 {
   transmitter->send(frames);
 }
+
+std::shared_ptr<ether::gateway> socket_transceiver::get_transmitter()
+{
+  return transmitter;
+}

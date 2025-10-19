@@ -1,29 +1,8 @@
-/*
- *
- * Copyright 2021-2025 Software Radio Systems Limited
- *
- * This file is part of srsRAN.
- *
- * srsRAN is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * srsRAN is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * A copy of the GNU Affero General Public License can be found in
- * the LICENSE file in the top-level directory of this distribution
- * and at http://www.gnu.org/licenses/.
- *
- */
-
 #pragma once
 
 #include "../baseband_cfo_processor.h"
 #include "srsran/adt/blocking_queue.h"
+#include "srsran/ran/tdd/tdd_ul_dl_config.h"
 #include "srsran/gateways/baseband/buffer/baseband_gateway_buffer_dynamic.h"
 #include "srsran/phy/lower/amplitude_controller/amplitude_controller.h"
 #include "srsran/phy/lower/processors/downlink/downlink_processor.h"
@@ -34,11 +13,14 @@
 #include "srsran/phy/lower/sampling_rate.h"
 #include "srsran/ran/cyclic_prefix.h"
 #include "srsran/support/math/stats.h"
+#include <srsran/srslog/logger.h>
 
 namespace srsran {
 
 /// Collects downlink processor baseband configuration parameters.
 struct downlink_processor_baseband_configuration {
+  /// Lower-PHY logger.
+  srslog::basic_logger* logger;
   /// Sector identifier.
   unsigned sector_id;
   /// Subcarrier spacing.
@@ -200,7 +182,8 @@ public:
 
   // See interface for documentation.
   baseband_gateway_transmitter_metadata process(baseband_gateway_buffer_writer& buffer,
-                                                baseband_gateway_timestamp      timestamp) override;
+                                                baseband_gateway_timestamp      timestamp,
+                                                uint32_t offset) override ;
 
 private:
   /// \brief Processes a new symbol.
@@ -211,6 +194,8 @@ private:
   /// \return \c true if the symbol has been processed, \c false otherwise.
   bool process_new_symbol(baseband_gateway_buffer_writer& buffer, slot_point slot, unsigned i_symbol);
 
+  /// Lower-PHY logger.
+  srslog::basic_logger& logger;
   /// PDxCH baseband processor.
   pdxch_processor_baseband& pdxch_proc_baseband;
   /// Amplitude control.
@@ -229,6 +214,10 @@ private:
   unsigned nof_slots_per_subframe;
   /// Number of symbols per slot.
   unsigned nof_symbols_per_slot;
+  /// Number of symbols per second.
+  unsigned  nof_symbols_per_sec;
+  /// The time length of a symbol.
+  const std::chrono::duration<double, std::nano> symbol_duration;
   /// List of the symbol sizes in number samples for each symbol within the subframe.
   std::vector<unsigned> symbol_sizes;
   /// Reference to the downlink notifier.
@@ -239,6 +228,9 @@ private:
   std::optional<slot_point> last_notified_slot;
   /// Carrier Frequency Offset processor.
   baseband_cfo_processor cfo_processor;
+
+  tdd_ul_dl_config_common tdd_cfg = {subcarrier_spacing::kHz30, {5, 3, 10, 1, 2}};
+  uint64_t last_gps_time = 0;
 };
 
 } // namespace srsran

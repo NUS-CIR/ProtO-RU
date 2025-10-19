@@ -90,6 +90,7 @@ public:
       state            = states::END_OF_BURST;
       wait_eob_timeout = time_spec;
       wait_eob_timeout += WAIT_EOB_ACK_TIMEOUT_S;
+      // fmt::print("async_event_late_underflow: wait_eob_timeout = {}\n", wait_eob_timeout.get_real_secs());
     }
   }
 
@@ -116,6 +117,7 @@ public:
       case states::WAIT_END_OF_BURST:
         // Do nothing if the wait for end-of-burst timeout has not expired.
         if (wait_eob_timeout.get_real_secs() >= time_spec.get_real_secs()) {
+          // fmt::print("WAIT_END_OF_BURST: Ignoring transmission at time {}\n",wait_eob_timeout.get_real_secs());
           return false;
         }
         // Otherwise go into start burst state and handle the state.
@@ -135,6 +137,7 @@ public:
 
           return true;
         }
+        // fmt::print("START_BURST: Ignoring transmission.\n");
         return false;
       case states::IN_BURST:
         if (is_empty || tail_padding) {
@@ -152,12 +155,14 @@ public:
         if (wait_eob_timeout == uhd::time_spec_t()) {
           wait_eob_timeout = time_spec;
           wait_eob_timeout += WAIT_EOB_ACK_TIMEOUT_S;
+          // fmt::print("END_OF_BURST: wait_eob_timeout = {}\n", wait_eob_timeout.get_real_secs());
         }
         break;
       case states::UNINITIALIZED:
       case states::WAIT_STOP:
       case states::STOPPED:
         // Ignore transmission.
+        // fmt::print("UNINITIALIZED/WAIT_STOP/STOPPED: Ignoring transmission.\n");
         return false;
     }
 

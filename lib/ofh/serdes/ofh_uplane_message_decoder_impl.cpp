@@ -61,8 +61,8 @@ static bool is_header_valid(const uplane_message_params& params,
                             unsigned                     nof_symbols,
                             unsigned                     version)
 {
-  if (params.direction != data_direction::uplink) {
-    logger.info("Sector#{}: dropped received Open Fronthaul message as it is not an uplink message", sector_id);
+  if (params.direction != data_direction::downlink) {
+    logger.info("Sector#{}: dropped received Open Fronthaul message as it is not a downlink message", sector_id);
 
     return false;
   }

@@ -37,6 +37,9 @@ namespace srsran {
 class ru_emulator_transceiver : public ether::gateway, public ether::receiver
 {
 public:
+  /// Return transmitter for the use of socket_transceiver.
+  virtual std::shared_ptr<ether::gateway> get_transmitter() = 0;
+
   /// Default destructor.
   virtual ~ru_emulator_transceiver() = default;
 };
@@ -64,6 +67,7 @@ public:
   // See interface for documentation.
   void send(span<span<const uint8_t>> frames) override;
 
+  std::shared_ptr<ether::gateway> get_transmitter() override { return nullptr; };
 protected:
   /// Main receiving loop.
   void receive_loop();
@@ -95,8 +99,10 @@ public:
   // See interface for documentation.
   void send(span<span<const uint8_t>> frames) override;
 
+  std::shared_ptr<ether::gateway> get_transmitter() override;
+
 private:
-  std::unique_ptr<ether::gateway>  transmitter;
+  std::shared_ptr<ether::gateway>  transmitter;
   std::unique_ptr<ether::receiver> receiver;
 };
 

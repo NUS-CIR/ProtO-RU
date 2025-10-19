@@ -23,6 +23,9 @@
 #include "radio_uhd_tx_stream.h"
 #include "srsran/gateways/baseband/buffer/baseband_gateway_buffer_reader_view.h"
 #include "srsran/srsvec/zero.h"
+#include "srsran/adt/gps_clock.h"
+#include <srsran/srslog/srslog.h>
+#include <uhd/version.hpp>
 
 using namespace srsran;
 
@@ -59,11 +62,13 @@ void radio_uhd_tx_stream::recv_async_msg()
       state_fsm.async_event_end_of_burst_ack();
       break;
     case uhd::async_metadata_t::EVENT_CODE_TIME_ERROR:
+      // fmt::print("LATE\n");
       event_description.type = radio_notification_handler::event_type::LATE;
       state_fsm.async_event_late_underflow(async_metadata.time_spec);
       break;
     case uhd::async_metadata_t::EVENT_CODE_UNDERFLOW:
     case uhd::async_metadata_t::EVENT_CODE_UNDERFLOW_IN_PACKET:
+      // fmt::print("UNDERFLOW\n");
       event_description.type = radio_notification_handler::event_type::UNDERFLOW;
       state_fsm.async_event_late_underflow(async_metadata.time_spec);
       break;
@@ -72,6 +77,11 @@ void radio_uhd_tx_stream::recv_async_msg()
     case uhd::async_metadata_t::EVENT_CODE_USER_PAYLOAD:
       event_description.type = radio_notification_handler::event_type::OTHER;
       break;
+#if UHD_VERSION >= 4090000
+    case uhd::async_metadata_t::EVENT_CODE_OK:
+      // This is not an error. Do nothing.
+      break;
+#endif // UHD_VERSION >= 4090000
   }
 
   // Notify event if it is defined.
@@ -120,6 +130,14 @@ bool radio_uhd_tx_stream::transmit_block(unsigned&                             n
 
   // Safe transmission.
   return safe_execution([this, &buffs_cpp, num_samples, &md, &nof_txd_samples]() {
+    // auto now = gps_clock::now();
+    // auto ns_fraction = gps_clock::calculate_ns_fraction_from(now);
+    // slot_point gps_slot = gps_clock::calculate_slot_point(subcarrier_spacing::kHz30,
+    //                   std::chrono::time_point_cast<std::chrono::seconds>(now).time_since_epoch().count(),
+    //                   std::chrono::duration_cast<std::chrono::microseconds>(ns_fraction).count(),
+    //                   1000 / get_nof_slots_per_subframe(subcarrier_spacing::kHz30));
+    // slot_point ofh_slot(subcarrier_spacing::kHz30, gps_slot.sfn()% NOF_OFH_SFNS, gps_slot.slot_index());
+    // logger.warning("radio_tx at slot {}", ofh_slot);
     nof_txd_samples = stream->send(buffs_cpp, num_samples, md, TRANSMIT_TIMEOUT_S);
   });
 }
@@ -129,13 +147,15 @@ radio_uhd_tx_stream::radio_uhd_tx_stream(uhd::usrp::multi_usrp::sptr& usrp,
                                          task_executor&               async_executor_,
                                          radio_notification_handler&  notifier_) :
   stream_id(description.id),
+  logger(srslog::fetch_basic_logger("RadioUHD_TX", true)),
   async_executor(async_executor_),
   notifier(notifier_),
   srate_hz(description.srate_hz),
   nof_channels(description.ports.size()),
   discontinuous_tx(description.discontiuous_tx),
   last_tx_timespec(0.0),
-  power_ramping_buffer(nof_channels, 0)
+  power_ramping_buffer(nof_channels, 0),
+  usrp_device(usrp)
 {
   srsran_assert(std::isnormal(srate_hz) && (srate_hz > 0.0), "Invalid sampling rate {}.", srate_hz);
 
@@ -201,11 +221,13 @@ void radio_uhd_tx_stream::transmit(const baseband_gateway_buffer_reader&        
   bool tx_start_padding = tx_md.tx_start.has_value();
   bool tx_end_padding   = tx_md.tx_end.has_value();
 
+  // uhd::time_spec_t time_spec = uhd::time_spec_t::from_ticks(tx_md.ts, srate_hz);
   uhd::time_spec_t time_spec = time_spec.from_ticks(tx_md.ts, srate_hz);
   bool             transmit;
   if (discontinuous_tx) {
     if (tx_start_padding) {
       // Set the timespec to the start of the actual transmission if there is head padding in the buffer.
+      // time_spec = uhd::time_spec_t::from_ticks(tx_md.ts + static_cast<baseband_gateway_timestamp>(tx_md.tx_start.value()), srate_hz);
       time_spec =
           time_spec.from_ticks(tx_md.ts + static_cast<baseband_gateway_timestamp>(tx_md.tx_start.value()), srate_hz);
     }
@@ -250,6 +272,7 @@ void radio_uhd_tx_stream::transmit(const baseband_gateway_buffer_reader&        
         power_ramping_metadata.has_time_spec  = true;
         power_ramping_metadata.start_of_burst = true;
         power_ramping_metadata.end_of_burst   = false;
+        // power_ramping_metadata.time_spec = uhd_metadata.time_spec - uhd::time_spec_t::from_ticks(nof_padding_samples, srate_hz);
         power_ramping_metadata.time_spec = uhd_metadata.time_spec - time_spec.from_ticks(nof_padding_samples, srate_hz);
 
         // Modify the actual trasnmission metadata, since we have already started the burst with padding.
@@ -301,14 +324,18 @@ void radio_uhd_tx_stream::transmit(const baseband_gateway_buffer_reader&        
   unsigned txd_samples_total = 0;
   do {
     unsigned txd_samples = 0;
+    // fmt::print("txd_samples_total: {}\n", txd_samples_total);
+    // uhd::time_spec_t now = usrp_device->get_time_now();
+    // uhd_metadata.time_spec = now + uhd::time_spec_t::from_ticks(srate_hz/1000, srate_hz);
+    // fmt::print("{}-{} : Scheduling for time {}.", usrp_device->get_time_now().get_real_secs(), uhd_metadata.has_time_spec? "yes" : "no", uhd_metadata.time_spec.get_real_secs());
     if (!transmit_block(txd_samples, tx_data, txd_samples_total, uhd_metadata)) {
-      printf("Error: failed transmitting packet. %s.\n", get_error_message().c_str());
+      printf("Error: failedtransmitting packet. %s.\n", get_error_message().c_str());
       return;
     }
-
-    // Increment timespec.
+    // fmt::print(" Nof samples {}\n", txd_samples);
+    /// Increment timespec. \note original calculation is wrong?
     uhd_metadata.time_spec += txd_samples * srate_hz;
-
+    // uhd_metadata.time_spec = uhd::time_spec_t::from_ticks(uhd_metadata.time_spec.to_ticks(srate_hz)+txd_samples, srate_hz);
     // Increment the total amount of received samples.
     txd_samples_total += txd_samples;
 

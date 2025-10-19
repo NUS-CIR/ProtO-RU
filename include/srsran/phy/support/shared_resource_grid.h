@@ -165,6 +165,8 @@ public:
   ///
   /// \return \c true if the pool and the reference counter are not \c nullptr.
   bool is_valid() const { return (pool != nullptr) && (ref_count != nullptr); }
+  pool_interface* get_pool() const { return pool; }
+  std::atomic<unsigned>* get_ref_count() const { return ref_count; }
 
   /// \brief Overload conversion to bool.
   /// \return \c true if the resource grid is valid.

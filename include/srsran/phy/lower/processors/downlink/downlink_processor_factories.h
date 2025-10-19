@@ -26,12 +26,15 @@
 #include "srsran/phy/lower/processors/downlink/downlink_processor.h"
 #include "srsran/phy/lower/processors/downlink/pdxch/pdxch_processor_factories.h"
 #include "srsran/phy/lower/sampling_rate.h"
+#include "srsran/srslog/logger.h"
 #include <memory>
 
 namespace srsran {
 
 /// Describes a sector configuration.
 struct downlink_processor_configuration {
+  /// Lower-PHY logger.
+  srslog::basic_logger* logger;
   /// Sector identifier.
   unsigned sector_id;
   /// Subcarrier spacing.

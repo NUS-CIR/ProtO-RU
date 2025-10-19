@@ -24,6 +24,7 @@
 #include "srsran/instrumentation/traces/du_traces.h"
 #include "srsran/phy/support/resource_grid_reader.h"
 #include "srsran/srsvec/zero.h"
+#include "srsran/adt/gps_clock.h" 
 
 using namespace srsran;
 
@@ -49,6 +50,7 @@ bool pdxch_processor_impl::process_symbol(baseband_gateway_buffer_writer&       
 
   // Update the current resource grid if the slot has changed.
   if (context.slot != current_slot) {
+    
     // Update slot.
     current_slot = context.slot;
 
@@ -60,11 +62,13 @@ bool pdxch_processor_impl::process_symbol(baseband_gateway_buffer_writer&       
 
     // If the request resource grid pointer is invalid, the request is empty.
     if (!request.grid) {
+      // logger.warning("invalid");
       return false;
     }
 
     // If the slot of the request does not match the current slot, then notify a late event.
     if (current_slot != request.slot) {
+      // logger.warning("not match");
       resource_grid_context late_context;
       late_context.slot   = request.slot;
       late_context.sector = context.sector;
@@ -74,21 +78,25 @@ bool pdxch_processor_impl::process_symbol(baseband_gateway_buffer_writer&       
 
     // Discard the resource grid if there is nothing to transmit.
     if (request.grid.get_reader().is_empty()) {
+      // logger.warning("empty");
       return false;
     }
 
     // Update the current grid with the new resource grid.
     current_grid = std::move(request.grid);
+    // slot_point ofh_slot = gps_clock::get_ofh_slot_now();
+    // logger.warning("[{}] : DL new slot {}", ofh_slot, context.slot);
   }
 
   // Skip processing if the resource grid is invalid.
   if (!current_grid) {
+    // fmt::print("current grid\n");
     return false;
   }
 
   // Symbol index within the subframe.
   unsigned symbol_index_subframe = context.symbol + context.slot.subframe_slot_index() * nof_symbols_per_slot;
-
+  // logger.warning("OK");
   // Modulate each of the ports.
   for (unsigned i_port = 0; i_port != nof_tx_ports; ++i_port) {
     modulator->modulate(samples.get_channel_buffer(i_port), current_grid.get_reader(), i_port, symbol_index_subframe);

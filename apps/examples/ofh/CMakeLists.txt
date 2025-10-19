@@ -20,7 +20,14 @@
 
 set_directory_properties(PROPERTIES LABELS "ofh")
 
+add_subdirectory(decoders)
+add_subdirectory(helpers)
+
 set (SOURCES
+        ofh_uplane_fragment_size_calculator.cpp
+        data_flow_uplane_uplink.cpp
+        upper_phy_fake.cpp
+        ru_ofh_transmitter.cpp
         ru_emulator_cli11_schema.cpp
         ru_emulator.cpp
         ru_emulator_rx_window_checker.cpp
@@ -33,7 +40,19 @@ endif (DPDK_FOUND)
 add_executable(ru_emulator ${SOURCES})
 target_include_directories(ru_emulator PRIVATE ${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/external)
-target_link_libraries(ru_emulator srslog srsran_ofh srsran_phy_support srsran_support)
+target_link_libraries(ru_emulator 
+                srslog 
+                srsran_ofh 
+                srsran_phy_support 
+                srsran_support
+                srsran_upper_phy_support
+                srsran_lower_phy
+                srsran_signal_processors
+                srsran_channel_processors
+                srsran_channel_precoder 
+                srsran_ofh_compression
+                srsran_o_ru_decoders 
+                srsran_o_ru_helpers)
 
 if (DPDK_FOUND)
     target_compile_options(ru_emulator PRIVATE ${DPDK_CFLAGS})

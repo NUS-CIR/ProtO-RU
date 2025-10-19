@@ -1,26 +1,6 @@
-/*
- *
- * Copyright 2021-2025 Software Radio Systems Limited
- *
- * This file is part of srsRAN.
- *
- * srsRAN is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * srsRAN is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * A copy of the GNU Affero General Public License can be found in
- * the LICENSE file in the top-level directory of this distribution
- * and at http://www.gnu.org/licenses/.
- *
- */
-
 #include "downlink_processor_baseband_impl.h"
+#include "srsran/adt/gps_clock.h"
+#include "srsran/ran/tdd/tdd_ul_dl_config.h"
 #include "srsran/gateways/baseband/buffer/baseband_gateway_buffer_writer_view.h"
 #include "srsran/phy/lower/lower_phy_baseband_metrics.h"
 #include "srsran/phy/lower/lower_phy_timing_context.h"
@@ -28,12 +8,15 @@
 #include "srsran/srsvec/dot_prod.h"
 #include "srsran/srsvec/zero.h"
 
+#include <fstream>
+
 using namespace srsran;
 
 downlink_processor_baseband_impl::downlink_processor_baseband_impl(
     pdxch_processor_baseband&                        pdxch_proc_baseband_,
     amplitude_controller&                            amplitude_control_,
     const downlink_processor_baseband_configuration& config) :
+  logger(*config.logger),
   pdxch_proc_baseband(pdxch_proc_baseband_),
   amplitude_control(amplitude_control_),
   nof_slot_tti_in_advance(config.nof_slot_tti_in_advance),
@@ -43,6 +26,8 @@ downlink_processor_baseband_impl::downlink_processor_baseband_impl(
   nof_samples_per_subframe(config.rate.to_kHz()),
   nof_slots_per_subframe(get_nof_slots_per_subframe(config.scs)),
   nof_symbols_per_slot(get_nsymb_per_slot(config.cp)),
+  nof_symbols_per_sec(nof_symbols_per_slot * get_nof_slots_per_subframe(scs) * NOF_SUBFRAMES_PER_FRAME * 100),
+  symbol_duration(1e9 / nof_symbols_per_sec),
   temp_buffer(config.nof_tx_ports, 2 * config.rate.get_dft_size(config.scs)),
   cfo_processor(config.rate)
 {
@@ -113,8 +98,14 @@ static void fill_zeros(baseband_gateway_buffer_writer& buffer, const baseband_ga
 }
 
 baseband_gateway_transmitter_metadata downlink_processor_baseband_impl::process(baseband_gateway_buffer_writer& buffer,
-                                                                                baseband_gateway_timestamp timestamp)
+                                                                                baseband_gateway_timestamp timestamp,
+                                                                                uint32_t offset)
 {
+  // uint64_t nnow = gps_clock::now().time_since_epoch().count();
+  // std::ofstream ofs("output.txt", std::ios::app);
+  // ofs << nnow-last_gps_time << std::endl;
+  //fmt::print("process : {}\n", now-last_gps_time);
+  // last_gps_time = nnow;
   srsran_assert(nof_rx_ports == buffer.get_nof_channels(), "Invalid number of channels.");
   unsigned nof_output_samples = buffer.get_nof_samples();
 
@@ -153,8 +144,9 @@ baseband_gateway_transmitter_metadata downlink_processor_baseband_impl::process(
         ++i_symbol_sf;
       }
 
-      // Calculate system slot index and the symbol index within the slot.
-      unsigned i_slot   = i_sf * nof_slots_per_subframe + i_symbol_sf / nof_symbols_per_slot;
+      // Calculate OFH system slot index and the symbol index within the slot.
+      unsigned i_slot   = (i_sf * nof_slots_per_subframe + i_symbol_sf / nof_symbols_per_slot + offset)
+                          % (NOF_SFNS * NOF_SUBFRAMES_PER_FRAME * nof_slots_per_subframe);
       unsigned i_symbol = i_symbol_sf % nof_symbols_per_slot;
 
       // Create slot point.
@@ -164,7 +156,10 @@ baseband_gateway_transmitter_metadata downlink_processor_baseband_impl::process(
       if ((!last_notified_slot.has_value() || (slot > last_notified_slot.value())) && (i_symbol == 0)) {
         // Notify slot boundary.
         lower_phy_timing_context context;
-        context.slot = slot + nof_slot_tti_in_advance;
+        // slot_point advance_slot = slot+nof_slot_tti_in_advance;
+        slot_point advance_slot = slot;
+        slot_point ofh_slot(slot.numerology(), advance_slot.sfn()%NOF_OFH_SFNS, advance_slot.slot_index());
+        context.slot = ofh_slot;
         last_notified_slot.emplace(slot);
         notifier->on_tti_boundary(context);
       }
@@ -186,7 +181,7 @@ baseband_gateway_transmitter_metadata downlink_processor_baseband_impl::process(
         // Timestamp of the first sample of the current OFDM symbol.
         baseband_gateway_timestamp symbol_timestamp = proc_timestamp - i_sample_symbol;
 
-        // Write the symbol into the temporary buffer.
+        // Write the symbol into the temporary buffer. 
         baseband_gateway_buffer_writer& dest_buffer = temp_buffer.write_symbol(symbol_timestamp, symbol_nof_samples);
         if (!process_new_symbol(dest_buffer, slot, i_symbol)) {
           // If the symbol could not be processed, advance output buffer and invalidate the temporary buffer contents.
@@ -226,9 +221,11 @@ bool downlink_processor_baseband_impl::process_new_symbol(baseband_gateway_buffe
                                                           slot_point                      slot,
                                                           unsigned                        i_symbol)
 {
+  slot_point ofh_slot(slot.numerology(), slot.sfn()%NOF_OFH_SFNS, slot.slot_index());
+
   // Process symbol by PDxCH processor.
   pdxch_processor_baseband::symbol_context pdxch_context;
-  pdxch_context.slot   = slot;
+  pdxch_context.slot   = ofh_slot;
   pdxch_context.sector = sector_id;
   pdxch_context.symbol = i_symbol;
 

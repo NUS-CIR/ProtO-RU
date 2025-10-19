@@ -1,25 +1,3 @@
-/*
- *
- * Copyright 2021-2025 Software Radio Systems Limited
- *
- * This file is part of srsRAN.
- *
- * srsRAN is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * srsRAN is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * A copy of the GNU Affero General Public License can be found in
- * the LICENSE file in the top-level directory of this distribution
- * and at http://www.gnu.org/licenses/.
- *
- */
-
 #include "uplink_processor_impl.h"
 #include "srsran/gateways/baseband/buffer/baseband_gateway_buffer_reader_view.h"
 #include "srsran/phy/lower/lower_phy_baseband_metrics.h"
@@ -38,6 +16,7 @@ using namespace srsran;
 lower_phy_uplink_processor_impl::lower_phy_uplink_processor_impl(std::unique_ptr<prach_processor> prach_proc_,
                                                                  std::unique_ptr<puxch_processor> puxch_proc_,
                                                                  const configuration&             config) :
+  logger(*config.logger),
   sector_id(config.sector_id),
   scs(config.scs),
   nof_rx_ports(config.nof_rx_ports),
@@ -97,20 +76,22 @@ uplink_processor_baseband& lower_phy_uplink_processor_impl::get_baseband()
 }
 
 void lower_phy_uplink_processor_impl::process(const baseband_gateway_buffer_reader& samples,
-                                              baseband_gateway_timestamp            timestamp)
+                                              baseband_gateway_timestamp            timestamp,
+                                              uint32_t                              offset)
 {
   switch (state) {
     case fsm_states::alignment:
-      process_alignment(samples, timestamp);
+      process_alignment(samples, timestamp, offset);
       break;
     case fsm_states::collecting:
-      process_collecting(samples, timestamp);
+      process_collecting(samples, timestamp, offset);
       break;
   }
 }
 
 void lower_phy_uplink_processor_impl::process_alignment(const baseband_gateway_buffer_reader& samples,
-                                                        baseband_gateway_timestamp            timestamp)
+                                                        baseband_gateway_timestamp            timestamp,
+                                                        uint32_t                              offset)
 {
   // Calculate the sample index within a subframe.
   unsigned i_sample_sf = timestamp % nof_samples_per_subframe;
@@ -125,7 +106,7 @@ void lower_phy_uplink_processor_impl::process_alignment(const baseband_gateway_b
   // If the next subframe boundary is within the buffer, then process.
   if (nof_samples_next_sf < nof_samples) {
     baseband_gateway_buffer_reader_view samples2(samples, nof_samples_next_sf, nof_samples - nof_samples_next_sf);
-    process_symbol_boundary(samples2, timestamp + nof_samples_next_sf);
+    process_symbol_boundary(samples2, timestamp + nof_samples_next_sf, offset);
     return;
   }
 
@@ -134,7 +115,8 @@ void lower_phy_uplink_processor_impl::process_alignment(const baseband_gateway_b
 }
 
 void lower_phy_uplink_processor_impl::process_symbol_boundary(const baseband_gateway_buffer_reader& samples,
-                                                              baseband_gateway_timestamp            timestamp)
+                                                              baseband_gateway_timestamp            timestamp, 
+                                                              uint32_t                              offset)
 {
   // Calculate the subframe index.
   unsigned i_sf = static_cast<uint64_t>((timestamp / nof_samples_per_subframe) % (NOF_SFNS * NOF_SUBFRAMES_PER_FRAME));
@@ -152,17 +134,17 @@ void lower_phy_uplink_processor_impl::process_symbol_boundary(const baseband_gat
 
   // If the sample is not aligned with the beginning of the OFDM symbol, align to next subframe.
   if (i_sample_symbol != 0) {
-    process_alignment(samples, timestamp);
+    process_alignment(samples, timestamp, offset);
     return;
   }
 
   // Calculate system slot index and the symbol index within the slot.
-  unsigned i_slot   = i_sf * nof_slots_per_subframe + i_symbol_sf / nof_symbols_per_slot;
+  unsigned i_slot   = i_sf * nof_slots_per_subframe + i_symbol_sf / nof_symbols_per_slot + offset;
   unsigned i_symbol = i_symbol_sf % nof_symbols_per_slot;
 
-  // Create slot point.
-  slot_point slot(to_numerology_value(scs), i_slot % (NOF_SFNS * NOF_SUBFRAMES_PER_FRAME * nof_slots_per_subframe));
-
+  // Create ofh slot point.
+  slot_point slot(to_numerology_value(scs), i_slot % (NOF_OFH_SFNS * NOF_SUBFRAMES_PER_FRAME * nof_slots_per_subframe));
+  
   // Prepare current symbol context before collect samples.
   current_slot             = slot;
   current_symbol_index     = i_symbol;
@@ -172,11 +154,12 @@ void lower_phy_uplink_processor_impl::process_symbol_boundary(const baseband_gat
   temp_buffer.resize(current_symbol_size);
 
   // Process baseband.
-  process_collecting(samples, timestamp);
+  process_collecting(samples, timestamp, offset);
 }
 
 void lower_phy_uplink_processor_impl::process_collecting(const baseband_gateway_buffer_reader& samples,
-                                                         baseband_gateway_timestamp            timestamp)
+                                                         baseband_gateway_timestamp            timestamp,
+                                                         uint32_t offset)
 {
   srsran_assert(notifier != nullptr, "Notifier has not been connected.");
   srsran_assert(nof_rx_ports == samples.get_nof_channels(), "Invalid number of channels.");
@@ -184,7 +167,7 @@ void lower_phy_uplink_processor_impl::process_collecting(const baseband_gateway_
   // Check that the timestamp matches with the current sample timestamp.
   if ((current_symbol_timestamp + temp_buffer_write_index) != timestamp) {
     // If the timestamp does not match, the alignment has been lost.
-    process_alignment(samples, timestamp);
+    process_alignment(samples, timestamp, offset);
     return;
   }
 
@@ -227,7 +210,7 @@ void lower_phy_uplink_processor_impl::process_collecting(const baseband_gateway_
   puxch_context.slot        = current_slot;
   puxch_context.sector      = sector_id;
   puxch_context.nof_symbols = current_symbol_index;
-  bool processed            = puxch_proc->get_baseband().process_symbol(temp_buffer.get_reader(), puxch_context);
+  bool processed = puxch_proc->get_baseband().process_symbol(temp_buffer.get_reader(), puxch_context);
 
   if (processed) {
     sample_statistics<float>   avg_power;
@@ -276,7 +259,7 @@ void lower_phy_uplink_processor_impl::process_collecting(const baseband_gateway_
 
   // Process next symbol with the remainder samples.
   baseband_gateway_buffer_reader_view samples2(samples, nof_samples, nof_input_samples - nof_samples);
-  process_symbol_boundary(samples2, timestamp + nof_samples);
+  process_symbol_boundary(samples2, timestamp + nof_samples, offset);
 }
 
 baseband_cfo_processor& lower_phy_uplink_processor_impl::get_cfo_handler()

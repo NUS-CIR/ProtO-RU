@@ -46,6 +46,8 @@ private:
 
   /// Indicates the stream identification for notifications.
   unsigned stream_id;
+  /// Logger
+  srslog::basic_logger& logger;
   /// Task executor for asynchronous messages.
   task_executor& async_executor;
   /// Radio notification interface.
@@ -70,6 +72,7 @@ private:
   uhd::time_spec_t last_tx_timespec;
   /// Power ramping transmit buffer. It is filled with zeros, used to absorb power ramping when starting a transmission.
   baseband_gateway_buffer_dynamic power_ramping_buffer;
+  uhd::usrp::multi_usrp::sptr& usrp_device;
 
   /// Receive asynchronous message.
   void recv_async_msg();

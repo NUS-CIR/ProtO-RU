@@ -59,6 +59,34 @@ struct gps_clock {
 
     return now - gps_offset;
   }
+
+  // 返回：年, 月, 日, 时, 分, 秒, 毫秒
+  static std::tuple<int,int,int,int,int,int,int> to_ymd_hms_ms(time_point tp_gps) {
+    // 转成 system_clock time_point
+    auto tp_sys = std::chrono::time_point<std::chrono::system_clock, duration>(
+                      tp_gps.time_since_epoch() + gps_offset
+                  );
+    // 拆分到毫秒
+    auto tp_ms  = std::chrono::time_point_cast<std::chrono::milliseconds>(tp_sys);
+    auto tp_sec = std::chrono::time_point_cast<std::chrono::seconds>(tp_sys);
+    // 毫秒部分 = ms_since_epoch % 1000
+    int ms = static_cast<int>(
+        (tp_ms.time_since_epoch() - std::chrono::duration_cast<std::chrono::milliseconds>(tp_sec.time_since_epoch()))
+        .count()
+    );
+    // 转成 time_t 秒
+    std::time_t tt = tp_sec.time_since_epoch().count();
+    std::tm gmt = *std::gmtime(&tt);
+
+    int year   = gmt.tm_year + 1900;
+    int month  = gmt.tm_mon  + 1;
+    int day    = gmt.tm_mday;
+    int hour   = gmt.tm_hour;
+    int minute = gmt.tm_min;
+    int second = gmt.tm_sec;
+
+    return {year, month, day, hour, minute, second, ms};
+  }
 };
 
 } // namespace
@@ -185,6 +213,10 @@ void realtime_timing_worker::poll()
   unsigned current_symbol_index = get_symbol_index(ns_fraction, symbol_duration);
   unsigned delta                = circular_distance(current_symbol_index, previous_symb_index, nof_symbols_per_sec);
   previous_symb_index           = current_symbol_index;
+
+  // auto [y, M, d, h, m, s, ms] = gps_clock::to_ymd_hms_ms(now);
+  // fmt::print("DU time-----{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:03}\n", 
+  //   y, M, d, h, m, s, ms);
 
   // Are we still in the same symbol as before?
   if (delta == 0) {

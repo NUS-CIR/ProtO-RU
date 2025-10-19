@@ -25,6 +25,7 @@
 #include "srsran/phy/lower/modulation/modulation_factories.h"
 #include "srsran/phy/lower/processors/uplink/puxch/puxch_processor.h"
 #include "srsran/phy/lower/sampling_rate.h"
+#include "srsran/srslog/srslog.h"
 #include <memory>
 
 namespace srsran {
@@ -33,6 +34,8 @@ class task_executor;
 
 /// Collects the necessary parameters to create a PUxCH processor.
 struct puxch_processor_configuration {
+  /// low-PHY logger.
+  srslog::basic_logger* logger;
   /// Cyclic prefix.
   cyclic_prefix cp;
   /// Subcarrier spacing.

@@ -59,6 +59,7 @@ public:
 
     // Prepare PUxCH processor configuration.
     puxch_processor_impl::configuration proc_config;
+    proc_config.logger             = config.logger;
     proc_config.cp                 = config.cp;
     proc_config.nof_rx_ports       = config.nof_rx_ports;
     proc_config.request_queue_size = request_queue_size;

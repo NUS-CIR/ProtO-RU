@@ -47,6 +47,10 @@ public:
   /// \brief Gets the current time.
   virtual baseband_gateway_timestamp read_current_time() = 0;
 
+  /// \brief Gets the actual sampling rate. 
+  /// \remark Returns 0 for zmq.
+  virtual double get_actual_srate() = 0;
+
   /// \brief Starts the radio operation.
   ///
   /// It requests all radio streams to start simultaneously.

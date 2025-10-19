@@ -104,6 +104,7 @@ private:
 
 public:
   baseband_gateway_timestamp read_current_time() override;
+  double get_actual_srate() override {return actual_sampling_rate_Hz;}
 
 public:
   /// Constructs a radio session based on UHD.

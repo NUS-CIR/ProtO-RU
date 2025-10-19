@@ -307,10 +307,11 @@ radio_session_uhd_impl::radio_session_uhd_impl(const radio_configuration::radio&
   actual_sampling_rate_Hz = actual_rx_rate_Hz;
 
   // Reset timestamps.
-  if ((total_rx_channel_count > 1 || total_tx_channel_count > 1) &&
-      radio_config.clock.sync != radio_configuration::clock_sources::source::GPSDO) {
-    device.set_time_unknown_pps(uhd::time_spec_t());
-  }
+  // if ((total_rx_channel_count > 1 || total_tx_channel_count > 1) &&
+  //     radio_config.clock.sync != radio_configuration::clock_sources::source::GPSDO) {
+  //   fmt::print("here\n");
+  //   device.set_time_unknown_pps(uhd::time_spec_t());
+  // }
 
   // Lists of stream descriptions.
   std::vector<radio_uhd_tx_stream::stream_description> tx_stream_description_list;
