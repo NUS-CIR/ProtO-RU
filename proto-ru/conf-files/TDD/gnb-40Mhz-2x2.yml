@@ -1,0 +1,157 @@
+# This example configuration outlines how to configure the srsRAN Project CU/DU to use an O-RU and split 7.2. This is specifically for use
+# with the Benetel R550 RU. This config will create a single TDD MIMO cell transmitting in band 78, with 100 MHz bandwidth and 30 kHz sub-carrier-spacing.
+# The parameters used to configure the RU are found in the `ru_ofh` sub-section. This configuration makes used of the OFH Lib from SRS to enable split 7.2.
+cu_cp:
+  amf:
+    addr: 172.22.0.10                                               # The address or hostname of the AMF.
+    bind_addr: 172.26.190.95                                            # A local IP that the gNB binds to for traffic from the AMF.
+    supported_tracking_areas:                                     # Configure the TA associated with the CU-CP
+      - tac: 1                        
+        plmn_list:
+          - plmn: "00101"
+            tai_slice_support_list:
+              - sst: 1
+#gnb_id: 411 
+#gnb_du_id: 0
+
+#f1ap:
+#  cu_cp_addr: 10.200.200.3
+#  bind_addr: 10.200.200.5
+
+#nru:                                # Interface between CU and CU-UP
+#  queue_size: 2048                      # Optional INT (2048). Sets the F1-U PDU queue size in bytes. 
+#  bind_addr: 10.200.200.5
+
+ru_ofh:
+  ru_bandwidth_MHz: 20
+  t1a_max_cp_dl: 2135                                              # Maximum T1a on Control-Plane for Downlink in microseconds.
+  t1a_min_cp_dl: 1886                                              # Minimum T1a on Control-Plane for Downlink in microseconds.
+  t1a_max_cp_ul: 2135                                              # Maximum T1a on Control-Plane for Uplink in microseconds.
+  t1a_min_cp_ul: 1886                                              # Minimum T1a on Control-Plane for Uplink in microseconds.
+  t1a_max_up: 1990                                                 # Maximum T1a on User-Plane in microseconds.
+  t1a_min_up: 1680                                                  # Minimum T1a on User-Plane in microseconds.
+  ta4_max: 1300                                                    # Maximum Ta4 on User-Plane in microseconds.
+  ta4_min: 925                                                     # Minimum Ta4 on User-Plane in microseconds.
+  is_prach_cp_enabled: true                                      # Configures if Control-Plane messages should be used to receive PRACH messages.
+#  is_dl_broadcast_enabled: false
+  compr_method_ul: none                                            # Uplink compression method.
+  compr_bitwidth_ul: 16                                            # Uplink IQ samples bitwidth after compression.
+  compr_method_dl: none                                          # Downlink compression method.
+  compr_bitwidth_dl: 16                                            # Downlink IQ samples bitwidth after compression.
+  compr_method_prach: none                                         # PRACH compression method.
+  compr_bitwidth_prach: 16                                         # PRACH IQ samples bitwidth after compression.
+  enable_ul_static_compr_hdr: true                                # Configures if the compression header is present for uplink User-Plane messages (false) or not present (true).
+  enable_dl_static_compr_hdr: true                                # Configures if the compression header is present for downlink User-Plane messages (false) or not present (true).
+  iq_scaling: 16.0                                                   # IQ samples scaling factor applied before compression, should be a positive value smaller than 10.
+  cells:
+    - network_interface: ens6f2np2                                   # Ethernet interface name used to communicate with the RU.
+      ru_mac_addr: 50:7c:6f:45:f3:04                             # RU MAC address.
+      du_mac_addr: 50:7c:6f:55:c6:ae                              # DU MAC address.
+      enable_promiscuous: true                                    # Promiscuous mode flag
+      vlan_tag_cp: 5                                              # VLAN tag value for C-Plane.
+      vlan_tag_up: 5                                              # VLAN tag value for U-Plane.
+      prach_port_id: [4, 5]                                       # PRACH eAxC port value.
+      dl_port_id: [0, 1]                                       # Downlink eAxC port values.
+      ul_port_id: [0, 1]                                          # Uplink eAxC port values.
+# ru_sdr:
+#   device_driver: uhd                  # The RF driver name.
+#   device_args: type=b200 #tx_port=tcp://*:5000,rx_port=tcp://localhost:6000,base_srate=61.44e6        # Optionally pass arguments to the selected RF driver.
+#   clock: default                      # Set clock source.
+#   srate: 23.04                        # RF sample rate might need to be adjusted according to selected bandwidth.
+#   tx_gain: 80.0                       # Transmit gain of the RF might need to adjusted to the given situation.
+#   rx_gain: 76.0                       # Receive gain of the RF might need to adjusted to the given situation.
+
+#dpdk:
+  # eal_args: "--lcores (0-1)@(0-31)"
+
+# fapi:
+#   l2_nof_slots_ahead: 5
+
+cell_cfg:
+  dl_arfcn: 628032   # 627996                                     # ARFCN of the downlink carrier (center frequency).
+  band: 78                                                        # The NR band.
+  channel_bandwidth_MHz: 20                                      # Bandwith in MHz. Number of PRBs will be automatically derived.
+  common_scs: 30                                                  # Subcarrier spacing in kHz used for data.
+  plmn: "00101"                                                   # PLMN broadcasted by the gNB.
+  tac: 1                                                          # Tracking area code (needs to match the core configuration).
+  pci: 1                                                          # Physical cell ID.
+  nof_antennas_dl: 2                                              # Downlink number of antennas.
+  nof_antennas_ul: 2                                              # Uplink number of anntennas.
+  prach:
+    prach_config_index: 159                                         # PRACH configuration index.
+    prach_root_sequence_index: 1                                  # PRACH root sequence index.
+    zero_correlation_zone: 0                                      # Zero correlation zone.
+    prach_frequency_start: 0                                      # Offset in PRBs of lowest PRACH transmission occasion in frequency domain respective to PRB 0.
+    preamble_rx_target_pw: -150
+    ra_resp_window:  20
+  tdd_ul_dl_cfg:
+    dl_ul_tx_period: 5                                           # Optional INT (10). Sets the TDD pattern periodicity in slots. The combination of this value and the chosen numerology must lead to a TDD periodicity of 0.5, >
+    nof_dl_slots: 3                                               # Optional INT (6). Number of consecutive full Downlink slots. Supported: [0-80].
+    nof_dl_symbols: 10                                             # Optional INT (0). Number of Downlink symbols at the beginning of the slot following full Downlink slots. Supported: [0-13].
+    nof_ul_slots: 1                                               # Optional INT (3). Number of consecutive full Uplink slots. Supported: [0 - 80].
+    nof_ul_symbols: 2
+  ssb:
+    ssb_block_power_dbm: 20                # Optional INT (-16). Sets the SS PBCH block power in dBm. Supported: [-60 - +50].
+#  pucch:
+#     p0_nominal: -76 
+#    target_sinr_f0: -10                      # Optional FLOAT (10). Sets the target SINR for PUCCH F0 in dB. Supported: [-10 - 20].
+#    target_sinr_f2: -10                       # Optional FLOAT (6). Sets the target SINR for PUCCH F2 in dB. Supported: [-10 - 20].
+#    target_sinr_f3: -10
+
+#  pusch:
+#    beta_offset_csi_p1_idx_1: 0             # Optional UINT (9). Sets the b_offset_csi_p1_idx_1 part of UCI-OnPUSCH. Supported: [0 - 31].
+#    beta_offset_csi_p1_idx_2: 0             # Optional UINT (9). Sets the b_offset_csi_p1_idx_2 part of UCI-OnPUSCH. Supported: [0 - 31].
+#    beta_offset_csi_p2_idx_1: 0             # Optional UINT (9). Sets the b_offset_csi_p2_idx_1 part of UCI-OnPUSCH. Supported: [0 - 31].
+#    beta_offset_csi_p2_idx_2: 0
+#  pucch:
+#    sr_period_ms: 40
+#    f1_nof_cyclic_shifts: 12
+#    f1_nof_cell_res_sr: 1
+#    f1_nof_symbols: 4
+#    f2_nof_ue_res_harq: 1
+#    f2_nof_cell_res_csi: 0
+#    max_consecutive_kos: 0
+#  paging: 
+#    pg_search_space_id: 0  
+#  csi: 
+#    csi_rs_enabled: false
+#    csi_rs_period: 80                       # Optional UINT (20). Sets the CSI-RS period in milliseconds. Supported: [10, 20, 40, 80].
+#    meas_csi_rs_slot_offset:                # Optional TEXT Sets the slot offset of first CSI-RS resource used for measurement.
+#    tracking_csi_rs_slot_offset:            # Optional TEXT. Sets the slot offset of the first CSI-RS slot used for tracking.
+#    zp_csi_rs_slot_offset:                  # Optional TEXT. Sets the slot offset of the ZP CSI-RS resources.     
+#    pwr_ctrl_offset: 0  
+#  pdsch:
+#    mcs_table: qam256
+    #mcs_table: qam256
+#    olla_target_bler: 0.1
+#    target_sinr: -5
+   #p0_nominal: -90 
+
+expert_phy:
+  allow_request_on_empty_uplink_slot: true
+  max_proc_delay: 5
+  pusch_dec_max_iterations: 10 
+
+#expert_execution:
+#  cell_affinities:                      
+#    -
+#      l1_dl_cpus:       16,17,18,19
+#      l1_ul_cpus:       20,21,22                         
+#      l2_cell_cpus:     23,24,25
+#      ru_cpus:          26,27,28        
+#  affinities:
+#    isolated_cpus:      16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+#    low_priority_cpus:  29,30,31
+
+log:
+  filename: /tmp/gnb.log                                          # Path of the log file.
+  all_level: info                                              # Logging level applied to all layers.
+  ofh_level: info
+  # f1ap_level: debug
+  broadcast_enabled: true
+pcap:
+  mac_enable: false                                               # Set to true to enable MAC-layer PCAPs.
+  mac_filename: /tmp/gnb_mac.pcap                                 # Path where the MAC PCAP is stored.
+#  ngap_enable: false                                              # Set to true to enable NGAP PCAPs.
+#  ngap_filename: /tmp/gnb_ngap.pcap                               # Path where the NGAP PCAP is stored.
+
