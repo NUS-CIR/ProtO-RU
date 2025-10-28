@@ -6,11 +6,13 @@ This is based on a fork of the [srsRAN Project](https://github.com/srsran/srsran
 ProtO-RU extends the srsRAN RU emulator to become a full-fledged O-RAN RU with split 7.2 support using SDRs like the USRP B210.
 Benefiting from the portability and modularity of srsRAN, ProtO-RU can be used on different hardware platforms (e.g., x86, ARM) and easily adapt to various use cases.
 
+A software-based O-RU implementation would allow researchers to customize and innovate more freely in end-to-end setups, especially given the fixed-function and proprietary nature of commercial O-RUs.
+
 Technical report - Coming soon.
 
-Support - [Discussion board](https://github.com/NUS-CIR/ProtO-RU/discussions).
+Supported features - [Features](./proto-ru/FEATURES.md).
 
-Features and roadmap - [Features](./proto-ru/FEATURES.md).
+> Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation.
 
 ## Building ProtO-RU
 
@@ -63,7 +65,7 @@ We also provide sample configuration files in the `proto-ru/configs/` directory 
 
 ## Citation
 
-If you find ProtO-RU useful to your research, please cite the following:
+If you find ProtO-RU useful to your research, please cite our technical report:
 
 ```bibtex
 @techreport{zhou2025protoru,
@@ -73,3 +75,10 @@ If you find ProtO-RU useful to your research, please cite the following:
   year        = "2025"
 }
 ```
+
+## Contact
+
+For any questions, or if you have any comments/feedback/feature requests, there are several ways to reach out.
+- File a GitHub issue under this repo.
+- Start a discussion on the GitHub [Discussion board](https://github.com/NUS-CIR/ProtO-RU/discussions).
+- Drop an email to `khooixz [at] comp [dot] nus [dot] edu [dot] sg`.
