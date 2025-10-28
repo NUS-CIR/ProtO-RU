@@ -47,9 +47,9 @@ make -j $(nproc)
 
 ## Running ProtO-RU
 
-### Time Synchronization (S-plane)
+### Time Synchronization
 
-Before running ProtO-RU, the host system must be time synchronized with the gNB host over PTP.
+Before running ProtO-RU, depending on your testbed setup (see [Testbed Hardware Setup](./proto-ru/TESTBED_SETUP.md)), the host system(s) must be time synchronized with the gNB host over PTP.
 We have prepared a quick guide on setting up PTP time synchronization at [Time Synchronization](./proto-ru/TIME_SYNC.md).
 
 ### Starting ProtO-RU
@@ -63,7 +63,7 @@ sudo ./ru_emulator -c /path/to/ru_emu.yml
 
 For more details on configuration options, please refer to the [Configuration Reference](./proto-ru/CONFIG_REFERENCE.md).
 
-We also provide sample configuration files in the `proto-ru/conf-files/` directory of the repository.
+We also provide sample configuration files in the [proto-ru/conf-files/](./proto-ru/conf-files/) directory of the repository.
 
 **Important Note:** Given that ProtO-RU requires a large delay profile, the integration with other 5G CU/DU implementations may require some patching. 
 Please refer to the [Integration Notes](./proto-ru/INTEGRATION_NOTES.md) for more details.
