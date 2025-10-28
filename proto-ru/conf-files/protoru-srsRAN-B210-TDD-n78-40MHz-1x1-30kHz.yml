@@ -1,0 +1,65 @@
+log:
+  filename: /tmp/ru_emu.log
+  level: warning
+
+ru_emu:
+    cells:
+    - bandwidth: 40                           # Bandwidth of the cell
+      network_interface: ens1f3               # Use BDF instead of interface name for DPDK
+      ru_mac_addr: 50:7c:6f:45:f3:07          # MAC address of the RU
+      du_mac_addr: 50:7c:6f:45:f3:06          # MAC address of the DU
+      enable_promiscuous: true                # Promiscuous mode flag
+      vlan_tag: 5                             # VLAN tag
+      dl_port_id: [0]                         # Port IDs for downlink
+      ul_port_id: [0]                         # Port IDs for uplink
+      prach_port_id: [4]                      # Port IDs for PRACH
+      compr_method_dl: bfp                   # Compression method for uplink
+      compr_bitwidth_dl: 9                   # Compression bitwidth for uplink
+      compr_method_ul: bfp                   # Compression method for downlink
+      compr_bitwidth_ul: 9                   # Compression bitwidth for downlink
+      enable_ul_static_compr_hdr: true        # Enable static compression header for uplink
+      enable_dl_static_compr_hdr: true        # Enable static compression header for downlink
+      iq_scaling: 1.0                         # IQ data scaling factor
+      t2a_max_cp_dl: 2635                     # T2a maximum value for downlink Control-Plane
+      t2a_min_cp_dl: 2221                     # T2a minimum value for downlink Control-Plane
+      t2a_max_cp_ul: 2635                     # T2a maximum value for uplink Control-Plane
+      t2a_min_cp_ul: 2221                     # T2a minimum value for uplink Control-Plane
+      t2a_max_up: 2454                        # T2a maximum value for User-Plane
+      t2a_min_up: 2015                        # T2a minimum value for User-Plane
+      # ta3_max_up: 1280                        # Ta3 maximum value for uplink User-Plane       
+      # ta3_min_up: 925                         # Ta3 minimum value for uplink User-Plane
+      ta3_max_up: 1480                         # Ta3 maximum value for uplink User-Plane       
+      ta3_min_up: 1125                         # Ta3 minimum value for uplink User-Plane
+      # max_proc_delay : 1                      # Maximum downlink processing delay in slots
+      dl_arfcn: 628032
+      common_scs: 30                          # Common subcarrier spacing   
+      band: 78
+      nof_antennas_dl: 1                      # Downlink number of antennas.
+      nof_antennas_ul: 1                      # Uplink number of anntennas.
+        #dpdk:
+        #eal_args: "--lcores (0-1)@(0-31) -b 0000:31:00.2"
+radio:
+  srate: 46.08
+  device_driver: uhd
+  device_args: type=b200,num_recv_frames=64,num_send_frames=64
+  # otw_format: sc12
+  tx_gain: 80
+  rx_gain: 30
+  amplitude_control:
+    tx_gain_backoff: 12                     # Optional FLOAT (12.0). Sets baseband gain back-off in dB. This accounts for the signal PAPR and is applied regardless of clipping settings. Format: positive float.
+    enable_clipping: true                   # Optional BOOLEAN (false). Sets clipping of the baseband samples on or off. If enabled, samples that exceed the power ceiling are clipped.
+    ceiling: -0.1   
+
+expert_execution:
+  cell_affinities:                      
+    -                           
+      ru_cpus:        0,1
+      ofh_rx_cpus:    2
+      ru_timing_cpus: 2            
+  affinities:
+    isolated_cpus:      0,1,2,3
+    low_priority_cpus:  3
+  
+  threads:
+    lower_phy:
+      execution_profile: quad
