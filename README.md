@@ -12,6 +12,8 @@ Technical report - Coming soon.
 
 Supported features - [Features](./proto-ru/FEATURES.md).
 
+Known issues - [Known Issues](./proto-ru/KNOWN_ISSUES.md).
+
 > Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation.
 
 ## Building ProtO-RU
@@ -39,7 +41,7 @@ cd ProtO-RU
 mkdir build
 cd build
 cmake ../
-cd build/apps/examples/ofh/ # ProtO-RU extends the srsRAN RU emulator
+cd ./apps/examples/ofh/ # ProtO-RU extends the srsRAN RU emulator
 make -j $(nproc)
 ```
 
@@ -61,7 +63,10 @@ sudo ./ru_emulator -c /path/to/ru_emu.yml
 
 For more details on configuration options, please refer to the [Configuration Reference](./proto-ru/CONFIG_REFERENCE.md).
 
-We also provide sample configuration files in the `proto-ru/configs/` directory of the repository.
+We also provide sample configuration files in the `proto-ru/conf-files/` directory of the repository.
+
+**Important Note:** Given that ProtO-RU requires a large delay profile, the integration with other 5G CU/DU implementations may require some patching. 
+Please refer to the [Integration Notes](./proto-ru/INTEGRATION_NOTES.md) for more details.
 
 ## Citation
 
