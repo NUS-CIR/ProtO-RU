@@ -10,6 +10,8 @@ A software-based O-RU implementation would allow researchers to customize and in
 
 Technical report - Coming soon.
 
+ACM Open AI-RAN 2025 workshop (invited) demo - [[Poster]](https://drive.google.com/file/d/10YtGOLr3b2fomS6cWCzG7gJtb5P75KzK/view?usp=sharing) [[YouTube]](https://www.youtube.com/watch?v=KSdTqXCAuGs).
+
 Supported features - [Features](./proto-ru/FEATURES.md).
 
 Known issues - [Known Issues](./proto-ru/KNOWN_ISSUES.md).
