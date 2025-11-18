@@ -1,6 +1,6 @@
 # Configuration Reference
 
-This document provides a comprehensive reference for the configuration options available for ProtO-RU.
+This document provides a reference for the configuration options available for ProtO-RU.
 
 Following the convention of srsRAN, ProtO-RU uses YAML files for configuration. 
 The configuration files are structured into sections, each corresponding to a specific component or functionality of the ProtO-RU system.
@@ -41,14 +41,14 @@ ru_emu:
       enable_ul_static_compr_hdr: true              # Optional BOOLEAN (true). Uplink static compression header enabled flag. Supported: [false, true].
       enable_dl_static_compr_hdr: true              # Optional BOOLEAN (true). Downlink static compression header enabled flag. Supported: [false, true].
       iq_scaling: 1.0                               # Optional FLOAT (0.35). Sets the IQ scaling factor. Supported: [0 - 20].
-      t2a_max_cp_dl: 2635                           # Optional INT (2635). Sets T2a maximum value for downlink control-plane. Supported: [0 - 5000].
-      t2a_min_cp_dl: 2221                           # Optional INT (2221). Sets T2a minimum value for downlink control-plane. Supported: [0 - 5000].
-      t2a_max_cp_ul: 2635                           # Optional INT (2635). Sets T2a maximum value for uplink control-plane. Supported: [0 - 5000].
-      t2a_min_cp_ul: 2221                           # Optional INT (2221). Sets T2a minimum value for uplink control-plane. Supported: [0 - 5000].
-      t2a_max_up: 2454                              # Optional INT (2454). Sets T2a maximum value for user-plane. Supported: [0 - 5000].
-      t2a_min_up: 2015                              # Optional INT (2015). Sets T2a minimum value for user-plane. Supported: [0 - 5000].
-      ta3_max_up: 1480                              # Optional INT (1480). Sets Ta3 maximum value for uplink user-plane. Supported: [0 - 5000].
-      ta3_min_up: 1125                              # Optional INT (1125). Sets Ta3 minimum value for uplink user-plane. Supported: [0 - 5000].
+      t2a_max_cp_dl: 2635                           # Required. Sets T2a maximum value for downlink control-plane. Supported: [0 - 5000].
+      t2a_min_cp_dl: 2221                           # Required. Sets T2a minimum value for downlink control-plane. Supported: [0 - 5000].
+      t2a_max_cp_ul: 2635                           # Required. Sets T2a maximum value for uplink control-plane. Supported: [0 - 5000].
+      t2a_min_cp_ul: 2221                           # Required. Sets T2a minimum value for uplink control-plane. Supported: [0 - 5000].
+      t2a_max_up: 2454                              # Required. Sets T2a maximum value for user-plane. Supported: [0 - 5000].
+      t2a_min_up: 2015                              # Required. Sets T2a minimum value for user-plane. Supported: [0 - 5000].
+      ta3_max_up: 1480                              # Required. Sets Ta3 maximum value for uplink user-plane. Supported: [0 - 5000].
+      ta3_min_up: 1125                              # Required. Sets Ta3 minimum value for uplink user-plane. Supported: [0 - 5000].
 
 radio:
   srate: 61.44                                      # Required FLOAT (61.44). Sets the sampling rate of the RF-frontend in MHz. 
@@ -64,13 +64,13 @@ radio:
 expert_execution:
   cell_affinities:                                  # Optional TEXT. Sets the cell CPU affinities configuration on a per cell basis. Entry order is the same as the order in the defined cell list.
     -                           
-      ru_cpus:        5,6,7,8,9,10,11,12,13,14      # Optional TEXT. Sets the CPU core(s) used for the Radio Unit tasks. Supported: [1, 2, 3 , ..., N].
-      ofh_rx_cpus:    1,2                           # Optional TEXT. Sets the CPU core(s) used for the OFH RX tasks. Supported: [1, 2, 3 , ..., N].
-      ru_timing_cpus: 3,4                           # Optional TEXT. Sets the CPU core(s) used for the RU Timing tasks. Supported: [1, 2, 3 , ..., N].
+      ru_cpus:                                      # Optional TEXT. Sets the CPU core(s) used for the Radio Unit tasks (low PHY and UHD). Supported: [1, 2, 3 , ..., N].
+      ofh_rx_cpus:                                  # Optional TEXT. Sets the CPU core(s) used for the OFH RX tasks. Supported: [1, 2, 3 , ..., N].
+      timing_cpus:                                  # Optional TEXT. Sets the CPU core(s) used for the RU Timing/ OFH TX tasks. Supported: [1, 2, 3 , ..., N].
   affinities:
-    isolated_cpus:      1,2,3,4,5,6,7,8,9,10,11,12,13,14,15     # Optional TEXT. Sets the CPU core(s) isolated for the gNB application. Supported: [1, 2, 3 , ..., N].
-    low_priority_cpus:  15                                      # Optional TEXT. Sets the CPU core(s) assigned to low priority tasks. Supported: [1, 2, 3 , ..., N].
+    isolated_cpus:                                  # Optional TEXT. Sets the CPU core(s) isolated for the application. Supported: [1, 2, 3 , ..., N].
+    low_priority_cpus:                              # Optional TEXT. Sets the CPU core(s) assigned to low priority tasks. Supported: [1, 2, 3 , ..., N].
   
   threads:                                          
     lower_phy:
-      execution_profile: quad                       # Optional TEXT (quad). Sets the lower physical layer executor profile. Supported: [single, dual, quad].
+      execution_profile: quad                       # Optional TEXT (quad). Sets the lower physical layer executor profile. Supported: [single, quad].
