@@ -14,8 +14,6 @@ ACM Open AI-RAN 2025 workshop (invited) demo - [[Poster]](https://drive.google.c
 
 Supported features - [Features](./proto-ru/FEATURES.md).
 
-Known issues - [Known Issues](./proto-ru/KNOWN_ISSUES.md).
-
 > Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation.
 
 ## Building ProtO-RU
@@ -51,7 +49,8 @@ make -j $(nproc)
 
 ### Time Synchronization
 
-Before running ProtO-RU, depending on your testbed setup (see [Testbed Hardware Setup](./proto-ru/TESTBED_SETUP.md)), the host system(s) must be time synchronized with the gNB host over PTP.
+Before running ProtO-RU, please ensure that you have a suitable system to host ProtO-RU (see [HW_REQUIREMENTS](./proto-ru/HW_REQUIREMENTS.md)).
+Depending on your testbed setup (see [Testbed Setup](./proto-ru/TESTBED_SETUP.md)), the DU and ProtO-RU host system(s) must be time synchronized with the gNB host over PTP.
 We have prepared a quick guide on setting up PTP time synchronization at [Time Synchronization](./proto-ru/TIME_SYNC.md).
 
 ### Starting ProtO-RU
@@ -69,6 +68,12 @@ We also provide sample configuration files in the [proto-ru/conf-files/](./proto
 
 **Important Note:** Given that ProtO-RU requires a large delay profile, the integration with other 5G CU/DU implementations may require some patching. 
 Please refer to the [Integration Notes](./proto-ru/INTEGRATION_NOTES.md) for more details.
+
+### Troubleshooting
+
+If you encounter any issues while running ProtO-RU, please consult to the [Troubleshooting Guide](./proto-ru/TROUBLESHOOTING.md) for common problems and their solutions.
+
+The list of known issues can also be found under [Known Issues](./proto-ru/KNOWN_ISSUES.md).
 
 ## Citation
 
