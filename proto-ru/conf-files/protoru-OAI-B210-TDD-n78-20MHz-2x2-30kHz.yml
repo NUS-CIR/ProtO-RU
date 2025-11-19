@@ -57,12 +57,13 @@ radio:
     enable_clipping: true                # Optional BOOLEAN (false). Sets clipping of the baseband samples on or off. If enabled, samples that exceed the power ceiling are clipped.
     ceiling: -0.1 
 
+# the following is an example used on a 16-core 32-thread CPU
 expert_execution:
   cell_affinities:                      
     -                           
       ru_cpus:        5,6,7,8,9,10,11,12,13,14
       ofh_rx_cpus:    1,2
-      ru_timing_cpus: 3,4            
+      timing_cpus: 3,4            
   affinities:
     isolated_cpus:      1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
     low_priority_cpus:  15

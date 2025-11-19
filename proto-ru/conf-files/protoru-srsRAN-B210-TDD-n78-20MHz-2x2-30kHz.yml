@@ -56,16 +56,18 @@ radio:
     enable_clipping: true                   # Optional BOOLEAN (false). Sets clipping of the baseband samples on or off. If enabled, samples that exceed the power ceiling are clipped.
     ceiling: -0.1   
 
+# the following is an example used on a 4-core 8-thread CPU
 expert_execution:
   cell_affinities:                      
     -                           
-      ru_cpus:        0,1
-      ofh_rx_cpus:    2
-      ru_timing_cpus: 2            
+      ru_cpus:        1                   # cpu for RU processing (i.e., low PHY/ UHD)
+      ofh_rx_cpus:    2                   # cpu for downlink OFH
+      timing_cpus:    3                   # cpu for uplink OFH
   affinities:
-    isolated_cpus:      0,1,2,3
-    low_priority_cpus:  3
+    isolated_cpus:      0,1,2,3,4,5,6
+    low_priority_cpus:  7
   
   threads:
     lower_phy:
-      execution_profile: quad
+      execution_profile: single           # either 'single' or 'quad'
+
