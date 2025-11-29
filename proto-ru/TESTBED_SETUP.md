@@ -13,9 +13,9 @@ gNB Host                          ProtO-RU Host
                                 SDR (e.g., USRP B210)
 ```
 
-In practice, the gNB host and ProtO-RU host can be the same machine or different machines connected via Ethernet (we have used both).
-If they are on different machines, ensure that both machines have synchronized clocks (i.e., using PTP) to avoid timing issues.
-If they are on the same machine, make sure to isolate the CPU cores used by the gNB and ProtO-RU to avoid performance degradation.
+In practice, the gNB host and ProtO-RU host can be the same machine or different machines connected via Ethernet (we have used both): 
+1. If they run on different machines, ensure that both machines have synchronized clocks (i.e., using PTP) to avoid timing issues.
+1. If they run on the same machine, make sure to *isolate* the CPU cores used by the gNB and ProtO-RU to avoid performance degradation.
 
 The interconnection between the gNB and ProtO-RU is *required* to be at least 10 GbE Ethernet to ensure sufficient bandwidth and low latency. 
 In our setup, all CUS-plane traffic between the gNB and ProtO-RU is carried over the shared Ethernet link, it is also possible to use a separate link for S-plane.
