@@ -8,13 +8,13 @@ Benefiting from the portability and modularity of srsRAN, ProtO-RU can be used o
 
 A software-based O-RU implementation would allow researchers to customize and innovate more freely in end-to-end setups, especially given the fixed-function and proprietary nature of commercial O-RUs.
 
-Technical report - Coming soon.
+Technical report - [arxiv](https://arxiv.org/abs/2512.02398).
 
 ACM Open AI-RAN 2025 workshop (invited) demo - [[Poster]](https://drive.google.com/file/d/10YtGOLr3b2fomS6cWCzG7gJtb5P75KzK/view?usp=sharing) [[YouTube]](https://www.youtube.com/watch?v=KSdTqXCAuGs).
 
 Supported features - [Features](./proto-ru/FEATURES.md).
 
-> Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation.
+> Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation. We are also in the process of rebasing ProtO-RU to the latest srsRAN version (i.e., 25.10).
 
 ## Building ProtO-RU
 
@@ -81,10 +81,13 @@ If you find ProtO-RU useful to your research, please cite our technical report:
 
 ```bibtex
 @techreport{zhou2025protoru,
-  author      = "Zhiyu Zhou and Xin Zhe Khooi and Satis Kumar Permal and Mun Choon Chan",
-  title       = "ProtO-RU: An O-RAN Split-7.2 Radio Unit using SDRs",
-  institution = "National University of Singapore",
-  year        = "2025"
+  title={ProtO-RU: An O-RAN Split-7.2 Radio Unit using SDRs}, 
+  author={Zhiyu Zhou and Xin Zhe Khooi and Satis Kumar Permal and Mun Choon Chan},
+  year={2025},
+  eprint={2512.02398},
+  archivePrefix={arXiv},
+  primaryClass={cs.NI},
+  url={https://arxiv.org/abs/2512.02398}, 
 }
 ```
 
