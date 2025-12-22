@@ -24,6 +24,16 @@ To troubleshoot the above timing issues, please attempt/consider the following:
 1. if the DU and ProtO-RU have to run on the same machine, use `taskset` to separate the CPU cores used by the DU and ProtO-RU.
 1. ensure that PTP is working properly and the ptp4l rms/ phc offset is stable, i.e., no huge spikes when ProtO-RU is running; if so, you should considering pinning `ptp4l` and `phc2sys` to a CPU core not used by ProtO-RU.
 1. ensure that your CPU is running at performance mode, and with idle states disabled for maximum responsiveness; having a real-time kernel is optional, but recommended.
+    - Useful commands:
+    ```bash
+    # to enable performance mode and disable idle states
+    sudo cpupower frequency-set -g performance
+    sudo cpupower idle-set -D 0
+
+    # to disable performance mode and enable idle states
+    sudo cpupower frequency-set -g powersave
+    sudo cpupower idle-set -E
+    ```
 1. for realtime failures, considering adding more CPU cores for low PHY processing through the parameter `ru_cpus`; if issues persist, consider changing the low PHY's execution profile from `single` to  `quad` (`dual` not supported).
 1. for missing/late packet arrivals at the DU, consider adding more CPU cores for uplink packet processing through the parameter `timing_cpus`.
 1. for late packet arrivals at the DU, consider raising the Ta4 values at the DU.
