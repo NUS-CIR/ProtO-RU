@@ -66,18 +66,11 @@ ENV UHD_DIR=/opt/uhd/${UHD_VERSION}
 ENV DPDK_DIR=/opt/dpdk/${DPDK_VERSION}
 RUN if [ -z "$NUM_JOBS" ]; then NUM_JOBS=$(nproc); fi \
     && \
-    /src/docker/scripts/builder.sh -c ${COMPILER} -m "-j${NUM_JOBS} srscu srsdu srsdu_split_8 srsdu_split_7_2 gnb gnb_split_8 gnb_split_7_2 ru_emulator" \
+    /src/docker/scripts/builder.sh -c ${COMPILER} -m "-j${NUM_JOBS} ru_emulator" \
     -DBUILD_TESTS=False -DENABLE_UHD=On -DENABLE_DPDK=On -DMARCH=${MARCH} -DCMAKE_INSTALL_PREFIX=/opt/srs \
     ${EXTRA_CMAKE_ARGS} /src \
     && \
     mkdir -p /opt/srs/bin /opt/srs/share/srsran && \
-    cp /src/build/apps/cu/srscu                 /opt/srs/bin/srscu            && \
-    cp /src/build/apps/du/srsdu                 /opt/srs/bin/srsdu            && \
-    cp /src/build/apps/du_split_8/srsdu         /opt/srs/bin/srsdu_split_8    && \
-    cp /src/build/apps/du_split_7_2/srsdu       /opt/srs/bin/srsdu_split_7_2  && \
-    cp /src/build/apps/gnb/gnb                  /opt/srs/bin/gnb              && \
-    cp /src/build/apps/gnb_split_8/gnb          /opt/srs/bin/gnb_split_8      && \
-    cp /src/build/apps/gnb_split_7_2/gnb        /opt/srs/bin/gnb_split_7_2    && \
     cp /src/build/apps/examples/ofh/ru_emulator /opt/srs/bin/ru_emulator      && \
     cp /src/configs/*.yml                       /opt/srs/share/srsran/
 
@@ -108,3 +101,5 @@ RUN /usr/local/etc/install_srsran_dependencies.sh run && \
     /usr/local/etc/install_uhd_dependencies.sh run && \
     /usr/local/etc/install_dpdk_dependencies.sh run && \
     apt-get autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["ru_emulator", "-c", "/opt/config.yaml"]

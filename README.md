@@ -45,21 +45,48 @@ cd ./apps/examples/ofh/ # ProtO-RU extends the srsRAN RU emulator
 make -j $(nproc)
 ```
 
+### Alternative: Using Docker
+
+You can also build a Docker image that contains ProtO-RU and all its dependencies pre-installed.
+To build the Docker image, run the following command from the root directory of the ProtO-RU repository:
+
+```bash
+./proto-ru/scripts/build_image.sh
+```
+
+This will create a Docker image named `protoru:latest`.
+Alternatively, you can pull the pre-built Docker image from Docker Hub:
+
+```bash
+docker pull khooi8913/protoru:latest
+```
+
+For more details, please refer to the [Docker Quickstart Guide](./proto-ru/DOCKER_QUICKSTART.md).
+
 ## Running ProtO-RU
 
 ### Time Synchronization
 
 Before running ProtO-RU, please ensure that you have a suitable system to host ProtO-RU (see [HW_REQUIREMENTS](./proto-ru/HW_REQUIREMENTS.md)).
+
 Depending on your testbed setup (see [Testbed Setup](./proto-ru/TESTBED_SETUP.md)), the DU and ProtO-RU host system(s) must be time synchronized with the gNB host over PTP.
 We have prepared a quick guide on setting up PTP time synchronization at [Time Synchronization](./proto-ru/TIME_SYNC.md).
 
+Once the system is time synchronized, we can then start ProtO-RU.
+
 ### Starting ProtO-RU
 
-Once the system is time synchronized, we can then start ProtO-RU.
-To run ProtO-RU, run the following command from the `build/apps/examples/ofh/` directory (assuming the configuration file is located at `/path/to/ru_emu.yml`):
+
+If you have built ProtO-RU from source, run the following command from the `build/apps/examples/ofh/` directory (assuming the configuration file is located at `/path/to/ru_emu.yml`):
 
 ```bash
 sudo ./ru_emulator -c /path/to/ru_emu.yml
+```
+
+If you are using the Docker image, run the following command (assuming the configuration file is located at `/path/to/ru_emu.yml` on the host system):
+
+```bash
+./proto-ru/scripts/start_image.sh /path/to/ru_emu.yml
 ```
 
 For more details on configuration options, please refer to the [Configuration Reference](./proto-ru/CONFIG_REFERENCE.md).
