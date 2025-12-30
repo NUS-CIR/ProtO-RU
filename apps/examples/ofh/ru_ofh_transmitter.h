@@ -1,6 +1,8 @@
 #pragma once
 
 #include "./helpers/timing_window_params.h"
+#include "./support/uplink_context_repository.h"
+#include "./helpers.h"
 #include "srsran/ofh/ethernet/ethernet_frame_pool.h"
 #include "srsran/ofh/ethernet/ethernet_gateway.h"
 #include "srsran/ofh/timing/ofh_ota_symbol_boundary_notifier.h"
@@ -24,12 +26,21 @@ class ofh_transmitter_impl : public ota_symbol_boundary_notifier
   std::shared_ptr<ether::gateway> gateway;
   /// Internal representation of timing parameters.
   const ru_window_timing_parameters timing_params;
+  /// Uplink context repository (for clearing contexts after transmission).
+  std::shared_ptr<uplink_cplane_context_repository> ul_context_repo;
+  /// PRACH context repository (for clearing contexts after transmission).
+  std::shared_ptr<uplink_cplane_context_repository> prach_context_repo;
+  /// TX total counter for uplink U-plane packets.
+  ru_emu_stats::kpi_counter* tx_counter;
 
 public:
-  ofh_transmitter_impl(srslog::basic_logger&                  logger_,
-                           const ru_window_timing_parameters&     timing_params_,
-                           std::shared_ptr<ether::gateway>        gw,
-                           std::shared_ptr<ether::eth_frame_pool> frame_pool);
+  ofh_transmitter_impl(srslog::basic_logger&                                 logger_,
+                       const ru_window_timing_parameters&                    timing_params_,
+                       std::shared_ptr<ether::gateway>                       gw,
+                       std::shared_ptr<ether::eth_frame_pool>                frame_pool,
+                       std::shared_ptr<uplink_cplane_context_repository>     ul_context_repo_,
+                       std::shared_ptr<uplink_cplane_context_repository>     prach_context_repo_,
+                       ru_emu_stats::kpi_counter*                            tx_counter_);
 
   // See interface for documentation.
   void on_new_symbol(slot_symbol_point symbol_point) override;

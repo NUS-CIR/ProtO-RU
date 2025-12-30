@@ -545,7 +545,7 @@ public:
 
     low_cfg.logger->set_level(cfg.phy_log_level);
 
-    ofh_transmitter = std::make_shared<ofh_transmitter_impl>(logger, cfg.timing_params, transceiver.get_transmitter(), ul_frame_pool);
+    ofh_transmitter = std::make_shared<ofh_transmitter_impl>(logger, cfg.timing_params, transceiver.get_transmitter(), ul_frame_pool, ul_context_repo, prach_cp_repo, &tx_total_counter);
 
     low_cfg.error_notifier = &error_adapter;
     low_cfg.metric_notifier = &metrics_adapter;

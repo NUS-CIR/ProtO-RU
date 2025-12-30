@@ -2,6 +2,7 @@
 #include "srsran/adt/static_vector.h"
 #include "srsran/adt/gps_clock.h"
 #include "srsran/instrumentation/traces/ofh_traces.h"
+#include "./support/uplink_context_repository.h"
 
 using namespace srsran;
 using namespace ofh;
@@ -17,14 +18,24 @@ static slot_symbol_point calculate_ofh_slot_symbol_point(slot_symbol_point symbo
   return {ofh_slot, symbol_point.get_symbol_index(), symbol_point.get_nof_symbols()};
 }
 
-ofh_transmitter_impl::ofh_transmitter_impl(srslog::basic_logger&                  logger_,
-                                                   const ru_window_timing_parameters&     timing_params_,
-                                                   std::shared_ptr<ether::gateway>        gw,
-                                                   std::shared_ptr<ether::eth_frame_pool> frame_pool) :
-  logger(logger_), pool(std::move(frame_pool)), gateway(gw), timing_params(timing_params_)
+ofh_transmitter_impl::ofh_transmitter_impl(srslog::basic_logger&                             logger_,
+                                           const ru_window_timing_parameters&                timing_params_,
+                                           std::shared_ptr<ether::gateway>                   gw,
+                                           std::shared_ptr<ether::eth_frame_pool>            frame_pool,
+                                           std::shared_ptr<uplink_cplane_context_repository> ul_context_repo_,
+                                           std::shared_ptr<uplink_cplane_context_repository> prach_context_repo_,
+                                          ru_emu_stats::kpi_counter*                         tx_counter_) :
+  logger(logger_),
+  pool(std::move(frame_pool)),
+  gateway(gw),
+  timing_params(timing_params_),
+  ul_context_repo(std::move(ul_context_repo_)),
+  prach_context_repo(std::move(prach_context_repo_)),
+  tx_counter(tx_counter_)
 {
   srsran_assert(gateway, "Invalid Ethernet gateway");
   srsran_assert(pool, "Invalid frame pool");
+  srsran_assert(tx_counter, "Invalid TX counter");
 }
 
 void ofh_transmitter_impl::transmit_frame_burst(span<span<const uint8_t>> frame_burst)
@@ -34,6 +45,8 @@ void ofh_transmitter_impl::transmit_frame_burst(span<span<const uint8_t>> frame_
   }
 
   gateway->send(frame_burst);
+  // Increment TX_TOTAL counter for uplink U-plane packets.
+  tx_counter->increment(frame_burst.size());
   logger.debug("Sending an Ethernet frame burst of size '{}'", frame_burst.size());
 }
 
@@ -94,6 +107,29 @@ void ofh_transmitter_impl::on_new_symbol(slot_symbol_point symbol_point)
   // Clear sent buffers.
   pool->clear_sent_frame_buffers(interval_up);
   pool->clear_sent_frame_buffers(interval_up_prach);
+
+  // Clear uplink C-Plane contexts for the transmitted slots to prevent stale contexts
+  // from generating new frames after DU stops.
+  if (ul_context_repo) {
+    slot_point start_slot = interval_up.start.get_slot();
+    slot_point end_slot   = interval_up.end.get_slot();
+    
+    // Clear contexts for all slots in the interval
+    for (slot_point slot = start_slot; slot <= end_slot; ++slot) {
+      ul_context_repo->clear_slot(slot);
+    }
+  }
+
+  // Clear PRACH C-Plane contexts for the transmitted slots.
+  if (prach_context_repo) {
+    slot_point start_slot = interval_up_prach.start.get_slot();
+    slot_point end_slot   = interval_up_prach.end.get_slot();
+    
+    // Clear contexts for all slots in the interval
+    for (slot_point slot = start_slot; slot <= end_slot; ++slot) {
+      prach_context_repo->clear_slot(slot);
+    }
+  }
 
   ofh_tracer << trace_event("ofh_ofh_transmitter", tp);
 }

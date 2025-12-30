@@ -27,6 +27,7 @@
 #include "srsran/ofh/ofh_constants.h"
 #include "srsran/ofh/serdes/ofh_cplane_message_properties.h"
 #include "srsran/ran/slot_pdu_capacity_constants.h"
+#include "srsran/srslog/srslog.h"
 #include <array>
 #include <mutex>
 #include <vector>
@@ -117,6 +118,26 @@ public:
     }
 
     return make_unexpected(default_error_t{});
+  }
+
+  /// Clears the context for the given slot and eAxC by resetting the number of symbols to 0.
+  void clear(slot_point slot, unsigned eaxc)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    ul_cplane_context& ctx = entry(slot, eaxc);
+    // Clear by setting nof_symbols to 0, which will cause future get() calls to fail
+    ctx.nof_symbols = 0;
+  }
+
+  /// Clears all contexts for the given slot across all eAxCs.
+  void clear_slot(slot_point slot)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    unsigned index = calculate_repository_index(slot, repo.size());
+    // Reset all eAxC entries for this slot
+    for (auto& ctx : repo[index]) {
+      ctx.nof_symbols = 0;
+    }
   }
 };
 

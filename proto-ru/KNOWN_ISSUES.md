@@ -2,13 +2,6 @@
 
 This document lists known issues and limitations in ProtO-RU.
 
-1. Realtime KPI monitoring 
-    - TX_TOTAL counter is currently not (yet) implemented.
-
-1. Uninitiated uplink U-plane packets
-    - In some cases, ProtO-RU may be sending uplink U-plane packets even if there are no incoming C-plane packets from the DU/gNB after ProtO-RU is running for a while.
-    - Note that this does not affect the normal operation of ProtO-RU, and this issue is currently under investigation.
-
 1. T2a/Ta3 value validation
     - Currently, ProtO-RU does not validate the T2a/Ta3 values configured in the RU configuration file.
     - Users must ensure that the T2a/Ta3 values are sufficiently large to provide enough time for the RU to process and transmit the data within the required deadlines.
