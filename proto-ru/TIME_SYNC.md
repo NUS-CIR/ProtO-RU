@@ -21,7 +21,7 @@ In the context of ProtO-RU, the DU is configured as the PTP Grandmaster, while t
 This corresponds to the LLS-C1 configuration.
 
 We have created an example configuration file for G.8275.1 Multicast PTP profile for LinuxPTP version 4. 
-The sample configurations for the ptp-gm and ptp-slave can be found [here](/ptp-conf-files/).
+The sample configurations for the ptp-gm and ptp-slave can be found [here](/proto-ru/ptp-conf-files/).
 
 ### Prerequisites
 First, we need to disable NTP on the DU and RU hosts.
