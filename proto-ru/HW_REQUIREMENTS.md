@@ -3,6 +3,7 @@
 To get ProtO-RU reliably, there are several system requirements that need to be met in order to meet the RT performance and functionality needs.
 
 - **CPU**: A modern processor with at least 4 CPU cores running at >=2.0 GHz is *required*. Higher core counts is necessary to support larger bandwidths.
+- **OS / Kernel**: A real-time kernel on the RU host is *required* for stable real-time operation. The CPU should also run in performance mode with idle states disabled (see [Troubleshooting](TROUBLESHOOTING.md)).
 - **Memory**: A minimum of 8GB RAM is recommended. 
 - **Network Interface**: 10GbE Ethernet interface is *required*. The NIC must also support hardware timestamping for PTP.
     - NOTE: Technically, 1GbE/2.5 GbE interfaces should work, but so far we have had limited success with them and kept on running into timing-related issues. Please consult [Known Issues](KNOWN_ISSUES.md) for more details.
@@ -33,3 +34,5 @@ ProtO-RU has been tested to work on the following systems:
     - NIC: Intel X710-DA2 2x10GbE Ethernet Adapter
     - OS: Ubuntu 24.04.3 LTS
     - Linux kernel: 6.8.0-87-generic
+
+> Note: Systems 2 and 3 ran a generic (non-RT) kernel and were used only for limited / reduced-load testing. A real-time kernel is required for stable, sustained operation.

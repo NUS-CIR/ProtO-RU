@@ -23,7 +23,7 @@ To troubleshoot the above timing issues, please attempt/consider the following:
 1. run ProtO-RU on a dedicated machine (clean installation recommended) to avoid any CPU resource contention with other applications.
 1. if the DU and ProtO-RU have to run on the same machine, use `taskset` to separate the CPU cores used by the DU and ProtO-RU.
 1. ensure that PTP is working properly and the ptp4l rms/ phc offset is stable, i.e., no huge spikes when ProtO-RU is running; if so, you should considering pinning `ptp4l` and `phc2sys` to a CPU core not used by ProtO-RU.
-1. ensure that your CPU is running at performance mode, and with idle states disabled for maximum responsiveness; having a real-time kernel is optional, but recommended.
+1. ensure that your CPU is running at performance mode, and with idle states disabled for maximum responsiveness; a real-time kernel on the RU host is *required* (see [Hardware Requirements](HW_REQUIREMENTS.md)).
     - Useful commands:
     ```bash
     # to enable performance mode and disable idle states
