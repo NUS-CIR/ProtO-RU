@@ -122,7 +122,7 @@
      auto merged_rg = dl_cp_repo->pop_and_merge_slot_resource_grid(context.slot, dl_rg);
      // Abort slot processing if the grid is not valid.
      if (!merged_rg) {
-       logger.warning("Invalid resource grid for slot {}.", context.slot);
+       logger.debug("Invalid resource grid for slot {}.", context.slot);
        // Raise TTI boundary and notify.
        tti_boundary = true;
        cvar_tti_boundary.notify_all();
