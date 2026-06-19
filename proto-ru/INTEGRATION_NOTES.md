@@ -49,6 +49,4 @@ Once the changes are made, recompile srsRAN.
 
 As for OAI, the xRAN fronthaul library does not support T1a/Ta4 values larger than a TTI interval.
 
-We have created a patch to modify xRAN implementation to support larger T1a/Ta4 values, and we are in the process of engaging with the OAI maintainers to upstream the changes.
-
-Please refer to the merge request [!3690](https://gitlab.eurecom.fr/oai/openairinterface5g/-/merge_requests/3690) for the patch and instructions on how to apply it.
+We have created a patch to modify the xRAN implementation to support larger T1a/Ta4 values. For the xRAN F release, this has been upstreamed and is supported since OAI `2026.w06`; please refer to the merge request [!3690](https://gitlab.eurecom.fr/oai/openairinterface5g/-/merge_requests/3690) for details. For the xRAN K release, upstream support is ongoing; see [openairinterface/o-du-phy#3](https://github.com/openairinterface/o-du-phy/pull/3).

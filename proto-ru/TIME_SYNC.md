@@ -21,7 +21,7 @@ In the context of ProtO-RU, the DU is configured as the PTP Grandmaster, while t
 This corresponds to the LLS-C1 configuration.
 
 We have created an example configuration file for G.8275.1 Multicast PTP profile for LinuxPTP version 4. 
-The sample configurations for the ptp-gm and ptp-slave can be found [here](/ptp_conf_files/).
+The sample configurations for the ptp-gm and ptp-slave can be found [here](/proto-ru/ptp-conf-files/).
 
 ### Prerequisites
 First, we need to disable NTP on the DU and RU hosts.
@@ -121,4 +121,25 @@ phc2sys[907592.360]: CLOCK_REALTIME phc offset        -5 s2 freq  -12025 delay  
 ```
 
 The phc offset is used to determine if the system clock is synchronized with the PTP hardware clock, for this we generally look for a value in the range of -100 to 100.
+
+## USRP Clock Reference (Long-Running Stability)
+
+The PTP setup above keeps the DU and RU *host* clocks aligned, but the USRP itself runs off its own onboard oscillator. By default (`clock: internal`, `sync: internal` in the `radio` section), that oscillator is free-running and drifts relative to the PTP-disciplined host clock. Over long, continuous runs the drift accumulates until the fronthaul timing can no longer be met and ProtO-RU crashes (see [Known Issues](KNOWN_ISSUES.md)); the only remedy at that point is to restart ProtO-RU.
+
+For stable long-running operation, discipline the USRP from an external time/frequency reference:
+
+- **External 10 MHz + PPS** -- feed a common 10 MHz reference and PPS into the USRP's REF/PPS inputs and set:
+  ```yaml
+  radio:
+    clock: external
+    sync: external
+  ```
+- **Onboard GPSDO** -- if the USRP is equipped with a GPSDO, set:
+  ```yaml
+  radio:
+    clock: gpsdo
+    sync: gpsdo
+  ```
+
+This requires a USRP model with the corresponding reference inputs (e.g., the B210's REF IN / PPS IN, or a GPSDO-equipped N310).
 

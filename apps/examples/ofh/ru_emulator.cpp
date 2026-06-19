@@ -779,15 +779,24 @@ private:
     if (message_info.direction == data_direction::downlink && message_info.type == message_type::control_plane){
       // A new slot point for downlink.
       slot_point slot = message_info.symbol_point.get_slot();
-      // Allocate a resource grid from the pool for writing.
-      shared_resource_grid rg = dl_rg_pool->allocate_resource_grid(slot);
+      unsigned start_symbol = message_info.symbol_point.get_symbol_index();
 
       // Send to dl_slot_repo.
       resource_grid_context ctx = {slot, cfg.sector};
-      ofdm_symbol_range symbol_range = ofdm_symbol_range(message_info.symbol_point.get_symbol_index(), message_info.nof_symbols);
+      ofdm_symbol_range symbol_range = ofdm_symbol_range(start_symbol, message_info.nof_symbols);
       // logger.warning("DL slot {}: symbol [{}, {}]\n", slot, symbol_range.start(), symbol_range.stop());
-      const downlink_context& dl_ctx = dl_context_repo->get(slot, 0);
+      const downlink_context& dl_ctx = dl_context_repo->get(slot, start_symbol);
       if(dl_ctx.empty()){
+        // Allocate a resource grid from the pool for writing only when this symbol context is not initialized.
+        shared_resource_grid rg = dl_rg_pool->allocate_resource_grid(slot);
+        if (!rg.is_valid()) {
+          logger.warning("Failed to allocate DL resource grid for slot '{}' and symbol '{}' (nof_symbols='{}'). "
+                         "This usually means the resource grid pool is exhausted.",
+                         slot,
+                         start_symbol,
+                         message_info.nof_symbols);
+          return;
+        }
         dl_context_repo->add(ctx, rg, symbol_range);
       }
     }

@@ -13,7 +13,7 @@ Support for Category B features is planned for future releases.
 - Short PRACH preamble (limited to format B4)
 - Per-slot C-plane packet handling
 - MIMO support (tested up to 2x2 on the USRP B210 and N310)
-- Realtime KPI monitoring (TX_TOTAL counter available soon)
+- Realtime KPI monitoring
 
 ## Coming Soon
 
