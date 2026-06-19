@@ -12,9 +12,11 @@ Technical report - [arxiv](https://arxiv.org/abs/2512.02398).
 
 ACM Open AI-RAN 2025 workshop (invited) demo - [[Poster]](https://drive.google.com/file/d/10YtGOLr3b2fomS6cWCzG7gJtb5P75KzK/view?usp=sharing) [[YouTube]](https://www.youtube.com/watch?v=KSdTqXCAuGs).
 
+OAI Summer 2026 Workshop demo - [[YouTube]](https://youtu.be/LIG8f8c_5q4); a preview of the next version of ProtO-RU based on OCUDU 26.04.
+
 Supported features - [Features](./proto-ru/FEATURES.md).
 
-> Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation. We are also in the process of rebasing ProtO-RU to the latest srsRAN version (i.e., 25.10).
+> Note: ProtO-RU is currently under active development. Please check back frequently for updates and new documentation. The next version of ProtO-RU, based on OCUDU 26.04, will be released soon in Q3 2026. As part of this rebase, ProtO-RU will also transition to the licensing model used by the upstream OCUDU project.
 
 ## Building ProtO-RU
 

@@ -15,14 +15,14 @@ More details on ProtO-RU's configuration options can be found in the [Configurat
 For srsRAN gNB configuration files, we use the following naming convention:
 `gNB-srsRAN-<SDR>-<DUPLEX_MODE>-<NR_BAND>-<BANDWIDTH>-<MIMO_MODE>-<SCS>.yml`.
 
-An example file name is `srsRAN-gNB-B210-TDD-n78-20MHz-2x2-30kHz.yml`, which indicates a gNB configuration file for srsRAN using a USRP B210 SDR in TDD mode running at MIMO2x2, 20 MHz bandwidth, and 30 kHz subcarrier spacing.
+An example file name is `gNB-srsRAN-B210-TDD-n78-20MHz-2x2-30kHz.yml`, which indicates a gNB configuration file for srsRAN using a USRP B210 SDR in TDD mode running at MIMO2x2, 20 MHz bandwidth, and 30 kHz subcarrier spacing.
 
 ### OpenAirInterface5G
 
 For OAI gNB configuration files, we use the following naming convention:
 `gNB-OAI-<SDR>-<DUPLEX_MODE>-<NR_BAND>-<BANDWIDTH>-<MIMO_MODE>-<SCS>.conf`.
 
-An example file name is `OAI-gNB-B210-TDD-n78-20MHz-2x2-30kHz.conf`, which indicates a gNB configuration file for OAI using a USRP B210 SDR in TDD mode running at MIMO2x2, 20 MHz bandwidth, and 30 kHz subcarrier spacing.
+An example file name is `gNB-OAI-B210-TDD-n78-20MHz-2x2-30kHz.conf`, which indicates a gNB configuration file for OAI using a USRP B210 SDR in TDD mode running at MIMO2x2, 20 MHz bandwidth, and 30 kHz subcarrier spacing.
 
 ### ProtO-RU
 
