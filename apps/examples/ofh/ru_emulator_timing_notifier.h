@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
@@ -29,7 +30,7 @@ class ru_emulator_timing_notifier : public ofh::ota_symbol_boundary_notifier_man
   std::atomic<worker_status>                      status{worker_status::running};
 
 public:
-  ru_emulator_timing_notifier(ocudulog::basic_logger& logger_, task_executor& executor_);
+  ru_emulator_timing_notifier(ocudulog::basic_logger& logger_, task_executor& executor_, subcarrier_spacing scs_);
 
   /// Starts operation of the timing notifier.
   void start();

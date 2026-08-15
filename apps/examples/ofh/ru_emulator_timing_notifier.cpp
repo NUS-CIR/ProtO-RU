@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
@@ -76,10 +77,11 @@ static unsigned circular_distance(unsigned cur, unsigned prev, unsigned size)
 }
 
 ru_emulator_timing_notifier::ru_emulator_timing_notifier(ocudulog::basic_logger& logger_,
-                                                         ocudu::task_executor&   executor_) :
+                                                         ocudu::task_executor&   executor_,
+                                                         subcarrier_spacing      scs_) :
   logger(logger_),
   executor(executor_),
-  scs(subcarrier_spacing::kHz30),
+  scs(scs_),
   nof_symbols_per_slot(get_nsymb_per_slot(cyclic_prefix::NORMAL)),
   nof_symbols_per_sec(nof_symbols_per_slot * get_nof_slots_per_subframe(scs) * NOF_SUBFRAMES_PER_FRAME * 100),
   nof_slots_per_hyper_system_frame(slot_point(scs, 0).nof_slots_per_hyper_system_frame()),

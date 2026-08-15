@@ -34,6 +34,56 @@ target_link_libraries(ofh_ru_sector_test ocudu_ofh_ru ocudu_ofh_transmitter ocud
         ocudu_ran GTest::gtest GTest::gtest_main)
 gtest_discover_tests(ofh_ru_sector_test)
 
+add_executable(ru_emulator_upper_phy_test ru_emulator_upper_phy_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_upper_phy.cpp)
+target_include_directories(ru_emulator_upper_phy_test PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(ru_emulator_upper_phy_test ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_upper_phy_test)
+
+add_executable(ru_emulator_rx_symbol_adapter_test ru_emulator_rx_symbol_adapter_test.cpp)
+target_include_directories(ru_emulator_rx_symbol_adapter_test PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(ru_emulator_rx_symbol_adapter_test ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_rx_symbol_adapter_test)
+
+add_executable(ru_emulator_sdr_upper_phy_test ru_emulator_sdr_upper_phy_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_sdr_upper_phy.cpp)
+target_include_directories(ru_emulator_sdr_upper_phy_test PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(ru_emulator_sdr_upper_phy_test ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_sdr_upper_phy_test)
+
+add_executable(ru_emulator_sdr_config_test ru_emulator_sdr_config_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_sdr.cpp)
+target_include_directories(ru_emulator_sdr_config_test PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(ru_emulator_sdr_config_test ocudu_ran ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_sdr_config_test)
+
+add_executable(ru_emulator_cli11_schema_test ru_emulator_cli11_schema_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_cli11_schema.cpp)
+target_include_directories(ru_emulator_cli11_schema_test PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/external)
+target_link_libraries(ru_emulator_cli11_schema_test ocudulog ocudu_ran ocudu_support ocudu_yaml_util
+        GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_cli11_schema_test)
+
+add_executable(ru_emulator_tti_orchestrator_test ru_emulator_tti_orchestrator_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_tti_orchestrator.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_sdr_upper_phy.cpp)
+target_include_directories(ru_emulator_tti_orchestrator_test PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(ru_emulator_tti_orchestrator_test ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_tti_orchestrator_test)
+
+add_executable(ru_emulator_gps_slot_aligner_test ru_emulator_gps_slot_aligner_test.cpp)
+target_include_directories(ru_emulator_gps_slot_aligner_test PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(ru_emulator_gps_slot_aligner_test ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_gps_slot_aligner_test)
+
 add_executable(ofh_ru_message_transmitter_test ofh_ru_message_transmitter_test.cpp)
 target_link_libraries(ofh_ru_message_transmitter_test ocudu_ofh_ru ocudu_ofh_ethernet ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
 gtest_discover_tests(ofh_ru_message_transmitter_test)
+
+add_executable(ru_emulator_appconfig_yaml_writer_test ru_emulator_appconfig_yaml_writer_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_appconfig_yaml_writer.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_cli11_schema.cpp)
+target_include_directories(ru_emulator_appconfig_yaml_writer_test PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/external)
+target_link_libraries(ru_emulator_appconfig_yaml_writer_test ocudulog ocudu_ran ocudu_support ocudu_yaml_util
+        GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_appconfig_yaml_writer_test)

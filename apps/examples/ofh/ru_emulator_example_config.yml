@@ -1,0 +1,134 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+# =====================================================================================================
+# RU emulator — annotated sample configuration
+#
+#   ru_emulator -c ru_emulator_example_config.yml
+#
+# As written, this runs ONE cell in SDR mode on a USRP B210 (n78 TDD, 20 MHz, 30 kHz SCS, 1x1).
+# To run in loopback mode (no radio, test IQ) delete the whole `sdr:` block of the cell.
+# Commented alternatives show the 15 kHz FDD (band n3) values where they differ.
+#
+# CPU layout assumed below (8-core host; adapt to yours, see ARCHITECTURE.md §4):
+#   core 1    -> ru_timing  (GPS OTA tick; strictly realtime, wants its own quiet core)
+#   cores 2,3 -> OFH workers (ru_rx receive, ru_emu decode, ru_ofh_tx UL build+send; event-driven, can share)
+#   cores 4,5 -> SDR radio + lower-PHY baseband (ru_radio, ru_phy*; busy, keep isolated)
+# =====================================================================================================
+
+log:
+  filename: stdout              # log file path, or "stdout"
+  level: info                   # none | error | warning | info | debug
+
+ru_emu:
+  # CPUs of the shared GPS timing worker (one thread for all cells). It polls the GPS wall clock every
+  # ~symbol/15 and ticks the OTA notifiers; its jitter sets the OTA reference for every sector.
+  timing_cpus: [1]
+
+  cells:
+    # ---------------- Fronthaul (Ethernet) ----------------
+    - network_interface: enp1s0f0      # AF_PACKET: kernel NIC name. DPDK: the NIC PCIe address (e.g. "0000:01:00.0")
+      ru_mac_addr: 0e:42:a3:ef:fd:71   # this emulator's MAC (source of the U-plane it transmits)
+      du_mac_addr: aa:bb:cc:dd:ee:ff   # the O-DU's MAC (destination)
+      vlan_tag: 1                      # must match the O-DU cell's VLAN
+      # enable_promiscuous: false      # rarely needed (e.g. veth pairs without MAC filtering)
+
+      # ---------------- Cell ----------------
+      bandwidth: 20                    # MHz. 20 MHz @ 30 kHz = 51 PRB
+      common_scs: 30                   # 15 or 30 (kHz). ALL cells must share one SCS (single GPS timing numerology)
+      dl_arfcn: 632628                 # n78 ~3489.42 MHz. DL/UL radio frequencies are derived from this (+ band)
+      # band: 78                       # optional; derived from dl_arfcn when unset
+      # 15 kHz FDD alternative:  common_scs: 15, bandwidth: 10, dl_arfcn: 365000 (n3: DL 1825 / UL 1730 MHz)
+
+      # ---------------- eAxC ports ----------------
+      # The lists must match the O-DU's ru_ofh cell config. In SDR mode they also size the radio:
+      # TX antennas = len(dl_port_id), RX antennas = len(ul_port_id).
+      ul_port_id: [0]
+      dl_port_id: [0]
+      prach_port_id: [4]
+      prach_format: short              # long (format 0) | short (B4). SDR mode requires short
+
+      # ---------------- O-RAN timing windows (microseconds, cap 5000) ----------------
+      # T2a: the RU's RECEIVE windows, measured back from the symbol's air time. With a software O-DU the
+      # arrival jitter is large, so keep them wide, and configure the SAME values on the O-DU (it transmits
+      # each message when its window opens). SDR constraints (the app aborts at startup if violated):
+      # everything for a slot must have arrived before its grid is pushed to the radio, 1 ms + 1 slot before
+      # air. Hard minimums: t2a_max_cp_dl > 1 ms + slot (1500 us @ 30 kHz, 2000 us @ 15 kHz),
+      # t2a_max_cp_ul > 1 ms + slot/2, t2a_max_up > 1 ms + slot + 13 symbols (~1964 us @ 30 kHz,
+      # ~2929 us @ 15 kHz). Keep a few hundred us of headroom on top for the receive/decode latency.
+      t2a_max_cp_dl: 2000
+      t2a_min_cp_dl: 258
+      t2a_max_cp_ul: 2000
+      t2a_min_cp_ul: 285
+      t2a_max_up: 2500
+      t2a_min_up: 85
+      # Ta3: the RU's uplink TRANSMIT window, measured forward from the symbol's air time. Must sit inside
+      # the O-DU's Ta4 receive window (patch the DU if its Ta4 cap is below these values).
+      ta3_max_up: 300
+      ta3_min_up: 85
+
+      # ---------------- Compression (must match the O-DU) ----------------
+      compr_method_ul: bfp             # U-plane the RU transmits: none | bfp
+      compr_bitwidth_ul: 9             # 9 | 16
+      compr_method_dl: bfp             # U-plane the RU receives/decompresses
+      compr_bitwidth_dl: 9
+      compr_method_prach: bfp          # PRACH U-plane the RU transmits
+      compr_bitwidth_prach: 9
+      is_ul_static_compr_hdr: true     # static (out-of-band) vs dynamic (in-band) compression header
+      is_dl_static_compr_hdr: true
+      # iq_scaling: 1.0                # applied before compression; lower it for hot real-world captures
+
+      # ---------------- OFH worker CPUs ----------------
+      # ru_rx (Ethernet receive), ru_emu (OFH decode + grid write) and ru_ofh_tx (UL U-plane build +
+      # compression + Ta3 drain + send) share this set; they are event-driven and co-exist fine.
+      ofh_cpus: [2, 3]
+
+      # ---------------- SDR (delete this block for loopback mode) ----------------
+      sdr:
+        device_driver: uhd             # uhd (USRP) | zmq (simulation)
+        device_args: type=b200
+        # ZMQ alternative: device_args: tx_port=tcp://*:5000,rx_port=tcp://localhost:5001
+        srate: 30.72                   # MHz; must equal FFT x common_scs and cover the bandwidth:
+                                       #   30 kHz: 15.36 (FFT 512) | 30.72 (1024) | 61.44 (2048)
+                                       #   15 kHz:  7.68 (512)     | 15.36 (1024) | 23.04 (1536)
+        tx_gain: 60                    # dB
+        rx_gain: 60
+
+        # Timing discipline. The slot/frame numbering is aligned to the O-DU at runtime against the HOST
+        # clock (keep it GPS/NTP-synchronized), so any source works; gpsdo (or a shared external
+        # 10 MHz + PPS) additionally keeps the radio from drifting vs GPS afterwards. "internal" runs on
+        # the radio's own TCXO (~ppm drift; fine for bench tests, set calibrate_clock_ppm to shrink it).
+        clock_source: gpsdo            # default | internal | external | gpsdo
+        sync_source: gpsdo
+
+        # Lower-PHY pipeline depth (slots the TTI fires ahead of air, on top of the lower PHY's 1 ms
+        # baseband lead). Fronthaul deadlines do not depend on it (downlink grids are pushed to the radio,
+        # and PRACH captures requested, 1 ms + half a slot before air regardless). Default 2.
+        max_proc_delay: 2
+
+        # Baseband threading: auto (by CPU count) | sequential | single | dual | triple.
+        # ZMQ is forced to sequential. See ARCHITECTURE.md §4/§6 for the thread-to-role mapping.
+        execution_profile: auto
+        ru_cpus: [4, 5]                # radio + baseband workers only (the OFH transmit lives on ofh_cpus)
+        pinning_policy: round-robin    # mask (share the whole set) | round-robin (one CPU per worker)
+
+        # ---- RF calibration (optional; defaults shown) ----
+        # center_freq_offset: 0        # Hz, added to all channels
+        # calibrate_clock_ppm: 0       # carrier-frequency PPM correction; measure your TCXO once and dial it in
+        # lo_offset: 0                 # MHz; moves LO leakage out of the channel
+        # time_alignment_calibration: 0  # samples; overrides the RF driver's Rx->Tx alignment
+        # otw_format: default          # default | sc16 | sc12 | sc8
+        # transmission_mode: continuous  # continuous | discontinuous | same-port
+        # power_ramping: 0             # us, for discontinuous TX
+
+        # ---- Amplitude control (optional; defaults shown) ----
+        # gain_backoff: 12             # dB of PAPR + DFT-normalisation headroom
+        # power_ceiling: -0.1          # dBFS
+        # enable_clipping: false
+
+# ---------------- DPDK fronthaul (optional; needs -DENABLE_DPDK=ON) ----------------
+# 1. bind the NIC:  sudo dpdk-devbind.py -b vfio-pci 0000:01:00.0   (the kernel netdev disappears)
+# 2. set the cell's network_interface to that PCIe address
+# 3. allow-list the same address in eal_args; run as root with hugepages configured
+# dpdk:
+#   eal_args: "-l 0-3 -a 0000:01:00.0 --proc-type auto"

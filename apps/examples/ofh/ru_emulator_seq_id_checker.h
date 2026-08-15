@@ -42,12 +42,13 @@ public:
 
     // The message is from the past.
     if (nof_skipped_seq_id < 0) {
-      logger.warning("Dropped received Open Fronthaul User-Plane packet for {} eAxC value '{}' in slot '{}' symbol "
-                     "'{}' as sequence identifier field is from the past. Last valid slot was '{}', symbol '{}'",
+      logger.warning("Received Open Fronthaul packet for {} eAxC value '{}' in slot '{}' symbol '{}' with sequence "
+                     "identifier '{}' from the past; processing it. Last valid slot was '{}', symbol '{}'",
                      port_type,
                      eaxc,
                      symbol_point.get_slot(),
                      symbol_point.get_symbol_index(),
+                     seq_id,
                      last_valid_symbol_point.get_slot(),
                      last_valid_symbol_point.get_symbol_index());
       return counter.increment();
