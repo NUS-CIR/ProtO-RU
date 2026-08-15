@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "../../../../lib/ofh/receiver/ofh_uplane_rx_symbol_data_flow_notifier.h"
@@ -28,7 +29,7 @@ static shared_resource_grid get_resource_grid()
 TEST(ofh_data_flow_uplane_rx_symbol_notifier, empty_context_does_not_notify)
 {
   auto                                notifier = std::make_shared<uplane_rx_symbol_notifier_spy>();
-  auto                                repo     = std::make_shared<uplink_context_repository>(1);
+  auto                                repo     = std::make_shared<rx_grid_context_repository>(1);
   uplane_rx_symbol_data_flow_notifier sender(ocudulog::fetch_basic_logger("TEST"), repo, notifier);
   slot_point                          slot(0, 0, 1);
   unsigned                            symbol = 0;
@@ -43,7 +44,7 @@ TEST(ofh_data_flow_uplane_rx_symbol_notifier, empty_context_does_not_notify)
 TEST(ofh_data_flow_uplane_rx_symbol_notifier, unwritten_grid_does_not_notify)
 {
   auto                                notifier = std::make_shared<uplane_rx_symbol_notifier_spy>();
-  auto                                repo     = std::make_shared<uplink_context_repository>(1);
+  auto                                repo     = std::make_shared<rx_grid_context_repository>(1);
   uplane_rx_symbol_data_flow_notifier sender(ocudulog::fetch_basic_logger("TEST"), repo, notifier);
   slot_point                          slot(0, 0, 1);
   unsigned                            symbol = 0;
@@ -61,7 +62,7 @@ TEST(ofh_data_flow_uplane_rx_symbol_notifier, unwritten_grid_does_not_notify)
 TEST(ofh_data_flow_uplane_rx_symbol_notifier, completed_resource_grid_triggers_notification)
 {
   auto                                notifier = std::make_shared<uplane_rx_symbol_notifier_spy>();
-  auto                                repo     = std::make_shared<uplink_context_repository>(1);
+  auto                                repo     = std::make_shared<rx_grid_context_repository>(1);
   uplane_rx_symbol_data_flow_notifier sender(ocudulog::fetch_basic_logger("TEST"), repo, notifier);
   slot_point                          slot(0, 0, 1);
   unsigned                            symbol = 0;
@@ -90,7 +91,7 @@ TEST(ofh_data_flow_uplane_rx_symbol_notifier, completed_resource_grid_triggers_n
 TEST(ofh_data_flow_uplane_rx_symbol_notifier, uncompleted_port_does_not_notify)
 {
   auto                                notifier = std::make_shared<uplane_rx_symbol_notifier_spy>();
-  auto                                repo     = std::make_shared<uplink_context_repository>(1);
+  auto                                repo     = std::make_shared<rx_grid_context_repository>(1);
   uplane_rx_symbol_data_flow_notifier sender(ocudulog::fetch_basic_logger("TEST"), repo, notifier);
   slot_point                          slot(0, 0, 1);
   unsigned                            symbol = 0;
@@ -113,7 +114,7 @@ TEST(ofh_data_flow_uplane_rx_symbol_notifier, uncompleted_port_does_not_notify)
 TEST(ofh_data_flow_uplane_rx_symbol_notifier, uncompleted_prbs_does_not_notify)
 {
   auto                                notifier = std::make_shared<uplane_rx_symbol_notifier_spy>();
-  auto                                repo     = std::make_shared<uplink_context_repository>(1);
+  auto                                repo     = std::make_shared<rx_grid_context_repository>(1);
   uplane_rx_symbol_data_flow_notifier sender(ocudulog::fetch_basic_logger("TEST"), repo, notifier);
   slot_point                          slot(0, 0, 1);
   unsigned                            symbol = 0;

@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "../support/prach_context_repository.h"
-#include "../support/uplink_context_repository.h"
+#include "../support/rx_grid_context_repository.h"
 #include "../support/uplink_cplane_context_repository.h"
 #include "../support/uplink_notified_grid_symbol_repository.h"
 #include "ofh_receiver_impl.h"
@@ -25,7 +26,7 @@ std::unique_ptr<receiver> create_receiver(const receiver_config&                
                                           std::unique_ptr<ether::receiver>                        eth_receiver,
                                           uplane_rx_symbol_notifier*                              notifier,
                                           std::shared_ptr<prach_context_repository>               prach_context_repo,
-                                          std::shared_ptr<uplink_context_repository>              ul_slot_context_repo,
+                                          std::shared_ptr<rx_grid_context_repository>             ul_slot_context_repo,
                                           std::shared_ptr<uplink_cplane_context_repository>       ul_cp_context_repo,
                                           std::shared_ptr<uplink_cplane_context_repository>       prach_cp_context_repo,
                                           std::shared_ptr<uplink_notified_grid_symbol_repository> notifier_symbol_repo);

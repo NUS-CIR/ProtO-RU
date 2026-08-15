@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -6,7 +7,7 @@
 #include "ofh_metrics_collector_impl.h"
 #include "ofh_sector_controller.h"
 #include "support/prach_context_repository.h"
-#include "support/uplink_context_repository.h"
+#include "support/rx_grid_context_repository.h"
 #include "support/uplink_cplane_context_repository.h"
 #include "ocudu/ofh/ethernet/ethernet_receiver.h"
 #include "ocudu/ofh/ethernet/ethernet_transmitter.h"
@@ -25,12 +26,12 @@ struct sector_impl_config {
 
 /// Sector implementation dependencies.
 struct sector_impl_dependencies {
-  std::unique_ptr<receiver>                  ofh_receiver;
-  std::unique_ptr<transmitter>               ofh_transmitter;
-  std::shared_ptr<uplink_context_repository> ul_data_repo;
-  std::shared_ptr<prach_context_repository>  ul_prach_repo;
-  ether::transmitter&                        eth_transmitter;
-  ether::receiver&                           eth_receiver;
+  std::unique_ptr<receiver>                   ofh_receiver;
+  std::unique_ptr<transmitter>                ofh_transmitter;
+  std::shared_ptr<rx_grid_context_repository> ul_data_repo;
+  std::shared_ptr<prach_context_repository>   ul_prach_repo;
+  ether::transmitter&                         eth_transmitter;
+  ether::receiver&                            eth_receiver;
 };
 
 /// Open Fronthaul sector implementation.

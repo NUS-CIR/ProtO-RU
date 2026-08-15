@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
-#include "../support/uplink_context_repository.h"
+#include "../support/rx_grid_context_repository.h"
 #include "ofh_closed_rx_window_handler.h"
 #include "ofh_message_receiver_impl.h"
 #include "ofh_message_receiver_task_dispatcher.h"
@@ -39,9 +40,9 @@ struct receiver_impl_dependencies {
   };
 
   struct close_rx_window_dependencies {
-    std::shared_ptr<prach_context_repository>  prach_repo;
-    std::shared_ptr<uplink_context_repository> uplink_repo;
-    std::shared_ptr<uplane_rx_symbol_notifier> notifier;
+    std::shared_ptr<prach_context_repository>   prach_repo;
+    std::shared_ptr<rx_grid_context_repository> uplink_repo;
+    std::shared_ptr<uplane_rx_symbol_notifier>  notifier;
   };
 
   /// Logger.

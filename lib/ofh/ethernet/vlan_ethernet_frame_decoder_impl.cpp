@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "vlan_ethernet_frame_decoder_impl.h"
@@ -27,9 +28,15 @@ span<const uint8_t> vlan_frame_decoder_impl::decode(span<const uint8_t> frame, v
   deserializer.read(eth_params.mac_dst_address);
   deserializer.read(eth_params.mac_src_address);
 
-  // VLAN parameters are stripped by the NIC.
-
+  eth_params.vlan_config.reset();
   eth_params.eth_type = deserializer.read<uint16_t>();
+
+  if (eth_params.eth_type == VLAN_TPID) {
+    const uint16_t tci     = deserializer.read<uint16_t>();
+    eth_params.vlan_config = vlan_parameters{.tci_vid = static_cast<uint16_t>(tci & 0x0fffU),
+                                             .tci_pcp = static_cast<uint8_t>((tci >> 13U) & 0x07U)};
+    eth_params.eth_type    = deserializer.read<uint16_t>();
+  }
 
   return frame.last(frame.size() - deserializer.get_offset());
 }

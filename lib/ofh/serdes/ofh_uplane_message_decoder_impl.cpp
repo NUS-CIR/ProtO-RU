@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_uplane_message_decoder_impl.h"
@@ -40,10 +41,13 @@ static bool is_header_valid(const uplane_message_params& params,
                             ocudulog::basic_logger&      logger,
                             unsigned                     sector_id,
                             unsigned                     nof_symbols,
-                            unsigned                     version)
+                            unsigned                     version,
+                            data_direction               expected_direction)
 {
-  if (OCUDU_UNLIKELY(params.direction != data_direction::uplink)) {
-    logger.info("Sector#{}: dropped received Open Fronthaul message as it is not an uplink message", sector_id);
+  if (OCUDU_UNLIKELY(params.direction != expected_direction)) {
+    logger.info("Sector#{}: dropped received Open Fronthaul message as its data direction does not match the expected "
+                "direction",
+                sector_id);
 
     return false;
   }
@@ -128,7 +132,7 @@ bool uplane_message_decoder_impl::decode_header(uplane_message_params&          
 
   params.slot = slot_point(to_numerology_value(scs), frame, subframe, slot_id);
 
-  return is_header_valid(params, logger, sector_id, nof_symbols, version);
+  return is_header_valid(params, logger, sector_id, nof_symbols, version, expected_direction);
 }
 
 bool uplane_message_decoder_impl::decode_all_sections(uplane_message_decoder_results&    results,

@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+
+set_directory_properties(PROPERTIES LABELS "ru")
+
+add_executable(ofh_ru_cplane_scheduling_handler_test ofh_ru_cplane_scheduling_handler_test.cpp)
+target_link_libraries(ofh_ru_cplane_scheduling_handler_test ocudu_ofh_ru ocudu_phy_support ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_cplane_scheduling_handler_test)
+
+add_executable(ofh_ru_downlink_rx_window_handler_test ofh_ru_downlink_rx_window_handler_test.cpp)
+target_link_libraries(ofh_ru_downlink_rx_window_handler_test ocudu_ofh_ru ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_downlink_rx_window_handler_test)
+
+add_executable(ofh_ru_uplink_scheduling_recorder_test ofh_ru_uplink_scheduling_recorder_test.cpp)
+target_link_libraries(ofh_ru_uplink_scheduling_recorder_test ocudu_ofh_ru ocudu_ofh_message_serdes ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_uplink_scheduling_recorder_test)
+
+add_executable(ofh_ru_uplink_symbol_responder_test ofh_ru_uplink_symbol_responder_test.cpp)
+target_link_libraries(ofh_ru_uplink_symbol_responder_test ocudu_ofh_ru ocudu_ofh_transmitter ocudu_ofh_message_serdes ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_uplink_symbol_responder_test)
+
+add_executable(ofh_ru_prach_window_responder_test ofh_ru_prach_window_responder_test.cpp)
+target_link_libraries(ofh_ru_prach_window_responder_test ocudu_ofh_ru ocudu_ofh_transmitter ocudu_ofh_message_serdes ocudu_phy_support ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_prach_window_responder_test)
+
+add_executable(ofh_ru_message_receiver_test ofh_ru_message_receiver_test.cpp)
+target_link_libraries(ofh_ru_message_receiver_test ocudu_ofh_ru ocudu_ofh_ethernet ocudu_ofh_ecpri ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_message_receiver_test)
+
+add_executable(ofh_ru_sector_test ofh_ru_sector_test.cpp)
+target_link_libraries(ofh_ru_sector_test ocudu_ofh_ru ocudu_ofh_transmitter ocudu_ofh_receiver ocudu_ofh_message_serdes
+        ocudu_ofh_compression ocudu_ofh_ecpri ocudu_ofh_ethernet ocudu_ofh_timing ocudu_phy_support ocudu_support
+        ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_sector_test)
+
+add_executable(ofh_ru_message_transmitter_test ofh_ru_message_transmitter_test.cpp)
+target_link_libraries(ofh_ru_message_transmitter_test ocudu_ofh_ru ocudu_ofh_ethernet ocudu_support ocudu_ran GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_message_transmitter_test)

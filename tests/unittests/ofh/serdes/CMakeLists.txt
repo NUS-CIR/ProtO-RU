@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 
@@ -31,3 +32,7 @@ gtest_discover_tests(ofh_uplane_packet_decoder_dynamic_impl)
 add_executable(ofh_uplane_packet_decoder_static_impl ofh_uplane_packet_decoder_static_impl_test.cpp)
 target_link_libraries(ofh_uplane_packet_decoder_static_impl ocudu_ofh_message_serdes ocudu_support GTest::gtest GTest::gtest_main)
 gtest_discover_tests(ofh_uplane_packet_decoder_static_impl)
+
+add_executable(ofh_cplane_packet_decoder_impl_test ofh_cplane_packet_decoder_impl_test.cpp)
+target_link_libraries(ofh_cplane_packet_decoder_impl_test ocudu_ofh_message_serdes ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_cplane_packet_decoder_impl_test)

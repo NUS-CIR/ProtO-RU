@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -28,6 +29,9 @@ struct uplane_message_params {
   section_type sect_type;
   /// IQ data compression parameters.
   ru_compression_params compression_params;
+  /// Section identifier. The O-DU transmitter always uses 0; an O-RU transmitter echoes the identifier of the
+  /// Control-Plane request it is replying to.
+  uint16_t section_id = 0;
 };
 
 } // namespace ofh

@@ -1,13 +1,15 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
-#include "../../../../lib/ofh/transmitter/ofh_data_flow_uplane_downlink_data_impl.h"
+#include "../../../../lib/ofh/transmitter/ofh_data_flow_uplane_data_impl.h"
 #include "../../phy/support/resource_grid_test_doubles.h"
 #include "../compression/ofh_iq_compressor_test_doubles.h"
 #include "../ecpri/ecpri_packet_builder_test_doubles.h"
 #include "../ethernet/vlan_ethernet_frame_builder_test_doubles.h"
 #include "ocudu/adt/interval.h"
 #include "ocudu/ofh/ethernet/ethernet_frame_pool.h"
+#include "ocudu/phy/support/prach_buffer.h"
 #include "ocudu/phy/support/resource_grid_context.h"
 #include "ocudu/ran/resource_block.h"
 #include <gtest/gtest.h>
@@ -53,9 +55,32 @@ public:
   span<const cbf16_t> get_iq_data(unsigned symbol) const { return iq_data[symbol]; }
 };
 
+/// Minimal PRACH buffer double returning a fixed, distinguishable preamble sequence for every symbol.
+class prach_buffer_double : public prach_buffer
+{
+  std::vector<cbf16_t> data;
+
+public:
+  explicit prach_buffer_double(unsigned sequence_length) : data(sequence_length)
+  {
+    // A non-zero ramp so the test can tell the preamble samples apart from the frequency-domain guard.
+    for (unsigned i = 0; i != sequence_length; ++i) {
+      data[i] = to_cbf16(cf_t(static_cast<float>(i + 1), 0.0F));
+    }
+  }
+
+  unsigned            get_max_nof_ports() const override { return 1; }
+  unsigned            get_max_nof_td_occasions() const override { return 1; }
+  unsigned            get_max_nof_fd_occasions() const override { return 1; }
+  unsigned            get_max_nof_symbols() const override { return MAX_NSYMB_PER_SLOT; }
+  unsigned            get_sequence_length() const override { return data.size(); }
+  span<cbf16_t>       get_symbol(unsigned, unsigned, unsigned, unsigned) override { return data; }
+  span<const cbf16_t> get_symbol(unsigned, unsigned, unsigned, unsigned) const override { return data; }
+};
+
 } // namespace
 
-class ofh_data_flow_uplane_downlink_data_impl_fixture : public ::testing::TestWithParam<ru_compression_params>
+class ofh_data_flow_uplane_data_impl_fixture : public ::testing::TestWithParam<ru_compression_params>
 {
 protected:
   const unsigned                          nof_symbols;
@@ -66,7 +91,7 @@ protected:
                                                           ether::vlan_parameters{.tci_vid = 1, .tci_pcp = 7},
                                                           0xaabb};
   const ru_compression_params             compr_params = GetParam();
-  data_flow_uplane_downlink_data_impl     data_flow;
+  data_flow_uplane_data_impl              data_flow;
   ether::testing::vlan_frame_builder_spy* vlan_builder;
   ecpri::testing::packet_builder_spy*     ecpri_builder;
   ofh_uplane_packet_builder_spy*          uplane_builder;
@@ -75,7 +100,7 @@ protected:
   resource_grid_spy                       rg_spy;
   shared_resource_grid_spy                shared_rg_spy;
 
-  ofh_data_flow_uplane_downlink_data_impl_fixture() :
+  ofh_data_flow_uplane_data_impl_fixture() :
     nof_symbols(3),
     ru_nof_prbs(273),
     du_nof_prbs(273),
@@ -87,18 +112,18 @@ protected:
     initialize_grid_reader();
   }
 
-  data_flow_uplane_downlink_data_impl_config get_config()
+  data_flow_uplane_data_impl_config get_config()
   {
-    data_flow_uplane_downlink_data_impl_config config;
+    data_flow_uplane_data_impl_config config;
     config.ru_nof_prbs  = ru_nof_prbs;
     config.compr_params = compr_params;
 
     return config;
   }
 
-  data_flow_uplane_downlink_data_impl_dependencies generate_data_flow_dependencies()
+  data_flow_uplane_data_impl_dependencies generate_data_flow_dependencies()
   {
-    data_flow_uplane_downlink_data_impl_dependencies dependencies;
+    data_flow_uplane_data_impl_dependencies dependencies;
     dependencies.logger         = &ocudulog::fetch_basic_logger("TEST");
     dependencies.compressor_sel = std::make_unique<ofh::testing::iq_compressor_dummy>();
     dependencies.frame_pool     = std::make_shared<ether::eth_frame_pool>(
@@ -138,11 +163,9 @@ static const std::array<ru_compression_params, 2> compr_params = {
     {{compression_type::none, 16}, {compression_type::BFP, 9}}};
 static const std::array<std::vector<interval<unsigned>>, 2> segmented_prbs = {{{{0, 186}, {186, 273}}, {{0, 273}}}};
 
-INSTANTIATE_TEST_SUITE_P(compression_params,
-                         ofh_data_flow_uplane_downlink_data_impl_fixture,
-                         ::testing::ValuesIn(compr_params));
+INSTANTIATE_TEST_SUITE_P(compression_params, ofh_data_flow_uplane_data_impl_fixture, ::testing::ValuesIn(compr_params));
 
-TEST_P(ofh_data_flow_uplane_downlink_data_impl_fixture, calling_enqueue_section_type_1_message_success)
+TEST_P(ofh_data_flow_uplane_data_impl_fixture, calling_enqueue_section_type_1_message_success)
 {
   data_flow_uplane_resource_grid_context context;
   context.port         = 0;
@@ -209,8 +232,7 @@ TEST_P(ofh_data_flow_uplane_downlink_data_impl_fixture, calling_enqueue_section_
   }
 }
 
-TEST(ofh_data_flow_uplane_downlink_data_impl,
-     frame_buffer_size_of_nof_prbs_plus_headers_size_generates_one_packet_per_symbol)
+TEST(ofh_data_flow_uplane_data_impl, frame_buffer_size_of_nof_prbs_plus_headers_size_generates_one_packet_per_symbol)
 {
   data_flow_uplane_resource_grid_context context;
   context.port         = 0;
@@ -219,7 +241,7 @@ TEST(ofh_data_flow_uplane_downlink_data_impl,
   context.eaxc         = 2;
   context.symbol_range = {0, 3};
 
-  data_flow_uplane_downlink_data_impl_config config;
+  data_flow_uplane_data_impl_config config;
 
   config.ru_nof_prbs  = 273;
   config.compr_params = {compression_type::BFP, 9};
@@ -229,7 +251,7 @@ TEST(ofh_data_flow_uplane_downlink_data_impl,
                                           ether::vlan_parameters{.tci_vid = 1},
                                           0xaabb};
 
-  data_flow_uplane_downlink_data_impl_dependencies dependencies;
+  data_flow_uplane_data_impl_dependencies dependencies;
   dependencies.logger         = &ocudulog::fetch_basic_logger("TEST");
   dependencies.compressor_sel = std::make_unique<ofh::testing::iq_compressor_dummy>();
 
@@ -269,14 +291,14 @@ TEST(ofh_data_flow_uplane_downlink_data_impl,
   resource_grid_spy        rg_spy(rg_reader_spy, rg_writer_spy);
   shared_resource_grid_spy shared_rg_spy(rg_spy);
 
-  data_flow_uplane_downlink_data_impl data_flow(config, std::move(dependencies));
+  data_flow_uplane_data_impl data_flow(config, std::move(dependencies));
   data_flow.enqueue_section_type_1_message(context, shared_rg_spy.get_grid());
 
   // Assert number of packets.
   ASSERT_EQ(uplane_builder->nof_built_packets(), context.symbol_range.length());
 }
 
-TEST(ofh_data_flow_uplane_downlink_data_impl, frame_buffer_size_of_nof_prbs_generates_two_packets_per_symbol)
+TEST(ofh_data_flow_uplane_data_impl, frame_buffer_size_of_nof_prbs_generates_two_packets_per_symbol)
 {
   data_flow_uplane_resource_grid_context context;
   context.port         = 0;
@@ -285,7 +307,7 @@ TEST(ofh_data_flow_uplane_downlink_data_impl, frame_buffer_size_of_nof_prbs_gene
   context.eaxc         = 2;
   context.symbol_range = {0, 3};
 
-  data_flow_uplane_downlink_data_impl_config config;
+  data_flow_uplane_data_impl_config config;
 
   config.ru_nof_prbs  = 273;
   config.compr_params = {compression_type::BFP, 9};
@@ -295,7 +317,7 @@ TEST(ofh_data_flow_uplane_downlink_data_impl, frame_buffer_size_of_nof_prbs_gene
                                           ether::vlan_parameters{.tci_vid = 1},
                                           0xaabb};
 
-  data_flow_uplane_downlink_data_impl_dependencies dependencies;
+  data_flow_uplane_data_impl_dependencies dependencies;
   dependencies.logger         = &ocudulog::fetch_basic_logger("TEST");
   dependencies.compressor_sel = std::make_unique<ofh::testing::iq_compressor_dummy>();
 
@@ -330,9 +352,202 @@ TEST(ofh_data_flow_uplane_downlink_data_impl, frame_buffer_size_of_nof_prbs_gene
   resource_grid_spy        rg_spy(rg_reader_spy, rg_writer_spy);
   shared_resource_grid_spy shared_rg_spy(rg_spy);
 
-  data_flow_uplane_downlink_data_impl data_flow(config, std::move(dependencies));
+  data_flow_uplane_data_impl data_flow(config, std::move(dependencies));
   data_flow.enqueue_section_type_1_message(context, shared_rg_spy.get_grid());
 
   // Assert number of packets. As the packet should not fit in the frame, check that it generated 2 packets per symbol.
   ASSERT_EQ(uplane_builder->nof_built_packets(), context.symbol_range.length() * 2);
+}
+
+TEST(ofh_data_flow_uplane_data_impl, enqueue_prach_message_builds_uplink_prach_uplane_messages)
+{
+  data_flow_uplane_data_impl_config config;
+  config.ru_nof_prbs  = 273;
+  config.compr_params = {compression_type::BFP, 9};
+  // An RU transmitter builds uplink messages.
+  config.direction = data_direction::uplink;
+
+  ether::vlan_frame_params vlan_params = {{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x11},
+                                          {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x22},
+                                          ether::vlan_parameters{.tci_vid = 1},
+                                          0xaabb};
+
+  data_flow_uplane_data_impl_dependencies dependencies;
+  dependencies.logger         = &ocudulog::fetch_basic_logger("TEST");
+  dependencies.compressor_sel = std::make_unique<ofh::testing::iq_compressor_dummy>();
+  // PRACH frames go in a frame-pool space of their own (uplane_prach).
+  dependencies.frame_pool = std::make_shared<ether::eth_frame_pool>(
+      *dependencies.logger, units::bytes(9000), 2, message_type::uplane_prach, data_direction::uplink);
+
+  ofh_uplane_packet_builder_spy* uplane_builder;
+  {
+    auto temp               = std::make_unique<ofh_uplane_packet_builder_spy>();
+    uplane_builder          = temp.get();
+    dependencies.up_builder = std::move(temp);
+  }
+  dependencies.eth_builder   = std::make_unique<ether::testing::vlan_frame_builder_spy>(vlan_params);
+  dependencies.ecpri_builder = std::make_unique<ecpri::testing::packet_builder_spy>();
+
+  data_flow_uplane_data_impl data_flow(config, std::move(dependencies));
+
+  // 12-PRB PRACH section, short preamble of 139 samples spanning 2 symbols.
+  prach_buffer_double prach(139);
+
+  data_flow_uplane_prach_context context;
+  context.slot         = slot_point(0, 0, 0);
+  context.sector       = 0;
+  context.port         = 0;
+  context.eaxc         = 4;
+  context.prb_start    = 0;
+  context.nof_prb      = 12;
+  context.start_symbol = 2;
+  context.nof_symbols  = 2;
+  context.filter_index = filter_index_type::ul_prach_preamble_short;
+  context.prach_scs    = prach_subcarrier_spacing::kHz15;
+
+  data_flow.enqueue_prach_message(context, prach);
+
+  // One PRACH User-Plane message per PRACH symbol.
+  ASSERT_EQ(uplane_builder->nof_built_packets(), context.nof_symbols);
+
+  span<const uplane_message_params> uplane_params = uplane_builder->get_uplane_params();
+  unsigned                          symbol_id     = context.start_symbol;
+  for (const auto& param : uplane_params) {
+    ASSERT_EQ(param.direction, data_direction::uplink);
+    ASSERT_EQ(param.filter_index, filter_index_type::ul_prach_preamble_short);
+    ASSERT_EQ(param.slot, context.slot);
+    ASSERT_EQ(param.start_prb, context.prb_start);
+    ASSERT_EQ(param.nof_prb, context.nof_prb);
+    ASSERT_EQ(param.symbol_id, symbol_id);
+    ASSERT_EQ(param.sect_type, section_type::type_1);
+    ++symbol_id;
+  }
+
+  // The short PRACH preamble is placed within the PRB section with a 2-RE frequency-domain guard at the bottom: REs 0
+  // and 1 are zero, the 139-sample preamble occupies REs [2, 141), and the rest of the 12-PRB section is zero.
+  constexpr unsigned prach_re_offset = 2;
+  for (unsigned symbol = context.start_symbol, end = context.start_symbol + context.nof_symbols; symbol != end;
+       ++symbol) {
+    span<const cbf16_t> iq = uplane_builder->get_iq_data(symbol);
+    ASSERT_EQ(to_cf(iq[0]), cf_t(0.0F, 0.0F));
+    ASSERT_EQ(to_cf(iq[1]), cf_t(0.0F, 0.0F));
+    // First and last preamble samples land at REs 2 and 2 + 138.
+    ASSERT_EQ(to_cf(iq[prach_re_offset]), cf_t(1.0F, 0.0F));
+    ASSERT_EQ(to_cf(iq[prach_re_offset + 138]), cf_t(139.0F, 0.0F));
+    // The remainder of the 12-PRB (144-RE) section is guard.
+    ASSERT_EQ(to_cf(iq[prach_re_offset + 139]), cf_t(0.0F, 0.0F));
+  }
+}
+
+TEST(ofh_data_flow_uplane_data_impl, long_prach_uses_frequency_mapping_offset)
+{
+  struct test_case {
+    subcarrier_spacing pusch_scs;
+    unsigned           expected_offset;
+  };
+  const std::array<test_case, 2> cases = {{{subcarrier_spacing::kHz15, 7}, {subcarrier_spacing::kHz30, 1}}};
+
+  for (const test_case& test : cases) {
+    data_flow_uplane_data_impl_config config = {};
+    config.sector                            = 0;
+    config.cp                                = cyclic_prefix::NORMAL;
+    config.ru_nof_prbs                       = 273;
+    config.compr_params                      = {compression_type::BFP, 9};
+    config.direction                         = data_direction::uplink;
+
+    ether::vlan_frame_params vlan_params = {{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x11},
+                                            {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x22},
+                                            ether::vlan_parameters{.tci_vid = 1},
+                                            0xaabb};
+
+    data_flow_uplane_data_impl_dependencies dependencies;
+    dependencies.logger         = &ocudulog::fetch_basic_logger("TEST");
+    dependencies.compressor_sel = std::make_unique<ofh::testing::iq_compressor_dummy>();
+    dependencies.frame_pool     = std::make_shared<ether::eth_frame_pool>(
+        *dependencies.logger, units::bytes(9000), 2, message_type::uplane_prach, data_direction::uplink);
+
+    ofh_uplane_packet_builder_spy* uplane_builder;
+    {
+      auto temp               = std::make_unique<ofh_uplane_packet_builder_spy>();
+      uplane_builder          = temp.get();
+      dependencies.up_builder = std::move(temp);
+    }
+    dependencies.eth_builder   = std::make_unique<ether::testing::vlan_frame_builder_spy>(vlan_params);
+    dependencies.ecpri_builder = std::make_unique<ecpri::testing::packet_builder_spy>();
+
+    data_flow_uplane_data_impl data_flow(config, std::move(dependencies));
+    prach_buffer_double        prach(/*long preamble sequence length=*/839);
+
+    data_flow_uplane_prach_context context;
+    context.slot         = slot_point(to_numerology_value(test.pusch_scs), 0, 0);
+    context.sector       = 0;
+    context.port         = 0;
+    context.eaxc         = 4;
+    context.prb_start    = 0;
+    context.nof_prb      = 72;
+    context.start_symbol = 2;
+    context.nof_symbols  = 1;
+    context.filter_index = filter_index_type::ul_prach_preamble_1p25khz;
+    context.prach_scs    = prach_subcarrier_spacing::kHz1_25;
+
+    data_flow.enqueue_prach_message(context, prach);
+
+    ASSERT_EQ(uplane_builder->nof_built_packets(), 1);
+    span<const cbf16_t> iq = uplane_builder->get_iq_data(context.start_symbol);
+    for (unsigned re = 0; re != test.expected_offset; ++re) {
+      ASSERT_EQ(iq[re], cbf16_t{});
+    }
+    ASSERT_EQ(iq[test.expected_offset], to_cbf16(cf_t(1.0F, 0.0F)));
+    ASSERT_EQ(iq[test.expected_offset + 838], to_cbf16(cf_t(839.0F, 0.0F)));
+    ASSERT_EQ(iq[test.expected_offset + 839], cbf16_t{});
+  }
+}
+
+TEST(ofh_data_flow_uplane_data_impl, prach_section_too_small_does_not_build_message)
+{
+  data_flow_uplane_data_impl_config config = {};
+  config.sector                            = 0;
+  config.cp                                = cyclic_prefix::NORMAL;
+  config.ru_nof_prbs                       = 273;
+  config.compr_params                      = {compression_type::BFP, 9};
+  config.direction                         = data_direction::uplink;
+
+  ether::vlan_frame_params vlan_params = {{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x11},
+                                          {0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x22},
+                                          ether::vlan_parameters{.tci_vid = 1},
+                                          0xaabb};
+
+  data_flow_uplane_data_impl_dependencies dependencies;
+  dependencies.logger         = &ocudulog::fetch_basic_logger("TEST");
+  dependencies.compressor_sel = std::make_unique<ofh::testing::iq_compressor_dummy>();
+  dependencies.frame_pool     = std::make_shared<ether::eth_frame_pool>(
+      *dependencies.logger, units::bytes(9000), 2, message_type::uplane_prach, data_direction::uplink);
+
+  ofh_uplane_packet_builder_spy* uplane_builder;
+  {
+    auto temp               = std::make_unique<ofh_uplane_packet_builder_spy>();
+    uplane_builder          = temp.get();
+    dependencies.up_builder = std::move(temp);
+  }
+  dependencies.eth_builder   = std::make_unique<ether::testing::vlan_frame_builder_spy>(vlan_params);
+  dependencies.ecpri_builder = std::make_unique<ecpri::testing::packet_builder_spy>();
+
+  data_flow_uplane_data_impl data_flow(config, std::move(dependencies));
+  prach_buffer_double        prach(/*long preamble sequence length=*/839);
+
+  data_flow_uplane_prach_context context;
+  context.slot         = slot_point(to_numerology_value(subcarrier_spacing::kHz30), 0, 0);
+  context.sector       = 0;
+  context.port         = 0;
+  context.eaxc         = 4;
+  context.prb_start    = 0;
+  context.nof_prb      = 1;
+  context.start_symbol = 2;
+  context.nof_symbols  = 1;
+  context.filter_index = filter_index_type::ul_prach_preamble_1p25khz;
+  context.prach_scs    = prach_subcarrier_spacing::kHz1_25;
+
+  data_flow.enqueue_prach_message(context, prach);
+
+  ASSERT_EQ(uplane_builder->nof_built_packets(), 0);
 }

@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
-#include "../support/uplink_context_repository.h"
+#include "../support/rx_grid_context_repository.h"
 #include "../support/uplink_cplane_context_repository.h"
 #include "ofh_data_flow_uplane_decoding_metrics_collector.h"
 #include "ofh_data_flow_uplane_uplink_data.h"
@@ -35,7 +36,7 @@ struct data_flow_uplane_uplink_data_impl_dependencies {
   /// Control-Plane context repository.
   std::shared_ptr<uplink_cplane_context_repository> ul_cplane_context_repo;
   /// Uplink context repository.
-  std::shared_ptr<uplink_context_repository> ul_context_repo;
+  std::shared_ptr<rx_grid_context_repository> ul_context_repo;
   /// User-Plane message decoder.
   std::unique_ptr<uplane_message_decoder> uplane_decoder;
 };

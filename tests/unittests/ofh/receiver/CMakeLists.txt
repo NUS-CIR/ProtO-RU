@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 
@@ -7,6 +8,18 @@ set_directory_properties(PROPERTIES LABELS "receiver")
 add_executable(ofh_data_flow_uplane_uplink_data_impl_test ofh_data_flow_uplane_uplink_data_impl_test.cpp)
 target_link_libraries(ofh_data_flow_uplane_uplink_data_impl_test ocudu_ofh_receiver ocudu_support GTest::gtest GTest::gtest_main)
 gtest_discover_tests(ofh_data_flow_uplane_uplink_data_impl_test)
+
+add_executable(ofh_ru_rx_uplane_data_flow_test ofh_ru_rx_uplane_data_flow_test.cpp)
+target_link_libraries(ofh_ru_rx_uplane_data_flow_test ocudu_ofh_receiver ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_rx_uplane_data_flow_test)
+
+add_executable(ofh_ru_rx_cplane_data_flow_test ofh_ru_rx_cplane_data_flow_test.cpp)
+target_link_libraries(ofh_ru_rx_cplane_data_flow_test ocudu_ofh_receiver ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_rx_cplane_data_flow_test)
+
+add_executable(ofh_ru_cplane_scheduling_dispatcher_test ofh_ru_cplane_scheduling_dispatcher_test.cpp)
+target_link_libraries(ofh_ru_cplane_scheduling_dispatcher_test ocudu_ofh_receiver ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_ru_cplane_scheduling_dispatcher_test)
 
 add_executable(ofh_data_flow_uplane_uplink_prach_impl_test ofh_data_flow_uplane_uplink_prach_impl_test.cpp)
 target_link_libraries(ofh_data_flow_uplane_uplink_prach_impl_test ocudu_ofh_receiver ocudu_support GTest::gtest GTest::gtest_main)

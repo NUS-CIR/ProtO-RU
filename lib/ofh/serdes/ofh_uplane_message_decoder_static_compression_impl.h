@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -21,7 +22,8 @@ public:
                                                  unsigned                         ru_nof_prbs_,
                                                  unsigned                         sector_id_,
                                                  std::unique_ptr<iq_decompressor> decompressor_,
-                                                 const ru_compression_params&     compression_params_);
+                                                 const ru_compression_params&     compression_params_,
+                                                 data_direction expected_direction_ = data_direction::uplink);
 
 private:
   // See parent for documentation.

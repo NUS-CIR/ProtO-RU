@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "../support/prach_context_repository.h"
-#include "../support/uplink_context_repository.h"
+#include "../support/rx_grid_context_repository.h"
 #include "../support/uplink_notified_grid_symbol_repository.h"
 #include "ofh_data_flow_cplane_scheduling_commands.h"
 #include "ofh_tx_window_checker.h"
@@ -49,7 +50,7 @@ struct uplink_request_handler_impl_dependencies {
   /// Error notifier.
   error_notifier& err_notifier;
   /// Uplink slot context repository.
-  std::shared_ptr<uplink_context_repository> ul_slot_repo;
+  std::shared_ptr<rx_grid_context_repository> ul_slot_repo;
   /// Uplink PRACH context repository.
   std::shared_ptr<prach_context_repository> ul_prach_repo;
   /// Notified uplink grid symbol repository.
@@ -87,7 +88,7 @@ private:
   const static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC>   prach_eaxc;
   const static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC>   ul_eaxc;
   tx_window_checker                                       window_checker;
-  std::shared_ptr<uplink_context_repository>              ul_slot_repo;
+  std::shared_ptr<rx_grid_context_repository>             ul_slot_repo;
   std::shared_ptr<prach_context_repository>               ul_prach_repo;
   std::shared_ptr<uplink_notified_grid_symbol_repository> notifier_symbol_repo;
   std::unique_ptr<data_flow_cplane_scheduling_commands>   data_flow;

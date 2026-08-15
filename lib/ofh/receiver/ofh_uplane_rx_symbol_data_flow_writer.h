@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
-#include "../support/uplink_context_repository.h"
+#include "../support/rx_grid_context_repository.h"
 #include "ocudu/ocudulog/logger.h"
 
 namespace ocudu {
@@ -17,10 +18,10 @@ struct uplane_message_decoder_results;
 class uplane_rx_symbol_data_flow_writer
 {
 public:
-  uplane_rx_symbol_data_flow_writer(span<const unsigned>                       ul_eaxc_,
-                                    unsigned                                   sector_id_,
-                                    ocudulog::basic_logger&                    logger_,
-                                    std::shared_ptr<uplink_context_repository> ul_context_repo_) :
+  uplane_rx_symbol_data_flow_writer(span<const unsigned>                        ul_eaxc_,
+                                    unsigned                                    sector_id_,
+                                    ocudulog::basic_logger&                     logger_,
+                                    std::shared_ptr<rx_grid_context_repository> ul_context_repo_) :
     ul_eaxc(ul_eaxc_.begin(), ul_eaxc_.end()),
     sector_id(sector_id_),
     logger(logger_),
@@ -38,7 +39,7 @@ private:
   const static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC> ul_eaxc;
   const unsigned                                        sector_id;
   ocudulog::basic_logger&                               logger;
-  std::shared_ptr<uplink_context_repository>            ul_context_repo;
+  std::shared_ptr<rx_grid_context_repository>           ul_context_repo;
 };
 
 } // namespace ofh

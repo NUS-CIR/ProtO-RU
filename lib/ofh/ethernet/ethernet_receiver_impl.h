@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -22,6 +23,8 @@ class receiver_impl : public receiver, private receiver_operation_controller
 {
   static constexpr unsigned BUFFER_SIZE = 9600;
 
+  friend class receiver_impl_test_accessor;
+
 public:
   receiver_impl(const receiver_config& config, task_executor& executor_, ocudulog::basic_logger& logger_);
 
@@ -34,6 +37,9 @@ public:
   receiver_metrics_collector* get_metrics_collector() override;
 
 private:
+  /// Constructs a receiver around an existing socket for unit testing.
+  receiver_impl(int socket_fd_, task_executor& executor_, ocudulog::basic_logger& logger_, bool are_metrics_enabled);
+
   // See interface for documentation.
   void start(frame_notifier& notifier_) override;
 

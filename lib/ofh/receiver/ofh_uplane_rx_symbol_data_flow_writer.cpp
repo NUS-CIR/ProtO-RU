@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_uplane_rx_symbol_data_flow_writer.h"
@@ -13,9 +14,9 @@ bool uplane_rx_symbol_data_flow_writer::write_to_resource_grid(unsigned         
 {
   trace_point access_repo_tp = ofh_tracer.now();
 
-  slot_point     slot       = results.params.slot;
-  unsigned       symbol     = results.params.symbol_id;
-  uplink_context ul_context = ul_context_repo->get(slot, symbol);
+  slot_point      slot       = results.params.slot;
+  unsigned        symbol     = results.params.symbol_id;
+  rx_grid_context ul_context = ul_context_repo->get(slot, symbol);
   if (OCUDU_UNLIKELY(ul_context.empty())) {
     logger.info(
         "Sector#{}: dropped received Open Fronthaul message as no uplink slot context was found for slot '{}', symbol "

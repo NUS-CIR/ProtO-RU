@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_message_receiver_impl.h"
@@ -168,6 +169,17 @@ bool message_receiver_impl::should_ethernet_frame_be_filtered(const ether::vlan_
         sector_id,
         span<const uint8_t>(eth_params.mac_dst_address),
         span<const uint8_t>(vlan_params.mac_dst_address));
+
+    return true;
+  }
+
+  if (OCUDU_UNLIKELY(eth_params.vlan_config.has_value() && vlan_params.vlan_config.has_value() &&
+                     eth_params.vlan_config->tci_vid != vlan_params.vlan_config->tci_vid)) {
+    logger.info("Sector#{}: dropped received Ethernet frame as its VLAN identifier '{}' does not match the configured "
+                "VLAN identifier '{}'",
+                sector_id,
+                eth_params.vlan_config->tci_vid,
+                vlan_params.vlan_config->tci_vid);
 
     return true;
   }

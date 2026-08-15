@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "../../../../lib/ofh/receiver/ofh_closed_rx_window_handler.h"
@@ -167,7 +168,7 @@ public:
                           {&ocudulog::fetch_basic_logger("TEST"),
                            &executor,
                            std::make_shared<prach_context_repository>(20),
-                           std::make_shared<uplink_context_repository>(20),
+                           std::make_shared<rx_grid_context_repository>(20),
                            std::make_shared<dummy_uplane_rx_symbol_notifier>()}),
     window_checker(false, {}),
     ul_handler(generate_config(), generate_dependencies())
@@ -274,6 +275,54 @@ TEST_F(ofh_message_receiver_fixture, discard_frames_with_unexpected_dst_mac)
   ASSERT_FALSE(ecpri_decoder->has_decode_function_been_called());
   ASSERT_FALSE(df_uplink->has_decode_function_been_called());
   ASSERT_FALSE(df_prach->has_decode_function_been_called());
+}
+
+TEST_F(ofh_message_receiver_fixture, discard_frames_with_unexpected_vlan)
+{
+  ether::unique_rx_buffer buffer(dummy_eth_rx_buffer(std::vector<uint8_t>{1}));
+
+  ether::vlan_frame_params params = vlan_params;
+  params.vlan_config              = ether::vlan_parameters{.tci_vid = 5};
+  vlan_decoder->set_vlan_params(params);
+
+  ul_handler.on_new_frame(std::move(buffer));
+
+  ASSERT_TRUE(vlan_decoder->has_decode_function_been_called());
+  ASSERT_FALSE(ecpri_decoder->has_decode_function_been_called());
+  ASSERT_FALSE(df_uplink->has_decode_function_been_called());
+  ASSERT_FALSE(df_prach->has_decode_function_been_called());
+}
+
+TEST_F(ofh_message_receiver_fixture, accept_frames_with_different_vlan_priority)
+{
+  ether::unique_rx_buffer buffer(dummy_eth_rx_buffer(std::vector<uint8_t>{1, 0, 0, 0}));
+
+  ether::vlan_frame_params params = vlan_params;
+  params.vlan_config              = ether::vlan_parameters{.tci_vid = 4, .tci_pcp = 1};
+  vlan_decoder->set_vlan_params(params);
+
+  ul_handler.on_new_frame(std::move(buffer));
+
+  ASSERT_TRUE(vlan_decoder->has_decode_function_been_called());
+  ASSERT_TRUE(ecpri_decoder->has_decode_function_been_called());
+  ASSERT_FALSE(df_uplink->has_decode_function_been_called());
+  ASSERT_TRUE(df_prach->has_decode_function_been_called());
+}
+
+TEST_F(ofh_message_receiver_fixture, accept_untagged_frame_when_vlan_is_configured)
+{
+  ether::unique_rx_buffer buffer(dummy_eth_rx_buffer(std::vector<uint8_t>{1, 0, 0, 0}));
+
+  ether::vlan_frame_params params = vlan_params;
+  params.vlan_config.reset();
+  vlan_decoder->set_vlan_params(params);
+
+  ul_handler.on_new_frame(std::move(buffer));
+
+  ASSERT_TRUE(vlan_decoder->has_decode_function_been_called());
+  ASSERT_TRUE(ecpri_decoder->has_decode_function_been_called());
+  ASSERT_FALSE(df_uplink->has_decode_function_been_called());
+  ASSERT_TRUE(df_prach->has_decode_function_been_called());
 }
 
 TEST_F(ofh_message_receiver_fixture, discard_ecpri_control_frames)

@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "../../../../lib/ofh/receiver/ofh_uplane_rx_symbol_data_flow_writer.h"
@@ -24,7 +25,7 @@ protected:
   resource_grid_reader_spy                                      rg_reader;
   resource_grid_spy                                             grid;
   shared_resource_grid_spy                                      shared_grid;
-  std::shared_ptr<uplink_context_repository>                    repo = std::make_shared<uplink_context_repository>(1);
+  std::shared_ptr<rx_grid_context_repository>                   repo = std::make_shared<rx_grid_context_repository>(1);
   uplane_message_decoder_results                                results;
   uplane_rx_symbol_data_flow_writer                             writer;
 
@@ -77,8 +78,8 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, decoded_prbs_outside_grid_
   ASSERT_FALSE(repo->get(results.params.slot, results.params.symbol_id).empty());
   ASSERT_FALSE(rg_writer.has_grid_been_written());
 
-  const uplink_context& context  = repo->get(slot, symbol_id);
-  const auto&           sym_data = context.get_re_written_mask();
+  const rx_grid_context& context  = repo->get(slot, symbol_id);
+  const auto&            sym_data = context.get_re_written_mask();
   ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [](const auto& port) { return port.none(); }));
 }
 
@@ -97,8 +98,8 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, decoded_prbs_match_grid_pr
   ASSERT_TRUE(rg_writer.has_grid_been_written());
   ASSERT_EQ(section.nof_prbs, rg_writer.get_nof_prbs_written());
 
-  const uplink_context& context  = repo->get(slot, symbol_id);
-  const auto&           sym_data = context.get_re_written_mask();
+  const rx_grid_context& context  = repo->get(slot, symbol_id);
+  const auto&            sym_data = context.get_re_written_mask();
   ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [](const auto& port) { return port.all(); }));
 }
 
@@ -117,8 +118,8 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, decoded_prbs_bigger_than_g
   ASSERT_TRUE(rg_writer.has_grid_been_written());
   ASSERT_EQ(rg_writer.get_nof_subc() / NOF_SUBCARRIERS_PER_RB, rg_writer.get_nof_prbs_written());
 
-  const uplink_context& context  = repo->get(slot, symbol_id);
-  const auto&           sym_data = context.get_re_written_mask();
+  const rx_grid_context& context  = repo->get(slot, symbol_id);
+  const auto&            sym_data = context.get_re_written_mask();
   ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [](const auto& port) { return port.all(); }));
 }
 
@@ -137,8 +138,8 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, segmented_prbs_inside_the_
   ASSERT_TRUE(rg_writer.has_grid_been_written());
   ASSERT_EQ(section.nof_prbs, rg_writer.get_nof_prbs_written());
 
-  const uplink_context& context  = repo->get(slot, symbol_id);
-  const auto&           sym_data = context.get_re_written_mask();
+  const rx_grid_context& context  = repo->get(slot, symbol_id);
+  const auto&            sym_data = context.get_re_written_mask();
   ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [&section](const auto& port) {
     return port.all(0, (section.nof_prbs - 1) * NOF_SUBCARRIERS_PER_RB);
   }));
@@ -159,8 +160,8 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, segmented_prbs_write_the_p
   ASSERT_TRUE(rg_writer.has_grid_been_written());
   ASSERT_EQ(11, rg_writer.get_nof_prbs_written());
 
-  const uplink_context& context  = repo->get(slot, symbol_id);
-  const auto&           sym_data = context.get_re_written_mask();
+  const rx_grid_context& context  = repo->get(slot, symbol_id);
+  const auto&            sym_data = context.get_re_written_mask();
   ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [](const auto& port) {
     return port.all(40 * NOF_SUBCARRIERS_PER_RB, 50 * NOF_SUBCARRIERS_PER_RB);
   }));
@@ -178,8 +179,8 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, segmented_prbs_fill_the_gr
   writer.write_to_resource_grid(eaxc[0], results);
   ASSERT_EQ(section.nof_prbs, rg_writer.get_nof_prbs_written());
   {
-    const uplink_context& context  = repo->get(slot, symbol_id);
-    const auto&           sym_data = context.get_re_written_mask();
+    const rx_grid_context& context  = repo->get(slot, symbol_id);
+    const auto&            sym_data = context.get_re_written_mask();
     ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [&section](const auto& port) {
       return port.all(0, (section.nof_prbs - 1) * NOF_SUBCARRIERS_PER_RB);
     }));
@@ -197,7 +198,7 @@ TEST_F(ofh_uplane_rx_symbol_data_flow_writer_fixture, segmented_prbs_fill_the_gr
   ASSERT_FALSE(repo->get(results.params.slot, results.params.symbol_id).empty());
   ASSERT_TRUE(rg_writer.has_grid_been_written());
   ASSERT_EQ(nof_prbs, rg_writer.get_nof_prbs_written());
-  const uplink_context& context  = repo->get(slot, symbol_id);
-  const auto&           sym_data = context.get_re_written_mask();
+  const rx_grid_context& context  = repo->get(slot, symbol_id);
+  const auto&            sym_data = context.get_re_written_mask();
   ASSERT_TRUE(std::all_of(sym_data.begin(), sym_data.end(), [](const auto& port) { return port.all(); }));
 }

@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_closed_rx_window_handler.h"
@@ -39,7 +40,7 @@ void closed_rx_window_handler::on_new_symbol(const slot_symbol_point_context& sy
         prach_repo->process_pending_contexts();
 
         // Check the repositories for unhandled contexts.
-        handle_uplink_context(internal_slot);
+        handle_rx_grid_context(internal_slot);
         handle_prach_context(internal_slot);
       })) {
     logger.warning(
@@ -57,16 +58,16 @@ void closed_rx_window_handler::collect_metrics(closed_rx_window_metrics& metrics
   metrics.nof_missing_uplink_symbols = nof_missed_uplink_symbols.exchange(0, std::memory_order_relaxed);
 }
 
-void closed_rx_window_handler::handle_uplink_context(slot_symbol_point symbol_point)
+void closed_rx_window_handler::handle_rx_grid_context(slot_symbol_point symbol_point)
 {
-  expected<uplink_context::uplink_context_resource_grid_info> context =
+  expected<rx_grid_context::rx_grid_context_resource_grid_info> context =
       uplink_repo->pop_resource_grid_symbol(symbol_point.get_slot(), symbol_point.get_symbol_index());
 
   if (!context) {
     return;
   }
 
-  uplink_context::uplink_context_resource_grid_info& ctx_value = *context;
+  rx_grid_context::rx_grid_context_resource_grid_info& ctx_value = *context;
 
   uplane_rx_symbol_context notification_context = {
       ctx_value.context.slot, symbol_point.get_symbol_index(), ctx_value.context.sector};

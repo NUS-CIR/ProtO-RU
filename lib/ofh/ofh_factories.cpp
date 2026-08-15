@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ocudu/ofh/ofh_factories.h"
@@ -60,6 +61,7 @@ static receiver_config generate_receiver_config(const sector_configuration& conf
   // In rx, dst and src addresses are swapped.
   rx_config.mac_dst_address  = config.mac_src_address;
   rx_config.mac_src_address  = config.mac_dst_address;
+  rx_config.vlan_config      = config.vlan_cfg_up;
   rx_config.rx_timing_params = config.rx_window_timing_params;
 
   return rx_config;
@@ -173,7 +175,7 @@ std::unique_ptr<sector> ocudu::ofh::create_ofh_sector(const sector_configuration
   auto cp_repo                      = std::make_shared<uplink_cplane_context_repository>(repository_size);
   auto prach_cp_repo                = std::make_shared<uplink_cplane_context_repository>(repository_size);
   auto ul_prach_repo                = std::make_shared<prach_context_repository>(repository_size);
-  auto ul_data_repo                 = std::make_shared<uplink_context_repository>(repository_size);
+  auto ul_data_repo                 = std::make_shared<rx_grid_context_repository>(repository_size);
   auto ul_grid_symbol_notified_repo = std::make_shared<uplink_notified_grid_symbol_repository>(repository_size);
 
   // Build the ethernet txrx.

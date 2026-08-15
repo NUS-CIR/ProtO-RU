@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "../operation_controller_dummy.h"
-#include "ofh_data_flow_uplane_downlink_data.h"
+#include "ofh_data_flow_uplane_data.h"
 #include "sequence_identifier_generator.h"
 #include "ocudu/instrumentation/traces/ofh_traces.h"
 #include "ocudu/ocudulog/ocudulog.h"
@@ -23,22 +24,24 @@ class eth_frame_pool;
 
 namespace ofh {
 
-/// Open Fronthaul User-Plane downlink data flow implementation configuration.
-struct data_flow_uplane_downlink_data_impl_config {
+/// Open Fronthaul User-Plane data flow implementation configuration.
+struct data_flow_uplane_data_impl_config {
   /// Radio sector identifier.
   unsigned sector;
   /// Cyclic prefix.
   cyclic_prefix cp;
   /// RU bandwidth in PRBs.
   unsigned ru_nof_prbs;
-  /// Downlink eAxCs.
+  /// eAxCs handled by this data flow.
   static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC> dl_eaxc;
   /// Compression parameters.
   ru_compression_params compr_params;
+  /// Data direction of the generated messages: downlink for a DU transmitter, uplink for an RU transmitter.
+  data_direction direction = data_direction::downlink;
 };
 
-/// Open Fronthaul User-Plane downlink data flow implementation dependencies.
-struct data_flow_uplane_downlink_data_impl_dependencies {
+/// Open Fronthaul User-Plane data flow implementation dependencies.
+struct data_flow_uplane_data_impl_dependencies {
   /// Logger
   ocudulog::basic_logger* logger = nullptr;
   /// Ethernet frame pool.
@@ -53,7 +56,7 @@ struct data_flow_uplane_downlink_data_impl_dependencies {
   std::unique_ptr<uplane_message_builder> up_builder;
 };
 
-/// Stores trace names used by the \c data_flow_uplane_downlink_data_impl class when OFH tracing is enabled.
+/// Stores trace names used by the \c data_flow_uplane_data_impl class when OFH tracing is enabled.
 template <bool Enabled = true>
 class ofh_uplane_trace_names
 {
@@ -80,16 +83,19 @@ public:
   const std::string operator[](std::size_t eaxc) const { return ""; }
 };
 
-/// Open Fronthaul User-Plane downlink data flow implementation.
-class data_flow_uplane_downlink_data_impl : public data_flow_uplane_downlink_data
+/// Open Fronthaul User-Plane data flow implementation.
+class data_flow_uplane_data_impl : public data_flow_uplane_data
 {
 public:
-  explicit data_flow_uplane_downlink_data_impl(const data_flow_uplane_downlink_data_impl_config&  config,
-                                               data_flow_uplane_downlink_data_impl_dependencies&& dependencies);
+  explicit data_flow_uplane_data_impl(const data_flow_uplane_data_impl_config&  config,
+                                      data_flow_uplane_data_impl_dependencies&& dependencies);
 
   // See interface for documentation.
   void enqueue_section_type_1_message(const data_flow_uplane_resource_grid_context& context,
                                       const shared_resource_grid&                   grid) override;
+
+  // See interface for documentation.
+  void enqueue_prach_message(const data_flow_uplane_prach_context& context, const prach_buffer& buffer) override;
 
   // See interface for documentation.
   operation_controller& get_operation_controller() override { return controller; }
@@ -114,6 +120,7 @@ private:
   const unsigned                            ru_nof_prbs;
   const unsigned                            sector_id;
   const ru_compression_params               compr_params;
+  const data_direction                      direction;
   operation_controller_dummy                controller;
   sequence_identifier_generator             up_seq_gen;
   std::shared_ptr<ether::eth_frame_pool>    frame_pool;

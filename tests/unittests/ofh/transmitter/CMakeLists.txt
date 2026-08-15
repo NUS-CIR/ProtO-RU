@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 
@@ -8,9 +9,9 @@ add_executable(ofh_data_flow_cplane_scheduling_commands_test ofh_data_flow_cplan
 target_link_libraries(ofh_data_flow_cplane_scheduling_commands_test ocudu_ofh_transmitter ocudu_support GTest::gtest GTest::gtest_main)
 gtest_discover_tests(ofh_data_flow_cplane_scheduling_commands_test)
 
-add_executable(ofh_data_flow_uplane_downlink_data_impl_test ofh_data_flow_uplane_downlink_data_impl_test.cpp)
-target_link_libraries(ofh_data_flow_uplane_downlink_data_impl_test ocudu_ofh_transmitter ocudu_support GTest::gtest GTest::gtest_main)
-gtest_discover_tests(ofh_data_flow_uplane_downlink_data_impl_test)
+add_executable(ofh_data_flow_uplane_data_impl_test ofh_data_flow_uplane_data_impl_test.cpp)
+target_link_libraries(ofh_data_flow_uplane_data_impl_test ocudu_ofh_transmitter ocudu_support GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ofh_data_flow_uplane_data_impl_test)
 
 add_executable(ofh_downlink_handler_impl_test ofh_downlink_handler_impl_test.cpp)
 target_link_libraries(ofh_downlink_handler_impl_test ocudu_ofh_transmitter ocudu_support GTest::gtest GTest::gtest_main)

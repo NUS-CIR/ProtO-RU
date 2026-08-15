@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "../../../../lib/ofh/receiver/ofh_data_flow_uplane_uplink_data_impl.h"
@@ -44,9 +45,9 @@ protected:
   uplane_rx_symbol_notifier_spy*                        notifier;
   std::shared_ptr<uplink_cplane_context_repository>     ul_cplane_context_repo_ptr =
       std::make_shared<uplink_cplane_context_repository>(1);
-  std::shared_ptr<uplink_context_repository> ul_context_repo = std::make_shared<uplink_context_repository>(1);
-  uplane_message_decoder_spy*                uplane_decoder;
-  data_flow_uplane_uplink_data_impl          data_flow;
+  std::shared_ptr<rx_grid_context_repository> ul_context_repo = std::make_shared<rx_grid_context_repository>(1);
+  uplane_message_decoder_spy*                 uplane_decoder;
+  data_flow_uplane_uplink_data_impl           data_flow;
 
 public:
   data_flow_uplane_uplink_data_impl_fixture() :

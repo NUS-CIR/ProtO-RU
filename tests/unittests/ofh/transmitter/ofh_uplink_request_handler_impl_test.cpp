@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "../../../../lib/ofh/transmitter/helpers.h"
@@ -68,21 +69,21 @@ public:
 class ofh_uplink_request_handler_impl_fixture : public ::testing::Test
 {
 protected:
-  const cyclic_prefix                        cp                 = {cyclic_prefix::NORMAL};
-  subcarrier_spacing                         scs                = subcarrier_spacing::kHz30;
-  const tdd_ul_dl_config_common              ttd_pattern        = {subcarrier_spacing::kHz30, {10, 6, 6, 3, 3}, {}};
-  tx_window_timing_parameters                tx_timing_params   = {0, 0, 8, 5, 0, 0};
-  std::chrono::microseconds                  ul_processing_time = std::chrono::microseconds(30);
-  unsigned                                   nof_symbols        = get_nsymb_per_slot(cp);
-  std::unique_ptr<prach_buffer_pool>         prach_pool;
-  error_notifier_spy                         notifier_spy;
-  uplink_request_handler_impl_config         cfg;
-  resource_grid_reader_spy                   reader_spy;
-  resource_grid_writer_spy                   writer_spy;
-  resource_grid_spy                          grid;
-  shared_resource_grid_spy                   shared_grid;
-  std::shared_ptr<uplink_context_repository> ul_slot_repo;
-  std::shared_ptr<prach_context_repository>  ul_prach_repo;
+  const cyclic_prefix                         cp                 = {cyclic_prefix::NORMAL};
+  subcarrier_spacing                          scs                = subcarrier_spacing::kHz30;
+  const tdd_ul_dl_config_common               ttd_pattern        = {subcarrier_spacing::kHz30, {10, 6, 6, 3, 3}, {}};
+  tx_window_timing_parameters                 tx_timing_params   = {0, 0, 8, 5, 0, 0};
+  std::chrono::microseconds                   ul_processing_time = std::chrono::microseconds(30);
+  unsigned                                    nof_symbols        = get_nsymb_per_slot(cp);
+  std::unique_ptr<prach_buffer_pool>          prach_pool;
+  error_notifier_spy                          notifier_spy;
+  uplink_request_handler_impl_config          cfg;
+  resource_grid_reader_spy                    reader_spy;
+  resource_grid_writer_spy                    writer_spy;
+  resource_grid_spy                           grid;
+  shared_resource_grid_spy                    shared_grid;
+  std::shared_ptr<rx_grid_context_repository> ul_slot_repo;
+  std::shared_ptr<prach_context_repository>   ul_prach_repo;
   std::shared_ptr<uplink_notified_grid_symbol_repository> notified_symbol_repo;
   data_flow_cplane_scheduling_commands_spy*               data_flow;
   data_flow_cplane_scheduling_commands_spy*               data_flow_prach;
@@ -95,7 +96,7 @@ protected:
     writer_spy(1, 14, 1),
     grid(reader_spy, writer_spy),
     shared_grid(grid),
-    ul_slot_repo(std::make_shared<uplink_context_repository>(REPOSITORY_SIZE)),
+    ul_slot_repo(std::make_shared<rx_grid_context_repository>(REPOSITORY_SIZE)),
     ul_prach_repo(std::make_shared<prach_context_repository>(REPOSITORY_SIZE)),
     notified_symbol_repo(std::make_unique<uplink_notified_grid_symbol_repository>(REPOSITORY_SIZE)),
     handler(get_config_prach_cp_disabled(), get_dependencies_prach_cp_disabled()),

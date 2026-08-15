@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "dpdk_ethernet_receiver.h"
@@ -106,7 +107,13 @@ void dpdk_receiver_impl::receive()
   }
 
   for (auto* mbuf : span<::rte_mbuf*>(mbufs.data(), num_frames)) {
-    ::rte_vlan_strip(mbuf);
+    // Keep the same wire-format contract as the socket backend. Some NICs strip the VLAN header and report its TCI in
+    // the mbuf metadata; restore it before handing the frame to the common Ethernet decoder.
+    if ((mbuf->ol_flags & RTE_MBUF_F_RX_VLAN_STRIPPED) != 0 && ::rte_vlan_insert(&mbuf) != 0) {
+      logger.warning("Failed to restore stripped VLAN header on a received Ethernet frame");
+      ::rte_pktmbuf_free(mbuf);
+      continue;
+    }
     notifier->on_new_frame(unique_rx_buffer(dpdk_rx_buffer_impl(mbuf)));
   }
   ofh_tracer << trace_event("ofh_dpdk_rx", dpdk_rx_tp);

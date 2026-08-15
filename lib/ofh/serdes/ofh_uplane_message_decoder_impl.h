@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -48,13 +49,15 @@ public:
                               unsigned                         nof_symbols_,
                               unsigned                         ru_nof_prbs_,
                               unsigned                         sector_id_,
-                              std::unique_ptr<iq_decompressor> decompressor_) :
+                              std::unique_ptr<iq_decompressor> decompressor_,
+                              data_direction                   expected_direction_ = data_direction::uplink) :
     logger(logger_),
     decompressor(std::move(decompressor_)),
     scs(scs_),
     nof_symbols(nof_symbols_),
     ru_nof_prbs(ru_nof_prbs_),
-    sector_id(sector_id_)
+    sector_id(sector_id_),
+    expected_direction(expected_direction_)
   {
     ocudu_assert(decompressor, "Invalid IQ decompressor");
   }
@@ -98,6 +101,8 @@ protected:
   const unsigned                   nof_symbols;
   const unsigned                   ru_nof_prbs;
   const unsigned                   sector_id;
+  /// Expected data direction of received messages (uplink for a DU receiver, downlink for an RU receiver).
+  const data_direction expected_direction;
 };
 
 } // namespace ofh

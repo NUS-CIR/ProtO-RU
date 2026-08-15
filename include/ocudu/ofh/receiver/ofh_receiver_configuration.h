@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -31,6 +32,8 @@ struct receiver_config {
   ether::mac_address mac_dst_address;
   /// Source MAC address.
   ether::mac_address mac_src_address;
+  /// Expected VLAN configuration of received User-Plane frames.
+  std::optional<ether::vlan_parameters> vlan_config;
   /// Reception window timing parameters.
   rx_window_timing_parameters rx_timing_params;
   /// \brief RU operating bandwidth.

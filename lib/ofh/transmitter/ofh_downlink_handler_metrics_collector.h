@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "ofh_data_flow_cplane_scheduling_commands.h"
-#include "ofh_data_flow_uplane_downlink_data.h"
+#include "ofh_data_flow_uplane_data.h"
 #include "ofh_tx_window_checker.h"
 #include "ocudu/ofh/transmitter/ofh_transmitter_metrics.h"
 
@@ -16,7 +17,7 @@ class downlink_handler_metrics_collector
 {
 public:
   downlink_handler_metrics_collector(data_flow_cplane_scheduling_commands& df_cplane,
-                                     data_flow_uplane_downlink_data&       df_uplane,
+                                     data_flow_uplane_data&                df_uplane,
                                      tx_window_checker&                    window_checker_) :
     df_cplane_collector(df_cplane.get_metrics_collector()),
     df_uplane_collector(df_uplane.get_metrics_collector()),

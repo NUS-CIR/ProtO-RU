@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "../support/prach_context_repository.h"
-#include "../support/uplink_context_repository.h"
+#include "../support/rx_grid_context_repository.h"
 #include "ocudu/ocudulog/logger.h"
 #include "ocudu/ofh/ofh_controller.h"
 #include "ocudu/ofh/ofh_uplane_rx_symbol_notifier.h"
@@ -36,11 +37,11 @@ struct closed_rx_window_handler_config {
 
 /// Closed reception window handler dependencies.
 struct closed_rx_window_handler_dependencies {
-  ocudulog::basic_logger*                    logger   = nullptr;
-  task_executor*                             executor = nullptr;
-  std::shared_ptr<prach_context_repository>  prach_repo;
-  std::shared_ptr<uplink_context_repository> uplink_repo;
-  std::shared_ptr<uplane_rx_symbol_notifier> notifier;
+  ocudulog::basic_logger*                     logger   = nullptr;
+  task_executor*                              executor = nullptr;
+  std::shared_ptr<prach_context_repository>   prach_repo;
+  std::shared_ptr<rx_grid_context_repository> uplink_repo;
+  std::shared_ptr<uplane_rx_symbol_notifier>  notifier;
 };
 
 /// Open Fronthaul closed reception window handler.
@@ -73,7 +74,7 @@ private:
   ///
   /// Pops an uplink context from the uplink repository and when the context is valid, notifies it using the User-Plane
   /// received symbol notifier.
-  void handle_uplink_context(slot_symbol_point symbol_point);
+  void handle_rx_grid_context(slot_symbol_point symbol_point);
 
   /// \brief Handles the PRACH context for the closed reception window given by symbol point.
   ///
@@ -86,15 +87,15 @@ private:
   ///
   /// This delay is calculated with the T4a_max parameter plus the number of symbols that takes to decode a received
   /// Open Fronthaul message.
-  const unsigned                             notification_delay_in_symbols;
-  const unsigned                             sector_id;
-  const warn_unreceived_ru_frames            warn_unreceived_frames;
-  bool                                       log_unreceived_messages;
-  ocudulog::basic_logger&                    logger;
-  task_executor&                             executor;
-  std::shared_ptr<prach_context_repository>  prach_repo;
-  std::shared_ptr<uplink_context_repository> uplink_repo;
-  std::shared_ptr<uplane_rx_symbol_notifier> notifier;
+  const unsigned                              notification_delay_in_symbols;
+  const unsigned                              sector_id;
+  const warn_unreceived_ru_frames             warn_unreceived_frames;
+  bool                                        log_unreceived_messages;
+  ocudulog::basic_logger&                     logger;
+  task_executor&                              executor;
+  std::shared_ptr<prach_context_repository>   prach_repo;
+  std::shared_ptr<rx_grid_context_repository> uplink_repo;
+  std::shared_ptr<uplane_rx_symbol_notifier>  notifier;
   /// Counts every symbol not received when reception window closes.
   std::atomic<unsigned> nof_missed_uplink_symbols;
   /// Counts every PRACH not received when the reception window closes.

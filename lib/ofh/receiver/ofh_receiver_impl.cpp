@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_receiver_impl.h"
@@ -17,6 +18,7 @@ static message_receiver_config get_message_receiver_configuration(const receiver
   config.scs                           = rx_config.scs;
   config.vlan_params.mac_src_address   = rx_config.mac_src_address;
   config.vlan_params.mac_dst_address   = rx_config.mac_dst_address;
+  config.vlan_params.vlan_config       = rx_config.vlan_config;
   config.vlan_params.eth_type          = ether::ECPRI_ETH_TYPE;
   config.warn_unreceived_frames        = rx_config.log_unreceived_ru_frames;
   config.are_metrics_enabled           = rx_config.are_metrics_enabled;

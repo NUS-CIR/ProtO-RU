@@ -1,12 +1,13 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_transmitter_factories.h"
 #include "ofh_data_flow_cplane_scheduling_commands_impl.h"
 #include "ofh_data_flow_cplane_scheduling_commands_metrics_decorator.h"
 #include "ofh_data_flow_cplane_scheduling_commands_task_dispatcher.h"
-#include "ofh_data_flow_uplane_downlink_data_impl.h"
-#include "ofh_data_flow_uplane_downlink_data_metrics_decorator.h"
+#include "ofh_data_flow_uplane_data_impl.h"
+#include "ofh_data_flow_uplane_data_metrics_decorator.h"
 #include "ofh_data_flow_uplane_downlink_task_dispatcher.h"
 #include "ofh_transmitter_impl.h"
 #include "ofh_uplane_fragment_size_calculator.h"
@@ -66,7 +67,7 @@ create_data_flow_cplane_sched(const transmitter_config&                         
   return std::make_unique<data_flow_cplane_metrics_decorator>(std::move(data_flow_cplane));
 }
 
-static std::unique_ptr<data_flow_uplane_downlink_data>
+static std::unique_ptr<data_flow_uplane_data>
 create_data_flow_uplane_data(const transmitter_config&              tx_config,
                              ocudulog::basic_logger&                logger,
                              std::shared_ptr<ether::eth_frame_pool> frame_pool)
@@ -74,7 +75,7 @@ create_data_flow_uplane_data(const transmitter_config&              tx_config,
   frequency_range freq_range =
       (tx_config.scs > subcarrier_spacing::kHz60) ? frequency_range::FR2 : frequency_range::FR1;
 
-  data_flow_uplane_downlink_data_impl_config config;
+  data_flow_uplane_data_impl_config config;
   config.ru_nof_prbs  = get_max_Nprb(tx_config.ru_working_bw, tx_config.scs, freq_range);
   config.sector       = tx_config.sector;
   config.dl_eaxc      = tx_config.dl_eaxc;
@@ -87,7 +88,7 @@ create_data_flow_uplane_data(const transmitter_config&              tx_config,
   ether_params.mac_dst_address = tx_config.mac_dst_address;
   ether_params.mac_src_address = tx_config.mac_src_address;
 
-  data_flow_uplane_downlink_data_impl_dependencies dependencies;
+  data_flow_uplane_data_impl_dependencies dependencies;
   dependencies.logger        = &logger;
   dependencies.frame_pool    = std::move(frame_pool);
   dependencies.eth_builder   = (tx_config.vlan_cfg_up) ? ether::create_vlan_frame_builder(ether_params)
@@ -105,7 +106,7 @@ create_data_flow_uplane_data(const transmitter_config&              tx_config,
           ? create_static_compr_method_ofh_user_plane_packet_builder(logger, *dependencies.compressor_sel)
           : create_dynamic_compr_method_ofh_user_plane_packet_builder(logger, *dependencies.compressor_sel);
 
-  auto data_flow_uplane = std::make_unique<data_flow_uplane_downlink_data_impl>(config, std::move(dependencies));
+  auto data_flow_uplane = std::make_unique<data_flow_uplane_data_impl>(config, std::move(dependencies));
   if (!tx_config.are_metrics_enabled) {
     return data_flow_uplane;
   }
@@ -167,7 +168,7 @@ resolve_transmitter_dependencies(const transmitter_config&                      
                                  error_notifier&                                         err_notifier,
                                  std::unique_ptr<ether::transmitter>                     eth_transmitter,
                                  std::shared_ptr<prach_context_repository>               prach_context_repo,
-                                 std::shared_ptr<uplink_context_repository>              ul_slot_context_repo,
+                                 std::shared_ptr<rx_grid_context_repository>             ul_slot_context_repo,
                                  std::shared_ptr<uplink_cplane_context_repository>       ul_cp_context_repo,
                                  std::shared_ptr<uplink_cplane_context_repository>       prach_cp_context_repo,
                                  std::shared_ptr<uplink_notified_grid_symbol_repository> notifier_symbol_repo)
@@ -228,7 +229,7 @@ ocudu::ofh::create_transmitter(const transmitter_config&                        
                                error_notifier&                                         err_notifier,
                                std::unique_ptr<ether::transmitter>                     eth_transmitter,
                                std::shared_ptr<prach_context_repository>               prach_context_repo,
-                               std::shared_ptr<uplink_context_repository>              ul_slot_context_repo,
+                               std::shared_ptr<rx_grid_context_repository>             ul_slot_context_repo,
                                std::shared_ptr<uplink_cplane_context_repository>       ul_cp_context_repo,
                                std::shared_ptr<uplink_cplane_context_repository>       prach_cp_context_repo,
                                std::shared_ptr<uplink_notified_grid_symbol_repository> notifier_symbol_repo)

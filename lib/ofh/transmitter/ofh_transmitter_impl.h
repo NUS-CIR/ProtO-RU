@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -29,11 +30,11 @@ struct transmitter_impl_dependencies {
   /// Data flow for downlink Control-Plane.
   std::unique_ptr<data_flow_cplane_scheduling_commands> dl_df_cplane;
   /// Data flow for downlink User-Plane.
-  std::unique_ptr<data_flow_uplane_downlink_data> dl_df_uplane;
+  std::unique_ptr<data_flow_uplane_data> dl_df_uplane;
   /// Data flow for uplink Control-Plane scheduling commands.
   std::unique_ptr<data_flow_cplane_scheduling_commands> ul_df_cplane;
   /// Uplink slot context repository.
-  std::shared_ptr<uplink_context_repository> ul_slot_repo;
+  std::shared_ptr<rx_grid_context_repository> ul_slot_repo;
   /// Uplink PRACH context repository.
   std::shared_ptr<prach_context_repository> ul_prach_repo;
   /// Notified uplink grid symbol repository.

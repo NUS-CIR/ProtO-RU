@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ofh_uplane_message_builder_impl.h"
@@ -12,14 +13,16 @@ using namespace ocudu;
 using namespace ofh;
 
 /// Encodes data direction, payload version and filter index.
-static uint8_t encode_data_direction()
+static uint8_t encode_data_direction(data_direction direction, filter_index_type filter_index)
 {
   uint8_t octet = 0;
-  // Data direction (DL); offset: 7, 1 bit long.
-  octet |= uint8_t(to_value(data_direction::downlink)) << 7u;
+  // Data direction (DL for the DU transmitter, UL for an RU transmitter); offset: 7, 1 bit long.
+  octet |= uint8_t(to_value(direction)) << 7u;
   // Payload version; offset: 4, 3 bits long.
   octet |= uint8_t(OFH_PAYLOAD_VERSION) << 4u;
-  // Filter index is fixed to 0, skip it.
+  // Filter index; offset: 0, 4 bits long. Standard channel filter (0) for ordinary data; a PRACH filter index for an
+  // O-RU's PRACH User-Plane.
+  octet |= uint8_t(to_value(filter_index)) & 0x0f;
 
   return octet;
 }
@@ -50,6 +53,7 @@ static uint8_t encode_slot_lsb_and_symbol(const uplane_message_params& params)
 static uint8_t encode_sect_id_rb_symbols(const uplane_message_params& params)
 {
   uint8_t octet = 0;
+  octet |= uint8_t(params.section_id & 0xf) << 4u;
   octet |= uint8_t(rb_id_type::every_rb_used) << 3u;
   octet |= uint8_t(symbol_incr_type::current_symbol_number) << 2u;
   octet |= uint8_t(params.start_prb >> 8u) & 0x3;
@@ -61,7 +65,7 @@ static uint8_t encode_sect_id_rb_symbols(const uplane_message_params& params)
 static void build_radio_app_header(network_order_binary_serializer& serializer, const uplane_message_params& params)
 {
   // Data direction + payload version + filter index (1 Byte).
-  serializer.write(encode_data_direction());
+  serializer.write(encode_data_direction(params.direction, params.filter_index));
 
   // Write FrameId (1 Byte) - a counter for 10 ms frames (wrapping period 2.56 seconds), range [0, 256].
   serializer.write(uint8_t(params.slot.sfn()));
@@ -76,8 +80,8 @@ static void build_radio_app_header(network_order_binary_serializer& serializer, 
 /// Writes section1 header to the output buffer.
 static void build_section1_header(network_order_binary_serializer& serializer, const uplane_message_params& params)
 {
-  // Section ID is fixed to 0.
-  serializer.write(uint8_t(0));
+  // Write the 8 MSBs of the section ID (0 for the O-DU transmitter; an O-RU echoes the request's section ID).
+  serializer.write(uint8_t(params.section_id >> 4u));
 
   // Write rb, symInc and 2 MSB bits of start PRB.
   serializer.write(encode_sect_id_rb_symbols(params));

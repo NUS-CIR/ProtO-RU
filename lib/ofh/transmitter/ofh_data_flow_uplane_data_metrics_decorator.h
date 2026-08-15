@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "../support/metrics_helpers.h"
-#include "ofh_data_flow_uplane_downlink_data.h"
+#include "ofh_data_flow_uplane_data.h"
 #include "ocudu/support/resource_usage/scoped_resource_usage.h"
 #include <memory>
 
@@ -12,12 +13,11 @@ namespace ocudu {
 namespace ofh {
 
 /// Open Fronthaul User-Plane downlink data flow metrics decorator.
-class data_flow_uplane_downlink_metrics_decorator : public data_flow_uplane_downlink_data,
+class data_flow_uplane_downlink_metrics_decorator : public data_flow_uplane_data,
                                                     public data_flow_message_encoding_metrics_collector
 {
 public:
-  explicit data_flow_uplane_downlink_metrics_decorator(
-      std::unique_ptr<data_flow_uplane_downlink_data> data_flow_uplane_) :
+  explicit data_flow_uplane_downlink_metrics_decorator(std::unique_ptr<data_flow_uplane_data> data_flow_uplane_) :
     data_flow_uplane(std::move(data_flow_uplane_))
   {
     ocudu_assert(data_flow_uplane, "Invalid data flow");
@@ -79,8 +79,8 @@ private:
     max_latency_ns.store(default_max_latency_ns, std::memory_order_relaxed);
   }
 
-  std::unique_ptr<data_flow_uplane_downlink_data> data_flow_uplane;
-  operation_controller_dummy                      controller;
+  std::unique_ptr<data_flow_uplane_data> data_flow_uplane;
+  operation_controller_dummy             controller;
 
   std::atomic<uint32_t> count          = {};
   std::atomic<uint64_t> sum_elapsed_ns = {};
