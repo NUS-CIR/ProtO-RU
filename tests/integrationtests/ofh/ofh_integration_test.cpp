@@ -590,7 +590,7 @@ private:
   /// after the first pass.
   static unsigned get_nof_flush_slots()
   {
-    return 2 * static_cast<unsigned>(ether::eth_frame_pool::pool_size_in_slots());
+    return 2 * static_cast<unsigned>(ether::eth_frame_pool::default_pool_size_in_slots());
   }
 
   /// Pushes an empty downlink resource grid, which only clears the OFH transmitter frame pools for the given slot.

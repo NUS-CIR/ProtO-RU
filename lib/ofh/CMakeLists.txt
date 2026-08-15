@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 # SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 
@@ -7,6 +8,7 @@ add_subdirectory(compression)
 add_subdirectory(ecpri)
 add_subdirectory(ethernet)
 add_subdirectory(receiver)
+add_subdirectory(ru)
 add_subdirectory(serdes)
 add_subdirectory(timing)
 add_subdirectory(transmitter)

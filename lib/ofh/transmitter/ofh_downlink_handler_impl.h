@@ -1,11 +1,12 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
 #include "ofh_data_flow_cplane_scheduling_commands.h"
-#include "ofh_data_flow_uplane_downlink_data.h"
+#include "ofh_data_flow_uplane_data.h"
 #include "ofh_downlink_handler_metrics_collector.h"
 #include "ofh_tx_window_checker.h"
 #include "ocudu/adt/static_vector.h"
@@ -51,7 +52,7 @@ struct downlink_handler_impl_dependencies {
   /// Data flow for Control-Plane.
   std::unique_ptr<data_flow_cplane_scheduling_commands> data_flow_cplane;
   /// Data flow for User-Plane.
-  std::unique_ptr<data_flow_uplane_downlink_data> data_flow_uplane;
+  std::unique_ptr<data_flow_uplane_data> data_flow_uplane;
   /// Ethernet frame pool downlink Control-Plane.
   std::shared_ptr<ether::eth_frame_pool> frame_pool_dl_cp;
   /// Ethernet frame pool downlink User-Plane.
@@ -90,7 +91,7 @@ private:
   const static_vector<unsigned, MAX_NOF_SUPPORTED_EAXC> dl_eaxc;
   tx_window_checker                                     window_checker;
   std::unique_ptr<data_flow_cplane_scheduling_commands> data_flow_cplane;
-  std::unique_ptr<data_flow_uplane_downlink_data>       data_flow_uplane;
+  std::unique_ptr<data_flow_uplane_data>                data_flow_uplane;
   std::shared_ptr<ether::eth_frame_pool>                frame_pool_dl_cp;
   std::shared_ptr<ether::eth_frame_pool>                frame_pool_dl_up;
   error_notifier&                                       err_notifier;

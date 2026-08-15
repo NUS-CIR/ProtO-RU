@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
 
-#include "ofh_data_flow_uplane_downlink_data.h"
+#include "ofh_data_flow_uplane_data.h"
 #include "ocudu/ocudulog/logger.h"
 #include "ocudu/ofh/ofh_controller.h"
 #include "ocudu/ofh/ofh_sector_executor_mapper.h"
@@ -21,14 +22,14 @@ namespace ofh {
 /// \brief Open Fronthaul User-Plane downlink data flow task dispatcher implementation.
 ///
 /// For a requested task the dispatcher fetches an executor associated with an eAxC.
-class data_flow_uplane_downlink_task_dispatcher : public data_flow_uplane_downlink_data, public operation_controller
+class data_flow_uplane_downlink_task_dispatcher : public data_flow_uplane_data, public operation_controller
 {
 public:
-  data_flow_uplane_downlink_task_dispatcher(ocudulog::basic_logger&                         logger_,
-                                            std::unique_ptr<data_flow_uplane_downlink_data> data_flow_uplane_,
-                                            ofh_sector_executor_mapper&                     exec_mapper_,
-                                            unsigned                                        sector_id_,
-                                            data_flow_message_encoding_metrics_collector*   metrics_collector_) :
+  data_flow_uplane_downlink_task_dispatcher(ocudulog::basic_logger&                       logger_,
+                                            std::unique_ptr<data_flow_uplane_data>        data_flow_uplane_,
+                                            ofh_sector_executor_mapper&                   exec_mapper_,
+                                            unsigned                                      sector_id_,
+                                            data_flow_message_encoding_metrics_collector* metrics_collector_) :
     logger(logger_),
     exec_mapper(exec_mapper_),
     data_flow_uplane(std::move(data_flow_uplane_)),
@@ -78,12 +79,12 @@ public:
   }
 
 private:
-  ocudulog::basic_logger&                         logger;
-  ofh_sector_executor_mapper&                     exec_mapper;
-  std::unique_ptr<data_flow_uplane_downlink_data> data_flow_uplane;
-  const unsigned                                  sector_id;
-  data_flow_message_encoding_metrics_collector*   metrics_collector;
-  rt_stop_event_source                            stop_manager;
+  ocudulog::basic_logger&                       logger;
+  ofh_sector_executor_mapper&                   exec_mapper;
+  std::unique_ptr<data_flow_uplane_data>        data_flow_uplane;
+  const unsigned                                sector_id;
+  data_flow_message_encoding_metrics_collector* metrics_collector;
+  rt_stop_event_source                          stop_manager;
 };
 
 } // namespace ofh

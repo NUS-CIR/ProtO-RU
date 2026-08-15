@@ -350,17 +350,14 @@ struct frame_pool_interval {
 /// Pool of Ethernet frame buffers pre-allocated for symbols in slots.
 class eth_frame_pool
 {
-  /// Number of slots the pool can accommodate.
-  static constexpr size_t NUM_SLOTS = 10;
-
-  /// Maximum number of entries contained by the pool (one entry per OFDM symbol).
-  static constexpr size_t NUM_ENTRIES = NOF_OFDM_SYM_PER_SLOT_NORMAL_CP * NUM_SLOTS;
+  /// [Implementation-defined] Default number of slots the pool accommodates.
+  static constexpr size_t DEFAULT_NUM_SLOTS = 10;
 
   /// Returns pool entry for the given slot and symbol.
   const frame_buffer_pool& get_pool_entry(slot_point slot_point, unsigned symbol) const
   {
-    unsigned slot_index = slot_point.slot_index();
-    unsigned sym_index  = (slot_index * NOF_OFDM_SYM_PER_SLOT_NORMAL_CP + symbol) % NUM_ENTRIES;
+    unsigned slot_index = slot_point.system_slot();
+    unsigned sym_index  = (slot_index * NOF_OFDM_SYM_PER_SLOT_NORMAL_CP + symbol) % pool.size();
     return *pool[sym_index];
   }
 
@@ -378,14 +375,17 @@ public:
   /// \param num_of_frames  - Number of frames with given MTU size that can be send in one symbol.
   /// \param type           - Type of Open Fronthaul messages this pool is dedicated for.
   /// \param direction      - Direction of the Open Fronthaul messages this pool is dedicated for.
+  /// \param nof_slots      - Number of slots the pool accommodates.
   eth_frame_pool(ocudulog::basic_logger& logger_,
                  units::bytes            mtu,
                  unsigned                num_of_frames,
                  ofh::message_type       type,
-                 ofh::data_direction     direction) :
+                 ofh::data_direction     direction,
+                 unsigned                nof_slots = DEFAULT_NUM_SLOTS) :
     logger(logger_), pool_frames_type(type), pool_frames_data_direction(direction)
   {
-    for (unsigned i = 0; i != NUM_ENTRIES; ++i) {
+    ocudu_assert(nof_slots > 0, "Invalid Ethernet frame pool size");
+    for (unsigned i = 0; i != NOF_OFDM_SYM_PER_SLOT_NORMAL_CP * nof_slots; ++i) {
       /// Multiply by 2 because for uplink C-Plane we may need to allocate space for data and PRACH.
       pool.emplace_back(
           std::make_unique<frame_buffer_pool>(logger, num_of_frames * ofh::MAX_NOF_SUPPORTED_EAXC * 2, mtu.value()));
@@ -533,7 +533,10 @@ public:
   }
 
   /// Returns number of slots the pool can accommodate.
-  static size_t pool_size_in_slots() { return NUM_SLOTS; }
+  size_t pool_size_in_slots() const { return pool.size() / NOF_OFDM_SYM_PER_SLOT_NORMAL_CP; }
+
+  /// Returns the default number of slots the pool accommodates.
+  static size_t default_pool_size_in_slots() { return DEFAULT_NUM_SLOTS; }
 
 private:
   /// Returns the number of frames expired in the transmission path since the last call, which are also late.
