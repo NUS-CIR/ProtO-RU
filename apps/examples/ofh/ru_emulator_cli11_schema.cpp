@@ -1,15 +1,39 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 #include "ru_emulator_cli11_schema.h"
 #include "helpers.h"
 #include "ru_emulator_appconfig.h"
+#include "ocudu/ofh/ofh_constants.h"
 #include "ocudu/support/cli11_utils.h"
 #include "ocudu/support/config_parsers.h"
 
 using namespace ocudu;
+
+/// Validates one configured eAxC list against the fixed-size OFH containers and repositories.
+static void validate_eaxc_list(span<const unsigned> eaxc_ids, const char* option_name)
+{
+  if (eaxc_ids.size() > ofh::MAX_NOF_SUPPORTED_EAXC) {
+    throw CLI::ValidationError(option_name,
+                               fmt::format("At most {} eAxC identifiers are supported", ofh::MAX_NOF_SUPPORTED_EAXC));
+  }
+
+  if (std::any_of(
+          eaxc_ids.begin(), eaxc_ids.end(), [](unsigned eaxc) { return eaxc >= ofh::MAX_SUPPORTED_EAXC_ID_VALUE; })) {
+    throw CLI::ValidationError(
+        option_name,
+        fmt::format("eAxC identifiers must be in the range [0, {}]", ofh::MAX_SUPPORTED_EAXC_ID_VALUE - 1));
+  }
+
+  std::vector<unsigned> sorted_ids(eaxc_ids.begin(), eaxc_ids.end());
+  std::sort(sorted_ids.begin(), sorted_ids.end());
+  if (std::adjacent_find(sorted_ids.begin(), sorted_ids.end()) != sorted_ids.end()) {
+    throw CLI::ValidationError(option_name, "Duplicate eAxC identifiers are not allowed");
+  }
+}
 
 /// Translates a string to the corresponding RU emulator's PRACH format.
 static ru_emulator_prach_format str_to_prach_format(std::string s)
@@ -66,8 +90,66 @@ static void configure_cli11_ru_emu_dpdk_args(CLI::App& app, std::optional<ru_emu
   config.emplace();
 
   add_option(app, "--eal_args", config->eal_args, "EAL configuration parameters used to initialize DPDK");
-  app.add_option("--enable_pdump_init", config->enable_pdump_init, "Enable DPDK pdump initialization")
+  add_option(app, "--enable_pdump_init", config->enable_pdump_init, "Enable DPDK pdump initialization")
       ->always_capture_default();
+}
+
+static void configure_cli11_sdr_args(CLI::App& app, std::optional<ru_emulator_sdr_appconfig>& sdr_config)
+{
+  sdr_config.emplace();
+  ru_emulator_sdr_appconfig& cfg = *sdr_config;
+
+  add_option(app, "--device_driver", cfg.device_driver, "Radio device driver (uhd or zmq)")->capture_default_str();
+  add_option(app, "--device_args", cfg.device_arguments, "Radio device arguments")->capture_default_str();
+  add_option(app, "--srate", cfg.srate_MHz, "Sampling rate in MHz")->capture_default_str();
+  add_option(app,
+             "--dl_freq_override",
+             cfg.dl_freq_override_Hz,
+             "Downlink centre frequency override in Hz (else "
+             "derived from the cell DL ARFCN and NR band)");
+  add_option(app,
+             "--ul_freq_override",
+             cfg.ul_freq_override_Hz,
+             "Uplink centre frequency override in Hz (else "
+             "derived from the cell UL ARFCN and NR band)");
+  add_option(app, "--tx_gain", cfg.tx_gain_dB, "Transmit gain in dB")->capture_default_str();
+  add_option(app, "--rx_gain", cfg.rx_gain_dB, "Receive gain in dB")->capture_default_str();
+  add_option(app, "--center_freq_offset", cfg.center_freq_offset_Hz, "Centre frequency offset in Hz (RF calibration)")
+      ->capture_default_str();
+  add_option(app, "--calibrate_clock_ppm", cfg.calibrate_clock_ppm, "Clock calibration in PPM (carrier frequency)")
+      ->capture_default_str();
+  add_option(app, "--lo_offset", cfg.lo_offset_MHz, "LO offset in MHz (moves LO leakage out of the channel)")
+      ->capture_default_str();
+  add_option(app,
+             "--time_alignment_calibration",
+             cfg.time_alignment_calibration,
+             "Rx-to-Tx time-alignment calibration in samples (overrides the RF driver default)");
+  add_option(app,
+             "--transmission_mode",
+             cfg.transmission_mode,
+             "Radio transmission mode "
+             "(continuous, discontinuous, same-port)")
+      ->capture_default_str();
+  add_option(app, "--power_ramping", cfg.power_ramping_us, "Transmit power ramping time in microseconds")
+      ->capture_default_str();
+  add_option(app, "--gain_backoff", cfg.gain_backoff_dB, "Transmit baseband gain back-off in dB")
+      ->capture_default_str();
+  add_option(app, "--otw_format", cfg.otw_format, "Over-the-wire sample format")->capture_default_str();
+  add_option(app, "--clock_source", cfg.clock_source, "Clock source")->capture_default_str();
+  add_option(app, "--sync_source", cfg.sync_source, "Synchronisation source")->capture_default_str();
+  add_option(app, "--max_proc_delay", cfg.max_proc_delay, "Maximum lower PHY processing delay in slots")
+      ->capture_default_str();
+  add_option(app,
+             "--execution_profile",
+             cfg.execution_profile,
+             "Lower-PHY baseband execution profile (auto, sequential, single, dual, triple)")
+      ->capture_default_str()
+      ->check(CLI::IsMember({"auto", "sequential", "single", "dual", "triple"}));
+  add_option(app, "--ru_cpus", cfg.ru_cpus, "CPUs the SDR radio and baseband workers are pinned to")
+      ->capture_default_str();
+  add_option(app, "--pinning_policy", cfg.pinning_policy, "Thread pinning policy within ru_cpus (mask, round-robin)")
+      ->capture_default_str()
+      ->check(CLI::IsMember({"mask", "round-robin"}));
 }
 
 static void configure_cli11_ru_emu_args(CLI::App& app, ru_emulator_ofh_appconfig& config)
@@ -87,6 +169,32 @@ static void configure_cli11_ru_emu_args(CLI::App& app, ru_emulator_ofh_appconfig
         return is_valid_bw(bw) ? "" : error_message;
       });
 
+  add_option_function<std::string>(
+      app,
+      "--common_scs",
+      [&config](const std::string& value) { config.common_scs = to_subcarrier_spacing(value); },
+      "Cell common subcarrier spacing (15 or 30 kHz)")
+      ->default_str(to_string(config.common_scs))
+      ->check([](const std::string& value) -> std::string {
+        const subcarrier_spacing scs = to_subcarrier_spacing(value);
+        if (scs == subcarrier_spacing::kHz15 || scs == subcarrier_spacing::kHz30) {
+          return {};
+        }
+        return fmt::format("Common subcarrier spacing '{}' not supported. Accepted values [15, 30]", value);
+      });
+
+  add_option(app, "--dl_arfcn", config.dl_arfcn, "Downlink ARFCN (cell centre-frequency reference)")
+      ->capture_default_str();
+  add_option_function<unsigned>(
+      app,
+      "--band",
+      [&config](const unsigned& value) {
+        if (value != 0) {
+          config.band = static_cast<nr_band>(value);
+        }
+      },
+      "NR band number (derived from the DL ARFCN when unset)");
+
   auto compression_method_check = [](const std::string& value) -> std::string {
     if (value == "none" || value == "bfp") {
       return {};
@@ -101,35 +209,65 @@ static void configure_cli11_ru_emu_args(CLI::App& app, ru_emulator_ofh_appconfig
   add_option(app, "--compr_bitwidth_ul", config.ul_compr_bitwidth, "Uplink compression bit width")
       ->capture_default_str()
       ->enum_values({9, 16});
+  add_option(app, "--compr_method_dl", config.dl_compr_method, "Downlink compression method")
+      ->capture_default_str()
+      ->check(compression_method_check);
+  add_option(app, "--compr_bitwidth_dl", config.dl_compr_bitwidth, "Downlink compression bit width")
+      ->capture_default_str()
+      ->enum_values({9, 16});
+  add_option(app, "--compr_method_prach", config.prach_compr_method, "PRACH compression method")
+      ->capture_default_str()
+      ->check(compression_method_check);
+  add_option(app, "--compr_bitwidth_prach", config.prach_compr_bitwidth, "PRACH compression bit width")
+      ->capture_default_str()
+      ->enum_values({9, 16});
+  add_option(app, "--iq_scaling", config.iq_scaling, "IQ scaling applied before compression")->capture_default_str();
+  add_option(app, "--is_ul_static_compr_hdr", config.is_ul_static_compr_hdr, "Uplink static compression header flag")
+      ->capture_default_str();
+  add_option(app, "--is_dl_static_compr_hdr", config.is_dl_static_compr_hdr, "Downlink static compression header flag")
+      ->capture_default_str();
   add_option(app, "--network_interface", config.network_interface, "PCIe identifier of network device")
       ->capture_default_str();
   add_option(app, "--ru_mac_addr", config.ru_mac_address, "Radio Unit MAC address")->capture_default_str();
   add_option(app, "--du_mac_addr", config.du_mac_address, "Distributed Unit MAC address")->capture_default_str();
-  add_option(app, "--vlan_tag", config.vlan_tag, "V-LAN identifier")->capture_default_str()->range(1, 65536);
+  add_option(app, "--vlan_tag", config.vlan_tag, "V-LAN identifier (omit to transmit untagged frames)")
+      ->capture_default_str()
+      ->range(1, 4094);
   add_option(app, "--enable_promiscuous", config.enable_promiscuous, "Promiscuous mode flag")->capture_default_str();
+  add_option(app,
+             "--ofh_cpus",
+             config.ofh_cpus,
+             "CPUs the Open Fronthaul receive + decode workers (ru_rx, ru_emu) are pinned to")
+      ->capture_default_str();
   add_option(app, "--ul_port_id", config.ru_ul_port_id, "RU uplink port identifier")->capture_default_str();
   add_option(app, "--dl_port_id", config.ru_dl_port_id, "RU downlink port identifier")->capture_default_str();
   add_option(app, "--prach_port_id", config.ru_prach_port_id, "RU PRACH port identifier")->capture_default_str();
 
-  // Note: For the timing parameters, worst case is 2 slots for scs 15KHz and 14 symbols. Implementation defined.
+  // Timing parameters are expressed in microseconds and support values up to five milliseconds.
   add_option(app, "--t2a_max_cp_dl", config.T2a_max_cp_dl, "T2a maximum value for downlink Control-Plane")
       ->capture_default_str()
-      ->range(0, 1960);
+      ->range(0, 5000);
   add_option(app, "--t2a_min_cp_dl", config.T2a_min_cp_dl, "T2a minimum value for downlink Control-Plane")
       ->capture_default_str()
-      ->range(0, 1960);
+      ->range(0, 5000);
   add_option(app, "--t2a_max_cp_ul", config.T2a_max_cp_ul, "T2a maximum value for uplink Control-Plane")
       ->capture_default_str()
-      ->range(0, 1960);
+      ->range(0, 5000);
   add_option(app, "--t2a_min_cp_ul", config.T2a_min_cp_ul, "T2a minimum value for uplink Control-Plane")
       ->capture_default_str()
-      ->range(0, 1960);
+      ->range(0, 5000);
   add_option(app, "--t2a_max_up", config.T2a_max_up, "T2a maximum value for User-Plane")
       ->capture_default_str()
-      ->range(0, 1960);
+      ->range(0, 5000);
   add_option(app, "--t2a_min_up", config.T2a_min_up, "T2a minimum value for User-Plane")
       ->capture_default_str()
-      ->range(0, 1960);
+      ->range(0, 5000);
+  add_option(app, "--ta3_max_up", config.Ta3_max_up, "Ta3 maximum value for the uplink User-Plane (RU transmit window)")
+      ->capture_default_str()
+      ->range(0, 5000);
+  add_option(app, "--ta3_min_up", config.Ta3_min_up, "Ta3 minimum value for the uplink User-Plane (RU transmit window)")
+      ->capture_default_str()
+      ->range(0, 5000);
 
   // Function to capture the PRACH format.
   auto capture_prach_format_function = [](ru_emulator_prach_format& format) {
@@ -152,6 +290,21 @@ static void configure_cli11_ru_emu_args(CLI::App& app, ru_emulator_ofh_appconfig
                                    "PRACH format. Set to 'long' to use format 0, or 'short' to use format B4")
       ->default_str(prach_format_to_str(config.prach_format))
       ->check(check_prach_format);
+
+  // Optional SDR (radio) section. When present, this RU runs in SDR mode; when absent, in loopback (test-IQ) mode.
+  CLI::App* sdr_subcmd = add_subcommand(app, "sdr", "SDR (radio) configuration");
+  configure_cli11_sdr_args(*sdr_subcmd, config.sdr_config);
+
+  // Clean the SDR optional if the section was not configured.
+  app.callback([&app, &config]() {
+    if (app.get_subcommand("sdr")->count_all() == 0) {
+      config.sdr_config.reset();
+    }
+
+    validate_eaxc_list(config.ru_ul_port_id, "--ul_port_id");
+    validate_eaxc_list(config.ru_dl_port_id, "--dl_port_id");
+    validate_eaxc_list(config.ru_prach_port_id, "--prach_port_id");
+  });
 }
 
 void ocudu::configure_cli11_with_ru_emulator_appconfig_schema(CLI::App& app, ru_emulator_appconfig& ru_emu_parsed_cfg)
@@ -180,6 +333,20 @@ void ocudu::configure_cli11_with_ru_emulator_appconfig_schema(CLI::App& app, ru_
         }
       },
       "Sets the RU emulator configuration");
+
+  add_option(*ru_subcmd,
+             "--timing_cpus",
+             ru_emu_parsed_cfg.timing_cpus,
+             "CPUs the shared GPS timing worker (ru_timing) is pinned to")
+      ->capture_default_str();
+
+  add_option(*ru_subcmd, "--phy_cpus", ru_emu_parsed_cfg.phy_cpus, "CPUs of the shared lower-PHY compute pool")
+      ->capture_default_str();
+  add_option(*ru_subcmd,
+             "--nof_phy_threads",
+             ru_emu_parsed_cfg.nof_phy_threads,
+             "Number of shared lower-PHY compute workers (automatic when omitted)")
+      ->positive();
 
   CLI::App* dpdk_subcmd = add_subcommand(app, "dpdk", "DPDK configuration");
   configure_cli11_ru_emu_dpdk_args(*dpdk_subcmd, ru_emu_parsed_cfg.dpdk_config);
