@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #pragma once
@@ -22,8 +23,15 @@ public:
                                                   unsigned                         nof_symbols_,
                                                   unsigned                         ru_nof_prbs_,
                                                   unsigned                         sector_id_,
-                                                  std::unique_ptr<iq_decompressor> decompressor_) :
-    uplane_message_decoder_impl(logger_, scs_, nof_symbols_, ru_nof_prbs_, sector_id_, std::move(decompressor_))
+                                                  std::unique_ptr<iq_decompressor> decompressor_,
+                                                  data_direction expected_direction_ = data_direction::uplink) :
+    uplane_message_decoder_impl(logger_,
+                                scs_,
+                                nof_symbols_,
+                                ru_nof_prbs_,
+                                sector_id_,
+                                std::move(decompressor_),
+                                expected_direction_)
   {
   }
 

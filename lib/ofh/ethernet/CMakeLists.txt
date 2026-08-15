@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 # SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 
@@ -8,6 +9,7 @@ set(SOURCES
         ethernet_frame_builder_impl.cpp
         ethernet_transmitter_impl.cpp
         ethernet_receiver_impl.cpp
+        ethernet_receiver_utils.cpp
         ethernet_rx_buffer_impl.cpp
         vlan_ethernet_frame_builder_impl.cpp
         vlan_ethernet_frame_decoder_impl.cpp)

@@ -1,12 +1,14 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "../../phy/support/resource_grid_test_doubles.h"
+#include "ocudu/ocudulog/ocudulog.h"
 #include "ofh_data_flow_cplane_scheduling_commands_test_doubles.h"
 #include "tests/ocudu_test_requirements.h"
 #include "transmitter/helpers.h"
-#include "transmitter/ofh_data_flow_uplane_downlink_data.h"
+#include "transmitter/ofh_data_flow_uplane_data.h"
 #include "transmitter/ofh_downlink_handler_impl.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/ofh/ofh_error_notifier.h"
@@ -24,7 +26,7 @@ using namespace std::chrono_literals;
 namespace {
 
 /// Spy User-Plane downlink data data flow.
-class data_flow_uplane_downlink_data_spy : public data_flow_uplane_downlink_data, public operation_controller
+class data_flow_uplane_data_spy : public data_flow_uplane_data, public operation_controller
 {
 public:
   struct spy_info {
@@ -117,7 +119,7 @@ static downlink_handler_impl_config generate_default_config()
 static downlink_handler_impl_dependencies
 generate_dependencies(error_notifier&                                           notifier,
                       std::unique_ptr<data_flow_cplane_scheduling_commands_spy> cplane,
-                      std::unique_ptr<data_flow_uplane_downlink_data_spy>       uplane)
+                      std::unique_ptr<data_flow_uplane_data_spy>                uplane)
 {
   return {ocudulog::fetch_basic_logger("TEST"),
           notifier,
@@ -159,7 +161,7 @@ TEST(ofh_downlink_handler_impl, handling_downlink_data_use_control_and_user_plan
   error_notifier_spy notifier_spy;
   auto               cplane     = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
   const auto&        cplane_spy = *cplane;
-  auto               uplane     = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane     = std::make_unique<data_flow_uplane_data_spy>();
   const auto&        uplane_spy = *uplane;
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
@@ -203,7 +205,7 @@ TEST(ofh_downlink_handler_impl, late_rg_is_not_handled)
   error_notifier_spy notifier_spy;
   auto               cplane     = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
   const auto&        cplane_spy = *cplane;
-  auto               uplane     = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane     = std::make_unique<data_flow_uplane_data_spy>();
   const auto&        uplane_spy = *uplane;
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
@@ -237,7 +239,7 @@ TEST(ofh_downlink_handler_impl, same_slot_fails)
   error_notifier_spy notifier_spy;
   auto               cplane     = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
   const auto&        cplane_spy = *cplane;
-  auto               uplane     = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane     = std::make_unique<data_flow_uplane_data_spy>();
   const auto&        uplane_spy = *uplane;
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
@@ -271,7 +273,7 @@ TEST(ofh_downlink_handler_impl, rg_in_the_frontier_is_handled)
   error_notifier_spy notifier_spy;
   auto               cplane     = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
   const auto&        cplane_spy = *cplane;
-  auto               uplane     = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane     = std::make_unique<data_flow_uplane_data_spy>();
   const auto&        uplane_spy = *uplane;
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
@@ -306,7 +308,7 @@ TEST(ofh_downlink_handler_impl, category_a_transmits_one_beam_port_per_eaxc)
   error_notifier_spy notifier_spy;
   auto               cplane     = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
   const auto&        cplane_spy = *cplane;
-  auto               uplane     = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane     = std::make_unique<data_flow_uplane_data_spy>();
   const auto&        uplane_spy = *uplane;
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
@@ -336,7 +338,7 @@ TEST(ofh_downlink_handler_impl, category_a_transmits_one_beam_port_per_eaxc)
   ASSERT_EQ(to_beam_id(0), cplane_calls[0].beam_id);
   ASSERT_EQ(to_beam_id(1), cplane_calls[1].beam_id);
 
-  span<const data_flow_uplane_downlink_data_spy::spy_info> uplane_calls = uplane_spy.get_section_type_1_calls();
+  span<const data_flow_uplane_data_spy::spy_info> uplane_calls = uplane_spy.get_section_type_1_calls();
   ASSERT_EQ(2, uplane_calls.size());
   ASSERT_EQ(0, uplane_calls[0].port);
   ASSERT_EQ(config.dl_eaxc[0], uplane_calls[0].eaxc);
@@ -355,7 +357,7 @@ TEST(ofh_downlink_handler_impl, category_b_maps_non_empty_beam_ports_onto_eaxcs)
   error_notifier_spy notifier_spy;
   auto               cplane     = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
   const auto&        cplane_spy = *cplane;
-  auto               uplane     = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane     = std::make_unique<data_flow_uplane_data_spy>();
   const auto&        uplane_spy = *uplane;
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
@@ -386,7 +388,7 @@ TEST(ofh_downlink_handler_impl, category_b_maps_non_empty_beam_ports_onto_eaxcs)
   ASSERT_EQ(config.dl_eaxc[1], cplane_calls[1].eaxc);
   ASSERT_EQ(to_beam_id(3), cplane_calls[1].beam_id);
 
-  span<const data_flow_uplane_downlink_data_spy::spy_info> uplane_calls = uplane_spy.get_section_type_1_calls();
+  span<const data_flow_uplane_data_spy::spy_info> uplane_calls = uplane_spy.get_section_type_1_calls();
   ASSERT_EQ(2, uplane_calls.size());
   ASSERT_EQ(1, uplane_calls[0].port);
   ASSERT_EQ(config.dl_eaxc[0], uplane_calls[0].eaxc);
@@ -404,7 +406,7 @@ TEST(ofh_downlink_handler_impl, category_b_rejects_more_active_beam_ports_than_c
 
   error_notifier_spy notifier_spy;
   auto               cplane = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
-  auto               uplane = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane = std::make_unique<data_flow_uplane_data_spy>();
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
   handler.start();
@@ -441,7 +443,7 @@ TEST(ofh_downlink_handler_impl, category_a_rejects_more_beam_ports_than_eaxcs)
 
   error_notifier_spy notifier_spy;
   auto               cplane = std::make_unique<data_flow_cplane_scheduling_commands_spy>();
-  auto               uplane = std::make_unique<data_flow_uplane_downlink_data_spy>();
+  auto               uplane = std::make_unique<data_flow_uplane_data_spy>();
 
   downlink_handler_impl handler(config, generate_dependencies(notifier_spy, std::move(cplane), std::move(uplane)));
   handler.start();
