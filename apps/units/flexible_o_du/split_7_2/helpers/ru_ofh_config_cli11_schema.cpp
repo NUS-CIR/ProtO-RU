@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
+// SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
@@ -56,31 +57,31 @@ static void configure_cli11_ru_ofh_base_cell_args(CLI::App& app, ru_ofh_unit_bas
         return error_message;
       });
 
-  // Note: For the timing parameters, worst case is 2 slots for scs 15KHz and 14 symbols. Implementation defined.
+  // Timing parameters are expressed in microseconds and support values up to five milliseconds.
   add_option(app, "--t1a_max_cp_dl", config.T1a_max_cp_dl, "T1a maximum value for downlink Control-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--t1a_min_cp_dl", config.T1a_min_cp_dl, "T1a minimum value for downlink Control-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--t1a_max_cp_ul", config.T1a_max_cp_ul, "T1a maximum value for uplink Control-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--t1a_min_cp_ul", config.T1a_min_cp_ul, "T1a minimum value for uplink Control-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--t1a_max_up", config.T1a_max_up, "T1a maximum value for User-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--t1a_min_up", config.T1a_min_up, "T1a minimum value for User-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--ta4_max", config.Ta4_max, "Ta4 maximum value for User-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
   add_option(app, "--ta4_min", config.Ta4_min, "Ta4 minimum value for User-Plane")
       ->capture_default_str()
-      ->check(CLI::Range(0, 1960));
+      ->check(CLI::Range(0, 5000));
 
   if (config.T1a_min_cp_dl > config.T1a_max_cp_dl) {
     report_error("Invalid Open Fronthaul Radio Unit configuration detected. T1a maximum value must be greater than "
