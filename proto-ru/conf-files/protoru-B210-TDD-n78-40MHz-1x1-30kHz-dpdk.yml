@@ -1,0 +1,70 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+# ProtO-RU DPDK profile: TDD n78, 40 MHz, 1x1, 30 kHz SCS.
+# Bind the fronthaul NIC to vfio-pci, then replace the sample PCIe address below.
+# Adapt MAC addresses, CPU sets, gains, and UHD arguments to the host.
+log:
+  filename: /tmp/proto-ru.log
+  level: info
+
+dpdk:
+  eal_args: "-l 0 -a 0000:31:01.0 --proc-type auto"
+
+ru_emu:
+  timing_cpus: [1]
+  cells:
+    - network_interface: 0000:31:01.0
+      ru_mac_addr: cc:aa:ee:11:00:55
+      du_mac_addr: 50:7c:6f:55:c6:ae
+      # Drop vlan_tag when the fronthaul port is an SR-IOV VF with a port VLAN ("ip link" shows "vf 0 ... vlan 5"):
+      # the PF already inserts the tag on egress and strips it on ingress, so tagging here double-tags the frames.
+      # vlan_tag: 5
+
+
+      bandwidth: 40
+      common_scs: 30
+      dl_arfcn: 628032
+      band: 78
+
+      dl_port_id: [0]
+      ul_port_id: [0]
+      prach_port_id: [4]
+      prach_format: short
+
+      compr_method_dl: bfp
+      compr_bitwidth_dl: 9
+      compr_method_ul: bfp
+      compr_bitwidth_ul: 9
+      compr_method_prach: bfp
+      compr_bitwidth_prach: 9
+      is_ul_static_compr_hdr: true
+      is_dl_static_compr_hdr: true
+      iq_scaling: 1.0
+
+      t2a_max_cp_dl: 2435
+      t2a_min_cp_dl: 2235
+      t2a_max_cp_ul: 2435
+      t2a_min_cp_ul: 2235
+      t2a_max_up: 2215
+      t2a_min_up: 2015
+      ta3_max_up: 1200
+      ta3_min_up: 800
+
+      ofh_cpus: [2, 3, 4]
+
+      sdr:
+        device_driver: uhd
+        device_args: type=b200,num_recv_frames=64,num_send_frames=64
+        srate: 46.08
+        tx_gain: 80
+        rx_gain: 45
+        gain_backoff: 12
+        enable_clipping: true
+        power_ceiling: -0.1
+        clock_source: internal
+        sync_source: internal
+        max_proc_delay: 2
+        execution_profile: auto
+        ru_cpus: [5, 6, 7]
+        pinning_policy: mask

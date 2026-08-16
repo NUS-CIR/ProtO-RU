@@ -1,0 +1,64 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+# Common ProtO-RU profile: FDD n3, 10 MHz, 2x2, 15 kHz SCS.
+# Use this file with either the matching OCUDU or OAI O-DU configuration where provided.
+# Adapt interface names, MAC addresses, CPU sets, gains, and UHD arguments to the host.
+log:
+  filename: /tmp/proto-ru.log
+  level: info
+
+ru_emu:
+  timing_cpus: [1]
+  cells:
+    - network_interface: ens1f0
+      ru_mac_addr: 50:7c:6f:45:f3:04
+      du_mac_addr: 50:7c:6f:55:c6:ae
+      vlan_tag: 5
+
+      bandwidth: 10
+      common_scs: 15
+      dl_arfcn: 368640
+      band: 3
+
+      dl_port_id: [0, 1]
+      ul_port_id: [0, 1]
+      prach_port_id: [4, 5]
+      prach_format: short
+
+      compr_method_dl: bfp
+      compr_bitwidth_dl: 9
+      compr_method_ul: bfp
+      compr_bitwidth_ul: 9
+      compr_method_prach: bfp
+      compr_bitwidth_prach: 9
+      is_ul_static_compr_hdr: true
+      is_dl_static_compr_hdr: true
+      iq_scaling: 1.0
+
+      t2a_max_cp_dl: 3935
+      t2a_min_cp_dl: 3400
+      t2a_max_cp_ul: 3935
+      t2a_min_cp_ul: 3400
+      t2a_max_up: 3300
+      t2a_min_up: 2500
+      ta3_max_up: 1680
+      ta3_min_up: 1280
+
+      ofh_cpus: [2, 3, 4]
+
+      sdr:
+        device_driver: uhd
+        device_args: type=b200,num_recv_frames=64,num_send_frames=64
+        srate: 23.04
+        tx_gain: 80
+        rx_gain: 15
+        gain_backoff: 12
+        enable_clipping: true
+        power_ceiling: -0.1
+        clock_source: internal
+        sync_source: internal
+        max_proc_delay: 2
+        execution_profile: auto
+        ru_cpus: [5, 6, 7]
+        pinning_policy: mask

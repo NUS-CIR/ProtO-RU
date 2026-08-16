@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 # =====================================================================================================
-# RU emulator — annotated sample configuration
+# RU emulator: annotated sample configuration
 #
 #   ru_emulator -c ru_emulator_example_config.yml
 #
@@ -10,14 +10,14 @@
 # To run in loopback mode (no radio, test IQ) delete the whole `sdr:` block of the cell.
 # Commented alternatives show the 15 kHz FDD (band n3) values where they differ.
 #
-# CPU layout assumed below (8-core host; adapt to yours, see ARCHITECTURE.md §4):
+# CPU layout assumed below (8-core host; adapt to yours, see proto-ru/ARCHITECTURE.md §4):
 #   core 1    -> ru_timing  (GPS OTA tick; strictly realtime, wants its own quiet core)
 #   cores 2,3 -> OFH workers (ru_rx receive, ru_emu decode, ru_ofh_tx UL build+send; event-driven, can share)
 #   cores 4,5 -> SDR radio + lower-PHY baseband (ru_radio, ru_phy*; busy, keep isolated)
 # =====================================================================================================
 
 log:
-  filename: stdout              # log file path, or "stdout"
+  filename: /tmp/proto-ru.log   # log file path, or "stdout"
   level: info                   # none | error | warning | info | debug
 
 ru_emu:
@@ -30,7 +30,8 @@ ru_emu:
     - network_interface: enp1s0f0      # AF_PACKET: kernel NIC name. DPDK: the NIC PCIe address (e.g. "0000:01:00.0")
       ru_mac_addr: 0e:42:a3:ef:fd:71   # this emulator's MAC (source of the U-plane it transmits)
       du_mac_addr: aa:bb:cc:dd:ee:ff   # the O-DU's MAC (destination)
-      vlan_tag: 1                      # must match the O-DU cell's VLAN
+      vlan_tag: 1                      # must match the O-DU cell's VLAN. Omit it when the interface tags the traffic
+                                       # itself (e.g. an SR-IOV VF port VLAN), otherwise frames leave double-tagged
       # enable_promiscuous: false      # rarely needed (e.g. veth pairs without MAC filtering)
 
       # ---------------- Cell ----------------
@@ -85,12 +86,9 @@ ru_emu:
 
       # ---------------- SDR (delete this block for loopback mode) ----------------
       sdr:
-        device_driver: uhd             # uhd (USRP) | zmq (simulation)
+        device_driver: uhd             # UHD-compatible USRP
         device_args: type=b200
-        # ZMQ alternative: device_args: tx_port=tcp://*:5000,rx_port=tcp://localhost:5001
-        srate: 30.72                   # MHz; must equal FFT x common_scs and cover the bandwidth:
-                                       #   30 kHz: 15.36 (FFT 512) | 30.72 (1024) | 61.44 (2048)
-                                       #   15 kHz:  7.68 (512)     | 15.36 (1024) | 23.04 (1536)
+        srate: 23.04                   # MHz; use a rate validated for the selected bandwidth and radio
         tx_gain: 60                    # dB
         rx_gain: 60
 
@@ -107,17 +105,16 @@ ru_emu:
         max_proc_delay: 2
 
         # Baseband threading: auto (by CPU count) | sequential | single | dual | triple.
-        # ZMQ is forced to sequential. See ARCHITECTURE.md §4/§6 for the thread-to-role mapping.
+        # See proto-ru/ARCHITECTURE.md §4/§6 for the thread-to-role mapping.
         execution_profile: auto
         ru_cpus: [4, 5]                # radio + baseband workers only (the OFH transmit lives on ofh_cpus)
-        pinning_policy: round-robin    # mask (share the whole set) | round-robin (one CPU per worker)
+        pinning_policy: mask           # mask (share the whole set) | round-robin (one CPU per worker)
 
         # ---- RF calibration (optional; defaults shown) ----
         # center_freq_offset: 0        # Hz, added to all channels
         # calibrate_clock_ppm: 0       # carrier-frequency PPM correction; measure your TCXO once and dial it in
         # lo_offset: 0                 # MHz; moves LO leakage out of the channel
         # time_alignment_calibration: 0  # samples; overrides the RF driver's Rx->Tx alignment
-        # otw_format: default          # default | sc16 | sc12 | sc8
         # transmission_mode: continuous  # continuous | discontinuous | same-port
         # power_ramping: 0             # us, for discontinuous TX
 

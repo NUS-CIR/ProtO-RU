@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+services:
+  protoru:
+    container_name: protoru
+    image: protoru:26.04
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: runtime
+      args:
+        OS_VERSION: "24.04"
+    privileged: true
+    network_mode: host
+    stdin_open: true
+    tty: true
+    volumes:
+      - /dev:/dev
+      - /tmp:/tmp
+    configs:
+      - source: protoru_config
+        target: /opt/protoru.yml
+    command: ru_emulator -c /opt/protoru.yml
+
+configs:
+  protoru_config:
+    file: ${PROTORU_CONFIG_PATH:-conf-files/protoru-B210-TDD-n78-20MHz-2x2-30kHz.yml}

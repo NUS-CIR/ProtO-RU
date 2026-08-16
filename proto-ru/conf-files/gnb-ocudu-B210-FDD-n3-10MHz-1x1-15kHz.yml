@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+# Matching OCUDU 26.04 O-DU configuration for FDD n3, 10 MHz, 1x1, 15 kHz SCS.
+# Use with protoru-B210-FDD-n3-10MHz-1x1-15kHz.yml.
+# Apply the T1a/Ta4 range change in proto-ru/INTEGRATION_NOTES.md before using this file.
+cu_cp:
+  amf:
+    addrs: 172.22.0.10
+    bind_addrs: 10.200.200.6
+    supported_tracking_areas:
+      - tac: 1
+        plmn_list:
+          - plmn: "00101"
+            tai_slice_support_list:
+              - sst: 1
+                sd: 1
+
+ru_ofh:
+  ru_bandwidth_MHz: 10
+  t1a_max_cp_dl: 3935
+  t1a_min_cp_dl: 3500
+  t1a_max_cp_ul: 3935
+  t1a_min_cp_ul: 3500
+  t1a_max_up: 3300
+  t1a_min_up: 2600
+  ta4_max: 1880
+  ta4_min: 1280
+  is_prach_cp_enabled: true
+  ignore_ecpri_payload_size: true
+  compr_method_ul: bfp
+  compr_bitwidth_ul: 9
+  compr_method_dl: bfp
+  compr_bitwidth_dl: 9
+  compr_method_prach: bfp
+  compr_bitwidth_prach: 9
+  enable_ul_static_compr_hdr: true
+  enable_dl_static_compr_hdr: true
+  iq_scaling: 6
+  cells:
+    - network_interface: ens6f2np2
+      ru_mac_addr: 50:7c:6f:45:f3:04
+      du_mac_addr: 50:7c:6f:55:c6:ae
+      vlan_tag_cp: 5
+      vlan_tag_up: 5
+      dl_port_id: [0]
+      ul_port_id: [0]
+      prach_port_id: [4]
+
+cell_cfg:
+  dl_arfcn: 368640
+  band: 3
+  channel_bandwidth_MHz: 10
+  common_scs: 15
+  plmn: "00101"
+  tac: 1
+  pci: 1
+  nof_antennas_dl: 1
+  nof_antennas_ul: 1
+  prach:
+    prach_config_index: 213
+    prach_root_sequence_index: 1
+    zero_correlation_zone: 0
+    prach_frequency_start: 0
+
+expert_phy:
+  allow_request_on_empty_uplink_slot: true
+  max_proc_delay: 5
+  pusch_dec_max_iterations: 10
+
+log:
+  filename: /tmp/gnb.log
+  all_level: warning

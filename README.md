@@ -1,3 +1,94 @@
+<!-- SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited -->
+<!-- SPDX-FileCopyrightText: Copyright (C) 2026 National University of Singapore -->
+<!-- SPDX-License-Identifier: BSD-3-Clause-Open-MPI -->
+
+# ProtO-RU
+
+ProtO-RU is a software implementation of an O-RAN split 7.2-compatible Radio Unit based on [OCUDU](https://gitlab.com/ocudu/ocudu) (release 26.04).
+It extends the OCUDU Open Fronthaul library and RU emulator with an SDR-backed O-RU mode.
+
+ProtO-RU supports UHD-compatible radios such as the USRP B210.
+ZMQ operation is not supported in this release.
+
+ProtO-RU is intended for research and development where a customizable software O-RU is preferable to a fixed-function commercial radio.
+It can run on x86 and ARM hosts supported by OCUDU and UHD.
+
+- Technical report: [arXiv](https://arxiv.org/abs/2512.02398)
+- ACM Open AI-RAN 2025 invited demo: [poster](https://drive.google.com/file/d/10YtGOLr3b2fomS6cWCzG7gJtb5P75KzK/view?usp=sharing), [video](https://www.youtube.com/watch?v=KSdTqXCAuGs)
+- Summer 2026 OAI Workshop demo: [video](https://youtu.be/LIG8f8c_5q4)
+
+> **Note:** For earlier releases of ProtO-RU, check out the [`legacy`](https://github.com/NUS-CIR/ProtO-RU/tree/legacy) branch.
+
+## Documentation
+
+- **Overview and setup**
+  - [Features](./proto-ru/FEATURES.md)
+  - [ProtO-RU architecture](./proto-ru/ARCHITECTURE.md)
+  - [Hardware requirements](./proto-ru/HW_REQUIREMENTS.md)
+  - [Testbed setup](./proto-ru/TESTBED_SETUP.md)
+  - [Time synchronization](./proto-ru/TIME_SYNC.md)
+  - [Docker quickstart](./proto-ru/DOCKER_QUICKSTART.md)
+- **Configuration and integration**
+  - [Example configurations](./proto-ru/conf-files/README.md)
+  - [Configuration reference](./proto-ru/CONFIG_REFERENCE.md)
+  - [Integration notes](./proto-ru/INTEGRATION_NOTES.md)
+- **Support**
+  - [Troubleshooting](./proto-ru/TROUBLESHOOTING.md)
+  - [Known issues](./proto-ru/KNOWN_ISSUES.md)
+
+## Build ProtO-RU
+
+Install the required dependencies by following the [OCUDU installation guide](https://docs.ocudu.org/user_manual/installation/).
+Then build ProtO-RU in the same way as OCUDU:
+
+```bash
+mkdir build
+cd build
+cmake ../
+make -j $(nproc)
+```
+
+The resulting executable is `build/apps/examples/ofh/ru_emulator`.
+
+See the [Docker quickstart](./proto-ru/DOCKER_QUICKSTART.md) for container-based build and run instructions.
+
+## Run ProtO-RU
+
+ProtO-RU requires synchronized DU and RU host clocks and a real-time kernel on the RU host for sustained operation.
+Review the [hardware requirements](./proto-ru/HW_REQUIREMENTS.md) and [time synchronization guide](./proto-ru/TIME_SYNC.md) before starting it.
+
+Adapt one of the [paired example configurations](./proto-ru/conf-files/README.md), then run:
+
+```bash
+sudo ./build/apps/examples/ofh/ru_emulator -c /absolute/path/to/protoru.yml
+```
+
+ProtO-RU needs a larger Open Fronthaul delay profile than the stock OCUDU O-DU accepts.
+Apply the range adjustment described in the [integration notes](./proto-ru/INTEGRATION_NOTES.md) before using the included OCUDU O-DU samples.
+
+## Citation
+
+```bibtex
+@techreport{zhou2025protoru,
+  title={ProtO-RU: An O-RAN Split-7.2 Radio Unit using SDRs},
+  author={Zhiyu Zhou and Xin Zhe Khooi and Satis Kumar Permal and Mun Choon Chan},
+  year={2025},
+  eprint={2512.02398},
+  archivePrefix={arXiv},
+  primaryClass={cs.NI},
+  url={https://arxiv.org/abs/2512.02398},
+}
+```
+
+For questions and feedback, use one of these channels:
+
+- [Issue tracker](https://github.com/NUS-CIR/ProtO-RU/issues)
+- [Discussion board](https://github.com/NUS-CIR/ProtO-RU/discussions)
+- [Discord server](https://discord.gg/RJaAYUMPs7)
+- Email: `khooixz [at] comp [dot] nus [dot] edu [dot] sg`
+
+---
+
 # The OCUDU Project
 
 [![Pipeline](https://gitlab.com/ocudu/ocudu/badges/main/pipeline.svg)](https://gitlab.com/ocudu/ocudu/-/pipelines?scope=branches)
