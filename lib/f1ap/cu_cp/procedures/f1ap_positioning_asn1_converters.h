@@ -7,6 +7,7 @@
 
 #include "ocudu/asn1/f1ap/f1ap_ies.h"
 #include "ocudu/ran/positioning/common.h"
+#include "ocudu/ran/positioning/e_cid_measurement.h"
 #include "ocudu/ran/positioning/trp_information_exchange.h"
 
 namespace ocudu::ocucp {
@@ -238,6 +239,41 @@ asn1_to_geographical_coordinates(const asn1::f1ap::geographical_coordinates_s& a
   }
 
   return geo_coords;
+}
+
+/// \brief Convert the E-CID measurement result from ASN.1 to common type.
+/// \param[in] asn1_result The ASN.1 type E-CID measurement result.
+/// \returns The common type struct.
+inline e_cid_measurement_result_t fill_e_cid_measurement_result(const asn1::f1ap::e_c_id_meas_result_s& asn1_result)
+{
+  e_cid_measurement_result_t result;
+
+  if (asn1_result.geographical_coordinates_present) {
+    result.geo_coords = asn1_to_geographical_coordinates(asn1_result.geographical_coordinates);
+  }
+
+  for (const auto& asn1_item : asn1_result.measured_results_list) {
+    if (asn1_item.e_c_id_measured_results_value.type() !=
+        asn1::f1ap::e_c_id_measured_results_value_c::types_opts::value_angleof_arrival_nr) {
+      continue;
+    }
+
+    const asn1::f1ap::ul_ao_a_s& asn1_aoa = asn1_item.e_c_id_measured_results_value.value_angleof_arrival_nr();
+    ul_angle_of_arrival_t        aoa;
+    aoa.azimuth_aoa = asn1_aoa.azimuth_ao_a;
+    if (asn1_aoa.zenith_ao_a_present) {
+      aoa.zenith_aoa = asn1_aoa.zenith_ao_a;
+    }
+    if (asn1_aoa.lcs_to_gcs_translation_present) {
+      aoa.lcs_to_gcs_translation = {asn1_aoa.lcs_to_gcs_translation.alpha,
+                                    asn1_aoa.lcs_to_gcs_translation.beta,
+                                    asn1_aoa.lcs_to_gcs_translation.gamma};
+    }
+
+    result.measured_results.push_back(aoa);
+  }
+
+  return result;
 }
 
 } // namespace ocudu::ocucp

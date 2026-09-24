@@ -33,11 +33,6 @@ static std::optional<meas_periodicity_e> meas_periodicity_to_asn1(meas_periodici
 /// \returns The ASN.1 type NR-AoA measurement periodicity.
 static pos_meas_periodicity_nr_ao_a_e meas_periodicity_nr_aoa_to_asn1(meas_periodicity_nr_aoa_t periodicity);
 
-/// \brief Convert the E-CID measurement result from ASN.1 to common type.
-/// \param[in] asn1_result The ASN.1 type E-CID measurement result.
-/// \returns The common type struct.
-static e_cid_measurement_result_t fill_e_cid_measurement_result(const e_c_id_meas_result_s& asn1_result);
-
 f1ap_e_cid_measurement_initiation_procedure::f1ap_e_cid_measurement_initiation_procedure(
     const f1ap_configuration&          f1ap_cfg_,
     const e_cid_measurement_request_t& request_,
@@ -283,36 +278,4 @@ static pos_meas_periodicity_nr_ao_a_e meas_periodicity_nr_aoa_to_asn1(meas_perio
   }
 
   return asn1_periodicity;
-}
-
-static e_cid_measurement_result_t fill_e_cid_measurement_result(const e_c_id_meas_result_s& asn1_result)
-{
-  e_cid_measurement_result_t result;
-
-  if (asn1_result.geographical_coordinates_present) {
-    result.geo_coords = asn1_to_geographical_coordinates(asn1_result.geographical_coordinates);
-  }
-
-  for (const auto& asn1_item : asn1_result.measured_results_list) {
-    if (asn1_item.e_c_id_measured_results_value.type() !=
-        e_c_id_measured_results_value_c::types_opts::value_angleof_arrival_nr) {
-      continue;
-    }
-
-    const ul_ao_a_s&      asn1_aoa = asn1_item.e_c_id_measured_results_value.value_angleof_arrival_nr();
-    ul_angle_of_arrival_t aoa;
-    aoa.azimuth_aoa = asn1_aoa.azimuth_ao_a;
-    if (asn1_aoa.zenith_ao_a_present) {
-      aoa.zenith_aoa = asn1_aoa.zenith_ao_a;
-    }
-    if (asn1_aoa.lcs_to_gcs_translation_present) {
-      aoa.lcs_to_gcs_translation = {asn1_aoa.lcs_to_gcs_translation.alpha,
-                                    asn1_aoa.lcs_to_gcs_translation.beta,
-                                    asn1_aoa.lcs_to_gcs_translation.gamma};
-    }
-
-    result.measured_results.push_back(aoa);
-  }
-
-  return result;
 }
