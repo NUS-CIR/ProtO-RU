@@ -74,6 +74,8 @@ public:
   async_task<expected<e_cid_measurement_response_t, e_cid_measurement_failure_t>>
   handle_e_cid_measurement_request(const e_cid_measurement_request_t& request) override;
 
+  void handle_e_cid_measurement_termination_command(const e_cid_measurement_termination_command_t& command) override;
+
   // f1ap_interface_management_handler functions.
   async_task<f1ap_gnb_cu_configuration_update_response>
   handle_gnb_cu_configuration_update(const f1ap_gnb_cu_configuration_update& request) override;
@@ -156,6 +158,12 @@ private:
 
   /// \brief Handle REFERENCE TIME INFORMATION REPORT from the gNB-DU as per TS 38.473 section 8.12.2.
   void handle_ref_time_info_report(const asn1::f1ap::ref_time_info_report_s& msg);
+
+  /// \brief Handle an E-CID Measurement Report from the gNB-DU, as per TS 38.473 section 8.13.14.
+  void handle_e_cid_measurement_report(const asn1::f1ap::e_c_id_meas_report_s& msg);
+
+  /// \brief Handle an E-CID Measurement Failure Indication from the gNB-DU, as per TS 38.473 section 8.13.13.
+  void handle_e_cid_measurement_failure_indication(const asn1::f1ap::e_c_id_meas_fail_ind_s& msg);
 
   /// \brief Log F1AP PDU.
   void log_pdu(bool is_rx, const f1ap_message& pdu);

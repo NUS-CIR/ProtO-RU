@@ -72,6 +72,9 @@ public:
   /// \returns The outcome of the procedure.
   virtual async_task<expected<e_cid_measurement_response_t, e_cid_measurement_failure_t>>
   on_e_cid_measurement_request(const e_cid_measurement_request_t& request) = 0;
+
+  /// \brief Notifies the F1AP about an E-CID measurement termination command.
+  virtual void on_e_cid_measurement_termination_command(const e_cid_measurement_termination_command_t& command) = 0;
 };
 
 // TRP information CU-CP response, containing information for all available TRPs at all DUs.
@@ -137,6 +140,21 @@ public:
                                nrppa_cu_cp_ue_notifier& new_ue_notifier) = 0;
 };
 
+/// Handler of the E-CID measurement events the gNB-DU reports.
+class nrppa_e_cid_report_handler
+{
+public:
+  virtual ~nrppa_e_cid_report_handler() = default;
+
+  /// \brief Handle an E-CID measurement report of the gNB-DU, as per TS 38.473 section 8.13.14.
+  /// \param[in] report The report of the gNB-DU.
+  virtual void handle_e_cid_measurement_report(const e_cid_measurement_report_t& report) = 0;
+
+  /// \brief Handle an E-CID measurement failure indication of the gNB-DU, as per TS 38.473 section 8.13.13.
+  /// \param[in] ind The failure indication of the gNB-DU.
+  virtual void handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) = 0;
+};
+
 /// Handler of the DU lifecycle events NRPPa tracks.
 class nrppa_du_context_handler
 {
@@ -162,6 +180,7 @@ public:
   virtual nrppa_message_handler&            get_nrppa_message_handler()            = 0;
   virtual nrppa_ue_context_removal_handler& get_nrppa_ue_context_removal_handler() = 0;
   virtual nrppa_du_context_handler&         get_nrppa_du_context_handler()         = 0;
+  virtual nrppa_e_cid_report_handler&       get_nrppa_e_cid_report_handler()       = 0;
 };
 
 } // namespace ocudu::ocucp

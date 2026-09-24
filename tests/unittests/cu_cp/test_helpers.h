@@ -90,6 +90,19 @@ public:
     return make_byte_buffer("deadbeef").value();
   }
 
+  void on_e_cid_measurement_report(const e_cid_measurement_report_t& report) override
+  {
+    last_e_cid_measurement_report = report;
+  }
+
+  void on_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override
+  {
+    last_e_cid_measurement_failure_indication = ind;
+  }
+
+  std::optional<e_cid_measurement_report_t>             last_e_cid_measurement_report;
+  std::optional<e_cid_measurement_failure_indication_t> last_e_cid_measurement_failure_indication;
+
   async_task<void> on_ue_removal_required(cu_cp_ue_index_t ue_index) override
   {
     logger.info("ue={}: Received a UE removal request", ue_index);

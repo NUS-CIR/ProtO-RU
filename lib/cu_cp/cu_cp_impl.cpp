@@ -2582,6 +2582,16 @@ void cu_cp_impl::handle_du_cells_removed(span<const nr_cell_identity> cells)
   }
 }
 
+void cu_cp_impl::handle_e_cid_measurement_report(const e_cid_measurement_report_t& report)
+{
+  nrppa_entity->get_nrppa_e_cid_report_handler().handle_e_cid_measurement_report(report);
+}
+
+void cu_cp_impl::handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind)
+{
+  nrppa_entity->get_nrppa_e_cid_report_handler().handle_e_cid_measurement_failure_indication(ind);
+}
+
 void cu_cp_impl::handle_du_added(cu_cp_du_index_t du_index)
 {
   // Give NRPPa a route to the DU's F1AP, so that the positioning procedures can reach it.

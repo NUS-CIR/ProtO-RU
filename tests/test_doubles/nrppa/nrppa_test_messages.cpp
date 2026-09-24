@@ -42,7 +42,8 @@ byte_buffer ocudu::ocucp::generate_valid_nrppa_e_cid_measurement_initiation_requ
 }
 
 byte_buffer ocudu::ocucp::generate_valid_nrppa_e_cid_measurement_initiation_request_with_periodic_reports(
-    lmf_ue_meas_id_t lmf_ue_meas_id)
+    lmf_ue_meas_id_t lmf_ue_meas_id,
+    bool             request_aoa)
 {
   asn1::nrppa::nr_ppa_pdu_c pdu;
 
@@ -58,7 +59,8 @@ byte_buffer ocudu::ocucp::generate_valid_nrppa_e_cid_measurement_initiation_requ
 
   asn1::protocol_ie_single_container_s<asn1::nrppa::meas_quantities_item_ies_o> meas_quantities_item_container;
   asn1::nrppa::meas_quantities_item_s& quantities_item = meas_quantities_item_container->meas_quantities_item();
-  quantities_item.meas_quantities_value                = asn1::nrppa::meas_quantities_value_opts::ss_rsrp;
+  quantities_item.meas_quantities_value = request_aoa ? asn1::nrppa::meas_quantities_value_opts::angle_of_arrival_nr
+                                                      : asn1::nrppa::meas_quantities_value_opts::ss_rsrp;
 
   req->meas_quantities.push_back(meas_quantities_item_container);
 
@@ -80,6 +82,10 @@ byte_buffer ocudu::ocucp::generate_valid_nrppa_e_cid_measurement_initiation_requ
   req->report_characteristics   = report_characteristics_opts::periodic;
   req->meas_periodicity_present = true;
   req->meas_periodicity         = meas_periodicity_opts::ms120;
+
+  // NR Angle of Arrival carries its own periodicity, as per TS 38.455 section 9.1.1.1.
+  req->meas_periodicity_nr_ao_a_present = true;
+  req->meas_periodicity_nr_ao_a         = asn1::nrppa::meas_periodicity_nr_ao_a_opts::ms1280;
 
   asn1::protocol_ie_single_container_s<asn1::nrppa::meas_quantities_item_ies_o> meas_quantities_item_container;
   asn1::nrppa::meas_quantities_item_s& quantities_item = meas_quantities_item_container->meas_quantities_item();

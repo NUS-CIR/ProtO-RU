@@ -61,6 +61,18 @@ public:
   }
 
   // See interface for documentation.
+  void on_e_cid_measurement_report(const e_cid_measurement_report_t& report) override
+  {
+    parent.cu_cp_notifier.on_e_cid_measurement_report(report);
+  }
+
+  // See interface for documentation.
+  void on_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override
+  {
+    parent.cu_cp_notifier.on_e_cid_measurement_failure_indication(ind);
+  }
+
+  // See interface for documentation.
   void on_ref_time_info_report(const f1ap_time_ref_info& info) override
   {
     std::optional<std::chrono::system_clock::time_point> time_point =

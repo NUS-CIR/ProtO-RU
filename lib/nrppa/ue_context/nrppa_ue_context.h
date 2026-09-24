@@ -26,6 +26,8 @@ struct nrppa_ue_context {
 
   std::optional<std::chrono::milliseconds> meas_periodicity_ms;
   std::vector<nrppa_meas_quantities_item>  meas_quantities;
+  /// Set while the gNB-DU runs a periodic E-CID measurement for this UE.
+  bool du_e_cid_meas_active = false;
 
   nrppa_ue_logger logger;
 

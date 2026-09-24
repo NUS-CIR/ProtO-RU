@@ -409,6 +409,40 @@ public:
     return true;
   }
 
+  /// \brief Start a periodic NR Angle of Arrival measurement and let the gNB-DU accept it.
+  [[nodiscard]] bool start_periodic_aoa_measurement(const ue_context* ue_ctxt)
+  {
+    report_fatal_error_if_not(not this->get_amf().try_pop_rx_pdu(ngap_pdu),
+                              "there are still NGAP messages to pop from AMF");
+    report_fatal_error_if_not(not this->get_du(du_idx).try_pop_dl_pdu(f1ap_pdu),
+                              "there are still F1AP DL messages to pop from DU");
+
+    get_amf().push_tx_pdu(generate_valid_dl_ue_associated_nrppa_transport_message(
+        ue_ctxt, generate_valid_nrppa_e_cid_measurement_initiation_request_with_periodic_aoa(lmf_ue_meas_id)));
+    report_fatal_error_if_not(this->wait_for_f1ap_tx_pdu(du_idx, f1ap_pdu),
+                              "Failed to receive F1AP E-CID Measurement Initiation Request");
+
+    const auto& req = f1ap_pdu.pdu.init_msg().value.e_c_id_meas_initiation_request();
+    du_ue_f1ap_id   = int_to_gnb_du_ue_f1ap_id(req->gnb_du_ue_f1ap_id);
+    cu_ue_f1ap_id   = int_to_gnb_cu_ue_f1ap_id(req->gnb_cu_ue_f1ap_id);
+    ran_ue_meas_id  = uint_to_ran_ue_meas_id(req->ran_ue_meas_id);
+
+    // The gNB-DU accepts the measurement. The response carries no result, as per TS 38.473 section 8.13.12.2.
+    get_du(du_idx).push_ul_pdu(test_helpers::generate_e_cid_measurement_initiation_response(
+        du_ue_f1ap_id, cu_ue_f1ap_id, req->lmf_ue_meas_id, req->ran_ue_meas_id, std::nullopt));
+    report_fatal_error_if_not(this->wait_for_ngap_tx_pdu(ngap_pdu),
+                              "Failed to receive NRPPa E-CID Measurement Initiation Response");
+
+    return true;
+  }
+
+  /// \brief Push an F1AP E-CID Measurement Report from the gNB-DU.
+  void push_f1ap_e_cid_measurement_report(uint16_t azimuth_aoa)
+  {
+    get_du(du_idx).push_ul_pdu(test_helpers::generate_e_cid_measurement_report(
+        du_ue_f1ap_id, cu_ue_f1ap_id, to_underlying(lmf_ue_meas_id), to_underlying(ran_ue_meas_id), azimuth_aoa));
+  }
+
   /// \brief Inject an F1AP E-CID Measurement Initiation Response and await the NRPPa response toward the LMF.
   /// \param[in] azimuth_aoa Azimuth Angle of Arrival the gNB-DU reports, in units of 0.1 degrees.
   [[nodiscard]] bool send_f1ap_e_cid_measurement_initiation_response_with_aoa(uint16_t azimuth_aoa)
@@ -944,6 +978,9 @@ public:
   amf_ue_id_t            amf_ue_id     = amf_ue_id_t::min;
   gnb_cu_up_ue_e1ap_id_t cu_up_e1ap_id = gnb_cu_up_ue_e1ap_id_t::min;
 
+  gnb_du_ue_f1ap_id_t du_ue_f1ap_id = gnb_du_ue_f1ap_id_t::invalid;
+  gnb_cu_ue_f1ap_id_t cu_ue_f1ap_id = gnb_cu_ue_f1ap_id_t::invalid;
+
   lmf_ue_meas_id_t lmf_ue_meas_id = lmf_ue_meas_id_t::min;
   ran_ue_meas_id_t ran_ue_meas_id = ran_ue_meas_id_t::min;
 
@@ -1092,31 +1129,6 @@ TEST_F(
       << "Periodic E-CID Measurement Report was not received";
 }
 
-/// The LMF may ask for NR Angle of Arrival together with quantities the CU-CP reports from the RRC measurement
-/// reports. The gNB-DU paces the angle of arrival, so the CU-CP leaves that quantity out and keeps reporting the rest.
-TEST_F(cu_cp_nrppa_test, when_periodic_e_cid_measurement_requests_aoa_and_rsrp_then_e_cid_measurement_reports_are_send)
-{
-  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-POS-16-1");
-
-  // Attach UE.
-  ASSERT_TRUE(attach_ue(du_ue_id, crnti, amf_ue_id, cu_up_e1ap_id));
-
-  // Inject measurement report.
-  ASSERT_TRUE(
-      send_rrc_measurement_report(test_ues.at(du_ue_id)->cu_ue_id.value(), test_ues.at(du_ue_id)->du_ue_id.value()));
-
-  // Inject E-CID measurement initiation request and await E-CID measurement initiation response.
-  ASSERT_TRUE(send_e_cid_measurement_initiation_request_and_await_e_cid_measurement_initiation_response(
-      test_ues.at(du_ue_id),
-      generate_valid_nrppa_e_cid_measurement_initiation_request_with_periodic_aoa(
-          lmf_ue_meas_id, {asn1::nrppa::meas_quantities_value_opts::ss_rsrp})));
-
-  // Await periodic measurement report.
-  ASSERT_TRUE(tick_until(
-      std::chrono::milliseconds{500}, [this]() { return await_e_cid_measurement_report(); }, false))
-      << "Periodic E-CID Measurement Report was not received";
-}
-
 TEST_F(cu_cp_nrppa_test, when_e_cid_termination_command_is_received_then_periodic_e_cid_measurement_reports_are_stopped)
 {
   OCUDU_TEST_REQUIREMENTS("MVP-FUNC-POS-16-1");
@@ -1256,6 +1268,64 @@ TEST_F(cu_cp_nrppa_test, when_du_rejects_the_e_cid_request_then_the_other_quanti
 
   const auto& resp = nrppa_pdu.successful_outcome().value.e_c_id_meas_initiation_resp();
   ASSERT_GT(resp->e_c_id_meas_result.measured_results.size(), 0);
+}
+
+TEST_F(cu_cp_nrppa_test, when_periodic_aoa_is_requested_then_e_cid_initiation_response_carries_no_result)
+{
+  ASSERT_TRUE(attach_ue(du_ue_id, crnti, amf_ue_id, cu_up_e1ap_id));
+
+  ASSERT_TRUE(start_periodic_aoa_measurement(test_ues.at(du_ue_id)));
+
+  // As per TS 38.473 section 8.13.12.2, the response to a periodic request carries no E-CID Measurement Result.
+  asn1::nrppa::nr_ppa_pdu_c nrppa_pdu = get_nrppa_pdu(ngap_pdu);
+  ASSERT_EQ(nrppa_pdu.type().value, asn1::nrppa::nr_ppa_pdu_c::types_opts::successful_outcome);
+  ASSERT_FALSE(nrppa_pdu.successful_outcome().value.e_c_id_meas_initiation_resp()->e_c_id_meas_result_present);
+}
+
+TEST_F(cu_cp_nrppa_test, when_du_sends_e_cid_measurement_reports_then_lmf_receives_e_cid_measurement_reports)
+{
+  constexpr uint16_t azimuth_aoa = 1800;
+
+  ASSERT_TRUE(attach_ue(du_ue_id, crnti, amf_ue_id, cu_up_e1ap_id));
+  ASSERT_TRUE(start_periodic_aoa_measurement(test_ues.at(du_ue_id)));
+
+  push_f1ap_e_cid_measurement_report(azimuth_aoa);
+
+  ASSERT_TRUE(this->wait_for_ngap_tx_pdu(ngap_pdu)) << "E-CID Measurement Report was not forwarded to the LMF";
+
+  asn1::nrppa::nr_ppa_pdu_c nrppa_pdu = get_nrppa_pdu(ngap_pdu);
+  ASSERT_TRUE(test_helpers::is_valid_e_cid_meas_report(nrppa_pdu));
+
+  const auto& report       = nrppa_pdu.init_msg().value.e_c_id_meas_report();
+  const auto& result_value = report->e_c_id_meas_result.measured_results[0];
+  ASSERT_EQ(result_value.choice_ext()->angle_of_arrival_nr().azimuth_ao_a, azimuth_aoa);
+}
+
+TEST_F(cu_cp_nrppa_test, when_lmf_terminates_then_du_receives_the_termination_command)
+{
+  ASSERT_TRUE(attach_ue(du_ue_id, crnti, amf_ue_id, cu_up_e1ap_id));
+  ASSERT_TRUE(start_periodic_aoa_measurement(test_ues.at(du_ue_id)));
+
+  get_amf().push_tx_pdu(generate_valid_dl_ue_associated_nrppa_transport_message(
+      test_ues.at(du_ue_id),
+      generate_valid_nrppa_e_cid_measurement_termination_command(lmf_ue_meas_id, ran_ue_meas_id)));
+
+  ASSERT_TRUE(this->wait_for_f1ap_tx_pdu(du_idx, f1ap_pdu));
+  ASSERT_EQ(f1ap_pdu.pdu.init_msg().value.type().value,
+            asn1::f1ap::f1ap_elem_procs_o::init_msg_c::types_opts::e_c_id_meas_termination_cmd);
+}
+
+TEST_F(cu_cp_nrppa_test, when_du_sends_failure_indication_then_lmf_receives_failure_indication)
+{
+  ASSERT_TRUE(attach_ue(du_ue_id, crnti, amf_ue_id, cu_up_e1ap_id));
+  ASSERT_TRUE(start_periodic_aoa_measurement(test_ues.at(du_ue_id)));
+
+  get_du(du_idx).push_ul_pdu(test_helpers::generate_e_cid_measurement_failure_indication(
+      du_ue_f1ap_id, cu_ue_f1ap_id, to_underlying(lmf_ue_meas_id), to_underlying(ran_ue_meas_id)));
+
+  ASSERT_TRUE(this->wait_for_ngap_tx_pdu(ngap_pdu));
+  ASSERT_EQ(get_nrppa_pdu(ngap_pdu).init_msg().value.type().value,
+            asn1::nrppa::nr_ppa_elem_procs_o::init_msg_c::types_opts::e_c_id_meas_fail_ind);
 }
 
 //----------------------------------------------------------------------------------//

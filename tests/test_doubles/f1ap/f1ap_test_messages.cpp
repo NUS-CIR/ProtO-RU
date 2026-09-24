@@ -1484,3 +1484,47 @@ f1ap_message ocudu::test_helpers::generate_e_cid_measurement_initiation_failure(
 
   return pdu;
 }
+
+f1ap_message ocudu::test_helpers::generate_e_cid_measurement_report(gnb_du_ue_f1ap_id_t du_ue_id,
+                                                                    gnb_cu_ue_f1ap_id_t cu_ue_id,
+                                                                    uint16_t            lmf_ue_meas_id,
+                                                                    uint16_t            ran_ue_meas_id,
+                                                                    uint16_t            azimuth_aoa)
+{
+  f1ap_message pdu = {};
+
+  pdu.pdu.set_init_msg();
+  pdu.pdu.init_msg().load_info_obj(ASN1_F1AP_ID_E_C_ID_MEAS_REPORT);
+
+  auto& report              = pdu.pdu.init_msg().value.e_c_id_meas_report();
+  report->gnb_cu_ue_f1ap_id = to_underlying(cu_ue_id);
+  report->gnb_du_ue_f1ap_id = to_underlying(du_ue_id);
+  report->lmf_ue_meas_id    = lmf_ue_meas_id;
+  report->ran_ue_meas_id    = ran_ue_meas_id;
+
+  asn1::f1ap::e_c_id_measured_results_item_s item;
+  item.e_c_id_measured_results_value.set_value_angleof_arrival_nr().azimuth_ao_a = azimuth_aoa;
+  report->e_c_id_meas_result.measured_results_list.push_back(item);
+
+  return pdu;
+}
+
+f1ap_message ocudu::test_helpers::generate_e_cid_measurement_failure_indication(gnb_du_ue_f1ap_id_t du_ue_id,
+                                                                                gnb_cu_ue_f1ap_id_t cu_ue_id,
+                                                                                uint16_t            lmf_ue_meas_id,
+                                                                                uint16_t            ran_ue_meas_id)
+{
+  f1ap_message pdu = {};
+
+  pdu.pdu.set_init_msg();
+  pdu.pdu.init_msg().load_info_obj(ASN1_F1AP_ID_E_C_ID_MEAS_FAIL_IND);
+
+  auto& ind                      = pdu.pdu.init_msg().value.e_c_id_meas_fail_ind();
+  ind->gnb_cu_ue_f1ap_id         = to_underlying(cu_ue_id);
+  ind->gnb_du_ue_f1ap_id         = to_underlying(du_ue_id);
+  ind->lmf_ue_meas_id            = lmf_ue_meas_id;
+  ind->ran_ue_meas_id            = ran_ue_meas_id;
+  ind->cause.set_radio_network() = asn1::f1ap::cause_radio_network_opts::unspecified;
+
+  return pdu;
+}

@@ -13,6 +13,7 @@
 #include "procedures/f1_setup_procedure.h"
 #include "procedures/f1ap_e_cid_measurement_initiation_procedure.h"
 #include "procedures/f1ap_positioning_activation_procedure.h"
+#include "procedures/f1ap_positioning_asn1_converters.h"
 #include "procedures/f1ap_positioning_information_exchange_procedure.h"
 #include "procedures/f1ap_positioning_measurement_procedure.h"
 #include "procedures/f1ap_stop_procedure.h"
@@ -290,6 +291,12 @@ void f1ap_cu_impl::handle_initiating_message(const asn1::f1ap::init_msg_s& msg)
       break;
     case asn1::f1ap::f1ap_elem_procs_o::init_msg_c::types_opts::options::ref_time_info_report:
       handle_ref_time_info_report(msg.value.ref_time_info_report());
+      break;
+    case asn1::f1ap::f1ap_elem_procs_o::init_msg_c::types_opts::options::e_c_id_meas_report:
+      handle_e_cid_measurement_report(msg.value.e_c_id_meas_report());
+      break;
+    case asn1::f1ap::f1ap_elem_procs_o::init_msg_c::types_opts::options::e_c_id_meas_fail_ind:
+      handle_e_cid_measurement_failure_indication(msg.value.e_c_id_meas_fail_ind());
       break;
     default:
       logger.warning("Initiating message of type {} is not supported", msg.value.type().to_string());
@@ -709,6 +716,70 @@ void f1ap_cu_impl::handle_ref_time_info_report(const asn1::f1ap::ref_time_info_r
   info.is_local_clock = msg->time_ref_info.time_info_type_present;
 
   du_processor_notifier.on_ref_time_info_report(info);
+}
+
+void f1ap_cu_impl::handle_e_cid_measurement_report(const asn1::f1ap::e_c_id_meas_report_s& msg)
+{
+  f1ap_ue_context* ue_ctxt = ue_ctxt_list.find(int_to_gnb_cu_ue_f1ap_id(msg->gnb_cu_ue_f1ap_id));
+  if (ue_ctxt == nullptr) {
+    logger.warning("cu_ue={} du_ue={}: Dropping \"ECIDMeasurementReport\". UE context does not exist",
+                   msg->gnb_cu_ue_f1ap_id,
+                   msg->gnb_du_ue_f1ap_id);
+    return;
+  }
+
+  e_cid_measurement_report_t report;
+  report.ue_index          = ue_ctxt->ue_ids.ue_index;
+  report.lmf_ue_meas_id    = uint_to_lmf_ue_meas_id(msg->lmf_ue_meas_id);
+  report.ran_ue_meas_id    = uint_to_ran_ue_meas_id(msg->ran_ue_meas_id);
+  report.e_cid_meas_result = fill_e_cid_measurement_result(msg->e_c_id_meas_result);
+  if (msg->cell_portion_id_present) {
+    report.cell_portion_id = msg->cell_portion_id;
+  }
+
+  du_processor_notifier.on_e_cid_measurement_report(report);
+}
+
+void f1ap_cu_impl::handle_e_cid_measurement_failure_indication(const asn1::f1ap::e_c_id_meas_fail_ind_s& msg)
+{
+  f1ap_ue_context* ue_ctxt = ue_ctxt_list.find(int_to_gnb_cu_ue_f1ap_id(msg->gnb_cu_ue_f1ap_id));
+  if (ue_ctxt == nullptr) {
+    logger.warning("cu_ue={} du_ue={}: Dropping \"ECIDMeasurementFailureIndication\". UE context does not exist",
+                   msg->gnb_cu_ue_f1ap_id,
+                   msg->gnb_du_ue_f1ap_id);
+    return;
+  }
+
+  e_cid_measurement_failure_indication_t ind;
+  ind.ue_index       = ue_ctxt->ue_ids.ue_index;
+  ind.lmf_ue_meas_id = uint_to_lmf_ue_meas_id(msg->lmf_ue_meas_id);
+  ind.ran_ue_meas_id = uint_to_ran_ue_meas_id(msg->ran_ue_meas_id);
+  ind.cause          = asn1_to_cause(msg->cause);
+
+  du_processor_notifier.on_e_cid_measurement_failure_indication(ind);
+}
+
+void f1ap_cu_impl::handle_e_cid_measurement_termination_command(const e_cid_measurement_termination_command_t& command)
+{
+  if (!ue_ctxt_list.contains(command.ue_index)) {
+    logger.warning("ue={}: Dropping \"ECIDMeasurementTerminationCommand\". UE context does not exist",
+                   command.ue_index);
+    return;
+  }
+
+  f1ap_ue_context& ue_ctxt = ue_ctxt_list[command.ue_index];
+  ocudu_sanity_check(ue_ctxt.ue_ids.du_ue_f1ap_id && ue_ctxt.ue_ids.du_ue_f1ap_id != gnb_du_ue_f1ap_id_t::invalid,
+                     "Invalid gNB-DU-UE-F1AP-Id");
+
+  f1ap_message f1ap_msg;
+  f1ap_msg.pdu.set_init_msg().load_info_obj(ASN1_F1AP_ID_E_C_ID_MEAS_TERMINATION);
+  auto& cmd              = f1ap_msg.pdu.init_msg().value.e_c_id_meas_termination_cmd();
+  cmd->gnb_cu_ue_f1ap_id = to_underlying(ue_ctxt.ue_ids.cu_ue_f1ap_id);
+  cmd->gnb_du_ue_f1ap_id = to_underlying(*ue_ctxt.ue_ids.du_ue_f1ap_id);
+  cmd->lmf_ue_meas_id    = to_underlying(command.lmf_ue_meas_id);
+  cmd->ran_ue_meas_id    = to_underlying(command.ran_ue_meas_id);
+
+  tx_pdu_notifier.on_new_message(f1ap_msg);
 }
 
 void f1ap_cu_impl::handle_ref_time_info_report_ctrl(const f1ap_ref_time_report_ctrl_request& request)

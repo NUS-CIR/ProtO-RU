@@ -41,6 +41,15 @@ public:
     return launch_no_op_task(
         expected<e_cid_measurement_response_t, e_cid_measurement_failure_t>{e_cid_measurement_response_t{}});
   }
+
+  void on_e_cid_measurement_termination_command(const e_cid_measurement_termination_command_t& command) override
+  {
+    e_cid_measurement_terminated = true;
+    last_termination_command     = command;
+  }
+
+  bool                                                   e_cid_measurement_terminated = false;
+  std::optional<e_cid_measurement_termination_command_t> last_termination_command;
 };
 
 // Test class.

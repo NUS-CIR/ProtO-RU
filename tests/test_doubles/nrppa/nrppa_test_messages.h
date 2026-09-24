@@ -21,7 +21,8 @@ byte_buffer generate_valid_nrppa_e_cid_measurement_initiation_request(
 
 /// \brief Generate a valid E-CID measurement initiation request with periodic reports.
 byte_buffer
-generate_valid_nrppa_e_cid_measurement_initiation_request_with_periodic_reports(lmf_ue_meas_id_t lmf_ue_meas_id);
+generate_valid_nrppa_e_cid_measurement_initiation_request_with_periodic_reports(lmf_ue_meas_id_t lmf_ue_meas_id,
+                                                                                bool             request_aoa = false);
 
 /// \brief Generate a valid E-CID measurement initiation request asking for periodic NR Angle of Arrival reports.
 byte_buffer generate_valid_nrppa_e_cid_measurement_initiation_request_with_periodic_aoa(

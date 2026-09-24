@@ -285,6 +285,10 @@ private:
 
   void handle_served_cells_updated() override;
 
+  void handle_e_cid_measurement_report(const e_cid_measurement_report_t& report) override;
+
+  void handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override;
+
   // NGAP UE creation handler.
   ngap_cu_cp_ue_notifier* handle_new_ngap_ue(cu_cp_ue_index_t ue_index) override;
   cu_cp_ue_index_t        handle_ue_association_transfer(ran_ue_id_t ran_ue_id, cu_cp_amf_index_t amf_index) override;

@@ -84,28 +84,58 @@ void e_cid_measurement_initiation_procedure::operator()(coro_context<async_task<
       CORO_EARLY_RETURN();
     }
 
-    // The gNB-DU paces the NR Angle of Arrival reporting, so periodic reporting of this quantity needs the E-CID
-    // Measurement Report procedure over F1AP. Leave the quantity out and report the other requested ones.
+    // Reject the request if NR Angle of Arrival was requested without its own mandatory periodicity, as per
+    // TS 38.455 section 9.1.1.1.
+    if (aoa_requested && !e_cid_meas_init_request.meas_periodicity_nr_aoa.has_value()) {
+      logger.warning("ue={}: Stopping \"{}\". Periodic NR Angle of Arrival requested without Measurement Periodicity "
+                     "NR-AoA",
+                     ue_index,
+                     name());
+      send_failure(nrppa_cause_protocol_t::semantic_error);
+      CORO_EARLY_RETURN();
+    }
+
     if (aoa_requested) {
-      logger.info("ue={}: \"{}\". Periodic NR Angle of Arrival reporting is not supported. The quantity is not "
-                  "reported",
-                  ue_index,
-                  name());
+      // The gNB-DU paces the NR Angle of Arrival reporting on its own periodicity, as per TS 38.473
+      // section 9.2.12.20, and reports through the E-CID Measurement Report procedure.
+      if (!du_ctxt_list.contains(du_index)) {
+        logger.warning("ue={}: Stopping \"{}\". DU serving the UE is not connected", ue_index, name());
+        send_failure(nrppa_cause_radio_network_t::requested_item_temporarily_not_available);
+        CORO_EARLY_RETURN();
+      }
+
+      CORO_AWAIT_VALUE(du_meas_outcome,
+                       du_ctxt_list[du_index].f1ap->on_e_cid_measurement_request(create_du_measurement_request()));
+
+      // The UE may have been removed while the F1AP request was pending.
+      if (!ue_ctxt_list.contains(ue_index)) {
+        logger.info("ue={}: Stopping \"{}\". UE was removed while the F1AP request was pending", ue_index, name());
+        CORO_EARLY_RETURN();
+      }
+
+      if (du_meas_outcome.has_value()) {
+        ue_ctxt_list[ue_index].du_e_cid_meas_active = true;
+      } else {
+        // The procedure continues with the quantities that the RRC measurement reports provide.
+        logger.info("ue={}: The gNB-DU did not initiate the E-CID measurement", ue_index);
+      }
     }
 
     // Fail only when the gNB-CU cannot report any of the requested quantities.
-    if (std::none_of(e_cid_meas_init_request.meas_quantities.begin(),
-                     e_cid_meas_init_request.meas_quantities.end(),
-                     [](const nrppa_meas_quantities_item& item) {
-                       return is_rrc_sourced_meas_quantity(item.meas_quantities_value);
-                     })) {
+    const bool rrc_quantity_requested = std::any_of(e_cid_meas_init_request.meas_quantities.begin(),
+                                                    e_cid_meas_init_request.meas_quantities.end(),
+                                                    [](const nrppa_meas_quantities_item& item) {
+                                                      return is_rrc_sourced_meas_quantity(item.meas_quantities_value);
+                                                    });
+    if (!rrc_quantity_requested && !ue_ctxt_list[ue_index].du_e_cid_meas_active) {
       logger.warning(
           "ue={}: Stopping \"{}\". No requested measurement quantity can be reported periodically", ue_index, name());
       send_failure(nrppa_cause_radio_network_t::requested_item_not_supported);
       CORO_EARLY_RETURN();
     }
 
-    // Setup periodic measurement.
+    // Start the local report timer only once the measurement is established, so that a failure does not leave the
+    // CU-CP reporting to an LMF that was told the procedure failed.
     setup_periodic_measurement();
 
   } else {
@@ -158,10 +188,12 @@ e_cid_measurement_request_t e_cid_measurement_initiation_procedure::create_du_me
 {
   e_cid_measurement_request_t request;
 
-  request.ue_index               = ue_index;
-  request.lmf_ue_meas_id         = ue_ids.lmf_ue_meas_id;
-  request.ran_ue_meas_id         = ue_ids.ran_ue_meas_id;
-  request.report_characteristics = e_cid_meas_init_request.report_characteristics;
+  request.ue_index                = ue_index;
+  request.lmf_ue_meas_id          = ue_ids.lmf_ue_meas_id;
+  request.ran_ue_meas_id          = ue_ids.ran_ue_meas_id;
+  request.report_characteristics  = e_cid_meas_init_request.report_characteristics;
+  request.meas_periodicity        = e_cid_meas_init_request.meas_periodicity;
+  request.meas_periodicity_nr_aoa = e_cid_meas_init_request.meas_periodicity_nr_aoa;
 
   for (const auto& meas_quantity : e_cid_meas_init_request.meas_quantities) {
     if (meas_quantity.meas_quantities_value == nrppa_meas_quantities_value::angle_of_arrival_nr) {
@@ -222,8 +254,7 @@ void e_cid_measurement_initiation_procedure::get_measurement_result()
 void e_cid_measurement_initiation_procedure::handle_du_measurement_outcome()
 {
   if (!du_meas_outcome.has_value()) {
-    // The procedure continues with the quantities that the RRC measurement reports provide.
-    logger.info("ue={}: The gNB-DU did not initiate the E-CID measurement", ue_index);
+    logger.warning("ue={}: The gNB-DU could not initiate the E-CID measurement", ue_index);
     return;
   }
 

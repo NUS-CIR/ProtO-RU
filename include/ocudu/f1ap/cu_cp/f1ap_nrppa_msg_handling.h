@@ -36,6 +36,9 @@ public:
   /// Handles the given E-CID measurement initiation request message.
   virtual async_task<expected<e_cid_measurement_response_t, e_cid_measurement_failure_t>>
   handle_e_cid_measurement_request(const e_cid_measurement_request_t& request) = 0;
+
+  /// Sends an E-CID measurement termination command to the gNB-DU.
+  virtual void handle_e_cid_measurement_termination_command(const e_cid_measurement_termination_command_t& command) = 0;
 };
 
 } // namespace ocudu::ocucp

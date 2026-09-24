@@ -11,6 +11,7 @@
 #include "ocudu/ran/nr_cgi.h"
 #include "ocudu/ran/pci.h"
 #include "ocudu/ran/positioning/common.h"
+#include "ocudu/ran/positioning/e_cid_measurement.h"
 #include "ocudu/ran/positioning/positioning_ids.h"
 #include "ocudu/ran/tac.h"
 #include <optional>
@@ -40,10 +41,12 @@ struct nrppa_meas_quantities_item {
 };
 
 struct nrppa_e_cid_meas_initiation_request {
-  lmf_ue_meas_id_t                        lmf_ue_meas_id;
-  report_characteristics_t                report_characteristics;
-  std::optional<meas_periodicity_t>       meas_periodicity;
-  std::vector<nrppa_meas_quantities_item> meas_quantities;
+  lmf_ue_meas_id_t                  lmf_ue_meas_id;
+  report_characteristics_t          report_characteristics;
+  std::optional<meas_periodicity_t> meas_periodicity;
+  /// NR Angle of Arrival has its own reporting periodicity, as per TS 38.455 section 9.1.1.1.
+  std::optional<meas_periodicity_nr_aoa_t> meas_periodicity_nr_aoa;
+  std::vector<nrppa_meas_quantities_item>  meas_quantities;
 };
 
 struct nrppa_result_ss_rsrp_per_ssb_item {

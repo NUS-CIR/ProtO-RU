@@ -139,6 +139,13 @@ public:
 
   /// \brief Indicates reception of a Reference Time Information Report from the gNB-DU as per TS 38.473 section 8.12.2.
   virtual void on_ref_time_info_report(const f1ap_time_ref_info& info) = 0;
+
+  /// \brief Indicates reception of an E-CID Measurement Report from the gNB-DU as per TS 38.473 section 8.13.14.
+  virtual void on_e_cid_measurement_report(const e_cid_measurement_report_t& report) = 0;
+
+  /// \brief Indicates reception of an E-CID Measurement Failure Indication from the gNB-DU as per TS 38.473
+  /// section 8.13.13.
+  virtual void on_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) = 0;
 };
 
 /// Methods to get statistics of the F1AP.

@@ -281,6 +281,12 @@ public:
 
   /// \brief Handle a change of the NR cells the connected DUs serve.
   virtual void handle_served_cells_updated() = 0;
+
+  /// \brief Handle an E-CID measurement report of the gNB-DU, as per TS 38.473 section 8.13.14.
+  virtual void handle_e_cid_measurement_report(const e_cid_measurement_report_t& report) = 0;
+
+  /// \brief Handle an E-CID measurement failure indication of the gNB-DU, as per TS 38.473 section 8.13.13.
+  virtual void handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) = 0;
 };
 
 /// Interface for an RRC UE entity to communicate with the CU-CP.

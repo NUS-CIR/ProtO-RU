@@ -21,7 +21,8 @@ namespace ocudu::ocucp {
 class nrppa_impl : public nrppa_interface,
                    public nrppa_message_handler,
                    public nrppa_ue_context_removal_handler,
-                   public nrppa_du_context_handler
+                   public nrppa_du_context_handler,
+                   public nrppa_e_cid_report_handler
 {
 public:
   nrppa_impl(const std::vector<supported_tracking_area>& supported_tas_,
@@ -45,6 +46,14 @@ public:
   void handle_du_addition(cu_cp_du_index_t du_index, nrppa_f1ap_notifier& f1ap_notifier) override;
   void handle_du_removal(cu_cp_du_index_t du_index) override;
 
+  // See nrppa_e_cid_report_handler for documentation.
+  void handle_e_cid_measurement_report(const e_cid_measurement_report_t& report) override;
+  void handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override;
+
+  /// \brief Tell the gNB-DU to stop the E-CID measurement it runs for the UE.
+  /// \param[in] ue_index The UE index.
+  void terminate_du_e_cid_measurement(cu_cp_ue_index_t ue_index);
+
   /// \brief Initialize the measurement report timer for the UE.
   /// \param[in] ue_index The UE index.
   /// \param[in] meas_periodicity_ms The measurement periodicity in milliseconds.
@@ -53,10 +62,14 @@ public:
   nrppa_message_handler&            get_nrppa_message_handler() override { return *this; }
   nrppa_ue_context_removal_handler& get_nrppa_ue_context_removal_handler() override { return *this; }
   nrppa_du_context_handler&         get_nrppa_du_context_handler() override { return *this; }
+  nrppa_e_cid_report_handler&       get_nrppa_e_cid_report_handler() override { return *this; }
 
 private:
   /// \brief Send the measurement results to the LMF.
   void handle_e_cid_meas_result(cu_cp_ue_index_t ue_index, const nrppa_e_cid_meas_result& result);
+
+  /// \brief Send an E-CID measurement failure indication to the LMF.
+  void send_e_cid_meas_failure_indication(const nrppa_ue_context& ue_ctxt, nrppa_cause_t cause);
 
   /// \brief Callback function for the measurement report timer. This sends a measurement report to the LMF.
   void on_meas_report_timer_expired(cu_cp_ue_index_t ue_index);

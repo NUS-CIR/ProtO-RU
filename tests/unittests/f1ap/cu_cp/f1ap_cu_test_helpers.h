@@ -225,6 +225,19 @@ public:
     });
   }
 
+  void on_e_cid_measurement_report(const e_cid_measurement_report_t& report) override
+  {
+    last_e_cid_measurement_report = report;
+  }
+
+  void on_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override
+  {
+    last_e_cid_measurement_failure_indication = ind;
+  }
+
+  std::optional<e_cid_measurement_report_t>             last_e_cid_measurement_report;
+  std::optional<e_cid_measurement_failure_indication_t> last_e_cid_measurement_failure_indication;
+
   void on_ref_time_info_report(const f1ap_time_ref_info& info) override { last_ref_time_info_report = info; }
 
   void set_ue_id(uint16_t ue_id_) { ue_id = ue_id_; }

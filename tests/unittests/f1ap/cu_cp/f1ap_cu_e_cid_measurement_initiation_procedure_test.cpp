@@ -218,3 +218,77 @@ TEST_F(f1ap_cu_e_cid_measurement_initiation_test, when_periodicity_is_not_encoda
   ASSERT_TRUE(t.ready());
   ASSERT_FALSE(t.get().has_value());
 }
+
+TEST_F(f1ap_cu_e_cid_measurement_initiation_test, when_periodic_request_is_sent_then_both_periodicity_ies_are_encoded)
+{
+  test_ue& ue = create_ue(int_to_gnb_du_ue_f1ap_id(0));
+
+  e_cid_measurement_request_t req = make_request(ue.ue_index, report_characteristics_t::periodic);
+  req.meas_periodicity            = meas_periodicity_t::ms1024;
+  req.meas_periodicity_nr_aoa     = meas_periodicity_nr_aoa_t::ms1280;
+  start_procedure(req);
+
+  ASSERT_TRUE(was_request_sent());
+  ASSERT_EQ(sent_request()->e_c_id_report_characteristics.value, e_c_id_report_characteristics_opts::periodic);
+  ASSERT_TRUE(sent_request()->e_c_id_meas_periodicity_present);
+  ASSERT_EQ(sent_request()->e_c_id_meas_periodicity.value, meas_periodicity_opts::ms1024);
+  ASSERT_TRUE(sent_request()->pos_meas_periodicity_nr_ao_a_present);
+  ASSERT_EQ(sent_request()->pos_meas_periodicity_nr_ao_a.value, pos_meas_periodicity_nr_ao_a_opts::ms1280);
+}
+
+TEST_F(f1ap_cu_e_cid_measurement_initiation_test, when_e_cid_measurement_report_is_received_then_it_is_forwarded)
+{
+  test_ue& ue = create_ue(int_to_gnb_du_ue_f1ap_id(0));
+  start_procedure(make_request(ue.ue_index));
+
+  f1ap->handle_message(test_helpers::generate_e_cid_measurement_report(
+      *ue.du_ue_id, sent_cu_ue_id(), lmf_ue_meas_id, ran_ue_meas_id, azimuth_aoa));
+
+  ASSERT_TRUE(du_processor_notifier.last_e_cid_measurement_report.has_value());
+  const auto& report = du_processor_notifier.last_e_cid_measurement_report.value();
+  ASSERT_EQ(report.ue_index, ue.ue_index);
+  ASSERT_EQ(report.ran_ue_meas_id, uint_to_ran_ue_meas_id(ran_ue_meas_id));
+  ASSERT_EQ(report.e_cid_meas_result.measured_results.size(), 1);
+
+  ASSERT_EQ(report.e_cid_meas_result.measured_results[0].azimuth_aoa, azimuth_aoa);
+}
+
+TEST_F(f1ap_cu_e_cid_measurement_initiation_test,
+       when_e_cid_measurement_report_for_unknown_ue_is_received_then_it_is_dropped)
+{
+  f1ap->handle_message(test_helpers::generate_e_cid_measurement_report(
+      int_to_gnb_du_ue_f1ap_id(0), int_to_gnb_cu_ue_f1ap_id(0), lmf_ue_meas_id, ran_ue_meas_id, azimuth_aoa));
+
+  ASSERT_FALSE(du_processor_notifier.last_e_cid_measurement_report.has_value());
+}
+
+TEST_F(f1ap_cu_e_cid_measurement_initiation_test,
+       when_e_cid_measurement_failure_indication_is_received_then_it_is_forwarded)
+{
+  test_ue& ue = create_ue(int_to_gnb_du_ue_f1ap_id(0));
+  start_procedure(make_request(ue.ue_index));
+
+  f1ap->handle_message(test_helpers::generate_e_cid_measurement_failure_indication(
+      *ue.du_ue_id, sent_cu_ue_id(), lmf_ue_meas_id, ran_ue_meas_id));
+
+  ASSERT_TRUE(du_processor_notifier.last_e_cid_measurement_failure_indication.has_value());
+  ASSERT_EQ(du_processor_notifier.last_e_cid_measurement_failure_indication->ue_index, ue.ue_index);
+}
+
+TEST_F(f1ap_cu_e_cid_measurement_initiation_test,
+       when_termination_command_is_sent_then_du_receives_both_measurement_ids)
+{
+  test_ue& ue = create_ue(int_to_gnb_du_ue_f1ap_id(0));
+  start_procedure(make_request(ue.ue_index));
+
+  f1ap->get_f1ap_nrppa_message_handler().handle_e_cid_measurement_termination_command(
+      e_cid_measurement_termination_command_t{
+          ue.ue_index, uint_to_lmf_ue_meas_id(lmf_ue_meas_id), uint_to_ran_ue_meas_id(ran_ue_meas_id)});
+
+  ASSERT_EQ(f1ap_pdu_notifier.last_f1ap_msg.pdu.init_msg().value.type().value,
+            f1ap_elem_procs_o::init_msg_c::types_opts::e_c_id_meas_termination_cmd);
+
+  const auto& cmd = f1ap_pdu_notifier.last_f1ap_msg.pdu.init_msg().value.e_c_id_meas_termination_cmd();
+  ASSERT_EQ(cmd->lmf_ue_meas_id, lmf_ue_meas_id);
+  ASSERT_EQ(cmd->ran_ue_meas_id, ran_ue_meas_id);
+}

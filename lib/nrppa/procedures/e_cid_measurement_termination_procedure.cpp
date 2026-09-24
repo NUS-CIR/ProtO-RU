@@ -12,8 +12,9 @@ using namespace ocucp;
 
 e_cid_measurement_termination_procedure::e_cid_measurement_termination_procedure(cu_cp_ue_index_t        ue_index_,
                                                                                  nrppa_ue_context_list&  ue_ctxt_list_,
+                                                                                 nrppa_impl&             parent_,
                                                                                  ocudulog::basic_logger& logger_) :
-  ue_index(ue_index_), ue_ctxt_list(ue_ctxt_list_), logger(logger_)
+  ue_index(ue_index_), ue_ctxt_list(ue_ctxt_list_), parent(parent_), logger(logger_)
 {
 }
 
@@ -46,4 +47,7 @@ void e_cid_measurement_termination_procedure::terminate_periodic_measurements()
 
   // Stop timer for periodic reporting.
   ue_ctxt->meas_report_timer.stop();
+
+  // Stop the measurement the gNB-DU runs, as per TS 38.473 section 8.13.15.
+  parent.terminate_du_e_cid_measurement(ue_index);
 }

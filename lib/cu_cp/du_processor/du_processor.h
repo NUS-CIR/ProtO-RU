@@ -134,6 +134,12 @@ public:
   /// \param[in] ue_index The index of the UE to remove.
   virtual async_task<void> on_ue_removal_required(cu_cp_ue_index_t ue_index) = 0;
 
+  /// \brief Notify the CU-CP about an E-CID measurement report of the gNB-DU.
+  virtual void on_e_cid_measurement_report(const e_cid_measurement_report_t& report) = 0;
+
+  /// \brief Notify the CU-CP about an E-CID measurement failure indication of the gNB-DU.
+  virtual void on_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) = 0;
+
   /// \brief Notify the CU-CP to release a UE.
   /// \param[in] request The release request.
   virtual async_task<void> on_ue_release_required(const cu_cp_ue_context_release_request& request) = 0;

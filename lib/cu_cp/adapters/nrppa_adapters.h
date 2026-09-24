@@ -126,6 +126,12 @@ public:
     return f1ap_handler->handle_e_cid_measurement_request(request);
   }
 
+  void on_e_cid_measurement_termination_command(const e_cid_measurement_termination_command_t& command) override
+  {
+    ocudu_assert(f1ap_handler != nullptr, "F1AP NRPPA handler must not be nullptr");
+    f1ap_handler->handle_e_cid_measurement_termination_command(command);
+  }
+
 private:
   f1ap_nrppa_message_handler* f1ap_handler = nullptr;
 };

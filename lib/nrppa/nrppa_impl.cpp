@@ -60,6 +60,9 @@ void nrppa_impl::remove_ue_context(cu_cp_ue_index_t ue_index)
     return;
   }
 
+  // Stop the measurement the gNB-DU runs, so that it does not keep reporting for a UE that is gone.
+  terminate_du_e_cid_measurement(ue_index);
+
   ue_ctxt_list.remove_ue_context(ue_index);
 }
 
@@ -93,6 +96,106 @@ void nrppa_impl::handle_du_removal(cu_cp_du_index_t du_index)
 
   trp_registry.remove_du(du_index);
   du_ctxt_list.remove_du_context(du_index);
+}
+
+void nrppa_impl::handle_e_cid_measurement_report(const e_cid_measurement_report_t& report)
+{
+  if (!ue_ctxt_list.contains(report.ue_index)) {
+    logger.warning("ue={}: Dropping E-CID measurement report. UE context doesn't exist", report.ue_index);
+    return;
+  }
+
+  nrppa_ue_context& ue_ctxt = ue_ctxt_list[report.ue_index];
+
+  if (report.ran_ue_meas_id != ue_ctxt.ue_ids.ran_ue_meas_id) {
+    ue_ctxt.logger.log_warning("Dropping E-CID measurement report for unknown ran_ue_meas_id={}",
+                               fmt::underlying(report.ran_ue_meas_id));
+    return;
+  }
+
+  if (!ue_ctxt.du_e_cid_meas_active) {
+    ue_ctxt.logger.log_warning("Dropping E-CID measurement report. No measurement is running at the gNB-DU");
+    return;
+  }
+
+  nrppa_cu_cp_ue_notifier* ue = ue_ctxt.get_cu_cp_ue();
+  if (ue == nullptr) {
+    ue_ctxt.logger.log_warning("Dropping E-CID measurement report. UE doesn't exist");
+    return;
+  }
+
+  std::optional<nr_cell_global_id_t> serving_cell_id = ue->get_serving_cell_id();
+  if (!serving_cell_id.has_value() or plmn_to_tac.find(serving_cell_id.value().plmn_id) == plmn_to_tac.end()) {
+    ue_ctxt.logger.log_warning("Dropping E-CID measurement report. Serving cell of the UE is unknown");
+    return;
+  }
+
+  nrppa_e_cid_meas_result meas_result;
+  meas_result.serving_cell_id  = serving_cell_id.value();
+  meas_result.serving_cell_tac = plmn_to_tac.at(serving_cell_id.value().plmn_id);
+  meas_result.measured_results = fill_du_measured_results(report.e_cid_meas_result);
+
+  handle_e_cid_meas_result(report.ue_index, meas_result);
+}
+
+void nrppa_impl::handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind)
+{
+  if (!ue_ctxt_list.contains(ind.ue_index)) {
+    logger.warning("ue={}: Dropping E-CID measurement failure indication. UE context doesn't exist", ind.ue_index);
+    return;
+  }
+
+  nrppa_ue_context& ue_ctxt = ue_ctxt_list[ind.ue_index];
+
+  if (ind.ran_ue_meas_id != ue_ctxt.ue_ids.ran_ue_meas_id) {
+    ue_ctxt.logger.log_warning("Dropping E-CID measurement failure indication for unknown ran_ue_meas_id={}",
+                               fmt::underlying(ind.ran_ue_meas_id));
+    return;
+  }
+
+  // The gNB-DU has terminated the E-CID measurements for the UE, as per TS 38.473 section 8.13.13.2.
+  ue_ctxt.du_e_cid_meas_active = false;
+
+  send_e_cid_meas_failure_indication(ue_ctxt, nrppa_cause_radio_network_t::requested_item_temporarily_not_available);
+}
+
+void nrppa_impl::send_e_cid_meas_failure_indication(const nrppa_ue_context& ue_ctxt, nrppa_cause_t cause)
+{
+  asn1::nrppa::nr_ppa_pdu_c nrppa_msg;
+  nrppa_msg.set_init_msg();
+  nrppa_msg.init_msg().load_info_obj(ASN1_NRPPA_ID_E_C_ID_MEAS_FAIL_IND);
+
+  auto& asn1_ind           = nrppa_msg.init_msg().value.e_c_id_meas_fail_ind();
+  asn1_ind->lmf_ue_meas_id = to_underlying(ue_ctxt.ue_ids.lmf_ue_meas_id);
+  asn1_ind->ran_ue_meas_id = to_underlying(ue_ctxt.ue_ids.ran_ue_meas_id);
+  asn1_ind->cause          = cause_to_asn1(cause);
+
+  byte_buffer nrppa_pdu = pack_into_pdu(nrppa_msg, "E-CID measurement failure indication");
+
+  log_nrppa_message(logger, Tx, nrppa_pdu, nrppa_msg);
+  cu_cp_notifier.on_ul_nrppa_pdu(nrppa_pdu, ue_ctxt.ue_ids.ue_index);
+}
+
+void nrppa_impl::terminate_du_e_cid_measurement(cu_cp_ue_index_t ue_index)
+{
+  nrppa_ue_context& ue_ctxt = ue_ctxt_list[ue_index];
+  if (!ue_ctxt.du_e_cid_meas_active) {
+    return;
+  }
+
+  nrppa_cu_cp_ue_notifier* ue = ue_ctxt.get_cu_cp_ue();
+  if (ue == nullptr) {
+    ue_ctxt.du_e_cid_meas_active = false;
+    return;
+  }
+
+  cu_cp_du_index_t du_index = ue->get_du_index();
+  if (du_ctxt_list.contains(du_index)) {
+    du_ctxt_list[du_index].f1ap->on_e_cid_measurement_termination_command(e_cid_measurement_termination_command_t{
+        ue_index, ue_ctxt.ue_ids.lmf_ue_meas_id, ue_ctxt.ue_ids.ran_ue_meas_id});
+  }
+
+  ue_ctxt.du_e_cid_meas_active = false;
 }
 
 void nrppa_impl::initialize_meas_report_timer(cu_cp_ue_index_t ue_index, std::chrono::milliseconds meas_periodicity_ms)
@@ -379,7 +482,7 @@ void nrppa_impl::handle_e_cid_meas_termination_command(const asn1::nrppa::e_c_id
                fmt::underlying(ue_ctxt.ue_ids.ran_ue_meas_id),
                fmt::underlying(ue_ctxt.ue_ids.lmf_ue_meas_id));
 
-  ue->schedule_async_task(launch_async<e_cid_measurement_termination_procedure>(ue_index, ue_ctxt_list, logger));
+  ue->schedule_async_task(launch_async<e_cid_measurement_termination_procedure>(ue_index, ue_ctxt_list, *this, logger));
 }
 
 void nrppa_impl::handle_trp_information_request(const asn1::nrppa::trp_info_request_s& msg,

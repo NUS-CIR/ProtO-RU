@@ -132,9 +132,11 @@ public:
     return activate;
   }
 
-  void             handle_du_cells_removed(span<const nr_cell_identity> cells) override {}
-  void             handle_du_added(cu_cp_du_index_t du_index) override {}
-  void             handle_du_removed(cu_cp_du_index_t du_index) override {}
+  void handle_du_cells_removed(span<const nr_cell_identity> cells) override {}
+  void handle_du_added(cu_cp_du_index_t du_index) override {}
+  void handle_e_cid_measurement_report(const e_cid_measurement_report_t& report) override {}
+  void handle_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override {}
+  void handle_du_removed(cu_cp_du_index_t du_index) override {}
   async_task<void> handle_transaction_info_loss(const ue_transaction_info_loss_event& ev) override
   {
     return launch_no_op_task();

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "../nrppa_impl.h"
 #include "../ue_context/nrppa_ue_context.h"
 
 namespace ocudu::ocucp {
@@ -17,6 +18,7 @@ class e_cid_measurement_termination_procedure
 public:
   e_cid_measurement_termination_procedure(cu_cp_ue_index_t        ue_index_,
                                           nrppa_ue_context_list&  ue_ctxt_list_,
+                                          nrppa_impl&             parent_,
                                           ocudulog::basic_logger& logger_);
 
   void operator()(coro_context<async_task<void>>& ctx);
@@ -28,6 +30,7 @@ private:
 
   cu_cp_ue_index_t        ue_index;
   nrppa_ue_context_list&  ue_ctxt_list;
+  nrppa_impl&             parent;
   ocudulog::basic_logger& logger;
 
   nrppa_ue_context* ue_ctxt = nullptr;

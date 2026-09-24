@@ -258,6 +258,14 @@ inline std::optional<gnb_cu_ue_f1ap_id_t> get_gnb_cu_ue_f1ap_id(const asn1::f1ap
   using init_msg_types = f1ap_elem_procs_o::init_msg_c::types_opts;
 
   switch (init_msg.value.type().value) {
+    case init_msg_types::e_c_id_meas_initiation_request:
+      return (gnb_cu_ue_f1ap_id_t)init_msg.value.e_c_id_meas_initiation_request()->gnb_cu_ue_f1ap_id;
+    case init_msg_types::e_c_id_meas_termination_cmd:
+      return (gnb_cu_ue_f1ap_id_t)init_msg.value.e_c_id_meas_termination_cmd()->gnb_cu_ue_f1ap_id;
+    case init_msg_types::e_c_id_meas_report:
+      return (gnb_cu_ue_f1ap_id_t)init_msg.value.e_c_id_meas_report()->gnb_cu_ue_f1ap_id;
+    case init_msg_types::e_c_id_meas_fail_ind:
+      return (gnb_cu_ue_f1ap_id_t)init_msg.value.e_c_id_meas_fail_ind()->gnb_cu_ue_f1ap_id;
     case init_msg_types::ue_context_setup_request:
       return (gnb_cu_ue_f1ap_id_t)init_msg.value.ue_context_setup_request()->gnb_cu_ue_f1ap_id;
     case init_msg_types::ue_context_release_cmd:

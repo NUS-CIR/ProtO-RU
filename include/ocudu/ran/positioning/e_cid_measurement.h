@@ -68,6 +68,30 @@ struct e_cid_measurement_response_t {
   std::optional<uint16_t>                   cell_portion_id;
 };
 
+/// E-CID MEASUREMENT REPORT, as per TS 38.473, Section 9.2.12.24.
+struct e_cid_measurement_report_t {
+  cu_cp_ue_index_t           ue_index;
+  lmf_ue_meas_id_t           lmf_ue_meas_id;
+  ran_ue_meas_id_t           ran_ue_meas_id;
+  e_cid_measurement_result_t e_cid_meas_result;
+  std::optional<uint16_t>    cell_portion_id;
+};
+
+/// E-CID MEASUREMENT FAILURE INDICATION, as per TS 38.473, Section 9.2.12.23.
+struct e_cid_measurement_failure_indication_t {
+  cu_cp_ue_index_t ue_index;
+  lmf_ue_meas_id_t lmf_ue_meas_id;
+  ran_ue_meas_id_t ran_ue_meas_id;
+  f1ap_cause_t     cause;
+};
+
+/// E-CID MEASUREMENT TERMINATION COMMAND, as per TS 38.473, Section 9.2.12.25.
+struct e_cid_measurement_termination_command_t {
+  cu_cp_ue_index_t ue_index;
+  lmf_ue_meas_id_t lmf_ue_meas_id;
+  ran_ue_meas_id_t ran_ue_meas_id;
+};
+
 /// E-CID MEASUREMENT INITIATION FAILURE, as per TS 38.473, Section 9.2.12.22.
 struct e_cid_measurement_failure_t {
   lmf_ue_meas_id_t                  lmf_ue_meas_id;

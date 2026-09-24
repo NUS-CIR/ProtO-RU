@@ -72,6 +72,18 @@ public:
     return ue_removal_handler->handle_ue_removal_request(ue_index);
   }
 
+  void on_e_cid_measurement_report(const e_cid_measurement_report_t& report) override
+  {
+    ocudu_assert(cu_cp_handler != nullptr, "CU-CP handler must not be nullptr");
+    cu_cp_handler->handle_e_cid_measurement_report(report);
+  }
+
+  void on_e_cid_measurement_failure_indication(const e_cid_measurement_failure_indication_t& ind) override
+  {
+    ocudu_assert(cu_cp_handler != nullptr, "CU-CP handler must not be nullptr");
+    cu_cp_handler->handle_e_cid_measurement_failure_indication(ind);
+  }
+
   async_task<void> on_ue_release_required(const cu_cp_ue_context_release_request& request) override
   {
     ocudu_assert(ue_context_handler != nullptr, "UE context handler must not be nullptr");
