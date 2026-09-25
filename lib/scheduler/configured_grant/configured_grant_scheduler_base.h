@@ -44,6 +44,12 @@ protected:
   /// requires an RRC-configured grant, as a CG configuration without one is activated by DCI, i.e. Type 2.
   virtual bool has_cg_grant_cfg(const ue_cell_configuration& ue_cfg) const = 0;
 
+  /// \brief Hook invoked after a CG PUSCH occasion has been added to the slot result.
+  ///
+  /// Used by CG Type 2 to record the slots in which a CRC indication is expected, which is how a UE that never
+  /// received the activation DCI is detected. CG Type 1 needs no activation and leaves it unimplemented.
+  virtual void on_cg_pusch_allocated(const ue& u, slot_point pusch_slot) {}
+
   /// Helper to fetch a UE cell by RNTI. Returns nullptr if either the UE or its cell is not found.
   const ue_cell* get_ue_cell(rnti_t rnti) const;
 

@@ -5,9 +5,25 @@
 
 #include "ue_scheduler_impl.h"
 #include "../configured_grant/configured_grant_type1_sched_impl.h"
+#include "../configured_grant/configured_grant_type2_sched_impl.h"
 #include "../logging/cell_metrics_handler.h"
 
 using namespace ocudu;
+
+static std::unique_ptr<configured_grant_scheduler> create_cg_scheduler(const cell_configuration& cell_cfg,
+                                                                       uci_allocator&            uci_alloc,
+                                                                       ue_repository&            ues,
+                                                                       pdcch_resource_allocator& pdcch_alloc)
+{
+  if (not cell_cfg.params.init_bwp.cg_cfg.has_value()) {
+    return nullptr;
+  }
+  const auto& cell_cg_cfg = *cell_cfg.params.init_bwp.cg_cfg;
+  if (cell_cg_cfg.is_type2()) {
+    return std::make_unique<configured_grant_type2_sched_impl>(cell_cfg, cell_cg_cfg, uci_alloc, pdcch_alloc, ues);
+  }
+  return std::make_unique<configured_grant_type1_sched_impl>(cell_cfg, cell_cg_cfg, uci_alloc, ues);
+}
 
 ue_scheduler_impl::ue_scheduler_impl(const scheduler_ue_expert_config& expert_cfg_) :
   expert_cfg(expert_cfg_), logger(ocudulog::fetch_basic_logger("SCHED")), ue_db(expert_cfg), event_mng(ue_db)
@@ -227,12 +243,7 @@ ue_scheduler_impl::cell_context::cell_context(ue_scheduler_impl&                
                     *params.cell_res_alloc,
                     *params.cell_metrics,
                     ocudulog::fetch_basic_logger("SCHED")),
-  cg_sched(params.cell_res_alloc->cfg.params.init_bwp.cg_cfg.has_value()
-               ? std::make_unique<configured_grant_type1_sched_impl>(params.cell_res_alloc->cfg,
-                                                                     *params.cell_res_alloc->cfg.params.init_bwp.cg_cfg,
-                                                                     *params.uci_alloc,
-                                                                     parent.ue_db)
-               : nullptr),
+  cg_sched(create_cg_scheduler(params.cell_res_alloc->cfg, *params.uci_alloc, parent.ue_db, *params.pdcch_sched)),
   trig_ul_sched(parent.ue_db, params.cell_res_alloc->cfg.cell_index, params.cell_res_alloc->cfg.scs_common())
 {
 }

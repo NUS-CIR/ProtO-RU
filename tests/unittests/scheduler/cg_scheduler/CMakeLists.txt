@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 # Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
-add_executable(cg_scheduler_test configured_grant_scheduler_test.cpp)
+add_executable(cg_scheduler_test configured_grant_scheduler_test.cpp configured_grant_type2_scheduler_test.cpp)
 target_link_libraries(cg_scheduler_test
         ocudu_sched
         ocudulog

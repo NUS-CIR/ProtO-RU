@@ -273,5 +273,7 @@ bool configured_grant_scheduler_base::allocate_cg_opportunity(cell_slot_resource
   // might wrongly update the SRB in that. Unless we defined by design that SRBs are mapped to a specific LCG (not
   // defined by the standard), we should skip updating the LCG repository.
 
+  on_cg_pusch_allocated(*u, pusch_slot);
+
   return true;
 }
