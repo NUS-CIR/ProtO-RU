@@ -1,8 +1,72 @@
+# SPDX-FileCopyrightText: Copyright (C) 2021-2026 Software Radio Systems Limited
 # SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
-# Owners listed on a section header apply to every path in that section.
+# One section per area; a section's owners on its header apply to its paths.
+# A file matched in several sections needs approval from each of them.
+# Files matched by no section need no code owner approval.
+
 # See https://docs.gitlab.com/user/project/codeowners/
+# Forks: replace these upstream users with your own, see .gitlab/README.md.
+
+[General][1] @ismael.gomez1 @andrepuschmann
+/README.md
+
+[CI][1] @asaezper @falkenberg
+/.gitlab-ci.yml
+/.github/
+/.gitlab/
+
+[Deploy][1] @asaezper @ninjab3s
+/docker/
+
+[Shared][1] @faluco @frankist @xarteaga @palvarez
+/lib/asn1/
+/include/ocudu/asn1/
+/tests/*/asn1/
+/lib/support/
+/include/ocudu/support/
+/tests/*/support/
+/lib/ocudulog/
+/include/ocudu/ocudulog/
+/tests/*/ocudulog/
+/lib/ocuduvec/
+/include/ocudu/ocuduvec/
+/tests/*/ocuduvec/
+/include/ocudu/adt/
+/tests/*/adt/
+/lib/gateways/
+/include/ocudu/gateways/
+/tests/*/gateways/
+/lib/pcap/
+/include/ocudu/pcap/
+/tests/*/pcap/
+/lib/instrumentation/
+/include/ocudu/instrumentation/
+/apps/
+/CMakeLists.txt
+
+[Fronthaul][1] @faluco @AleaLC @sauka @jc.gonzalez1
+/lib/ofh/
+/include/ocudu/ofh/
+/tests/*/ofh/
+/lib/ru/
+/include/ocudu/ru/
+/lib/radio/
+/include/ocudu/radio/
+/tests/*/radio/
+
+[PHY][1] @xarteaga @dvdgrgrtt @ddries
+/lib/phy/
+/include/ocudu/phy/
+/tests/*/phy/
+/lib/hal/
+/include/ocudu/hal/
+/lib/cuda/
+/include/ocudu/cuda/
+/tests/*/cuda/
+/lib/du/du_low/
+/include/ocudu/du/du_low/
 
 [FAPI][1] @faluco @AleaLC @sauka @jc.gonzalez1
 /include/ocudu/fapi/
@@ -11,3 +75,95 @@
 /tests/unittests/fapi/
 /tests/unittests/fapi_adaptor/
 
+[RAN][1] @xarteaga @frankist
+/lib/ran/
+/include/ocudu/ran/
+/tests/*/ran/
+
+[DU-high][1] @frankist @jonathan-srs @carlo-glab
+/lib/scheduler/
+/include/ocudu/scheduler/
+/tests/*/scheduler/
+/lib/mac/
+/include/ocudu/mac/
+/tests/*/mac/
+/lib/du/du_high/
+/include/ocudu/du/du_high/
+/tests/*/du_high/
+/tests/*/du_manager/
+/tests/integrationtests/du_high_cu/
+# F1AP: DU and common parts
+/lib/f1ap/
+/include/ocudu/f1ap/
+/tests/*/f1ap/
+!/lib/f1ap/cu_cp/
+!/include/ocudu/f1ap/cu_cp/
+!/tests/unittests/f1ap/cu_cp/
+
+[NTN][1] @yagoda1 @piotr.gawlowicz
+/lib/ntn/
+/include/ocudu/ntn/
+/tests/*/ntn/
+/tests/integrationtests/du_high/ntn/
+
+[CU-UP][1] @palvarez @falkenberg
+/lib/cu_up/
+/include/ocudu/cu_up/
+/tests/*/cu_up/
+/lib/pdcp/
+/include/ocudu/pdcp/
+/tests/*/pdcp/
+/lib/sdap/
+/include/ocudu/sdap/
+/tests/*/sdap/
+/lib/gtpu/
+/include/ocudu/gtpu/
+/tests/*/gtpu/
+/lib/f1u/
+/include/ocudu/f1u/
+/tests/*/f1u/
+/lib/e1ap/
+/include/ocudu/e1ap/
+/tests/*/e1ap/
+/lib/rohc/
+/include/ocudu/rohc/
+/tests/*/rohc/
+/lib/rlc/
+/include/ocudu/rlc/
+/tests/*/rlc/
+
+[CU-CP][1] @palvarez @fabian.eckermann
+/lib/cu_cp/
+/include/ocudu/cu_cp/
+/tests/*/cu_cp/
+/lib/rrc/
+/include/ocudu/rrc/
+/tests/*/rrc/
+/lib/ngap/
+/include/ocudu/ngap/
+/tests/*/ngap/
+/lib/xnap/
+/include/ocudu/xnap/
+/tests/*/xnap/
+/lib/nrppa/
+/include/ocudu/nrppa/
+/tests/*/nrppa/
+/lib/lpp/
+/include/ocudu/lpp/
+/tests/integrationtests/du_high_cu/
+# F1AP: CU-CP and common parts
+/lib/f1ap/
+/include/ocudu/f1ap/
+/tests/*/f1ap/
+!/lib/f1ap/du/
+!/include/ocudu/f1ap/du/
+!/tests/unittests/f1ap/du/
+
+[E2][1] @yagoda1 @piotr.gawlowicz
+/lib/e2/
+/include/ocudu/e2/
+/tests/*/e2/
+/tests/integrationtests/e2ap/
+
+[CODEOWNERS file][3] @ismael.gomez1 @andrepuschmann @frankist @xarteaga @palvarez @faluco @asaezper
+/.gitlab/CODEOWNERS
