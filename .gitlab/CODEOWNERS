@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
+# SPDX-License-Identifier: BSD-3-Clause-Open-MPI
+
+# Owners listed on a section header apply to every path in that section.
+# See https://docs.gitlab.com/user/project/codeowners/
+
+[FAPI][1] @faluco @AleaLC @sauka @jc.gonzalez1
+/include/ocudu/fapi/
+/include/ocudu/fapi_adaptor/
+/lib/fapi_adaptor/
+/tests/unittests/fapi/
+/tests/unittests/fapi_adaptor/
+
