@@ -82,6 +82,17 @@ If you don't create the `GITLAB_TOKEN` variable, GitOps won't be used and you ca
 In that case, check the scheduled pipelines defined at the end of [.gitlab/main.tf](./main.tf) to replicate them
 manually in your project's **Settings → CI/CD → Schedules**.
 
+#### Code Owners
+
+[GitLab Code Owners File](./CODEOWNERS) lists upstream OCUDU users for each repo. In your fork they are not project
+members, so GitLab ignores them and auto-approves their entries: nothing is blocked, but code owners have no effect.
+
+To use code owners in your fork, replace those usernames with members of your project (Developer role or higher).
+Otherwise, delete the file or set `code_owner_approval_required = false` in [.gitlab/main.tf](./main.tf).
+
+Code owner approvals require GitLab Premium / Ultimate. See the
+[GitLab Code Owners documentation](https://docs.gitlab.com/user/project/codeowners/).
+
 ### 2.3. GitLab Runners
 
 OCUDU CI/CD is designed to work primarily with GitLab Shared Runners, with options for custom runners when needed.
