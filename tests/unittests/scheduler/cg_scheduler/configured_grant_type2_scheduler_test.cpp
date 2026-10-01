@@ -1486,4 +1486,81 @@ INSTANTIATE_TEST_SUITE_P(
         cg_duplex_test_params{"TDD_3D1S6U", tdd_ul_dl_config_common{subcarrier_spacing::kHz30, {10, 3, 10, 6, 0}}}),
     [](const auto& p) { return p.param.name; });
 
+/// \brief Fixture in which more UEs become ready for activation in one slot than the per-slot cap allows.
+///
+/// run_ues_activation() rations the activation DCIs to MAX_CG_ACTIVATION_PDCCHS_PER_SLOT, so that a burst of UEs does
+/// not take the PDCCH space the dynamic grants need. CG_CONFIRMATIONS_POOL_SIZE is sized on that cap holding.
+class configured_grant_type2_activation_cap_test : public configured_grant_scheduler_test
+{
+protected:
+  /// Enough UEs that the cap has to defer at least one of them.
+  static constexpr unsigned nof_ues = MAX_CG_ACTIVATION_PDCCHS_PER_SLOT + 2;
+  /// Wide enough for one CG resource per UE, at the default grant size and MCS, so that no UE is held back for want
+  /// of a resource rather than by the cap.
+  static constexpr unsigned wide_cg_band_rbs = 10 * nof_ues;
+
+  configured_grant_type2_activation_cap_test() :
+    configured_grant_scheduler_test(cg_test_params{.type2 = true, .max_nof_cell_cg_rbs = wide_cg_band_rbs})
+  {
+  }
+
+  static rnti_t crnti_of(unsigned i) { return to_rnti(static_cast<uint16_t>(fmt::underlying(ue_crnti) + i)); }
+  static rnti_t cs_rnti_of(unsigned i) { return to_rnti(static_cast<uint16_t>(fmt::underlying(cs_rnti) + i)); }
+
+  /// \brief Adds every UE so that they all become ready for activation in the same slot.
+  ///
+  /// All the UEs are created first and the CG installed on them only afterwards, with no slot run in between: adding
+  /// them one at a time would let the earlier ones be activated while the later ones are still being created, and no
+  /// slot would ever see more activations pending than the cap allows.
+  void add_all_ues()
+  {
+    for (unsigned i = 0; i != nof_ues; ++i) {
+      ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(i), crnti_of(i)));
+    }
+    for (unsigned i = 0; i != nof_ues; ++i) {
+      ASSERT_NO_FATAL_FAILURE(
+          install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(i), crnti_of(i), cs_rnti_of(i)));
+    }
+  }
+
+  /// Counts the CG Type 2 activation DCIs in the last scheduler result, which are the only format 0_1 DCIs addressed
+  /// to a CS-RNTI.
+  unsigned count_activation_dcis() const
+  {
+    const auto& ul_pdcchs = last_sched_result()->dl.ul_pdcchs;
+    return std::count_if(ul_pdcchs.begin(), ul_pdcchs.end(), [](const pdcch_ul_information& pdcch) {
+      return pdcch.dci.type() == dci_ul_rnti_config_type::cs_rnti_f0_1;
+    });
+  }
+};
+
+TEST_F(configured_grant_type2_activation_cap_test, no_slot_carries_more_activation_dcis_than_the_cap)
+{
+  ASSERT_NO_FATAL_FAILURE(add_all_ues());
+
+  unsigned         max_activations_in_a_slot = 0;
+  std::set<rnti_t> activated_ues;
+  for (unsigned i = 0; i != 2 * cg_params.period_slots; ++i) {
+    run_slot();
+
+    const unsigned nof_activations = count_activation_dcis();
+    ASSERT_LE(nof_activations, MAX_CG_ACTIVATION_PDCCHS_PER_SLOT)
+        << "more CG activation DCIs were sent in one slot than the cap the CG confirmation pool is sized on";
+    max_activations_in_a_slot = std::max(max_activations_in_a_slot, nof_activations);
+
+    for (unsigned u = 0; u != nof_ues; ++u) {
+      if (find_ue_ul_pdcch(cs_rnti_of(u)) != nullptr) {
+        activated_ues.emplace(cs_rnti_of(u));
+      }
+    }
+  }
+
+  // Guard against a vacuous pass: unless some slot actually reached the cap, the assertion above never bit.
+  ASSERT_EQ(max_activations_in_a_slot, MAX_CG_ACTIVATION_PDCCHS_PER_SLOT)
+      << "no slot ever reached the activation cap, so the limit was never the binding constraint";
+
+  // The cap must defer activations, not starve them.
+  ASSERT_EQ(activated_ues.size(), nof_ues) << "some UEs were never activated after the cap deferred them";
+}
+
 } // namespace

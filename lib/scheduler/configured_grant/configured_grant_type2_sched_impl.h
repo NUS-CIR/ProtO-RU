@@ -78,7 +78,7 @@ private:
 
   // Schedules DCI for CG type 2 activation, containing all the required information for CG grant (i.e., VRBs, MCS,
   // TDRA, CG offset, etc.).
-  bool activate_ue(cell_resource_allocator& cell_alloc, du_ue_index_t ue_index);
+  bool activate_ue(cell_resource_allocator& cell_alloc, ue& ue_index);
 
   // Scans the list of UEs that got CG activation initiated, but never acked it; for those UEs, proceed with releasing
   // the previously allocated resources.
