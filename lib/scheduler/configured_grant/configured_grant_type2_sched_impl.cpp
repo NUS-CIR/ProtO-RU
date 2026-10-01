@@ -44,6 +44,43 @@ static const search_space_info* get_cg_activation_search_space(const ue_cell_con
   return nullptr;
 }
 
+static unsigned get_max_k2(span<const pusch_time_domain_resource_allocation> pusch_td_alloc_list)
+{
+  unsigned max_k2 = 0;
+  for (const pusch_time_domain_resource_allocation& td : pusch_td_alloc_list) {
+    max_k2 = std::max(max_k2, static_cast<unsigned>(td.k2));
+  }
+  return max_k2;
+}
+
+static bool are_grants_and_rbs_free(cell_resource_allocator&                          cell_alloc,
+                                    span<const pusch_time_domain_resource_allocation> pusch_td_list,
+                                    unsigned                                          cg_period_slots,
+                                    uint8_t                                           td_alloc,
+                                    const crb_interval&                               crbs,
+                                    subcarrier_spacing                                scs)
+{
+  const unsigned max_k2 = get_max_k2(pusch_td_list);
+  // In the worst case scenario, a dynamic PUSCH (which are allocated after CG PUSCHs) could have been allocated in the
+  // previous slot with max k2; check the grid and grant list availability up until max_k2 - 1 slots from the current
+  // one.
+  for (unsigned n = 0U; n < max_k2; n += cg_period_slots) {
+    auto& pdcch_alloc = cell_alloc[pusch_td_list[td_alloc].k2 + n];
+
+    // Check whether there is space for another PUSCH in the list.
+    if (pdcch_alloc.result_builder().ul().puschs().full()) {
+      return false;
+    }
+
+    // Check whether the REs/symbols on the grid are available.
+    if (pdcch_alloc.ul_res_grid.collides(scs, pusch_td_list[td_alloc].symbols, crbs)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 configured_grant_type2_sched_impl::configured_grant_type2_sched_impl(const cell_configuration& cell_cfg_,
                                                                      const cg_builder_params&  cell_cg_cfg,
                                                                      uci_allocator&            uci_alloc_,
@@ -184,7 +221,7 @@ void configured_grant_type2_sched_impl::run_slot(cell_resource_allocator& cell_a
   ues_resource_release(pdcch_slot);
 
   // Scan the UEs that are ready for activation and allocate the activation DCI.
-  run_ues_activation(pdcch_alloc);
+  run_ues_activation(cell_alloc);
 
   // Reserve the CG resources in the grid and allocate the CG PUSCH occasions of this slot.
   configured_grant_scheduler_base::run_slot(cell_alloc);
@@ -249,11 +286,11 @@ void configured_grant_type2_sched_impl::start_ue_cg_activation(du_ue_index_t ue_
   }
 }
 
-void configured_grant_type2_sched_impl::run_ues_activation(cell_slot_resource_allocator& pdcch_alloc)
+void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocator& cell_alloc)
 {
-  const slot_point sl = pdcch_alloc.slot;
+  const slot_point pdcch_slot = cell_alloc[0U].slot;
 
-  if (not cell_cfg.is_dl_enabled(sl)) {
+  if (not cell_cfg.is_dl_enabled(pdcch_slot)) {
     return;
   }
 
@@ -275,13 +312,13 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_slot_resource_al
     // Activate UEs with no activation outstanding: either they have never been activated, or a previous attempt was
     // abandoned by release_ue_activation() because the UE gave no sign of having received the activation DCI.
     if (not u.activation_triggered) {
-      bool cg_activated = activate_ue(pdcch_alloc, u.ue_index);
+      bool cg_activated = activate_ue(cell_alloc, u.ue_index);
       if (not cg_activated) {
         // Failure due to lack of PDCCH space or CG resources would block all UEs. Stop here.
         break;
       }
       u.activation_triggered  = cg_activated;
-      u.activation_pdcch_slot = sl;
+      u.activation_pdcch_slot = pdcch_slot;
     }
     ++i;
   }
@@ -345,7 +382,7 @@ void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activat
   u.missed_grants_cnt = 0;
 }
 
-bool configured_grant_type2_sched_impl::activate_ue(cell_slot_resource_allocator& pdcch_alloc, du_ue_index_t ue_index)
+bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_alloc, du_ue_index_t ue_index)
 {
   auto* u = ues.find(ue_index);
   if (u == nullptr) {
@@ -361,6 +398,7 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_slot_resource_allocator
     return false;
   }
 
+  auto&       pdcch_alloc   = cell_alloc[0U];
   const auto  slot_pdcch    = pdcch_alloc.slot;
   const auto& pusch_td_list = cell_cfg.params.ul_cfg_common.init_ul_bwp.pusch_cfg_common.value().pusch_td_alloc_list;
 
@@ -380,16 +418,16 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_slot_resource_allocator
   std::optional<cg_type2_resource> candidate_resource;
   std::optional<unsigned>          candidate_cg_offset;
 
-  const auto ue_period_slots =
+  const auto cg_period_slots =
       static_cast<unsigned>(u->get_pcell().cfg().init_bwp().ul.ded()->cg_cfg.value().periodicity);
 
   // The CG offset below is a phase within the UE CG period, but cg_type2_resource_manager tracks resource occupancy
   // in a wheel sized by the cell CG period. If the two differed, a UE whose period is shorter would recur on offsets
   // the resource manager never marks as used, and two UEs could be handed the same resource on the same slot.
-  ocudu_assert(ue_period_slots == static_cast<unsigned>(cell_cfg.params.init_bwp.cg_cfg.value().periodicity),
+  ocudu_assert(cg_period_slots == static_cast<unsigned>(cell_cfg.params.init_bwp.cg_cfg.value().periodicity),
                "ue={}: CG period of {} slots differs from the cell CG period of {} slots",
                fmt::underlying(ue_index),
-               ue_period_slots,
+               cg_period_slots,
                static_cast<unsigned>(cell_cfg.params.init_bwp.cg_cfg.value().periodicity));
 
   for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
@@ -399,17 +437,36 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_slot_resource_allocator
     }
 
     // The Resource manager doesn't assign a resource if the slot not fully UL-enabled.
-    const unsigned cg_offset = (slot_pdcch + pusch_td_list[td].k2).count() % ue_period_slots;
+    const unsigned cg_offset = (slot_pdcch + pusch_td_list[td].k2).count() % cg_period_slots;
     candidate_resource       = res_mng.request_resource(cg_offset, u->crnti);
-    if (candidate_resource.has_value()) {
+    if (not candidate_resource.has_value()) {
+      continue;
+    }
+
+    // The resource manager only tracks the CG resources against one another, so it can hand out one whose slots are
+    // already taken by dynamic PUSCHs scheduled in an earlier slot. Check that there is room in the PUSCH list and on
+    // the grid for every CG PUSCH allocation from k2 until max_k2 before committing to this candidate.
+    if (are_grants_and_rbs_free(cell_alloc,
+                                pusch_td_list,
+                                cg_period_slots,
+                                td,
+                                candidate_resource.value().crbs,
+                                cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.scs)) {
       candidate_cg_offset.emplace(cg_offset);
       candidate_td_allocation.emplace(td);
       break;
     }
+
+    // The resource is free as far as the resource manager is concerned, but the slots it would occupy are not. Return
+    // it to the pool before moving on to the next TD candidate, or it is lost from the pool for good.
+    res_mng.deallocate_resource(cg_offset, candidate_resource.value().id, u->crnti);
+    candidate_resource.reset();
   }
 
   // No available resources.
-  if (not candidate_resource.has_value()) {
+  // NOTE: this tests the offset rather than the resource, as only the success path above sets it. \c
+  // candidate_resource is written on every iteration, so it can hold a candidate that was rejected by the grid check.
+  if (not candidate_cg_offset.has_value()) {
     return false;
   }
 
@@ -425,10 +482,8 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_slot_resource_allocator
   // SearchSpace; the DCI must be built against the same one, as its size depends on it.
   const search_space_info& ss_info       = *get_cg_activation_search_space(u->get_pcell().cfg());
   const unsigned           bwp_crb_start = cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.crbs.start();
-  const vrb_interval       vrbs =
-      rb_helper::crb_to_vrb_ul_non_interleaved(crb_interval{candidate_resource.value().crbs.start() + bwp_crb_start,
-                                                            candidate_resource.value().crbs.stop() + bwp_crb_start},
-                                               bwp_crb_start);
+  const vrb_interval       vrbs          = rb_helper::crb_to_vrb_ul_non_interleaved(
+      crb_interval{candidate_resource.value().crbs.start(), candidate_resource.value().crbs.stop()}, bwp_crb_start);
 
   const auto mcs = static_cast<uint8_t>(cell_cfg.params.init_bwp.cg_cfg.value().mcs);
   // The DCI size is derived from the SearchSpace it is sent in, and get_cg_activation_search_space() only returns
@@ -444,7 +499,7 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_slot_resource_allocator
   const units::bytes  tbs          = compute_ul_tbs_unsafe(pusch_params, sch_mcs_index{mcs}, vrbs.length());
 
   // Set "CG activated" (i.e., DCI has been sent) for the UE.
-  u->get_pcell().get_conf_grant_state_manager().update_state(ue_period_slots,
+  u->get_pcell().get_conf_grant_state_manager().update_state(cg_period_slots,
                                                              tbs,
                                                              vrbs,
                                                              mcs,
@@ -549,6 +604,21 @@ void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication
                    [ue_idx](const ue_pending_activation& ue_to_rem) { return ue_idx == ue_to_rem.ue_index; });
   if (it == ues_pending_activation.end()) {
     // This UE has been already removed from the UE pending activation list.
+    return;
+  }
+
+  if (not it->activation_triggered) {
+    // The activation this confirms was already given up on by release_ue_activation(), which inferred from the CRCs
+    // missing on the UE's CG PUSCHs that the UE had never received the activation DCI. The confirmation proves that
+    // inference wrong: the UE did receive it and is transmitting on a CG resource that has since been returned to the
+    // pool and may already have been handed to another UE. Nothing here can stop that, as the scheduler has no
+    // deactivation DCI to send, so report it and leave the entry queued: re-activating the UE is what ends the
+    // overlap, whereas dropping the entry here would strand it on the stale resource for good.
+    // NOTE: a UE whose UL SINR is persistently too low for its CG PUSCHs to decode reaches this while receiving the
+    // downlink perfectly well, so this is not limited to a UE that is losing PDCCHs.
+    logger.error("ue={}: CG activation confirmed after its activation attempt had been released. Cause: the UE did "
+                 "receive the activation DCI, but no CRC arrived in time for any of its CG PUSCHs",
+                 fmt::underlying(ue_idx));
     return;
   }
 

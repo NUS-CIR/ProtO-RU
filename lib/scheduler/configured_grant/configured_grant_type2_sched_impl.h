@@ -74,11 +74,11 @@ private:
   void add_ue_to_wheel(const ue_cell_configuration& ue_cfg, unsigned time_domain_offset);
 
   // Scans the list of UEs pending activation and proceeds with activation procedure.
-  void run_ues_activation(cell_slot_resource_allocator& pdcch_alloc);
+  void run_ues_activation(cell_resource_allocator& cell_alloc);
 
   // Schedules DCI for CG type 2 activation, containing all the required information for CG grant (i.e., VRBs, MCS,
   // TDRA, CG offset, etc.).
-  bool activate_ue(cell_slot_resource_allocator& pdcch_alloc, du_ue_index_t ue_index);
+  bool activate_ue(cell_resource_allocator& cell_alloc, du_ue_index_t ue_index);
 
   // Scans the list of UEs that got CG activation initiated, but never acked it; for those UEs, proceed with releasing
   // the previously allocated resources.
