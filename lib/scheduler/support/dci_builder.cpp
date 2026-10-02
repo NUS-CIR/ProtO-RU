@@ -482,7 +482,6 @@ void ocudu::build_dci_f0_1_c_rnti(dci_ul_info&                  dci,
 
   // TODO: Set values for -
   //  - srs_resource_indicator
-  //  - precoding_info_nof_layers
   //  - beta_offset_indicator
   //  - ptrs_dmrs_association
   //  - cbg_transmission_info

@@ -1723,6 +1723,87 @@ TEST_F(cg_harq_reservation_test, when_no_harq_id_specified_then_returns_non_rese
   ASSERT_GE(h_ul->id(), to_harq_id(nof_cg_reserved));
 }
 
+/// \brief Allocates the CG HARQ \c id and reports a CRC for it.
+///
+/// \return Whether the HARQ was left free, i.e. available for the next occasion that reuses the same ID.
+static bool cg_harq_is_free_after_crc(unique_ue_harq_entity& harq_ent,
+                                      harq_id_t              id,
+                                      slot_point             pdcch_slot,
+                                      slot_point             pusch_slot,
+                                      unsigned               max_retxs,
+                                      unsigned               cg_harq_timeout,
+                                      bool                   crc_ack)
+{
+  auto h_ul = harq_ent.alloc_ul_harq(pdcch_slot, pusch_slot, max_retxs, cg_harq_alloc_params{id, cg_harq_timeout});
+  EXPECT_TRUE(h_ul.has_value());
+  EXPECT_TRUE(h_ul->ul_crc_info(crc_ack).has_value());
+  return not h_ul->is_waiting_ack() and not h_ul->has_pending_retx();
+}
+
+TEST_F(cg_harq_reservation_test, crc_ack_frees_the_cg_harq_for_the_next_occasion)
+{
+  // A CG HARQ ID recurs every nof_harq_processes CG periods, far sooner than the CG HARQ timeout when the two are
+  // misconfigured, so it is the CRC that has to release it in time.
+  constexpr harq_id_t cg_id = to_harq_id(0);
+  // NOTE: the check is on the HARQ state, not on whether the ID can be allocated again: forced reuse hands the ID out
+  // whether or not the CRC released it, so a successful re-allocation would prove nothing.
+  ASSERT_TRUE(cg_harq_is_free_after_crc(
+      harq_ent, cg_id, current_slot, pusch_slot, max_retxs, cg_harq_timeout, /*crc_ack=*/true));
+}
+
+TEST_F(cg_harq_reservation_test, crc_ko_frees_the_cg_harq_when_no_retransmission_is_allowed)
+{
+  // CG PUSCHs are scheduled with nof_harq_retx = 0, so a CRC KO must free the process rather than leave it pending a
+  // retransmission the CG scheduler would never issue.
+  constexpr harq_id_t cg_id   = to_harq_id(0);
+  constexpr unsigned  no_retx = 0;
+  ASSERT_TRUE(cg_harq_is_free_after_crc(
+      harq_ent, cg_id, current_slot, pusch_slot, no_retx, cg_harq_timeout, /*crc_ack=*/false));
+}
+
+TEST_F(cg_harq_reservation_test, cg_harq_still_waiting_ack_is_forcibly_reused)
+{
+  // When no CRC ever arrives and the timeout has not elapsed either, the process is still waiting for an ACK when its
+  // next occasion comes round. Rather than stall the CG, the HARQ manager reclaims it, which is what lets the CG
+  // scheduler keep issuing one grant per period. Note that this is a safety net: a configuration with
+  // nof_harq_processes >= configured_grant_timer never reaches it, which validate_cg_cfg() enforces.
+  constexpr harq_id_t cg_id = to_harq_id(0);
+
+  auto h_first =
+      harq_ent.alloc_ul_harq(current_slot, pusch_slot, max_retxs, cg_harq_alloc_params{cg_id, cg_harq_timeout});
+  ASSERT_TRUE(h_first.has_value());
+  ASSERT_TRUE(h_first->is_waiting_ack()) << "the HARQ should still be awaiting its CRC";
+
+  // Same ID requested again while busy: it is handed out anyway, the previous transmission being discarded.
+  auto h_second =
+      harq_ent.alloc_ul_harq(current_slot + 1, pusch_slot + 1, max_retxs, cg_harq_alloc_params{cg_id, cg_harq_timeout});
+  ASSERT_TRUE(h_second.has_value()) << "a busy CG HARQ must be forcibly reused rather than stall the CG occasions";
+  ASSERT_EQ(h_second->id(), cg_id);
+}
+
+TEST_F(cg_harq_reservation_test, repeated_forced_reuse_of_a_cg_harq_keeps_the_free_list_sound)
+{
+  // Every occasion reuses the same ID without ever reporting a CRC. If forced reuse corrupted the free list, a later
+  // allocation would start failing, or hand out an ID other than the one requested.
+  constexpr harq_id_t cg_id      = to_harq_id(0);
+  constexpr unsigned  nof_cycles = 16;
+
+  for (unsigned i = 0; i != nof_cycles; ++i) {
+    auto h_ul = harq_ent.alloc_ul_harq(
+        current_slot + i, pusch_slot + i, max_retxs, cg_harq_alloc_params{cg_id, cg_harq_timeout});
+    ASSERT_TRUE(h_ul.has_value()) << "CG HARQ allocation failed on cycle " << i;
+    ASSERT_EQ(h_ul->id(), cg_id) << "a different HARQ ID was handed out on cycle " << i;
+  }
+
+  // The other reserved IDs must be untouched by all that reuse.
+  for (unsigned id = 1; id != nof_cg_reserved; ++id) {
+    auto h_ul = harq_ent.alloc_ul_harq(
+        current_slot, pusch_slot, max_retxs, cg_harq_alloc_params{to_harq_id(id), cg_harq_timeout});
+    ASSERT_TRUE(h_ul.has_value()) << "reserved CG HARQ id=" << id << " was lost";
+    ASSERT_EQ(h_ul->id(), to_harq_id(id));
+  }
+}
+
 TEST_F(cg_harq_reservation_test, when_no_harq_id_specified_then_reserved_ids_are_never_allocated)
 {
   // Drain all non-reserved HARQ slots via regular scheduling.

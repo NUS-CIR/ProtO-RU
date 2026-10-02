@@ -95,3 +95,41 @@ TEST_F(cg_transform_precoding_validator_test, cg_type2_requires_cp_ofdm_dynamic_
   expect_tp_failure(validate(false, false, pusch_config::transform_precoder::enabled, type2));
   expect_tp_failure(validate(true, false, pusch_config::transform_precoder::not_set, type2));
 }
+
+/// Checks the Type 2 requirement for a UE-specific SearchSpace monitored with DCI format 0_1, which is the only format
+/// the activation DCI is built in.
+class cg_type2_search_space_validator_test : public ::testing::Test
+{
+protected:
+  scheduler_expert_config                  sched_cfg = config_helpers::make_default_scheduler_expert_config();
+  sched_cell_configuration_request_message cell_req =
+      sched_config_helper::make_default_sched_cell_configuration_request();
+  du_cell_group_config_pool cfg_pool;
+
+  /// Validates a Type 2 CG UE whose UE-specific SearchSpace monitors \c uss_fmt.
+  error_type<std::string> validate(search_space_configuration::ue_specific_dci_format uss_fmt)
+  {
+    cell_req.ran.init_bwp.cg_cfg = cg_builder_params{.type = cg_builder_params::cg_type::type2};
+    cell_req.ran.init_bwp.pdcch_cfg->search_spaces[0].set_non_ss0_monitored_dci_formats(uss_fmt);
+
+    const cell_configuration&         cell_cfg = cfg_pool.add_cell(sched_cfg, cell_req);
+    sched_ue_creation_request_message ue_req =
+        sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
+    // A Type 2 CG carries no RRC-configured grant.
+    ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg->rrc_configured_ul_grant_cfg.reset();
+
+    return config_validators::validate_sched_ue_creation_request_message(ue_req, cell_cfg);
+  }
+};
+
+TEST_F(cg_type2_search_space_validator_test, cg_type2_with_a_dci_f0_1_search_space_is_valid)
+{
+  ASSERT_TRUE(validate(search_space_configuration::ue_specific_dci_format::f0_1_and_1_1).has_value());
+}
+
+TEST_F(cg_type2_search_space_validator_test, cg_type2_without_a_dci_f0_1_search_space_is_invalid)
+{
+  const auto result = validate(search_space_configuration::ue_specific_dci_format::f0_0_and_f1_0);
+  ASSERT_FALSE(result.has_value());
+  ASSERT_NE(result.error().find("DCI format 0_1"), std::string::npos) << result.error();
+}

@@ -21,5 +21,15 @@ namespace config_validators {
 error_type<std::string> validate_sched_ue_creation_request_message(const sched_ue_creation_request_message& msg,
                                                                    const cell_configuration&                cell_cfg);
 
+/// \brief Validates a \c sched_ue_reconfiguration_message used to reconfigure a UE.
+///
+/// Only the parts the request actually carries are checked: a reconfiguration is a delta, and an absent cell list
+/// leaves the UE's cell configuration as it was.
+/// \param[in] msg scheduler UE reconfiguration request message to be validated.
+/// \param[in] cell_cfg Cell configuration.
+/// \return In case an invalid parameter is detected, returns a string containing an error message.
+error_type<std::string> validate_sched_ue_reconfiguration_message(const sched_ue_reconfiguration_message& msg,
+                                                                  const cell_configuration&               cell_cfg);
+
 } // namespace config_validators
 } // namespace ocudu

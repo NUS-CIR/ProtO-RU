@@ -469,6 +469,21 @@ uint8_t config_helpers::compute_max_nof_candidates(aggregation_level aggr_lvl, c
   return max_nof_candidates > PDCCH_MAX_NOF_CANDIDATES_SS ? PDCCH_MAX_NOF_CANDIDATES_SS : max_nof_candidates;
 }
 
+unsigned config_helpers::compute_last_non_srs_symbol(const ran_cell_config& cell_cfg)
+{
+  // The cell's SRS resources are whole blocks of srs_cfg.nof_symbols anchored at the last symbol of the slot (see
+  // generate_cell_srs_list()), so the region actually occupied is the largest multiple of that length that fits in the
+  // configured budget: what is left of max_nof_symbols below it is too short for another resource and stays free.
+  // Sizing a PUSCH against the whole budget instead would give up those symbols for nothing.
+  const srs_builder_params& srs_cfg         = cell_cfg.init_bwp.srs_cfg;
+  const unsigned            srs_res_syms    = static_cast<unsigned>(srs_cfg.nof_symbols);
+  const unsigned            nof_srs_symbols = srs_cfg.srs_type_enabled != srs_type::disabled
+                                                  ? (srs_cfg.max_nof_symbols.value() / srs_res_syms) * srs_res_syms
+                                                  : 0U;
+
+  return NOF_OFDM_SYM_PER_SLOT_NORMAL_CP - nof_srs_symbols;
+}
+
 std::optional<unsigned> config_helpers::find_cg_pusch_td_res_idx(const ran_cell_config& cell_cfg)
 {
   ocudu_assert(cell_cfg.init_bwp.cg_cfg.has_value(), "This function cannot be called if CG is not set");
@@ -476,17 +491,7 @@ std::optional<unsigned> config_helpers::find_cg_pusch_td_res_idx(const ran_cell_
                "PUSCH Config Common must be configured.");
 
   // Symbols left free by the SRS, which sits at the end of the slot.
-  //
-  // The cell's SRS resources are whole blocks of srs_cfg.nof_symbols anchored at the last symbol of the slot (see
-  // generate_cell_srs_list()), so the region actually occupied is the largest multiple of that length that fits in the
-  // configured budget: what is left of max_nof_symbols below it is too short for another resource and stays free.
-  // Sizing the CG PUSCH against the whole budget instead would give up those symbols for nothing.
-  const srs_builder_params& srs_cfg             = cell_cfg.init_bwp.srs_cfg;
-  const unsigned            srs_res_syms        = static_cast<unsigned>(srs_cfg.nof_symbols);
-  const unsigned            nof_srs_symbols     = srs_cfg.srs_type_enabled != srs_type::disabled
-                                                      ? (srs_cfg.max_nof_symbols.value() / srs_res_syms) * srs_res_syms
-                                                      : 0U;
-  const unsigned            last_non_srs_symbol = NOF_OFDM_SYM_PER_SLOT_NORMAL_CP - nof_srs_symbols;
+  const unsigned last_non_srs_symbol = compute_last_non_srs_symbol(cell_cfg);
 
   // PUSCH time-domain resources are sorted by increasing k2 first, then by decreasing symbols .stop().
   const auto& td_res = cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common.value().pusch_td_alloc_list;

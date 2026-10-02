@@ -18,6 +18,7 @@
 #include "ocudu/ran/csi_report/csi_report_config_helpers.h"
 #include "ocudu/ran/direct_current_offset.h"
 #include "ocudu/ran/slot_pdu_capacity_constants.h"
+#include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/support/rb_helper.h"
 #include <optional>
 
@@ -404,20 +405,22 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
     return false;
   }
 
-  auto&       pdcch_alloc   = cell_alloc[0U];
-  const auto  slot_pdcch    = pdcch_alloc.slot;
-  const auto& pusch_td_list = cell_cfg.params.ul_cfg_common.init_ul_bwp.pusch_cfg_common.value().pusch_td_alloc_list;
+  auto&      pdcch_alloc = cell_alloc[0U];
+  const auto slot_pdcch  = pdcch_alloc.slot;
+  // The index put in the activation DCI is resolved by the UE against the table of that DCI's own format, which is 0_1
+  // (TS 38.214, Section 6.1.2.3 and Table 6.1.2.1.1-1A): pusch-TimeDomainAllocationListDCI-0-1 when configured, and the
+  // cell's common list otherwise. Indexing the common list directly would mean a different row to the UE whenever the
+  // DCI-0-1 list is configured, which it is once PUSCH repetition Type A is enabled.
+  const auto& pusch_td_list = u.get_pcell().active_bwp().ul.td_mapper().pusch_td_resources(dci_ul_format::f0_1);
 
   // For type2 CG, the TD allocation is not defined yet at this point; the scheduler will choose the symbols that do
   // not collide with SRS. In the following, we proceed under that assumption.
 
   // Compute PUSCH symbols to avoid overlapping with SRS.
-  const ofdm_symbol_range non_srs_symbols =
-      cell_cfg.params.init_bwp.srs_cfg.srs_type_enabled != srs_type::disabled
-          ? ofdm_symbol_range{0,
-                              NOF_OFDM_SYM_PER_SLOT_NORMAL_CP -
-                                  cell_cfg.params.init_bwp.srs_cfg.max_nof_symbols.value()}
-          : ofdm_symbol_range{0, NOF_OFDM_SYM_PER_SLOT_NORMAL_CP};
+  // NOTE: this must use the same bound as find_cg_pusch_td_res_idx(), which the cell configuration validator and the
+  // CG PRB sizing go through. Subtracting the whole srs_cfg.max_nof_symbols budget here instead would reserve symbols
+  // no SRS resource can occupy, and this loop would then skip the very time-domain resource those two picked.
+  const unsigned last_non_srs_symbol = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
 
   // Find k2 for which there is a CG resource available.
   std::optional<uint8_t>           candidate_td_allocation;
@@ -438,7 +441,7 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
 
   for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
     // Make sure the CG PUSCH symbols do not collide with the SRS ones.
-    if (pusch_td_list[td].symbols.stop() > non_srs_symbols.stop()) {
+    if (pusch_td_list[td].symbols.stop() > last_non_srs_symbol) {
       continue;
     }
 

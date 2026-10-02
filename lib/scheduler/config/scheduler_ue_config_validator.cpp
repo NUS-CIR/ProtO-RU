@@ -4,6 +4,7 @@
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 #include "ocudu/scheduler/config/scheduler_ue_config_validator.h"
+#include "../support/pdcch/search_space_helper.h"
 #include "cell_configuration.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/asn1/rrc_nr/rrc_nr.h"
@@ -14,9 +15,10 @@
 using namespace ocudu;
 using namespace config_validators;
 
-static validator_result validate_cg_cfg(const uplink_config& ul_cfg, const cell_configuration& cell_cfg)
+static validator_result validate_cg_cfg(const serving_cell_config& serv_cell_cfg, const cell_configuration& cell_cfg)
 {
-  const auto& bwp_ul_ded_cfg = ul_cfg.init_ul_bwp;
+  const uplink_config& ul_cfg         = serv_cell_cfg.ul_config.value();
+  const auto&          bwp_ul_ded_cfg = ul_cfg.init_ul_bwp;
   VERIFY(bwp_ul_ded_cfg.cg_cfg.has_value(), "Configured Grant configuration not set");
   const auto& cg_cfg = bwp_ul_ded_cfg.cg_cfg.value();
 
@@ -81,18 +83,34 @@ static validator_result validate_cg_cfg(const uplink_config& ul_cfg, const cell_
          type2 ? "absent" : "present");
 
   if (type2) {
+    // The activation DCI is scrambled with the CS-RNTI, which a UE only monitors unconditionally in a UE-specific
+    // SearchSpace (TS 38.213, Section 10.1), and of the UL formats TS 38.213, Table 10.2-1 allows for the activation
+    // only 0_1 is supported. A UE without such a SearchSpace could never be activated, and since it stays queued,
+    // run_ues_activation() would retry it on every slot and hold back every UE behind it. Type 1 needs no activation
+    // DCI, hence no such SearchSpace.
+    const auto is_uss_with_dci_f0_1 = [](const search_space_configuration& ss) {
+      return not ss.is_common_search_space() and pdcch_helper::get_ul_dci_format(ss) == dci_ul_format::f0_1;
+    };
+    VERIFY(serv_cell_cfg.init_dl_bwp.pdcch_cfg.has_value() and
+               std::any_of(serv_cell_cfg.init_dl_bwp.pdcch_cfg->search_spaces.begin(),
+                           serv_cell_cfg.init_dl_bwp.pdcch_cfg->search_spaces.end(),
+                           is_uss_with_dci_f0_1),
+           "Configured Grant type 2 requires a UE-specific SearchSpace monitored with DCI format 0_1, to carry the "
+           "activation DCI");
+  }
+
+  if (type2) {
     return {};
   }
 
   const auto& cg_ul_grant = cg_cfg.rrc_configured_ul_grant_cfg.value();
 
   // TS 38.214, Section 6.1.2.3: a Type 1 CG with PUSCH repetition Type A selects its TDRA table as for DCI format 0_0
-  // in a UE-specific search space, i.e. the UE's dedicated pusch-TimeDomainAllocationList when configured, and the
-  // common one otherwise (Table 6.1.2.1.1-1).
-  // NOTE: [Implementation-defined] \c pusch-TimeDomainAllocationList is never set in the code, therefore the TDRA list
-  // resolves to the common one (what can be set is \c PUSCH-TimeDomainResourceAllocation-r16, but that is not used for
-  // CG type 1 and PUSCH repetition type A).
-  // TODO: revise this once CG type 2 is supported, as the different rules apply in that case.
+  // in a UE-specific search space, i.e. by Table 6.1.2.1.1-1. The only dedicated list that table admits is
+  // pusch-TimeDomainAllocationList in pusch-Config, which is not modelled here: pusch_config::pusch_td_alloc_list
+  // carries pusch-TimeDomainAllocationListDCI-0-1, which Table 6.1.2.1.1-1 never mentions and which only applies to
+  // DCI format 0_1. A Type 1 CG index therefore always refers to the cell's common list, as reserve_cg_resources()
+  // reads it.
   const span<const pusch_time_domain_resource_allocation> pusch_td_list =
       span<const pusch_time_domain_resource_allocation>(cell_cfg.init_bwp.ul.pusch_common()->pusch_td_alloc_list);
   VERIFY(
@@ -132,19 +150,12 @@ validator_result validate_bwp_ded_cfg(const serving_cell_config& ue_cell_cfg, co
   return {};
 }
 
-error_type<std::string>
-ocudu::config_validators::validate_sched_ue_creation_request_message(const sched_ue_creation_request_message& msg,
-                                                                     const cell_configuration&                cell_cfg)
+static validator_result validate_ue_cells(span<const sched_ue_cell_config> cells, const cell_configuration& cell_cfg)
 {
-  // Verify the list of ServingCellConfig contains spCellConfig.
-  VERIFY(msg.cfg.cells.has_value() and not msg.cfg.cells->empty(), "Empty list of ServingCellConfig");
-
-  for (const sched_ue_cell_config& cell : *msg.cfg.cells) {
+  for (const sched_ue_cell_config& cell : cells) {
     if (not cell.ded.has_value()) {
       // The UE uses only the common configuration of its PCell, e.g. a UE that gets an RRC Reject.
-      VERIFY(msg.cfg.cells->size() == 1,
-             "cell={}: A UE without dedicated configuration cannot have SCells",
-             cell.cell_index);
+      VERIFY(cells.size() == 1, "cell={}: A UE without dedicated configuration cannot have SCells", cell.cell_index);
       continue;
     }
     const auto& serv_cell_cfg = cell.ded->serv_cell_cfg;
@@ -174,11 +185,36 @@ ocudu::config_validators::validate_sched_ue_creation_request_message(const sched
       HANDLE_ERROR(validate_pusch_cfg(serv_cell_cfg.ul_config.value(), cell_cfg.params.init_bwp.csi.has_value()));
 
       if (serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value()) {
-        HANDLE_ERROR(validate_cg_cfg(serv_cell_cfg.ul_config.value(), cell_cfg));
+        HANDLE_ERROR(validate_cg_cfg(serv_cell_cfg, cell_cfg));
       }
     }
   }
 
   // TODO: Validate other parameters.
   return {};
+}
+
+error_type<std::string>
+ocudu::config_validators::validate_sched_ue_creation_request_message(const sched_ue_creation_request_message& msg,
+                                                                     const cell_configuration&                cell_cfg)
+{
+  // Verify the list of ServingCellConfig contains spCellConfig.
+  VERIFY(msg.cfg.cells.has_value() and not msg.cfg.cells->empty(), "Empty list of ServingCellConfig");
+
+  return validate_ue_cells(*msg.cfg.cells, cell_cfg);
+}
+
+error_type<std::string>
+ocudu::config_validators::validate_sched_ue_reconfiguration_message(const sched_ue_reconfiguration_message& msg,
+                                                                    const cell_configuration&               cell_cfg)
+{
+  // A reconfiguration carries a delta: an absent cell list leaves the UE's cell configuration untouched, so there is
+  // nothing to check. The entries it does carry are complete ServingCellConfigs rather than deltas of their own -
+  // du_cell_config_pool::update_ue() builds the new configuration from the entry alone - so the very same per-cell
+  // checks as for a UE creation apply to them.
+  if (not msg.cfg.cells.has_value()) {
+    return {};
+  }
+
+  return validate_ue_cells(*msg.cfg.cells, cell_cfg);
 }

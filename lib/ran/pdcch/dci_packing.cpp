@@ -1166,6 +1166,37 @@ dci_payload ocudu::dci_1_0_tc_rnti_pack(const dci_1_0_tc_rnti_configuration& con
   return payload;
 }
 
+/// \brief Checks that every optional DCI format 0_1 field the size configuration budgeted bits for was actually set.
+///
+/// \ref dci_0_1_pack() writes an optional field only when it is engaged, while \ref dci_0_1_size counts it whenever
+/// its configuration gives it a non-zero length. A field left unset therefore yields a payload shorter than
+/// \c payload_size.total, which the assertion at the end of the packing can only report as a bare size mismatch.
+/// Naming the field that is missing turns that into something a caller can act on.
+/// \remark \c ul_sul_indicator and \c ptrs_dmrs_association are deliberately left out: dci_0_1_pack() already asserts
+/// that neither is set, as neither is supported yet, so a non-zero size for them trips that check first.
+static void assert_dci_0_1_sized_fields_are_set(const dci_0_1_configuration& config)
+{
+  const dci_0_1_size& sizes = config.payload_size;
+
+  const auto check = [&sizes](const char* field_name, units::bits field_size, bool is_set) {
+    ocudu_assert(field_size == units::bits(0) or is_set,
+                 "DCI format 0_1 field '{}' was allotted {}, but it was left unset, so the packed payload would fall "
+                 "short of the expected total of {}",
+                 field_name,
+                 field_size,
+                 sizes.total);
+  };
+
+  check("carrier indicator", sizes.carrier_indicator, config.carrier_indicator.has_value());
+  check("BWP indicator", sizes.bwp_indicator, config.bwp_indicator.has_value());
+  check("frequency hopping flag", sizes.freq_hopping_flag, config.frequency_hopping_flag.has_value());
+  check("2nd downlink assignment index", sizes.second_dl_assignment_idx, config.second_dl_assignment_index.has_value());
+  check("CSI request", sizes.csi_request, config.csi_request.has_value());
+  check("CBG transmission information", sizes.cbg_transmission_info, config.cbg_transmission_info.has_value());
+  check("beta offset indicator", sizes.beta_offset_indicator, config.beta_offset_indicator.has_value());
+  check("DM-RS sequence initialization", sizes.dmrs_seq_initialization, config.dmrs_seq_initialization.has_value());
+}
+
 dci_payload ocudu::dci_0_1_pack(const dci_0_1_configuration& config)
 {
   ocudu_assert(config.payload_size.total.value() >= 12,
@@ -1175,6 +1206,8 @@ dci_payload ocudu::dci_0_1_pack(const dci_0_1_configuration& config)
   // Assertions for unsupported fields.
   ocudu_assert(!config.ul_sul_indicator.has_value(), "UL/SUL indicator field is not currently supported.");
   ocudu_assert(!config.ptrs_dmrs_association.has_value(), "PT-RS/DM-RS association field is not currently supported.");
+
+  assert_dci_0_1_sized_fields_are_set(config);
 
   dci_payload payload;
 

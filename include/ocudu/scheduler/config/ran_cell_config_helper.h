@@ -53,6 +53,17 @@ make_default_common_search_space_config(const config_helpers::cell_config_builde
 /// Compute the maximum number of candidates that can be accommodated in a CORESET for a given aggregation level.
 uint8_t compute_max_nof_candidates(aggregation_level aggr_lvl, const coreset_configuration& cs_cfg);
 
+/// \brief Returns the first symbol of the slot that the cell's SRS resources can never occupy.
+///
+/// The SRS resources are whole blocks of \c srs_cfg.nof_symbols anchored at the last symbol of the slot and laid down
+/// while they still fit within \c srs_cfg.max_nof_symbols (see \c generate_cell_srs_list()), so the region actually
+/// occupied is the largest multiple of the block length that fits in that budget. Whatever is left of the budget below
+/// it is too short to hold another resource and stays free, hence treating the whole budget as occupied would give up
+/// usable symbols; with a block length that does not divide the budget at all, no SRS resource is generated and the
+/// entire slot is free.
+/// \return The number of symbols in the slot, if SRS is disabled or no SRS resource fits.
+unsigned compute_last_non_srs_symbol(const ran_cell_config& cell_cfg);
+
 /// \brief Finds the index, into the cell's common PUSCH time-domain resource list, of the resource a Configured Grant
 /// PUSCH should use, i.e. the first one whose symbols end before the SRS region at the end of the slot.
 ///

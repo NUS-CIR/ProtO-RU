@@ -230,6 +230,19 @@ ue_config_update_event sched_config_manager::update_ue(const sched_ue_reconfigur
     return ue_config_update_event{cfg_req.ue_index, *this};
   }
 
+  // Validate the UE reconfiguration before anything is applied. The checks are the same per-cell ones a UE creation
+  // goes through: a reconfiguration only carries a delta, but each cell entry it does carry is a complete
+  // ServingCellConfig, so they apply unchanged.
+  error_type<std::string> result =
+      config_validators::validate_sched_ue_reconfiguration_message(cfg_req, *added_cells[pcell_index]);
+  if (not result.has_value()) {
+    logger.error("ue={} c-rnti={}: Discarding invalid UE reconfiguration request. Cause: {}",
+                 cfg_req.ue_index,
+                 cfg_req.crnti,
+                 result.error());
+    return ue_config_update_event{cfg_req.ue_index, *this};
+  }
+
   // Make a copy of the current UE dedicated config.
   auto next_ded_cfg = std::make_unique<ue_configuration>(current_ue_cfg);
 
