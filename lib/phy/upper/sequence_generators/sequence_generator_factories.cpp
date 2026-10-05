@@ -7,7 +7,12 @@
 #include "low_papr_sequence_collection_impl.h"
 #include "low_papr_sequence_generator_impl.h"
 #include "pseudo_random_generator_impl.h"
+#include "ocudu/support/cpu_features.h"
 #include "ocudu/support/math/math_utils.h"
+
+#ifdef __x86_64__
+#include "pseudo_random_generator_avx2_impl.h"
+#endif // __x86_64__
 
 using namespace ocudu;
 
@@ -48,6 +53,12 @@ class pseudo_random_generator_sw_factory : public pseudo_random_generator_factor
 public:
   std::unique_ptr<pseudo_random_generator> create() override
   {
+#ifdef __x86_64__
+    if (cpu_supports_feature(cpu_feature::avx2)) {
+      return std::make_unique<pseudo_random_generator_avx2_impl>();
+    }
+#endif // __x86_64__
+
     return std::make_unique<pseudo_random_generator_impl>();
   }
 };

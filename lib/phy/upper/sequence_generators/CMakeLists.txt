@@ -18,6 +18,12 @@ set(SOURCES
         sequence_generator_factories.cpp
         )
 
+if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+    list(APPEND SOURCES pseudo_random_generator_avx2_impl.cpp)
+    set_source_files_properties(pseudo_random_generator_avx2_impl.cpp PROPERTIES
+            COMPILE_OPTIONS "-mavx2;")
+endif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+
 add_library(ocudu_sequence_generators STATIC ${SOURCES})
 target_link_libraries(ocudu_sequence_generators ocudu_support ocuduvec)
 
