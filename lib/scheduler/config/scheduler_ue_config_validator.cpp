@@ -9,6 +9,7 @@
 #include "ocudu/adt/format.h"
 #include "ocudu/asn1/rrc_nr/rrc_nr.h"
 #include "ocudu/ran/configured_grant/cg_configuration.h"
+#include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/config/serving_cell_config_validator.h"
 #include "ocudu/support/config/validator_helpers.h"
 
@@ -97,6 +98,31 @@ static validator_result validate_cg_cfg(const serving_cell_config& serv_cell_cfg
                            is_uss_with_dci_f0_1),
            "Configured Grant type 2 requires a UE-specific SearchSpace monitored with DCI format 0_1, to carry the "
            "activation DCI");
+
+    // A Type 2 CG has no configured time-domain row: activate_ue() picks one at activation, from the same list the
+    // activation DCI is resolved against, and skips the rows that overlap the SRS region or ask for slot repetitions.
+    // If none survives, activation fails on every attempt, and since the UE stays queued it holds back every UE behind
+    // it - so check here that at least one usable row exists rather than let the cell come up with a CG that can never
+    // be activated.
+    const bool has_ded_td_list =
+        bwp_ul_ded_cfg.pusch_cfg.has_value() and not bwp_ul_ded_cfg.pusch_cfg->pusch_td_alloc_list.empty();
+    const span<const pusch_time_domain_resource_allocation> activation_td_list =
+        has_ded_td_list
+            ? span<const pusch_time_domain_resource_allocation>(bwp_ul_ded_cfg.pusch_cfg->pusch_td_alloc_list)
+            : span<const pusch_time_domain_resource_allocation>(
+                  cell_cfg.init_bwp.ul.pusch_common()->pusch_td_alloc_list);
+
+    const unsigned last_non_srs_symbol      = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
+    const auto     is_usable_for_activation = [last_non_srs_symbol](const pusch_time_domain_resource_allocation& td) {
+      return td.nof_repetitions.value_or(1) == 1 and td.symbols.stop() <= last_non_srs_symbol;
+    };
+    VERIFY(std::any_of(activation_td_list.begin(), activation_td_list.end(), is_usable_for_activation),
+           "Configured Grant type 2 requires a PUSCH time domain resource that both ends at or before symbol {}, where "
+           "the SRS region starts, and requests no slot repetitions, but none of the {} entries of the {} list "
+           "qualifies",
+           last_non_srs_symbol,
+           activation_td_list.size(),
+           has_ded_td_list ? "dedicated" : "common");
   }
 
   if (type2) {

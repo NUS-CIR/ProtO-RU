@@ -17,6 +17,7 @@
 #include "cg_type2_resource_manager.h"
 #include "ocudu/ran/csi_report/csi_report_config_helpers.h"
 #include "ocudu/ran/direct_current_offset.h"
+#include "ocudu/ran/prach/ra_helper.h"
 #include "ocudu/ran/slot_pdu_capacity_constants.h"
 #include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/support/rb_helper.h"
@@ -62,12 +63,13 @@ static bool are_grants_and_rbs_free(cell_resource_allocator&                    
                                     const crb_interval&                               crbs,
                                     subcarrier_spacing                                scs)
 {
-  const unsigned max_k2 = get_max_k2(pusch_td_list);
-  // In the worst case scenario, a dynamic PUSCH (which are allocated after CG PUSCHs) could have been allocated in the
-  // previous slot with max k2; check the grid and grant list availability up until max_k2 - 1 slots from the current
-  // one.
-  for (unsigned n = 0U; n < max_k2; n += cg_period_slots) {
-    auto& pdcch_alloc = cell_alloc[pusch_td_list[td_alloc].k2 + n];
+  // Furthest slot from the current one at which a UL grant may already sit. A dynamic PUSCH - allocated after the CG
+  // ones, so possibly in an earlier slot - reaches max_k2, while a Msg3 reaches k2 + Delta, as the RA scheduler places
+  // it Delta slots further out (TS 38.214, Section 6.1.2.1.1 and Table 6.1.2.1.1-5).
+  const unsigned last_occupied_delay = get_max_k2(pusch_td_list) + ra_helper::get_pusch_delay_delta(scs);
+  // NOTE: the scan starts at k2, which is where the UE's first CG transmission is.
+  for (unsigned delay = pusch_td_list[td_alloc].k2; delay <= last_occupied_delay; delay += cg_period_slots) {
+    auto& pdcch_alloc = cell_alloc[delay];
 
     // Check whether there is space for another PUSCH in the list.
     if (pdcch_alloc.result_builder().ul().puschs().full()) {
@@ -283,7 +285,6 @@ void configured_grant_type2_sched_impl::start_ue_cg_activation(du_ue_index_t ue_
     return elem.ue_index == ue_idx;
   });
   if (ue_it == ues_pending_activation.end()) {
-    // TODO: add reserve in the constructor.
     ues_pending_activation.emplace_back(ue_idx);
   }
 }
@@ -439,9 +440,17 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
                cg_period_slots,
                static_cast<unsigned>(cell_cfg.params.init_bwp.cg_cfg.value().periodicity));
 
+  // NOTE: In the following, \c pusch_td_list might not be the same as the one used to compute the initial CG resources
+  // (i.e, dedicated vs. common). It is assumed that the symbols intervals available in both lists are the same for each
+  // of their k2 values.
   for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
     // Make sure the CG PUSCH symbols do not collide with the SRS ones.
     if (pusch_td_list[td].symbols.stop() > last_non_srs_symbol) {
+      continue;
+    }
+
+    // Skip TDRA entries that sets repetitions.
+    if (pusch_td_list[td].nof_repetitions.has_value() and pusch_td_list[td].nof_repetitions.value() > 1) {
       continue;
     }
 
@@ -508,13 +517,17 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
   const units::bytes  tbs          = compute_ul_tbs_unsafe(pusch_params, sch_mcs_index{mcs}, vrbs.length());
 
   // Set "CG activated" (i.e., DCI has been sent) for the UE.
+  // NOTE: Set the first time CG transmission slot: this is to skip the allocations that fall in between PDCCH slot and
+  // PDCCH slot + k2 (only applies to cases with cg_period_slots <= k2).
   u.get_pcell().get_conf_grant_state_manager().update_state(cg_period_slots,
                                                             tbs,
                                                             vrbs,
                                                             mcs,
                                                             candidate_td_allocation.value(),
                                                             candidate_cg_offset.value(),
-                                                            candidate_resource.value().id);
+                                                            candidate_resource.value().id,
+                                                            slot_pdcch +
+                                                                pusch_td_list[candidate_td_allocation.value()].k2);
 
   // The UE must be added to the wheel at the same offset that was recorded in the CG state manager above, so that
   // cg_slot_wheel::rem_ue() removes exactly the entries inserted here.

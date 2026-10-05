@@ -944,6 +944,59 @@ TEST_F(configured_grant_type2_dci_contract_test, first_cg_pusch_lands_k2_slots_a
       << "the first CG PUSCH occasion does not sit k2 slots after the activation DCI";
 }
 
+/// \brief Fixture whose CG period is shorter than the k2 the activation DCI announces.
+///
+/// The occasion phase is (activation slot + k2) % period, so with a period at or below k2 that phase recurs at least
+/// once between the activation PDCCH and the UE's first transmission. Those earlier occasions belong to the grant the
+/// UE is only about to receive, so it does not transmit on them.
+class configured_grant_type2_short_period_vs_k2_test : public configured_grant_scheduler_test
+{
+protected:
+  configured_grant_type2_short_period_vs_k2_test() :
+    configured_grant_scheduler_test(
+        cg_test_params{.periodicity = cg_configuration::periodicity_t::sl4, .period_slots = 4, .type2 = true})
+  {
+  }
+};
+
+TEST_F(configured_grant_type2_short_period_vs_k2_test, no_cg_pusch_is_scheduled_before_the_first_transmission)
+{
+  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+
+  const slot_point pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
+  ASSERT_TRUE(pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
+  const pdcch_ul_information* pdcch = find_ue_ul_pdcch(cs_rnti);
+  ASSERT_NE(pdcch, nullptr);
+  const cg_activation_grant_params dci_params = decode_cg_activation_dci(*pdcch);
+
+  const auto& pusch_td_list = cell_cfg().params.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
+  ASSERT_LT(dci_params.time_resource, pusch_td_list.size());
+  const unsigned k2 = pusch_td_list[dci_params.time_resource].k2;
+
+  // Guard against a vacuous pass: with a k2 below the period there is no occasion between the activation and the first
+  // transmission, and the gate under test would never be consulted.
+  ASSERT_GE(k2, cg_params.period_slots)
+      << "this test needs a k2 of at least the CG period, otherwise no occasion precedes the first transmission";
+
+  // Every slot from the activation up to the first transmission must be free of CG PUSCHs. The activation slot itself
+  // is checked first: with k2 equal to the period the occasion phase lands on it, and run_slot() has already produced
+  // its result, so advancing before looking would step straight over the case under test.
+  EXPECT_EQ(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
+      << "a CG PUSCH was scheduled in the very slot that carried the activation DCI";
+  for (unsigned i = 1; i != k2; ++i) {
+    run_slot();
+    EXPECT_EQ(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
+        << "a CG PUSCH was scheduled " << i << " slots after the activation DCI, before the UE's first transmission at "
+        << "k2=" << k2;
+  }
+
+  // The first transmission itself must be there.
+  run_slot();
+  EXPECT_NE(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
+      << "no CG PUSCH at the first transmission slot, k2=" << k2 << " slots after the activation DCI";
+  EXPECT_EQ(last_result_slot() - pdcch_slot, static_cast<int>(k2));
+}
+
 TEST_F(configured_grant_type2_scheduler_test, cg_puschs_recur_at_the_configured_cg_period)
 {
   // Once activated, the UE must get one CG PUSCH occasion per CG period and no more: a wheel filled at the wrong

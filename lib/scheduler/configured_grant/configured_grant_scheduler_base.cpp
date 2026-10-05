@@ -128,6 +128,13 @@ void configured_grant_scheduler_base::reserve_cg_resources(cell_slot_resource_al
     return;
   }
 
+  // Nothing to reserve for an occasion that precedes the UE's first transmission: it belongs to the recurrence the
+  // activation established, but the UE has no grant for it yet.
+  // NOTE: this applies to Type 2 schedule, in which the first transmission is k2 slots from the DCI that activates it.
+  if (ue_cc.get_conf_grant_state_manager().is_before_first_tx(slot_alloc.slot)) {
+    return;
+  }
+
   // Compute CRBs: CG PUSCH uses non-interleaved VRB-to-PRB mapping, so VRBs = PRBs.
   const bwp_configuration& ul_bwp_cfg = cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params;
   const crb_interval       crbs       = prb_to_crb(ul_bwp_cfg, cg_params->vrbs.convert_to<prb_interval>());
@@ -179,6 +186,13 @@ bool configured_grant_scheduler_base::validate_cg_opportunity(cell_slot_resource
     return false;
   }
 
+  // Skip the occasions that precede the UE's first transmission. They share the phase the activation established, but
+  // the UE has no grant for them yet, so scheduling one would waste a HARQ process and record a CRC expectation that
+  // can never be met.
+  if (ue_cc->get_conf_grant_state_manager().is_before_first_tx(slot_alloc.slot)) {
+    return false;
+  }
+
   // Check that the PUSCH result list has capacity.
   if (slot_alloc.result_builder().ul().puschs().full()) {
     logger.warning("rnti={}: CG PUSCH cannot be allocated at slot={}: PUSCH list is full", rnti, slot_alloc.slot);
@@ -204,6 +218,11 @@ bool configured_grant_scheduler_base::allocate_cg_opportunity(cell_slot_resource
 
   // The CG grant parameters were established when the UE was added to the wheel: from the RRC-configured grant for CG
   // Type 1, and from the activation DCI for CG Type 2.
+  // The occasion was validated to be at or after the first transmission, so that gate has served its purpose. Reset it
+  // rather than keep comparing: a slot_point comparison only holds within half a hyperframe, so a first-transmission
+  // slot left in place would eventually read as being in the future again and suppress real occasions.
+  ue_cc->get_conf_grant_state_manager().clear_first_tx_slot();
+
   const auto& cg_params = ue_cc->get_conf_grant_state_manager().get_grant_params();
   ocudu_assert(cg_params.has_value(), "rnti={}: CG PUSCH scheduled for a UE with no active CG", rnti);
 

@@ -1953,12 +1953,6 @@ static bool validate_cell_cg_config(const du_high_configured_grants& cg_cfg, uns
     return false;
   }
 
-  // TODO: remove this when CG type 2 is fully supported
-  if (cg_cfg.type2) {
-    fmt::print("Configured Grant type 2 not yet supported.\n");
-    return false;
-  }
-
   return true;
 }
 

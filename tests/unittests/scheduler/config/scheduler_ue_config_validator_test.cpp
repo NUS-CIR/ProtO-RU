@@ -133,3 +133,52 @@ TEST_F(cg_type2_search_space_validator_test, cg_type2_without_a_dci_f0_1_search_
   ASSERT_FALSE(result.has_value());
   ASSERT_NE(result.error().find("DCI format 0_1"), std::string::npos) << result.error();
 }
+
+/// Checks the Type 2 requirement for a PUSCH time domain resource that activate_ue() can actually pick, i.e. one that
+/// neither overlaps the SRS region nor asks for slot repetitions.
+class cg_type2_activation_td_res_validator_test : public ::testing::Test
+{
+protected:
+  scheduler_expert_config                  sched_cfg = config_helpers::make_default_scheduler_expert_config();
+  sched_cell_configuration_request_message cell_req =
+      sched_config_helper::make_default_sched_cell_configuration_request();
+  du_cell_group_config_pool cfg_pool;
+
+  /// \brief Validates a Type 2 CG UE whose dedicated TDRA list holds a single row.
+  /// \param nof_repetitions Repetitions that row asks for. A row asking for more than one is unusable, as the CG
+  /// scheduler emits a single PUSCH per occasion.
+  error_type<std::string> validate(uint8_t nof_repetitions)
+  {
+    cell_req.ran.init_bwp.cg_cfg = cg_builder_params{.type = cg_builder_params::cg_type::type2};
+
+    const cell_configuration&         cell_cfg = cfg_pool.add_cell(sched_cfg, cell_req);
+    sched_ue_creation_request_message ue_req =
+        sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
+    auto& ul_cfg = ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config.value();
+    // A Type 2 CG carries no RRC-configured grant.
+    ul_cfg.init_ul_bwp.cg_cfg->rrc_configured_ul_grant_cfg.reset();
+
+    // Give the UE a dedicated list of exactly one row, taken from the cell's common list so that it is otherwise
+    // usable, and ask for the repetitions under test. The activation resolves against the dedicated list whenever one
+    // is configured, so this row is the only candidate the scheduler would have.
+    pusch_time_domain_resource_allocation td_res =
+        cell_req.ran.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list.front();
+    td_res.nof_repetitions                            = nof_repetitions;
+    ul_cfg.init_ul_bwp.pusch_cfg->pusch_td_alloc_list = {td_res};
+
+    return config_validators::validate_sched_ue_creation_request_message(ue_req, cell_cfg);
+  }
+};
+
+TEST_F(cg_type2_activation_td_res_validator_test, cg_type2_with_a_td_res_without_repetitions_is_valid)
+{
+  ASSERT_TRUE(validate(/*nof_repetitions=*/1).has_value());
+}
+
+TEST_F(cg_type2_activation_td_res_validator_test, cg_type2_whose_only_td_res_asks_for_repetitions_is_invalid)
+{
+  const auto result = validate(/*nof_repetitions=*/4);
+  ASSERT_FALSE(result.has_value());
+  // Assert on the cause, so that the test cannot pass on an unrelated validation failure.
+  ASSERT_NE(result.error().find("slot repetitions"), std::string::npos) << result.error();
+}
