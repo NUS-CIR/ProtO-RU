@@ -78,7 +78,20 @@ private:
 
   // Schedules DCI for CG type 2 activation, containing all the required information for CG grant (i.e., VRBs, MCS,
   // TDRA, CG offset, etc.).
-  bool activate_ue(cell_resource_allocator& cell_alloc, ue& ue_index);
+  /// Outcome of an attempt to activate one UE, which tells run_ues_activation() whether the UEs queued behind it are
+  /// worth trying in this slot.
+  enum class activation_outcome {
+    /// The activation DCI was allocated.
+    success,
+    /// This UE could not be activated, for a reason of its own: no PDCCH space at the aggregation level its CQI calls
+    /// for, no SearchSpace carrying DCI format 0_1, or no time-domain resource it can use. Another UE may well
+    /// succeed, so the caller moves on to the next one.
+    skip_ue,
+    /// No UE can be activated in this slot, as the resource that ran out is shared by all of them.
+    stop_slot
+  };
+
+  activation_outcome activate_ue(cell_resource_allocator& cell_alloc, ue& ue_index);
 
   // Scans the list of UEs that got CG activation initiated, but never acked it; for those UEs, proceed with releasing
   // the previously allocated resources.

@@ -61,12 +61,10 @@ static bool are_grants_and_rbs_free(cell_resource_allocator&                    
                                     unsigned                                          cg_period_slots,
                                     uint8_t                                           td_alloc,
                                     const crb_interval&                               crbs,
-                                    subcarrier_spacing                                scs)
+                                    subcarrier_spacing                                scs,
+                                    unsigned                                          last_occupied_delay,
+                                    rnti_t                                            ue_rnti)
 {
-  // Furthest slot from the current one at which a UL grant may already sit. A dynamic PUSCH - allocated after the CG
-  // ones, so possibly in an earlier slot - reaches max_k2, while a Msg3 reaches k2 + Delta, as the RA scheduler places
-  // it Delta slots further out (TS 38.214, Section 6.1.2.1.1 and Table 6.1.2.1.1-5).
-  const unsigned last_occupied_delay = get_max_k2(pusch_td_list) + ra_helper::get_pusch_delay_delta(scs);
   // NOTE: the scan starts at k2, which is where the UE's first CG transmission is.
   for (unsigned delay = pusch_td_list[td_alloc].k2; delay <= last_occupied_delay; delay += cg_period_slots) {
     auto& pdcch_alloc = cell_alloc[delay];
@@ -78,6 +76,15 @@ static bool are_grants_and_rbs_free(cell_resource_allocator&                    
 
     // Check whether the REs/symbols on the grid are available.
     if (pdcch_alloc.ul_res_grid.collides(scs, pusch_td_list[td_alloc].symbols, crbs)) {
+      return false;
+    }
+
+    // The UE must not already hold a PUSCH in this slot, even on other RBs. As per TS 38.321, Section 5.8.2, a UE only
+    // uses its configured grant when the PUSCH duration does not overlap one of an uplink grant received on the PDCCH.
+    const auto puschs = pdcch_alloc.result_reader().ul().puschs();
+    if (std::any_of(puschs.begin(), puschs.end(), [ue_rnti](const ul_sched_info& pusch) {
+          return pusch.pusch_cfg.rnti == ue_rnti;
+        })) {
       return false;
     }
   }
@@ -323,18 +330,20 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
       if (nof_activations == MAX_CG_ACTIVATION_PDCCHS_PER_SLOT) {
         // Ration the activation DCIs, so that a burst of UEs coming up at once does not consume the PDCCH space the
         // dynamic grants need. The UEs left in the list keep their place and are activated over the next slots.
-        // NOTE: CG_CONFIRMATIONS_POOL_SIZE in cell_event_manager.cpp is sized on this cap, as each activation draws at
-        // most one CG Confirmation MAC CE from the UE.
         break;
       }
-      bool cg_activated = activate_ue(cell_alloc, *ue_it);
-      if (not cg_activated) {
-        // Failure due to lack of PDCCH space or CG resources would block all UEs. Stop here.
+      const activation_outcome outcome = activate_ue(cell_alloc, *ue_it);
+      if (outcome == activation_outcome::stop_slot) {
+        // The resource that ran out is shared by every UE, so the ones queued behind would fail the same way.
         break;
       }
-      ++nof_activations;
-      u.activation_triggered  = cg_activated;
-      u.activation_pdcch_slot = pdcch_slot;
+      if (outcome == activation_outcome::success) {
+        ++nof_activations;
+        u.activation_triggered  = true;
+        u.activation_pdcch_slot = pdcch_slot;
+      }
+      // On skip_ue the UE keeps its place in the list and is retried on a later slot, while the ones behind it get
+      // their turn now: its failure says nothing about whether they can be activated.
     }
     ++i;
   }
@@ -384,9 +393,7 @@ void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activat
     res_mng.deallocate_resource(cg_params->time_offset, cg_params->resource_id, ue_to_reset->crnti);
 
     // Remove the UE from the periodic wheel, as it will be assign a new resource and CG offset.
-    const auto* u_to_rem = ues.find(u.ue_index);
-    ocudu_assert(u_to_rem != nullptr, "UE={} not found in scheduler UE repo", u.ue_index);
-    (void)periodic_pusch_slot_wheel.rem_ue(u_to_rem->crnti, cg_params->time_offset);
+    (void)periodic_pusch_slot_wheel.rem_ue(ue_to_reset->crnti, cg_params->time_offset);
   }
   // Set the UE as "not CG activated".
   ue_cg_state_mng.reset_state();
@@ -398,16 +405,29 @@ void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activat
   u.missed_grants_cnt = 0;
 }
 
-bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_alloc, ue& u)
+configured_grant_type2_sched_impl::activation_outcome
+configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_alloc, ue& u)
 {
   if (res_mng.get_nof_free_resources() == 0) {
     logger.error("ue={}: Failed to activate CG PUSCH type2. Cause: no available resources",
                  fmt::underlying(u.ue_index));
-    return false;
+    return activation_outcome::stop_slot;
   }
 
-  auto&      pdcch_alloc = cell_alloc[0U];
-  const auto slot_pdcch  = pdcch_alloc.slot;
+  auto& pdcch_alloc = cell_alloc[0U];
+  if (pdcch_alloc.result_builder().dl().ul_pdcchs().full()) {
+    logger.info("Stopping CG Type 2 activations at slot={}. Cause: max PDCCH grants reached", pdcch_alloc.slot);
+    return activation_outcome::stop_slot;
+  }
+
+  if (not u.get_pcell().is_pdcch_enabled(pdcch_alloc.slot)) {
+    logger.debug("ue={}: Deferring CG Type 2 activation at slot={}. Cause: UE cannot receive a PDCCH in this slot",
+                 fmt::underlying(u.ue_index),
+                 pdcch_alloc.slot);
+    return activation_outcome::skip_ue;
+  }
+
+  const auto slot_pdcch = pdcch_alloc.slot;
   // The index put in the activation DCI is resolved by the UE against the table of that DCI's own format, which is 0_1
   // (TS 38.214, Section 6.1.2.3 and Table 6.1.2.1.1-1A): pusch-TimeDomainAllocationListDCI-0-1 when configured, and the
   // cell's common list otherwise. Indexing the common list directly would mean a different row to the UE whenever the
@@ -443,6 +463,14 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
   // NOTE: In the following, \c pusch_td_list might not be the same as the one used to compute the initial CG resources
   // (i.e, dedicated vs. common). It is assumed that the symbols intervals available in both lists are the same for each
   // of their k2 values.
+  // Furthest slot from the current one at which a UL grant may already sit. A dynamic PUSCH - allocated after the CG
+  // ones, so possibly in an earlier slot - reaches max_k2, while a Msg3 reaches k2 + Delta, as the RA scheduler places
+  // it Delta slots further out (TS 38.214, Section 6.1.2.1.1 and Table 6.1.2.1.1-5). The list is the same for every
+  // candidate, so this is computed once rather than on every call below.
+  const unsigned last_occupied_delay =
+      get_max_k2(pusch_td_list) +
+      ra_helper::get_pusch_delay_delta(cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.scs);
+
   for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
     // Make sure the CG PUSCH symbols do not collide with the SRS ones.
     if (pusch_td_list[td].symbols.stop() > last_non_srs_symbol) {
@@ -469,7 +497,9 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
                                 cg_period_slots,
                                 td,
                                 candidate_resource.value().crbs,
-                                cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.scs)) {
+                                cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.scs,
+                                last_occupied_delay,
+                                u.crnti)) {
       candidate_cg_offset.emplace(cg_offset);
       candidate_td_allocation.emplace(td);
       break;
@@ -482,18 +512,23 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
   }
 
   // No available resources.
-  // NOTE: this tests the offset rather than the resource, as only the success path above sets it. \c
-  // candidate_resource is written on every iteration, so it can hold a candidate that was rejected by the grid check.
   if (not candidate_cg_offset.has_value()) {
-    return false;
+    // Every time-domain candidate was rejected: its symbols overlap the SRS, it asks for repetitions, or the resource
+    // or grid space at its offset is taken. All of those depend on this UE's own TD list and offsets, so another UE
+    // may still be activated in this slot.
+    logger.info("ue={}: Failed to activate CG PUSCH type2. Cause: no usable PUSCH time domain resource",
+                fmt::underlying(u.ue_index));
+    return activation_outcome::skip_ue;
   }
 
   // Check if DCI can be allocated.
   pdcch_ul_information* pdcch = alloc_pdcch_ul_information(pdcch_alloc, u.ue_index);
 
   if (pdcch == nullptr) {
+    // The PDCCH list was checked above, so a failure here is specific to this UE: either it monitors no SearchSpace
+    // with DCI format 0_1, or its CQI calls for an aggregation level that does not fit in the CCEs left.
     res_mng.deallocate_resource(candidate_cg_offset.value(), candidate_resource.value().id, u.crnti);
-    return false;
+    return activation_outcome::skip_ue;
   }
 
   // NOTE: existence was already validated by alloc_pdcch_ul_information(), which allocated the PDCCH in this
@@ -535,21 +570,13 @@ bool configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cel
 
   // NOTE: the HARQ reconfiguration is done during the reconfiguration /ref add_reconf_ue(), to avoid reconfiguring the
   // HARQs while there are in-flight PUSCHs.
-  return true;
+  return activation_outcome::success;
 }
 
 pdcch_ul_information*
 configured_grant_type2_sched_impl::alloc_pdcch_ul_information(cell_slot_resource_allocator& pdcch_alloc,
                                                               du_ue_index_t                 ue_idx) const
 {
-  if (pdcch_alloc.result_builder().dl().ul_pdcchs().full()) {
-    // Early exit. No space for new PDCCH grants in the scheduler output.
-    logger.info("ue={}: Failed to allocate CG DCI activation. Cause: Max PDCCH grants reached for slot={}",
-                ue_idx,
-                pdcch_alloc.slot);
-    return nullptr;
-  }
-
   ue&                          u           = ues[ue_idx];
   ue_cell&                     ue_cc       = *u.find_cell(cell_cfg.cell_index);
   const ue_cell_configuration& ue_cell_cfg = ue_cc.cfg();
