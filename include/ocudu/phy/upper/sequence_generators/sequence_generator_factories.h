@@ -9,6 +9,7 @@
 #include "ocudu/phy/upper/sequence_generators/low_papr_sequence_generator.h"
 #include "ocudu/phy/upper/sequence_generators/pseudo_random_generator.h"
 #include <memory>
+#include <string>
 
 namespace ocudu {
 
@@ -41,6 +42,10 @@ public:
   virtual std::unique_ptr<pseudo_random_generator> create() = 0;
 };
 
-std::shared_ptr<pseudo_random_generator_factory> create_pseudo_random_generator_sw_factory();
+/// \brief Creates a pseudo-random generator factory.
+///
+/// \param[in] generator_type Implementation selector. Values: generic, avx2, auto.
+std::shared_ptr<pseudo_random_generator_factory>
+create_pseudo_random_generator_sw_factory(const std::string& generator_type = "auto");
 
 } // namespace ocudu
