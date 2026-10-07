@@ -180,9 +180,9 @@ pdcch_ul_information* pdcch_resource_allocator_impl::alloc_ul_pdcch_helper(cell_
     pdcch.ctx.tx_pwr.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
   }
 
-  // Allocate a position for UL PDCCH in CORESET.
+  // Allocate a position for UL PDCCH in CORESET. No other resource is derived from the CCE position of a UL DCI.
   pdcch_slot_allocator& pdcch_alloc = get_pdcch_slot_alloc(slot_alloc.slot);
-  if (not pdcch_alloc.alloc_pdcch(pdcch.ctx, slot_alloc, cs_cfg, ss_cfg, candidates)) {
+  if (not pdcch_alloc.alloc_pdcch(pdcch.ctx, slot_alloc, cs_cfg, ss_cfg, candidates, true)) {
     slot_alloc.result_builder().dl().ul_pdcchs().pop_back();
     ++slot_alloc.result_builder().failed_attempts().ul_pdcch;
     if (ss_cfg.is_common_search_space()) {
@@ -235,12 +235,11 @@ pdcch_dl_information* pdcch_resource_allocator_impl::alloc_dl_pdcch_helper(cell_
   pdcch.ctx.context.ss_id     = ss_cfg.get_id();
   // [Implementation-defined] The PDCCH is not precoded.
   pdcch.ctx.precoding_and_beamforming = beam.has_value() ? make_single_beam_precoding(*beam) : make_default_precoding();
-  pdcch.ctx.context.dci_format =
-      (ss_cfg.is_common_search_space() ||
-       (std::get<search_space_configuration::ue_specific_dci_format>(ss_cfg.get_monitored_dci_formats()) ==
-        search_space_configuration::ue_specific_dci_format::f0_0_and_f1_0))
-          ? "1_0"
-          : "1_1";
+  const bool fallback_dci =
+      ss_cfg.is_common_search_space() ||
+      (std::get<search_space_configuration::ue_specific_dci_format>(ss_cfg.get_monitored_dci_formats()) ==
+       search_space_configuration::ue_specific_dci_format::f0_0_and_f1_0);
+  pdcch.ctx.context.dci_format = fallback_dci ? "1_0" : "1_1";
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty() and cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
     // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
@@ -248,9 +247,11 @@ pdcch_dl_information* pdcch_resource_allocator_impl::alloc_dl_pdcch_helper(cell_
     pdcch.ctx.tx_pwr.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
   }
 
-  // Allocate a position for DL PDCCH in CORESET.
+  // Allocate a position for DL PDCCH in CORESET. The HARQ-ACK of a DCI 1_0 may use a common PUCCH resource, which is
+  // derived from the first CCE of the PDCCH (TS 38.213, Section 9.2.1) right after this allocation, so such a PDCCH
+  // must not be moved.
   pdcch_slot_allocator& pdcch_alloc = get_pdcch_slot_alloc(slot_alloc.slot);
-  if (not pdcch_alloc.alloc_pdcch(pdcch.ctx, slot_alloc, cs_cfg, ss_cfg, candidates)) {
+  if (not pdcch_alloc.alloc_pdcch(pdcch.ctx, slot_alloc, cs_cfg, ss_cfg, candidates, not fallback_dci)) {
     slot_alloc.result_builder().dl().dl_pdcchs().pop_back();
     ++slot_alloc.result_builder().failed_attempts().dl_pdcch;
     if (ss_cfg.is_common_search_space()) {

@@ -46,21 +46,35 @@ public:
 
   /// \brief Searches for an available CCEs in the PDCCH to allocate a DCI. If it finds it, it reserves the CCEs, so
   /// they cannot be reused in this same slot.
+  /// \param movable Whether later allocations in this slot may move this PDCCH to another candidate. A PDCCH whose
+  /// CCE position other resources are derived from must not be moved.
   bool alloc_pdcch(dci_context_information&          pdcch_ctx,
                    cell_slot_resource_allocator&     slot_alloc,
                    const sched_coreset_config&       cs_cfg,
                    const search_space_configuration& ss_cfg,
-                   span<const pdcch_candidate_type>  ss_candidates);
+                   span<const pdcch_candidate_type>  ss_candidates,
+                   bool                              movable);
 
   /// Deallocates the last PDCCH CCE space reservation.
   bool cancel_last_pdcch(cell_slot_resource_allocator& slot_alloc);
 
 private:
-  bool alloc_dfs_node(cell_slot_resource_allocator& slot_alloc, const alloc_record& record, unsigned dci_iter_index);
-  bool get_next_dfs(cell_slot_resource_allocator& slot_alloc);
+  /// \brief Maximum number of PDCCH candidate positions checked by a single alloc_pdcch() call.
+  ///
+  /// Moving the PDCCHs already allocated in the slot makes the search exponential in their number. The bound keeps
+  /// the search time on the real-time scheduler thread small; an exhausted search fails and reverts as any other.
+  static constexpr unsigned max_nof_candidate_checks = 64;
+
+  bool alloc_dfs_node(cell_slot_resource_allocator& slot_alloc,
+                      const alloc_record&           record,
+                      unsigned                      dci_iter_index,
+                      unsigned&                     attempts_left);
+  bool get_next_dfs(cell_slot_resource_allocator& slot_alloc, unsigned& attempts_left);
 
   /// Allocate CCEs of a given PDCCH.
   bool allocate_cce(cell_slot_resource_allocator& slot_alloc, const alloc_record& record, unsigned dci_iter_index);
+  /// Release the CCEs of a given PDCCH.
+  void release_cce(cell_slot_resource_allocator& slot_alloc, const alloc_record& record, unsigned dci_iter_index);
 
   /// list of grants in a given slot.
   static_vector<alloc_record, MAX_DL_PDCCH_PDUS_PER_SLOT + MAX_UL_PDCCH_PDUS_PER_SLOT> records;

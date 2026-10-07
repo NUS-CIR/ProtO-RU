@@ -5,20 +5,25 @@
 
 #include "../test_utils/config_generators.h"
 #include "lib/scheduler/pdcch_scheduling/pdcch_resource_allocator_impl.h"
+#include "lib/scheduler/pdcch_scheduling/pdcch_slot_resource_allocator.h"
 #include "lib/scheduler/support/pdcch/pdcch_mapping.h"
 #include "tests/test_doubles/scheduler/scheduler_config_helper.h"
 #include "tests/test_doubles/utils/test_rng.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/ran/pdcch/pdcch_candidates.h"
 #include "ocudu/scheduler/config/ran_cell_config_helper.h"
+#include "ocudu/scheduler/config/sched_pdcch_config.h"
 #include "ocudu/scheduler/config/scheduler_expert_config_factory.h"
 #include "ocudu/scheduler/config/scheduler_ue_config_validator.h"
 #include "ocudu/scheduler/config/serving_cell_config_factory.h"
 #include "ocudu/scheduler/scheduler_configurator.h"
 #include "fmt/std.h"
+#include <array>
 #include <gtest/gtest.h>
+#include <initializer_list>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 using namespace ocudu;
 
@@ -289,6 +294,158 @@ void PrintTo(const test_scrambling_params& value, ::std::ostream* os)
 } // namespace pdcch_test
 
 using namespace pdcch_test;
+
+class pdcch_backtracking_test : public base_pdcch_resource_allocator_tester, public ::testing::Test
+{
+protected:
+  struct request {
+    dci_context_information           ctx{};
+    std::vector<pdcch_candidate_type> candidates;
+
+    request(const bwp_configuration&       bwp,
+            const sched_coreset_config&    cs,
+            std::initializer_list<uint8_t> starts,
+            aggregation_level              level = aggregation_level::n2) :
+      candidates(starts)
+    {
+      ctx.bwp_cfg       = &bwp;
+      ctx.coreset_cfg   = &cs.cfg();
+      ctx.cces.aggr_lvl = level;
+    }
+  };
+
+  static sched_coreset_config make_coreset(const bwp_configuration& bwp, pci_t pci)
+  {
+    freq_resource_bitmap resources(pdcch_constants::MAX_NOF_FREQ_RESOURCES);
+    resources.fill(0, 16, true);
+    coreset_configuration cs{to_coreset_id(1),
+                             resources,
+                             1,
+                             std::nullopt,
+                             coreset_configuration::precoder_granularity_type::same_as_reg_bundle};
+
+    std::array<std::vector<crb_index_list>, NOF_AGGREGATION_LEVELS> candidate_crbs;
+    for (unsigned i = 0; i != NOF_AGGREGATION_LEVELS; ++i) {
+      const aggregation_level level = aggregation_index_to_level(i);
+      for (unsigned ncce = 0; ncce < cs.get_nof_cces(); ncce += to_nof_cces(level)) {
+        candidate_crbs[i].push_back(pdcch_helper::cce_to_prb_mapping(bwp, cs, pci, level, ncce));
+        for (uint16_t& prb : candidate_crbs[i].back()) {
+          prb = prb_to_crb(bwp.crbs, prb);
+        }
+      }
+    }
+    return sched_coreset_config{cs, candidate_crbs};
+  }
+
+  pdcch_backtracking_test() :
+    base_pdcch_resource_allocator_tester(to_rnti(0x4601),
+                                         sched_config_helper::make_default_sched_cell_configuration_request(
+                                             cell_config_builder_params{.dl_carrier{.carrier_bw = cell_bw::MHz20}}))
+  {
+    res_grid[0].dl_res_grid.fill({bwp.scs, {0, 1}, {96, 98}});
+    res_grid[0].dl_res_grid.fill({bwp.scs, {3, 4}, {2, 4}});
+  }
+
+  bool allocate(request& r, bool movable = true)
+  {
+    return allocator.alloc_pdcch(r.ctx, res_grid[0], cs, ss, r.candidates, movable);
+  }
+
+  cell_slot_resource_grid snapshot() { return res_grid[0].dl_res_grid; }
+
+  const bwp_configuration&          bwp = cell_cfg.params.dl_cfg_common.init_dl_bwp.generic_params;
+  const sched_coreset_config        cs  = make_coreset(bwp, cell_cfg.params.pci);
+  const search_space_configuration& ss  = cell_cfg.params.dl_cfg_common.init_dl_bwp.pdcch_common.search_spaces[0];
+  pdcch_slot_allocator              allocator;
+};
+
+TEST_F(pdcch_backtracking_test, moves_existing_grant_and_releases_old_position)
+{
+  request a(bwp, cs, {0, 2});
+  request b(bwp, cs, {0}, aggregation_level::n1);
+  auto    expected = snapshot();
+  ASSERT_TRUE(allocate(a));
+  ASSERT_EQ(a.ctx.cces.ncce, 0U);
+  ASSERT_TRUE(allocate(b));
+  EXPECT_EQ(a.ctx.cces.ncce, 2U);
+  EXPECT_EQ(b.ctx.cces.ncce, 0U);
+  EXPECT_FALSE(res_grid[0].dl_res_grid.collides(bwp.scs, {0, 1}, crb_interval{6, 12}));
+  expected.fill(bwp.scs, {0, 1}, cs.candidate_crbs(2, aggregation_level::n2));
+  expected.fill(bwp.scs, {0, 1}, cs.candidate_crbs(0, aggregation_level::n1));
+  EXPECT_EQ(snapshot(), expected);
+}
+
+TEST_F(pdcch_backtracking_test, failed_repacking_restores_entire_grid_and_context)
+{
+  request a(bwp, cs, {0, 2});
+  request b(bwp, cs, {4, 6});
+  request impossible(bwp, cs, {0}, aggregation_level::n8);
+  request later(bwp, cs, {2});
+  ASSERT_TRUE(allocate(a));
+  ASSERT_TRUE(allocate(b));
+  const auto before = snapshot();
+  ASSERT_FALSE(allocate(impossible));
+  EXPECT_EQ(snapshot(), before);
+  EXPECT_EQ(a.ctx.cces.ncce, 0U);
+  EXPECT_EQ(b.ctx.cces.ncce, 4U);
+  ASSERT_TRUE(allocate(later));
+}
+
+TEST_F(pdcch_backtracking_test, cancellation_after_repacking_releases_only_cancelled_grant)
+{
+  request a(bwp, cs, {0, 2});
+  request b(bwp, cs, {0}, aggregation_level::n1);
+  auto    expected = snapshot();
+  auto    dl       = res_grid[0].result_builder().dl().dl_pdcchs();
+  auto&   ca       = dl.emplace_back()->ctx;
+  ca               = a.ctx;
+  ASSERT_TRUE(allocator.alloc_pdcch(ca, res_grid[0], cs, ss, a.candidates, true));
+  auto& cb = dl.emplace_back()->ctx;
+  cb       = b.ctx;
+  ASSERT_TRUE(allocator.alloc_pdcch(cb, res_grid[0], cs, ss, b.candidates, true));
+  ASSERT_TRUE(allocator.cancel_last_pdcch(res_grid[0]));
+  ASSERT_EQ(dl.size(), 1U);
+  EXPECT_EQ(ca.cces.ncce, 2U);
+  EXPECT_FALSE(res_grid[0].dl_res_grid.collides(bwp.scs, {0, 1}, crb_interval{0, 12}));
+  expected.fill(bwp.scs, {0, 1}, cs.candidate_crbs(2, aggregation_level::n2));
+  EXPECT_EQ(snapshot(), expected);
+}
+
+TEST_F(pdcch_backtracking_test, immovable_grant_is_never_relocated)
+{
+  request a(bwp, cs, {0, 2});
+  request b(bwp, cs, {0}, aggregation_level::n1);
+  request later(bwp, cs, {2});
+  ASSERT_TRUE(allocate(a, false));
+  const auto before = snapshot();
+  ASSERT_FALSE(allocate(b));
+  EXPECT_EQ(a.ctx.cces.ncce, 0U);
+  EXPECT_EQ(snapshot(), before);
+  ASSERT_TRUE(allocate(later));
+}
+
+TEST_F(pdcch_backtracking_test, bounded_search_failure_preserves_existing_allocations)
+{
+  std::array<request, 4> accepted{request(bwp, cs, {0, 2, 4, 6, 8}),
+                                  request(bwp, cs, {0, 2, 4, 6}),
+                                  request(bwp, cs, {0, 2, 4, 6}),
+                                  request(bwp, cs, {0, 2, 4, 6})};
+  for (request& r : accepted) {
+    ASSERT_TRUE(allocate(r));
+  }
+  const auto before = snapshot();
+  // An unbounded search moves the first grant to CCE 8 after exploring permutations of CCEs 0..6.
+  request limited(bwp, cs, {0});
+  for (unsigned repeat = 0; repeat != 10; ++repeat) {
+    ASSERT_FALSE(allocate(limited));
+    EXPECT_EQ(snapshot(), before);
+    for (unsigned i = 0; i != accepted.size(); ++i) {
+      EXPECT_EQ(accepted[i].ctx.cces.ncce, 2U * i);
+    }
+  }
+  request later(bwp, cs, {8});
+  ASSERT_TRUE(allocate(later));
+}
 
 TEST_F(common_pdcch_allocator_tester, no_pdcch_allocation)
 {
