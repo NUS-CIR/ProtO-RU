@@ -461,9 +461,15 @@ void logical_channel_system::configure(soa::row_id ue_rid, logical_channel_confi
 
   // Refresh sorted channels list.
   ue_ch.sorted_channels.clear();
+  dl_transport_block_restrictions dl_restrictions;
+  ul_grant_restrictions           ul_restrictions;
   for (const auto& lc_cfg : *ue_cfg.channel_configs) {
     ue_ch.sorted_channels.push_back(lc_cfg->lcid);
+    dl_restrictions.set(*lc_cfg);
+    ul_restrictions.set(*lc_cfg);
   }
+  ue_ch.restricted_channel_present    = dl_restrictions.is_restricted();
+  ue_ul_ch.restricted_channel_present = ul_restrictions.is_restricted();
   std::sort(ue_ch.sorted_channels.begin(), ue_ch.sorted_channels.end(), [&ue_cfg](lcid_t lhs, lcid_t rhs) {
     return get_lc_prio(*ue_cfg.channel_configs.value()[lhs]) < get_lc_prio(*ue_cfg.channel_configs.value()[rhs]);
   });
@@ -1051,6 +1057,11 @@ unsigned ue_logical_channel_repository::ul_pending_bytes() const
 ue_logical_channel_repository::dl_transport_block_selection
 ue_logical_channel_repository::select_dl_transport_block(ran_slice_id_t slice_id) const
 {
+  // Nothing restricts the block, so it serves the whole slice.
+  if (not get_ue_row().at<ue_dl_channel_context>().restricted_channel_present) {
+    return {{}, dl_pending_bytes(slice_id)};
+  }
+
   const logical_channel_config_list& lc_cfgs = cfg();
   // Resolves the row of a channel of the slice, so that its slice and its buffer are read with one lookup.
   const auto slice_row = [&](lcid_t lcid) -> std::optional<soa::row_id> {

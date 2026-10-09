@@ -332,6 +332,8 @@ private:
     static_vector<lcid_t, MAX_NOF_RB_LCIDS> sorted_channels;
     /// Context of channels currently configured.
     static_flat_map<lcid_t, soa::row_id, MAX_NOF_RB_LCIDS> channels;
+    /// Whether any configured channel restricts the transport blocks it can be multiplexed into.
+    bool restricted_channel_present = false;
   };
   /// UE context relative to its UL channel management.
   struct ue_ul_channel_context {
@@ -339,6 +341,8 @@ private:
     static_flat_map<lcg_id_t, soa::row_id, MAX_NOF_LCGS> lcgs;
     /// Slot at which the oldest, unserved SR indication was received for this UE.
     slot_point oldest_sr_sl_rx;
+    /// Whether any configured channel restricts the grants it can be served on.
+    bool restricted_channel_present = false;
   };
   /// UE context relative to its DL state.
   struct ue_context {
@@ -713,6 +717,11 @@ public:
   /// channels forbid, whatever it buffers after its last report.
   [[nodiscard]] ul_grant_restrictions select_ul_grant_restrictions(ran_slice_id_t slice_id) const
   {
+    // Nothing restricts the grant, so every channel of the slice can be served on it.
+    if (not get_ue_row().at<ue_ul_channel_context>().restricted_channel_present) {
+      return {};
+    }
+
     std::optional<ul_harq_mode> with_data;
     std::optional<ul_harq_mode> configured;
     for (const logical_channel_config_ptr& lc_cfg : cfg()) {
