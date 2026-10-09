@@ -74,6 +74,14 @@ inline harq_mode_t to_harq_mode(bool select_normal_mode)
   return select_normal_mode ? harq_mode_t::normal : harq_mode_t::feedback_disabled_or_mode_b;
 }
 
+/// \brief Returns the mode a process has to operate in to carry the given DL HARQ feedback.
+///
+/// An unset feedback leaves the transport block unrestricted, which the feedback disabled mode serves.
+inline harq_mode_t to_harq_mode(const std::optional<dl_harq_feedback>& feedback)
+{
+  return feedback == dl_harq_feedback::enabled ? harq_mode_t::normal : harq_mode_t::feedback_disabled_or_mode_b;
+}
+
 struct pending_retx_list_tag;
 
 /// Parameters that are common to DL and UL HARQ processes.

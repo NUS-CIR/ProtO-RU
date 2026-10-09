@@ -35,6 +35,8 @@ struct dl_sched_context {
   unsigned expected_nof_rbs;
   /// Pending bytes for newTx.
   units::bytes pending_bytes;
+  /// Restrictions the transport block carries. Open for a reTx, which follows the process it already holds.
+  dl_transport_block_restrictions restrictions;
   /// Number of Rel-16 slot-based PDSCH repetitions of the selected TDRA row, or nullopt for a single transmission.
   std::optional<uint8_t> nof_repetitions;
 };
@@ -43,11 +45,12 @@ struct dl_sched_context {
 /// The number of Rel-16 PDSCH repetitions to request is decided by link adaptation: when it asks for repetitions, the
 /// selector picks the TDRA row carrying that repetitionNumber-r16 and returns nullopt if it does not fit the slot;
 /// otherwise it picks a single-transmission row.
-std::optional<dl_sched_context> get_newtx_dl_sched_context(const slice_ue& u,
-                                                           slot_point      pdcch_slot,
-                                                           slot_point      pdsch_slot,
-                                                           bool            interleaving_enabled,
-                                                           units::bytes    pending_bytes);
+std::optional<dl_sched_context> get_newtx_dl_sched_context(const slice_ue&                 u,
+                                                           slot_point                      pdcch_slot,
+                                                           slot_point                      pdsch_slot,
+                                                           bool                            interleaving_enabled,
+                                                           units::bytes                    pending_bytes,
+                                                           dl_transport_block_restrictions restrictions);
 
 /// Retrieve recommended PDCCH and PDSCH parameters for a reTx DL grant.
 /// The reTx keeps the repetition scheme of the original transmission, so only the TDRA row carrying its

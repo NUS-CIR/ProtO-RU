@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "ocudu/scheduler/config/logical_channel_config.h"
 #include "ocudu/scheduler/result/pdsch_info.h"
 #include "ocudu/scheduler/result/pusch_info.h"
 #include "ocudu/scheduler/result/sched_result_grid.h"
@@ -32,6 +33,8 @@ struct ue_newtx_candidate {
   const slice_ue*   ue;
   ue_sched_priority priority;
   units::bytes      pending_bytes;
+  /// Restrictions the transport block carries, as selected for the pending bytes. Open for a UL candidate.
+  dl_transport_block_restrictions dl_restrictions;
 };
 
 /// Interface of data scheduler that is used to allocate UE DL and UL grants in a given slot

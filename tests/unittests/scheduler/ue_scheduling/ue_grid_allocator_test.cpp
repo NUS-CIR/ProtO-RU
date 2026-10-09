@@ -187,8 +187,8 @@ protected:
                                bool                    interleaving_enabled,
                                std::optional<unsigned> max_nof_rbs = std::nullopt)
   {
-    auto result =
-        alloc.allocate_dl_grant(ue_newtx_dl_grant_request{user, current_slot, pending_bytes, interleaving_enabled});
+    auto result = alloc.allocate_dl_grant(ue_newtx_dl_grant_request{
+        user, current_slot, pending_bytes, interleaving_enabled, user.select_dl_transport_block().restrictions});
     if (not result.has_value()) {
       return;
     }
@@ -1372,7 +1372,7 @@ TEST_P(ue_grid_allocator_dl_harq_feedback_test, retx_of_a_feedback_enabled_proce
   // process that carries no feedback.
   push_dl_bs(u.ue_index, srb_lcid, 0);
   push_dl_bs(u.ue_index, drb_lcid, 100000);
-  ASSERT_FALSE(slice_ues[u.ue_index].select_normal_dl_harq_mode());
+  ASSERT_EQ(slice_ues[u.ue_index].select_dl_transport_block().restrictions.harq_feedback, dl_harq_feedback::disabled);
 
   ASSERT_TRUE(h_dl->dl_ack_info(mac_harq_ack_report_status::nack, std::nullopt));
 

@@ -201,13 +201,14 @@ compute_retx_nof_rbs_mcs(const pdsch_config_params&                  pdsch_cfg,
   return std::nullopt;
 }
 
-static std::optional<dl_sched_context> get_dl_sched_context(const slice_ue&               u,
-                                                            slot_point                    pdcch_slot,
-                                                            slot_point                    pdsch_slot,
-                                                            bool                          interleaving_enabled,
-                                                            const dl_harq_process_handle* h_dl,
-                                                            units::bytes                  pending_bytes,
-                                                            unsigned                      max_rbs = MAX_NOF_PRBS)
+static std::optional<dl_sched_context> get_dl_sched_context(const slice_ue&                 u,
+                                                            slot_point                      pdcch_slot,
+                                                            slot_point                      pdsch_slot,
+                                                            bool                            interleaving_enabled,
+                                                            const dl_harq_process_handle*   h_dl,
+                                                            units::bytes                    pending_bytes,
+                                                            dl_transport_block_restrictions restrictions,
+                                                            unsigned                        max_rbs = MAX_NOF_PRBS)
 {
   const ue_cell& ue_cc = u.get_cc();
 
@@ -339,6 +340,7 @@ static std::optional<dl_sched_context> get_dl_sched_context(const slice_ue&     
   ctxt.nof_rb_lims        = nof_rb_lims;
   ctxt.expected_nof_rbs   = mcs_prbs_sel->nof_prbs;
   ctxt.pending_bytes      = units::bytes{pending_bytes};
+  ctxt.restrictions       = restrictions;
   ctxt.nof_repetitions    = dl_td_mapper.pdsch_td_resources(dci_format)[*selected_pdsch_td_index].rep_number;
   return ctxt;
 }
@@ -347,9 +349,10 @@ std::optional<dl_sched_context> sched_helper::get_newtx_dl_sched_context(const s
                                                                          slot_point      pdcch_slot,
                                                                          slot_point      pdsch_slot,
                                                                          bool            interleaving_enabled,
-                                                                         units::bytes    pending_bytes)
+                                                                         units::bytes    pending_bytes,
+                                                                         dl_transport_block_restrictions restrictions)
 {
-  return get_dl_sched_context(u, pdcch_slot, pdsch_slot, interleaving_enabled, nullptr, pending_bytes);
+  return get_dl_sched_context(u, pdcch_slot, pdsch_slot, interleaving_enabled, nullptr, pending_bytes, restrictions);
 }
 
 std::optional<dl_sched_context> sched_helper::get_retx_dl_sched_context(const slice_ue& u,
@@ -359,7 +362,7 @@ std::optional<dl_sched_context> sched_helper::get_retx_dl_sched_context(const sl
                                                                         const dl_harq_process_handle& h_dl,
                                                                         unsigned                      max_rbs)
 {
-  return get_dl_sched_context(u, pdcch_slot, pdsch_slot, interleaving_enabled, &h_dl, units::bytes{0}, max_rbs);
+  return get_dl_sched_context(u, pdcch_slot, pdsch_slot, interleaving_enabled, &h_dl, units::bytes{0}, {}, max_rbs);
 }
 
 /// Gets the PDSCH resource allocation type that can be used in a DL grant.

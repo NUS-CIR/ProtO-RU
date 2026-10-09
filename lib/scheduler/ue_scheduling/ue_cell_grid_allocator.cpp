@@ -210,8 +210,12 @@ ue_cell_grid_allocator::allocate_dl_grant(const ue_newtx_dl_grant_request& reque
   const search_space_info&         ss_info      = ue_cc.cfg().search_space(ue_ded_ss_id);
 
   // Select PDCCH searchSpace and PDSCH time-domain resource config.
-  auto sched_ctxt = sched_helper::get_newtx_dl_sched_context(
-      request.user, cell_alloc[0].slot, request.pdsch_slot, request.interleaving_enabled, request.pending_bytes);
+  auto sched_ctxt = sched_helper::get_newtx_dl_sched_context(request.user,
+                                                             cell_alloc[0].slot,
+                                                             request.pdsch_slot,
+                                                             request.interleaving_enabled,
+                                                             request.pending_bytes,
+                                                             request.restrictions);
   if (not sched_ctxt.has_value()) {
     // No valid parameters were found for this UE. When repetitions were requested but no repetition row fits this slot
     // (e.g. a special slot), the grant is deferred to a later one.
@@ -337,7 +341,7 @@ ue_cell_grid_allocator::setup_dl_grant_builder(const slice_ue&                  
     if (is_retx) {
       harq_mode = h_dl->mode();
     } else {
-      harq_mode = harq_utils::to_harq_mode(user.select_normal_dl_harq_mode());
+      harq_mode = harq_utils::to_harq_mode(params.restrictions.harq_feedback);
       // Checked before the PUCCH is booked, as it cannot be given back.
       if (not ue_cc.harqs.has_empty_dl_harqs(harq_mode)) {
         logger.debug("ue={} rnti={}: Failed to allocate PDSCH in slot={}. Cause: no free DL HARQ process",
@@ -583,11 +587,12 @@ ue_cell_grid_allocator::set_pdsch_params(dl_grant_info& grant, const vrb_alloc& 
   // Set MAC logical channels to schedule in this PDU for each new-TX codeword.
   for (const auto& cw : msg.pdsch_cfg.codewords) {
     if (cw.new_data) {
-      build_dl_transport_block_info(msg.tb_list.emplace_back(),
-                                    u.logical_channels(),
-                                    cw.tb_size_bytes,
-                                    grant.user->ran_slice_id(),
-                                    harq_utils::to_dl_harq_feedback(grant.h_dl.mode()));
+      build_dl_transport_block_info(
+          msg.tb_list.emplace_back(),
+          u.logical_channels(),
+          cw.tb_size_bytes,
+          grant.user->ran_slice_id(),
+          dl_transport_block_restrictions{harq_utils::to_dl_harq_feedback(grant.h_dl.mode())});
     }
   }
   if (not is_retx) {

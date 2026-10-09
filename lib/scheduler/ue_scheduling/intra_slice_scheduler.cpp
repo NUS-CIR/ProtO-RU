@@ -519,8 +519,10 @@ unsigned intra_slice_scheduler::schedule_dl_newtx_candidates(dl_ran_slice_candid
     }
 
     // Create DL grant builder.
-    auto result =
-        ue_alloc.allocate_dl_grant(ue_newtx_dl_grant_request{*ue_candidate.ue, pdsch_slot, ue_candidate.pending_bytes});
+    auto result = ue_alloc.allocate_dl_grant(ue_newtx_dl_grant_request{.user          = *ue_candidate.ue,
+                                                                       .pdsch_slot    = pdsch_slot,
+                                                                       .pending_bytes = ue_candidate.pending_bytes,
+                                                                       .restrictions  = ue_candidate.dl_restrictions});
 
     if (result.has_value()) {
       // Allocation was successful. Move grant builder to list of pending newTx grants.
@@ -771,7 +773,9 @@ std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_dl_candida
   ocudu_assert(ue_cc.is_active() and not ue_cc.is_in_fallback_mode(), "Invalid slice UE state");
 
   // Check if the UE has pending data to transmit.
-  units::bytes pending_bytes{u.pending_dl_newtx_bytes()};
+  // The block carries only the channels its restrictions allow, so the grant is sized for those alone.
+  const auto   tb_sel = u.select_dl_transport_block();
+  units::bytes pending_bytes{tb_sel.pending_bytes};
   if (pending_bytes.value() == 0) {
     return std::nullopt;
   }
@@ -782,7 +786,7 @@ std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_dl_candida
 
   // A process is only usable when it carries the feedback the logical channels of the slice need, so the grant is
   // dropped here rather than after a PDCCH and a PUCCH have been booked for it.
-  if (not ue_cc.harqs.has_empty_dl_harqs(harq_utils::to_harq_mode(u.select_normal_dl_harq_mode()))) {
+  if (not ue_cc.harqs.has_empty_dl_harqs(harq_utils::to_harq_mode(tb_sel.restrictions.harq_feedback))) {
     // No available HARQs. A process free in the other mode owes no HARQ-ACK, so the feedback only runs late once no
     // process at all is free.
     if (not ue_cc.harqs.has_empty_dl_harqs() and not ue_cc.harqs.find_pending_dl_retx().has_value()) {
@@ -798,7 +802,7 @@ std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_dl_candida
     return std::nullopt;
   }
 
-  return ue_newtx_candidate{&u, forbid_sched_priority, pending_bytes};
+  return ue_newtx_candidate{&u, forbid_sched_priority, pending_bytes, tb_sel.restrictions};
 }
 std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_ul_candidate(const slice_ue& u) const
 {

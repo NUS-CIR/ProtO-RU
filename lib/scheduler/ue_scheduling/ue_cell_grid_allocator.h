@@ -27,6 +27,8 @@ struct ue_newtx_dl_grant_request {
   units::bytes pending_bytes;
   /// Whether interleaving VRB-to-PRB mapping is enabled.
   bool interleaving_enabled;
+  /// Restrictions the transport block carries, as selected for the pending bytes.
+  dl_transport_block_restrictions restrictions;
 };
 
 /// Request for a reTx DL grant allocation.

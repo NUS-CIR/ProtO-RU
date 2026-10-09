@@ -1048,6 +1048,55 @@ unsigned ue_logical_channel_repository::ul_pending_bytes() const
   return bytes;
 }
 
+ue_logical_channel_repository::dl_transport_block_selection
+ue_logical_channel_repository::select_dl_transport_block(ran_slice_id_t slice_id) const
+{
+  const logical_channel_config_list& lc_cfgs = cfg();
+  // Resolves the row of a channel of the slice, so that its slice and its buffer are read with one lookup.
+  const auto slice_row = [&](lcid_t lcid) -> std::optional<soa::row_id> {
+    if (not lc_cfgs.contains(lcid)) {
+      return std::nullopt;
+    }
+    const std::optional<soa::row_id> lc_rid = parent->lc_mapper.find_row_id(ue_index, lcid);
+    if (not lc_rid.has_value() or parent->lc_mapper.dl_slice_id(*lc_rid) != slice_id) {
+      return std::nullopt;
+    }
+    return lc_rid;
+  };
+
+  dl_transport_block_selection selection{{}, dl_pending_bytes(slice_id)};
+  bool                         serves_data = false;
+  for (const lcid_t lcid : get_prioritized_logical_channels()) {
+    const std::optional<soa::row_id> lc_rid = slice_row(lcid);
+    // An idle channel neither fills the block nor closes a restriction of it.
+    if (not lc_rid.has_value() or parent->lc_mapper.dl_buf_st(*lc_rid).value() == 0) {
+      continue;
+    }
+    if (selection.restrictions.admits(*lc_cfgs[lcid])) {
+      selection.restrictions.set(*lc_cfgs[lcid]);
+      serves_data = true;
+      continue;
+    }
+    const unsigned dropped = parent->dl_pending_bytes(*lc_rid);
+    selection.pending_bytes -= std::min(selection.pending_bytes, dropped);
+  }
+  if (serves_data) {
+    return selection;
+  }
+
+  // Nothing is buffered, so the block carries what the channel it would serve first asks for.
+  for (const lcid_t lcid : get_prioritized_logical_channels()) {
+    if (not slice_row(lcid).has_value()) {
+      continue;
+    }
+    selection.restrictions.set(*lc_cfgs[lcid]);
+    if (selection.restrictions.is_restricted()) {
+      break;
+    }
+  }
+  return selection;
+}
+
 double ue_logical_channel_repository::average_dl_bit_rate(lcid_t lcid) const
 {
   if (auto rid = parent->lc_mapper.find_row_id(ue_index, lcid); rid.has_value()) {
@@ -1239,30 +1288,30 @@ unsigned ocudu::build_dl_fallback_transport_block_info(dl_msg_tb_info&          
   return total_subpdu_bytes;
 }
 
-unsigned ocudu::build_dl_transport_block_info(dl_msg_tb_info&                tb_info,
-                                              ue_logical_channel_repository& lch_mng,
-                                              units::bytes                   tb_size_bytes,
-                                              ran_slice_id_t                 slice_id,
-                                              dl_harq_feedback               feedback)
+unsigned ocudu::build_dl_transport_block_info(dl_msg_tb_info&                 tb_info,
+                                              ue_logical_channel_repository&  lch_mng,
+                                              units::bytes                    tb_size_bytes,
+                                              ran_slice_id_t                  slice_id,
+                                              dl_transport_block_restrictions restrictions)
 {
-  // A restricted channel only rides the processes it allows, so it stays out of a block built on any other. A channel
-  // no configuration restricts rides either.
-  const logical_channel_config_list& lc_cfgs       = lch_mng.cfg();
-  const auto                         can_multiplex = [&lc_cfgs, feedback](lcid_t lcid) {
-    if (not lc_cfgs.contains(lcid)) {
-      return true;
-    }
-    const std::optional<dl_harq_feedback>& allowed = lc_cfgs[lcid]->allowed_dl_harq_feedback;
-    return not allowed.has_value() or *allowed == feedback;
-  };
+  // A channel the block does not accept is left for another block.
+  const logical_channel_config_list& lc_cfgs = lch_mng.cfg();
 
   unsigned total_subpdu_bytes = 0;
   total_subpdu_bytes += allocate_mac_ces(tb_info, lch_mng, tb_size_bytes);
   for (const auto lcid : lch_mng.get_prioritized_logical_channels()) {
-    if (lch_mng.get_slice_id(lcid) == slice_id and can_multiplex(uint_to_lcid(lcid))) {
-      total_subpdu_bytes += allocate_mac_sdus(
-          tb_info, lch_mng, units::bytes{tb_size_bytes.value() - total_subpdu_bytes}, uint_to_lcid(lcid));
+    // An idle channel neither fills the block nor closes a restriction of it.
+    if (lch_mng.get_slice_id(lcid) != slice_id or not lch_mng.has_pending_bytes(lcid)) {
+      continue;
     }
+    if (lc_cfgs.contains(lcid)) {
+      if (not restrictions.admits(*lc_cfgs[lcid])) {
+        continue;
+      }
+      restrictions.set(*lc_cfgs[lcid]);
+    }
+    total_subpdu_bytes +=
+        allocate_mac_sdus(tb_info, lch_mng, units::bytes{tb_size_bytes.value() - total_subpdu_bytes}, lcid);
   }
   return total_subpdu_bytes;
 }

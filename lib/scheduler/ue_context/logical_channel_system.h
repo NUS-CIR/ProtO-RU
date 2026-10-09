@@ -691,33 +691,20 @@ public:
     return lcg_rid.has_value() and parent->lc_mapper.ul_buf_st(*lcg_rid).value() > 0;
   }
 
-  /// \brief Returns the DL HARQ feedback a new transport block for the given slice must carry, if any channel
-  /// restricts it.
+  /// Transport block a slice can build next.
+  struct dl_transport_block_selection {
+    /// Restrictions the block carries, as the channels it serves set them.
+    dl_transport_block_restrictions restrictions;
+    /// Pending bytes the block can carry, i.e. the slice total less the channels it leaves out.
+    unsigned pending_bytes;
+  };
+
+  /// \brief Selects the transport block a new grant for the given slice is built on.
   ///
-  /// The highest priority channel holding data decides, as the block is filled in that same order. With nothing
-  /// buffered the highest priority restricted channel decides on its own configuration.
-  [[nodiscard]] std::optional<dl_harq_feedback> required_dl_harq_feedback(ran_slice_id_t slice_id) const
-  {
-    const logical_channel_config_list& lc_cfgs = cfg();
-    std::optional<dl_harq_feedback>    configured;
-    for (const lcid_t lcid : get_prioritized_logical_channels()) {
-      if (not lc_cfgs.contains(lcid)) {
-        continue;
-      }
-      const std::optional<dl_harq_feedback>& allowed = lc_cfgs[lcid]->allowed_dl_harq_feedback;
-      if (not allowed.has_value() or get_slice_id(lcid) != slice_id) {
-        continue;
-      }
-      // The channels come in decreasing order of priority, so the first one holding data decides.
-      if (pending_bytes(lcid) > 0) {
-        return allowed;
-      }
-      if (not configured.has_value()) {
-        configured = allowed;
-      }
-    }
-    return configured;
-  }
+  /// The channels holding data join in decreasing order of priority, the order the block is filled in, and the bytes
+  /// of those left out are dropped from the size. With nothing buffered the highest priority restricted channel
+  /// decides.
+  [[nodiscard]] dl_transport_block_selection select_dl_transport_block(ran_slice_id_t slice_id) const;
 
   /// \brief Returns the UL HARQ mode a new grant for the given slice must use, if any channel restricts it.
   ///
@@ -743,6 +730,10 @@ public:
       if (parent->lc_mapper.ul_buf_st(*lcg_rid).value() > 0 and
           (not with_data.has_value() or mode == ul_harq_mode::mode_a)) {
         with_data = mode;
+        if (mode == ul_harq_mode::mode_a) {
+          // No channel left can outrank mode A with data.
+          return {with_data};
+        }
       }
     }
     if (with_data.has_value()) {
@@ -952,10 +943,10 @@ unsigned build_dl_fallback_transport_block_info(dl_msg_tb_info&                t
 /// given RAN slice.
 /// \return Returns the number of bytes reserved in the TB for subPDUs (other than padding).
 /// \remark Excludes SRB0, as this operation is specific to a given RAN slice.
-unsigned build_dl_transport_block_info(dl_msg_tb_info&                tb_info,
-                                       ue_logical_channel_repository& lch_mng,
-                                       units::bytes                   tb_size_bytes,
-                                       ran_slice_id_t                 slice_id,
-                                       dl_harq_feedback               feedback);
+unsigned build_dl_transport_block_info(dl_msg_tb_info&                 tb_info,
+                                       ue_logical_channel_repository&  lch_mng,
+                                       units::bytes                    tb_size_bytes,
+                                       ran_slice_id_t                  slice_id,
+                                       dl_transport_block_restrictions restrictions);
 
 } // namespace ocudu
