@@ -1514,7 +1514,7 @@ TEST_P(ue_grid_allocator_ul_harq_mode_test, retx_is_scheduled_when_its_mode_has_
   push_ul_bsr(u.ue_index, mode_a_lcg, 1000);
   ASSERT_TRUE(run_until([&]() { allocate_ul_newtx_grant(slice_ues[u.ue_index], units::bytes{200}); },
                         [&]() { return ue_cc.harqs.nof_empty_ul_harqs(harq_utils::harq_mode_t::normal) == 0; }));
-  ASSERT_TRUE(slice_ues[u.ue_index].select_normal_ul_harq_mode());
+  ASSERT_EQ(slice_ues[u.ue_index].select_ul_grant_restrictions().harq_mode, ul_harq_mode::mode_a);
 
   std::optional<ul_harq_process_handle> h_ul = ue_cc.harqs.find_ul_harq_waiting_ack();
   ASSERT_TRUE(h_ul.has_value());

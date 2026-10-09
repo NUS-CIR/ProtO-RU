@@ -95,4 +95,32 @@ struct dl_transport_block_restrictions {
   }
 };
 
+/// \brief Restrictions a UL grant satisfies, as per the LCP mapping restrictions of TS 38.321, Section 5.4.3.1.2.
+///
+/// The UE serves a logical channel on the grant only where the two agree. A channel leaving a restriction unset rides
+/// any grant.
+struct ul_grant_restrictions {
+  /// UL HARQ mode the grant uses, once a channel served by it restricts the mode.
+  std::optional<ul_harq_mode> harq_mode;
+
+  /// Checks whether the grant carries any restriction, so that it serves only part of the logical channels.
+  [[nodiscard]] bool is_restricted() const { return harq_mode.has_value(); }
+
+  /// Checks whether this grant admits the given logical channel, which the UE then serves on it.
+  [[nodiscard]] bool admits(const logical_channel_config& lc_cfg) const
+  {
+    // A restriction either side leaves open agrees with the other.
+    return not harq_mode.has_value() or not lc_cfg.allowed_harq_mode.has_value() or
+           harq_mode == lc_cfg.allowed_harq_mode;
+  }
+
+  /// Takes on the restrictions the given logical channel sets, leaving the others open.
+  void set(const logical_channel_config& lc_cfg)
+  {
+    if (lc_cfg.allowed_harq_mode.has_value()) {
+      harq_mode = lc_cfg.allowed_harq_mode;
+    }
+  }
+};
+
 } // namespace ocudu

@@ -706,11 +706,12 @@ public:
   /// decides.
   [[nodiscard]] dl_transport_block_selection select_dl_transport_block(ran_slice_id_t slice_id) const;
 
-  /// \brief Returns the UL HARQ mode a new grant for the given slice must use, if any channel restricts it.
+  /// \brief Selects the restrictions a new grant for the given slice satisfies.
   ///
   /// A channel bound to mode A wins as soon as it has data: mode A holds each process a full round trip, so it cannot
-  /// crowd mode B out. Without buffer status, as in the grant an SR earns, the configuration decides, mode A first.
-  [[nodiscard]] std::optional<ul_harq_mode> required_ul_harq_mode(ran_slice_id_t slice_id) const
+  /// crowd mode B out. Otherwise the configuration decides, mode A first, as the UE cannot be served on a grant its
+  /// channels forbid, whatever it buffers after its last report.
+  [[nodiscard]] ul_grant_restrictions select_ul_grant_restrictions(ran_slice_id_t slice_id) const
   {
     std::optional<ul_harq_mode> with_data;
     std::optional<ul_harq_mode> configured;
@@ -737,9 +738,9 @@ public:
       }
     }
     if (with_data.has_value()) {
-      return with_data;
+      return {with_data};
     }
-    return configured;
+    return {configured};
   }
 
   /// \brief Checks whether a ConRes CE is pending for transmission.

@@ -1066,7 +1066,7 @@ ue_cell_grid_allocator::setup_ul_grant_builder(const slice_ue&                  
   // Only a new tx picks a HARQ process; a retx keeps the one it already holds.
   harq_utils::harq_mode_t harq_mode = harq_utils::harq_mode_t::normal;
   if (not is_retx and ue_cc.harqs.is_ul_harq_mode_selective()) {
-    harq_mode = harq_utils::to_harq_mode(user.select_normal_ul_harq_mode());
+    harq_mode = harq_utils::to_harq_mode(user.select_ul_grant_restrictions().harq_mode);
     // Checked before the PDCCH is booked, as cancelling one still costs the UL attempt of the slot.
     if (not ue_cc.harqs.has_empty_ul_harqs(harq_mode)) {
       logger.debug("ue={} rnti={}: Failed to allocate PUSCH in slot={}. Cause: no free UL HARQ process",

@@ -213,9 +213,8 @@ TEST_F(slice_ue_repository_test, restricted_logical_channel_decides_the_ul_harq_
   ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{1}, 1000}}));
 
   const slice_ue& u = (*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx];
-  ASSERT_TRUE(u.required_ul_harq_mode().has_value());
-  ASSERT_EQ(*u.required_ul_harq_mode(), ul_harq_mode::mode_a);
-  ASSERT_TRUE(u.select_normal_ul_harq_mode());
+  ASSERT_TRUE(u.select_ul_grant_restrictions().harq_mode.has_value());
+  ASSERT_EQ(*u.select_ul_grant_restrictions().harq_mode, ul_harq_mode::mode_a);
 }
 
 /// With no channel restricting it, a grant rides mode B, whichever RAN slice it belongs to.
@@ -225,9 +224,8 @@ TEST_F(slice_ue_repository_test, unrestricted_data_rides_mode_b_in_every_slice)
   add_ue(ue_idx);
   ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{1}, 1000}}));
 
-  ASSERT_FALSE((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].required_ul_harq_mode().has_value());
-  ASSERT_FALSE((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_normal_ul_harq_mode());
-  ASSERT_FALSE((*slices[SRB_RAN_SLICE_ID.value()])[ue_idx].select_normal_ul_harq_mode());
+  ASSERT_FALSE((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant_restrictions().is_restricted());
+  ASSERT_FALSE((*slices[SRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant_restrictions().is_restricted());
 }
 
 /// The grant an SR earns follows the channels it is meant to serve, which hold no data to restrict it yet.
@@ -241,9 +239,10 @@ TEST_F(slice_ue_repository_test, sr_grant_follows_the_configured_restriction)
   ue_db[ue_idx].handle_sr_indication(next_slot);
 
   const slice_ue& u = (*slices[SRB_RAN_SLICE_ID.value()])[ue_idx];
-  ASSERT_TRUE(u.select_normal_ul_harq_mode());
+  ASSERT_EQ(u.select_ul_grant_restrictions().harq_mode, ul_harq_mode::mode_a);
   // The SR is reported per UE, so the other slices see it too and keep following their own channels.
-  ASSERT_FALSE((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_normal_ul_harq_mode());
+  ASSERT_EQ((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant_restrictions().harq_mode,
+            ul_harq_mode::mode_b);
 }
 
 /// \brief A slice is not held back by the data another slice of the same UE has in flight.

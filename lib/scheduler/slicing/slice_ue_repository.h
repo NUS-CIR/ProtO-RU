@@ -43,17 +43,14 @@ public:
   /// Determines if LCG-ID is part of this slice.
   bool contains(lcg_id_t lcg_id) const { return u.logical_channels().get_slice_id(lcg_id) == slice_id; }
 
-  /// \brief Returns the UL HARQ mode a new grant must use for this slice, if the pending UL data restricts it.
+  /// \brief Selects the restrictions a new grant for this slice satisfies.
   ///
   /// See \c allowedHARQ-mode, TS 38.331.
-  /// \return The mode the grant must use, or nullopt when no logical channel of this slice restricts it.
-  std::optional<ul_harq_mode> required_ul_harq_mode() const
+  /// \return The restrictions the grant satisfies, each unset when no logical channel of this slice sets it.
+  ul_grant_restrictions select_ul_grant_restrictions() const
   {
-    return u.logical_channels().required_ul_harq_mode(slice_id);
+    return u.logical_channels().select_ul_grant_restrictions(slice_id);
   }
-
-  /// Returns whether a new UL grant for this UE must use a HARQ process in normal mode, i.e. mode A.
-  bool select_normal_ul_harq_mode() const { return required_ul_harq_mode() == ul_harq_mode::mode_a; }
 
   /// \brief Selects the transport block a new grant for this slice is built on, and the bytes it can take.
   ///
