@@ -42,6 +42,8 @@ static constexpr unsigned            n_id                        = 0;
 static constexpr unsigned            scrambling_id               = 0;
 static constexpr bool                n_scid                      = false;
 static constexpr bool                use_early_stop              = true;
+/// [Implementation-defined] Number of HARQ processes, which sets the number of slots between retransmissions.
+static constexpr unsigned nof_harq_processes = 16;
 
 class pxsch_bler_test
 {
@@ -176,7 +178,7 @@ private:
                                           cfg.pxsch_type,
                                           cfg.td_interpolation_strategy,
                                           cfg.fd_smoothing_strategy,
-                                          channel_equalizer_algorithm_type::zf);
+                                          cfg.equalizer_algorithm);
     report_fatal_error_if_not(pusch_proc_factory, "Failed to create PUSCH processor factory.");
 
     // Create a PUSCH processor pool factory - creates a PUSCH processor for each retransmission.
@@ -308,6 +310,8 @@ private:
                                                   cfg.channel_fading_distribution,
                                                   cfg.sinr_dB,
                                                   cfg.cfo_Hz,
+                                                  cfg.doppler_Hz,
+                                                  cfg.mimo_correlation,
                                                   cfg.nof_corrupted_re_per_ofdm_symbol,
                                                   cfg.nof_layers,
                                                   cfg.nof_rx_ports,
@@ -330,11 +334,14 @@ private:
     double data_bler       = static_cast<double>(data_error_count) / static_cast<double>(count);
     double mean_iterations = static_cast<double>(count_iterations) /
                              static_cast<double>(count * nof_codeblocks * cfg.rep_rv_sequence.size());
+    // Each transmission occupies a slot, so the throughput is relative to the transmissions, not the transport blocks.
+    double throughput_percent = 100.0 * (1.0 - crc_bler) / repetitions_stats.get_mean();
 
     fmt::print("\r[{:>5.1f}%] "
                "Iterations={{{:<2} {:<2} {:<3.1f}}}; "
                "Repetitions={{{:<2} {:<2} {:<3.1f}}}; "
                "BLER={:.10f}/{:.10f}; "
+               "Throughput={:.2f}%; "
                "SINR={{{:+.2f} {:+.2f} {:+.2f}}}; "
                "EVM={{{:.3f} {:.3f} {:.3f}}}; "
                "TA={{{:.2f} {:.2f} {:.2f}}}us; "
@@ -349,6 +356,7 @@ private:
                repetitions_stats.get_mean(),
                crc_bler,
                data_bler,
+               throughput_percent,
                sinr_stats.get_min(),
                sinr_stats.get_max(),
                sinr_stats.get_mean(),
@@ -391,9 +399,13 @@ private:
         tx_notifier.wait_for_completion();
       }
 
-      // Run channel emulator for retransmission.
+      // Run channel emulator for retransmission. Consecutive transport blocks occupy consecutive HARQ processes, so the
+      // retransmissions of a transport block are nof_harq_processes slots apart and every transmission gets a distinct
+      // slot.
       for (unsigned i_rep = 0, rep_end = cfg.rep_rv_sequence.size(); i_rep != rep_end; ++i_rep) {
-        emulator->run(rx_grids[i_rep]->get_writer(), tx_grids[i_rep]->get_reader());
+        uint64_t i_slot = static_cast<uint64_t>(n / nof_harq_processes) * nof_harq_processes * rep_end +
+                          i_rep * nof_harq_processes + n % nof_harq_processes;
+        emulator->run(rx_grids[i_rep]->get_writer(), tx_grids[i_rep]->get_reader(), i_slot);
       }
 
       // Process PUSCH.

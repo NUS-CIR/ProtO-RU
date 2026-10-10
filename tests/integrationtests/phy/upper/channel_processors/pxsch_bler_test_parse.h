@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ocudu/adt/expected.h"
+#include "ocudu/phy/upper/equalization/channel_equalizer_algorithm_type.h"
 #include "ocudu/phy/upper/signal_processors/channel_estimator/port_channel_estimator_parameters.h"
 #include "ocudu/ran/dmrs/dmrs.h"
 #include "ocudu/ran/pdsch/pdsch_mcs.h"
@@ -25,6 +26,8 @@ struct pxsch_bler_test_configuration {
   std::string                                      channel_fading_distribution      = "uniform-phase";
   float                                            sinr_dB                          = 60.0F;
   float                                            cfo_Hz                           = 0.0F;
+  float                                            doppler_Hz                       = 0.0F;
+  std::string                                      mimo_correlation                 = "low";
   unsigned                                         nof_corrupted_re_per_ofdm_symbol = 0;
   unsigned                                         nof_rx_ports                     = 2;
   unsigned                                         nof_layers                       = 1;
@@ -37,11 +40,12 @@ struct pxsch_bler_test_configuration {
       port_channel_estimator_td_interpolation_strategy::average;
   port_channel_estimator_fd_smoothing_strategy fd_smoothing_strategy =
       port_channel_estimator_fd_smoothing_strategy::filter;
-  dmrs_additional_positions dmrs_additional_pos = dmrs_additional_positions::pos2;
-  unsigned                  nof_ldpc_iterations = 10;
-  unsigned                  ul_slot_offset      = 0;
-  std::vector<unsigned>     rep_rv_sequence     = {0};
-  std::string               log_level           = "warning";
+  channel_equalizer_algorithm_type equalizer_algorithm = channel_equalizer_algorithm_type::mmse;
+  dmrs_additional_positions        dmrs_additional_pos = dmrs_additional_positions::pos2;
+  unsigned                         nof_ldpc_iterations = 10;
+  unsigned                         ul_slot_offset      = 0;
+  std::vector<unsigned>            rep_rv_sequence     = {0};
+  std::string                      log_level           = "warning";
 };
 
 /// \brief Parse CLI11 arguments into a \c pxsch_bler_test_configuration.

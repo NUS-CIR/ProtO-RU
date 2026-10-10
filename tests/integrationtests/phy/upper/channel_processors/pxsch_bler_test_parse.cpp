@@ -72,6 +72,12 @@ expected<pxsch_bler_test_configuration, int> parse_configuration(int argc, char*
                  "Channel fading distribution: uniform-phase, rayleigh, butler")
       ->check(CLI::IsMember({"uniform-phase", "rayleigh", "butler"}));
 
+  app.add_option("--doppler-hz", cfg.doppler_Hz, "Maximum Doppler frequency in Hz. Zero disables time correlation")
+      ->check(CLI::Range(0.0F, 2000.0F));
+
+  app.add_option("--mimo-correlation", cfg.mimo_correlation, "MIMO correlation level: low, medium, high")
+      ->check(CLI::IsMember({"low", "medium", "high"}));
+
   app.add_flag("-D,--enable-dc-position", cfg.enable_dc_position, "Enable DC position");
 
   app.add_option("-S,--sinr-db", cfg.sinr_dB, "SINR in dB")->check(CLI::Range(0.0F, 100.0F));
@@ -131,6 +137,16 @@ expected<pxsch_bler_test_configuration, int> parse_configuration(int argc, char*
       "FD smoothing strategy: none, mean, filter");
 
   app.add_option_function<std::string>(
+         "--equalizer",
+         [&cfg](const std::string& value) {
+           cfg.equalizer_algorithm =
+               (value == "mmse") ? channel_equalizer_algorithm_type::mmse : channel_equalizer_algorithm_type::zf;
+         },
+         "Channel equalizer algorithm: zf, mmse")
+      ->default_str("mmse")
+      ->check(CLI::IsMember({"zf", "mmse"}));
+
+  app.add_option_function<std::string>(
       "-A,--dmrs-additional-positions",
       [&cfg](const std::string& value) {
         auto raw = parse_int<unsigned>(value);
@@ -164,6 +180,11 @@ expected<pxsch_bler_test_configuration, int> parse_configuration(int argc, char*
     app.parse(argc, argv);
   } catch (const CLI::ParseError& e) {
     return make_unexpected(app.exit(e));
+  }
+
+  if (((cfg.doppler_Hz != 0) || (cfg.mimo_correlation != "low")) && (cfg.channel_fading_distribution != "rayleigh")) {
+    fmt::print(stderr, "Doppler and MIMO correlation require the rayleigh fading distribution.\n");
+    return make_unexpected(EXIT_FAILURE);
   }
 
   return cfg;

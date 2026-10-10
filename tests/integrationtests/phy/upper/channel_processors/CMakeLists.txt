@@ -36,6 +36,8 @@ add_test(pxsch_bler_test_1CBs_32reps pxsch_bler_test -m 0 -R 10 -V [0,2,3,1,0,2,
 add_test(pxsch_bler_test_manyCBs_4rep pxsch_bler_test -m 28 -R 10 -V [0,2,3,1] -j 1)
 # BLER test - 1024QAM
 add_test(pxsch_bler_test_1024QAM pxsch_bler_test -M qam1024 -m 25 -R 10 -V [0,2,3,1] -j 1)
+# BLER test - TDLA with Doppler and medium MIMO correlation.
+add_test(pxsch_bler_test_tdla_doppler pxsch_bler_test -C TDLA -F rayleigh --doppler-hz 10 --mimo-correlation medium -R 10)
 
 add_executable(pxsch_chain_test pxsch_chain_test.cpp)
 target_link_libraries(pxsch_chain_test
