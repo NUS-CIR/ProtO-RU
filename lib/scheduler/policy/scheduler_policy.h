@@ -35,6 +35,8 @@ struct ue_newtx_candidate {
   units::bytes      pending_bytes;
   /// Restrictions the transport block carries, as selected for the pending bytes. Open for a UL candidate.
   dl_transport_block_restrictions dl_restrictions;
+  /// Restrictions the grant satisfies, as selected for the pending bytes. Open for a DL candidate.
+  ul_grant_restrictions ul_restrictions;
 };
 
 /// Interface of data scheduler that is used to allocate UE DL and UL grants in a given slot

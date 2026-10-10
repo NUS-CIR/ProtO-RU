@@ -99,6 +99,8 @@ struct ul_sched_context {
   unsigned expected_nof_rbs;
   /// Pending bytes for newTx.
   units::bytes pending_bytes;
+  /// Restrictions the grant satisfies. Open for a reTx, which follows the process it already holds.
+  ul_grant_restrictions restrictions;
   /// PUSCH config params.
   pusch_config_params pusch_cfg;
   /// Number of Rel-16 PUSCH repetitions of the selected TDRA row, or nullopt for a single transmission.
@@ -116,12 +118,13 @@ struct ul_sched_context {
 /// The number of Rel-16 PUSCH repetitions to request is decided by link adaptation: when it asks for repetitions, the
 /// selector picks the TDRA row carrying that numberOfRepetitions-r16 and returns nullopt if it does not fit the slot;
 /// otherwise it picks a single-transmission row.
-std::optional<ul_sched_context> get_newtx_ul_sched_context(const slice_ue&   u,
-                                                           slot_point        pdcch_slot,
-                                                           slot_point        pusch_slot,
-                                                           unsigned          uci_nof_harq_bits,
-                                                           units::bytes      pending_bytes,
-                                                           ofdm_symbol_range allowed_symbols);
+std::optional<ul_sched_context> get_newtx_ul_sched_context(const slice_ue&       u,
+                                                           slot_point            pdcch_slot,
+                                                           slot_point            pusch_slot,
+                                                           unsigned              uci_nof_harq_bits,
+                                                           units::bytes          pending_bytes,
+                                                           ofdm_symbol_range     allowed_symbols,
+                                                           ul_grant_restrictions restrictions);
 
 /// Retrieve recommended PDCCH and PUSCH parameters for a reTx UL grant.
 /// The reTx tries to reuse the repetition scheme of the original transmission, if it's not possible, fallback to single

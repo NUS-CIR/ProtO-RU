@@ -86,8 +86,8 @@ struct dl_transport_block_restrictions {
            harq_feedback == lc_cfg.allowed_dl_harq_feedback;
   }
 
-  /// Takes on the restrictions the given logical channel sets, leaving the others open.
-  void set(const logical_channel_config& lc_cfg)
+  /// Narrows these restrictions by the ones the given logical channel sets, leaving the others open.
+  void narrow(const logical_channel_config& lc_cfg)
   {
     if (lc_cfg.allowed_dl_harq_feedback.has_value()) {
       harq_feedback = lc_cfg.allowed_dl_harq_feedback;
@@ -114,8 +114,8 @@ struct ul_grant_restrictions {
            harq_mode == lc_cfg.allowed_harq_mode;
   }
 
-  /// Takes on the restrictions the given logical channel sets, leaving the others open.
-  void set(const logical_channel_config& lc_cfg)
+  /// Narrows these restrictions by the ones the given logical channel sets, leaving the others open.
+  void narrow(const logical_channel_config& lc_cfg)
   {
     if (lc_cfg.allowed_harq_mode.has_value()) {
       harq_mode = lc_cfg.allowed_harq_mode;

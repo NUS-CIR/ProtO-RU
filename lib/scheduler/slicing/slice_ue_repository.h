@@ -43,14 +43,11 @@ public:
   /// Determines if LCG-ID is part of this slice.
   bool contains(lcg_id_t lcg_id) const { return u.logical_channels().get_slice_id(lcg_id) == slice_id; }
 
-  /// \brief Selects the restrictions a new grant for this slice satisfies.
+  /// \brief Selects the grant a new allocation for this slice is built on, and the bytes it can serve.
   ///
-  /// See \c allowedHARQ-mode, TS 38.331.
-  /// \return The restrictions the grant satisfies, each unset when no logical channel of this slice sets it.
-  ul_grant_restrictions select_ul_grant_restrictions() const
-  {
-    return u.logical_channels().select_ul_grant_restrictions(slice_id);
-  }
+  /// See \c allowedHARQ-mode, TS 38.331, which the UE applies as per TS 38.321, Section 5.4.3.1.2.
+  /// \return The restrictions the grant satisfies and the pending bytes it can serve.
+  ue_logical_channel_repository::ul_grant_selection select_ul_grant() const;
 
   /// \brief Selects the transport block a new grant for this slice is built on, and the bytes it can take.
   ///
@@ -118,6 +115,9 @@ public:
 
 private:
   friend class slice_ue_repository;
+
+  /// Returns the bytes a new transmission takes out of the pending bytes of a slice.
+  units::bytes get_newtx_bytes(units::bytes slice_pending_bytes) const;
 
   ue&                  u;
   ue_cell&             ue_cc;

@@ -710,47 +710,21 @@ public:
   /// decides.
   [[nodiscard]] dl_transport_block_selection select_dl_transport_block(ran_slice_id_t slice_id) const;
 
-  /// \brief Selects the restrictions a new grant for the given slice satisfies.
+  /// Grant a slice can build next.
+  struct ul_grant_selection {
+    /// Restrictions the grant satisfies, as the channels served on it set them.
+    ul_grant_restrictions restrictions;
+    /// Pending bytes the grant can serve, i.e. the slice total less the groups it leaves out.
+    unsigned pending_bytes;
+  };
+
+  /// \brief Selects the grant a new allocation for the given slice is built on.
   ///
   /// A channel bound to mode A wins as soon as it has data: mode A holds each process a full round trip, so it cannot
   /// crowd mode B out. Otherwise the configuration decides, mode A first, as the UE cannot be served on a grant its
-  /// channels forbid, whatever it buffers after its last report.
-  [[nodiscard]] ul_grant_restrictions select_ul_grant_restrictions(ran_slice_id_t slice_id) const
-  {
-    // Nothing restricts the grant, so every channel of the slice can be served on it.
-    if (not get_ue_row().at<ue_ul_channel_context>().restricted_channel_present) {
-      return {};
-    }
-
-    std::optional<ul_harq_mode> with_data;
-    std::optional<ul_harq_mode> configured;
-    for (const logical_channel_config_ptr& lc_cfg : cfg()) {
-      if (not lc_cfg->allowed_harq_mode.has_value()) {
-        continue;
-      }
-      const std::optional<soa::row_id> lcg_rid = parent->lc_mapper.find_row_id(ue_index, lc_cfg->lc_group);
-      if (not lcg_rid.has_value() or parent->lc_mapper.ul_slice_id(*lcg_rid) != slice_id) {
-        continue;
-      }
-      // Mode A outranks mode B, so it wins whichever channel is seen first.
-      const ul_harq_mode mode = *lc_cfg->allowed_harq_mode;
-      if (not configured.has_value() or mode == ul_harq_mode::mode_a) {
-        configured = mode;
-      }
-      if (parent->lc_mapper.ul_buf_st(*lcg_rid).value() > 0 and
-          (not with_data.has_value() or mode == ul_harq_mode::mode_a)) {
-        with_data = mode;
-        if (mode == ul_harq_mode::mode_a) {
-          // No channel left can outrank mode A with data.
-          return {with_data};
-        }
-      }
-    }
-    if (with_data.has_value()) {
-      return {with_data};
-    }
-    return {configured};
-  }
+  /// channels forbid, whatever it buffers after its last report. The UE leaves a group the grant cannot serve out of
+  /// its LCP, so its bytes are dropped from the size.
+  [[nodiscard]] ul_grant_selection select_ul_grant(ran_slice_id_t slice_id) const;
 
   /// \brief Checks whether a ConRes CE is pending for transmission.
   bool is_con_res_id_pending() const { return get_ue_row().at<ue_context>().pending_con_res_id; }

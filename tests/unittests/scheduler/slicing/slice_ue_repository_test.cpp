@@ -212,9 +212,10 @@ TEST_F(slice_ue_repository_test, restricted_logical_channel_decides_the_ul_harq_
   add_ue(ue_idx, lc_chs);
   ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{1}, 1000}}));
 
-  const slice_ue& u = (*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx];
-  ASSERT_TRUE(u.select_ul_grant_restrictions().harq_mode.has_value());
-  ASSERT_EQ(*u.select_ul_grant_restrictions().harq_mode, ul_harq_mode::mode_a);
+  const slice_ue& u         = (*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx];
+  const auto      selection = u.select_ul_grant();
+  ASSERT_TRUE(selection.restrictions.harq_mode.has_value());
+  ASSERT_EQ(*selection.restrictions.harq_mode, ul_harq_mode::mode_a);
 }
 
 /// With no channel restricting it, a grant rides mode B, whichever RAN slice it belongs to.
@@ -224,8 +225,8 @@ TEST_F(slice_ue_repository_test, unrestricted_data_rides_mode_b_in_every_slice)
   add_ue(ue_idx);
   ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{1}, 1000}}));
 
-  ASSERT_FALSE((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant_restrictions().is_restricted());
-  ASSERT_FALSE((*slices[SRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant_restrictions().is_restricted());
+  ASSERT_FALSE((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant().restrictions.is_restricted());
+  ASSERT_FALSE((*slices[SRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant().restrictions.is_restricted());
 }
 
 /// The grant an SR earns follows the channels it is meant to serve, which hold no data to restrict it yet.
@@ -239,9 +240,9 @@ TEST_F(slice_ue_repository_test, sr_grant_follows_the_configured_restriction)
   ue_db[ue_idx].handle_sr_indication(next_slot);
 
   const slice_ue& u = (*slices[SRB_RAN_SLICE_ID.value()])[ue_idx];
-  ASSERT_EQ(u.select_ul_grant_restrictions().harq_mode, ul_harq_mode::mode_a);
+  ASSERT_EQ(u.select_ul_grant().restrictions.harq_mode, ul_harq_mode::mode_a);
   // The SR is reported per UE, so the other slices see it too and keep following their own channels.
-  ASSERT_EQ((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant_restrictions().harq_mode,
+  ASSERT_EQ((*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx].select_ul_grant().restrictions.harq_mode,
             ul_harq_mode::mode_b);
 }
 
@@ -302,4 +303,55 @@ TEST_F(slice_ue_repository_test, data_in_flight_of_no_slice_counts_against_every
   EXPECT_EQ(u.pending_ul_newtx_bytes(), before - in_flight);
   // The fallback scheduler, which serves the UE outside of any slice, counts them just the same.
   EXPECT_EQ(ue_db[ue_idx].pending_ul_newtx_bytes(), ue_wide_before - in_flight);
+}
+
+/// \brief A group whose data is in flight must not take the grant from the groups the restriction serves.
+///
+/// The bytes in flight are counted for the whole slice, so they cannot be told apart from the ones the restriction
+/// leaves out. Taking them off what the grant serves, rather than off the slice total, would empty it.
+TEST_F(slice_ue_repository_test, data_in_flight_does_not_starve_the_groups_a_restricted_grant_serves)
+{
+  const du_ue_index_t ue_idx = to_du_ue_index(0);
+  // One slice, two groups that disagree, so a grant serves one of them and leaves the other out.
+  const std::vector<test_lc_ch_cfg> lc_chs = {
+      test_lc_ch_cfg{LCID_SRB1, uint_to_lcg_id(0), SRB_RAN_SLICE_ID},
+      test_lc_ch_cfg{LCID_MIN_DRB, uint_to_lcg_id(1), DEFAULT_DRB_RAN_SLICE_ID, ul_harq_mode::mode_a},
+      test_lc_ch_cfg{
+          uint_to_lcid(LCID_MIN_DRB + 1), uint_to_lcg_id(2), DEFAULT_DRB_RAN_SLICE_ID, ul_harq_mode::mode_b}};
+  add_ue(ue_idx, lc_chs);
+  ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{1}, 1000}}));
+  ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{2}, 8000}}));
+
+  const slice_ue& u      = (*slices[DEFAULT_DRB_RAN_SLICE_ID.value()])[ue_idx];
+  const auto      before = u.select_ul_grant();
+  ASSERT_EQ(before.restrictions.harq_mode, ul_harq_mode::mode_a) << "mode A outranks mode B with data";
+  const unsigned served_bytes = before.pending_bytes;
+  ASSERT_GT(served_bytes, 0);
+
+  // More bytes are in flight than the group the grant serves holds, and they may well be the other group's.
+  allocate_ul_harq_bytes(ue_idx, units::bytes{4000}, DEFAULT_DRB_RAN_SLICE_ID);
+
+  const auto selection = u.select_ul_grant();
+  ASSERT_EQ(selection.restrictions.harq_mode, ul_harq_mode::mode_a);
+  EXPECT_EQ(selection.pending_bytes, served_bytes) << "the group the grant serves was starved by data in flight";
+}
+
+/// \brief The grant an SR earns is not cut down to the bytes the slice already has in flight.
+///
+/// A grant that serves every group of the slice is sized by the slice alone, the minimum an SR earns included.
+TEST_F(slice_ue_repository_test, an_unrestricted_grant_keeps_the_minimum_an_sr_earns)
+{
+  const du_ue_index_t ue_idx = to_du_ue_index(0);
+  add_ue(ue_idx);
+  // The SRB slice holds less than the minimum, and all of it is already in flight.
+  ue_db[ue_idx].handle_bsr_indication(create_short_bsr(ue_idx, ul_bsr_lcg_report_list{{lcg_id_t{0}, 100}}));
+  allocate_ul_harq_bytes(ue_idx, units::bytes{2000}, SRB_RAN_SLICE_ID);
+  ue_db[ue_idx].handle_sr_indication(next_slot);
+
+  const slice_ue& u         = (*slices[SRB_RAN_SLICE_ID.value()])[ue_idx];
+  const auto      selection = u.select_ul_grant();
+  ASSERT_FALSE(selection.restrictions.is_restricted());
+  EXPECT_EQ(units::bytes{selection.pending_bytes}, u.pending_ul_newtx_bytes());
+  EXPECT_GT(selection.pending_bytes, ue_db[ue_idx].logical_channels().ul_pending_bytes(SRB_RAN_SLICE_ID))
+      << "the grant was cut down to the bytes the slice holds";
 }

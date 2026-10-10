@@ -229,8 +229,12 @@ protected:
                                        std::optional<unsigned> max_nof_rbs = std::nullopt)
   {
     const auto& init_ul_bwp = cell_cfg.params.ul_cfg_common.init_ul_bwp;
-    auto        result      = alloc.allocate_ul_grant(ue_newtx_ul_grant_request{
-        user, pusch_slot, pending_bytes, ofdm_symbol_range{0, NOF_OFDM_SYM_PER_SLOT_NORMAL_CP}});
+    auto        result      = alloc.allocate_ul_grant(
+        ue_newtx_ul_grant_request{.user            = user,
+                                              .pusch_slot      = pusch_slot,
+                                              .pending_bytes   = pending_bytes,
+                                              .allowed_symbols = ofdm_symbol_range{0, NOF_OFDM_SYM_PER_SLOT_NORMAL_CP},
+                                              .restrictions    = user.select_ul_grant().restrictions});
     if (not result.has_value()) {
       return result.error();
     }
@@ -457,11 +461,12 @@ TEST_P(ue_grid_allocator_default_cfg_test,
   bool cancelled = false;
   ASSERT_TRUE(run_until(
       [&]() {
-        auto grant =
-            alloc.allocate_ul_grant(ue_newtx_ul_grant_request{slice_ues[u.ue_index],
-                                                              get_next_ul_slot(current_slot),
-                                                              newtx_bytes,
-                                                              ofdm_symbol_range{0, NOF_OFDM_SYM_PER_SLOT_NORMAL_CP}});
+        auto grant = alloc.allocate_ul_grant(
+            ue_newtx_ul_grant_request{.user            = slice_ues[u.ue_index],
+                                      .pusch_slot      = get_next_ul_slot(current_slot),
+                                      .pending_bytes   = newtx_bytes,
+                                      .allowed_symbols = ofdm_symbol_range{0, NOF_OFDM_SYM_PER_SLOT_NORMAL_CP},
+                                      .restrictions    = slice_ues[u.ue_index].select_ul_grant().restrictions});
         if (grant.has_value()) {
           grant.value().set_pusch_params({});
           cancelled = true;
@@ -1514,7 +1519,7 @@ TEST_P(ue_grid_allocator_ul_harq_mode_test, retx_is_scheduled_when_its_mode_has_
   push_ul_bsr(u.ue_index, mode_a_lcg, 1000);
   ASSERT_TRUE(run_until([&]() { allocate_ul_newtx_grant(slice_ues[u.ue_index], units::bytes{200}); },
                         [&]() { return ue_cc.harqs.nof_empty_ul_harqs(harq_utils::harq_mode_t::normal) == 0; }));
-  ASSERT_EQ(slice_ues[u.ue_index].select_ul_grant_restrictions().harq_mode, ul_harq_mode::mode_a);
+  ASSERT_EQ(slice_ues[u.ue_index].select_ul_grant().restrictions.harq_mode, ul_harq_mode::mode_a);
 
   std::optional<ul_harq_process_handle> h_ul = ue_cc.harqs.find_ul_harq_waiting_ack();
   ASSERT_TRUE(h_ul.has_value());

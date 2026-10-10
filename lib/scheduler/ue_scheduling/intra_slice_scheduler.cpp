@@ -519,10 +519,11 @@ unsigned intra_slice_scheduler::schedule_dl_newtx_candidates(dl_ran_slice_candid
     }
 
     // Create DL grant builder.
-    auto result = ue_alloc.allocate_dl_grant(ue_newtx_dl_grant_request{.user          = *ue_candidate.ue,
-                                                                       .pdsch_slot    = pdsch_slot,
-                                                                       .pending_bytes = ue_candidate.pending_bytes,
-                                                                       .restrictions  = ue_candidate.dl_restrictions});
+    const ue_newtx_dl_grant_request request{.user          = *ue_candidate.ue,
+                                            .pdsch_slot    = pdsch_slot,
+                                            .pending_bytes = ue_candidate.pending_bytes,
+                                            .restrictions  = ue_candidate.dl_restrictions};
+    auto                            result = ue_alloc.allocate_dl_grant(request);
 
     if (result.has_value()) {
       // Allocation was successful. Move grant builder to list of pending newTx grants.
@@ -655,8 +656,12 @@ unsigned intra_slice_scheduler::schedule_ul_newtx_candidates(ul_ran_slice_candid
     // Create UL grant builder.
     // NOTE: the symbols passed to the grant are the symbols that are available for PUSCH and for which the used VRBs
     // have been computed.
-    auto result = ue_alloc.allocate_ul_grant(ue_newtx_ul_grant_request{
-        *ue_candidate.ue, pusch_slot, ue_candidate.pending_bytes, ofdm_symbol_range{0, min_srs_symbol}});
+    auto result =
+        ue_alloc.allocate_ul_grant(ue_newtx_ul_grant_request{.user            = *ue_candidate.ue,
+                                                             .pusch_slot      = pusch_slot,
+                                                             .pending_bytes   = ue_candidate.pending_bytes,
+                                                             .allowed_symbols = ofdm_symbol_range{0, min_srs_symbol},
+                                                             .restrictions    = ue_candidate.ul_restrictions});
 
     if (result.has_value()) {
       // Allocation was successful. Move grant builder to list of pending newTx grants.
@@ -802,25 +807,32 @@ std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_dl_candida
     return std::nullopt;
   }
 
-  return ue_newtx_candidate{&u, forbid_sched_priority, pending_bytes, tb_sel.restrictions};
+  return ue_newtx_candidate{.ue              = &u,
+                            .priority        = forbid_sched_priority,
+                            .pending_bytes   = pending_bytes,
+                            .dl_restrictions = tb_sel.restrictions};
 }
 std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_ul_candidate(const slice_ue& u) const
 {
   const ue_cell& ue_cc = u.get_cc();
   ocudu_assert(ue_cc.is_active() and not ue_cc.is_in_fallback_mode(), "Invalid slice UE state");
 
-  units::bytes pending_bytes = u.pending_ul_newtx_bytes();
-  if (pending_bytes.value() == 0) {
-    return std::nullopt;
-  }
-
   if (not can_allocate_pusch(u, ue_cc)) {
     return std::nullopt;
   }
 
-  if (not ue_cc.harqs.has_empty_ul_harqs()) {
-    // No available HARQs.
-    if (not ue_cc.harqs.find_pending_ul_retx().has_value()) {
+  // The grant is built on a process that is free, and the UE only serves the channels that process allows on it, so
+  // the grant is sized for those alone.
+  const auto   grant_sel = u.select_ul_grant();
+  units::bytes pending_bytes{grant_sel.pending_bytes};
+  if (pending_bytes.value() == 0) {
+    return std::nullopt;
+  }
+
+  if (not ue_cc.harqs.has_empty_ul_harqs(harq_utils::to_harq_mode(grant_sel.restrictions.harq_mode))) {
+    // No available HARQs. A process free in the other mode is not waiting for a CRC, so the UE only runs late once
+    // no process at all is free.
+    if (not ue_cc.harqs.has_empty_ul_harqs() and not ue_cc.harqs.find_pending_ul_retx().has_value()) {
       // All HARQs are waiting for their respective CRC. This may be a symptom of a slow PUSCH processing chain.
       logger.info("ue={} rnti={} PUSCH allocation skipped. Cause: All the UE HARQs are busy waiting for "
                   "their respective CRC result. Check if any CRC PDU went missing in the lower layers or is "
@@ -832,7 +844,10 @@ std::optional<ue_newtx_candidate> intra_slice_scheduler::create_newtx_ul_candida
     return std::nullopt;
   }
 
-  return ue_newtx_candidate{&u, forbid_sched_priority, pending_bytes};
+  return ue_newtx_candidate{.ue              = &u,
+                            .priority        = forbid_sched_priority,
+                            .pending_bytes   = pending_bytes,
+                            .ul_restrictions = grant_sel.restrictions};
 }
 
 unsigned intra_slice_scheduler::max_pdschs_to_alloc(const dl_ran_slice_candidate& slice) const

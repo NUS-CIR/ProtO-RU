@@ -465,8 +465,8 @@ void logical_channel_system::configure(soa::row_id ue_rid, logical_channel_confi
   ul_grant_restrictions           ul_restrictions;
   for (const auto& lc_cfg : *ue_cfg.channel_configs) {
     ue_ch.sorted_channels.push_back(lc_cfg->lcid);
-    dl_restrictions.set(*lc_cfg);
-    ul_restrictions.set(*lc_cfg);
+    dl_restrictions.narrow(*lc_cfg);
+    ul_restrictions.narrow(*lc_cfg);
   }
   ue_ch.restricted_channel_present    = dl_restrictions.is_restricted();
   ue_ul_ch.restricted_channel_present = ul_restrictions.is_restricted();
@@ -1084,7 +1084,7 @@ ue_logical_channel_repository::select_dl_transport_block(ran_slice_id_t slice_id
       continue;
     }
     if (selection.restrictions.admits(*lc_cfgs[lcid])) {
-      selection.restrictions.set(*lc_cfgs[lcid]);
+      selection.restrictions.narrow(*lc_cfgs[lcid]);
       serves_data = true;
       continue;
     }
@@ -1100,10 +1100,78 @@ ue_logical_channel_repository::select_dl_transport_block(ran_slice_id_t slice_id
     if (not slice_row(lcid).has_value()) {
       continue;
     }
-    selection.restrictions.set(*lc_cfgs[lcid]);
+    selection.restrictions.narrow(*lc_cfgs[lcid]);
     if (selection.restrictions.is_restricted()) {
       break;
     }
+  }
+  return selection;
+}
+
+ue_logical_channel_repository::ul_grant_selection
+ue_logical_channel_repository::select_ul_grant(ran_slice_id_t slice_id) const
+{
+  const auto& ue_ul_ch = get_ue_row().at<ue_ul_channel_context>();
+  // Nothing restricts the grant, so every channel of the slice can be served on it.
+  if (not ue_ul_ch.restricted_channel_present) {
+    return {{}, ul_pending_bytes(slice_id)};
+  }
+
+  // Resolves the row of a group of the slice, so that its slice and its buffer are read with one lookup.
+  const auto slice_row = [&](lcg_id_t lcgid) -> std::optional<soa::row_id> {
+    const std::optional<soa::row_id> lcg_rid = parent->lc_mapper.find_row_id(ue_index, lcgid);
+    if (not lcg_rid.has_value() or parent->lc_mapper.ul_slice_id(*lcg_rid) != slice_id) {
+      return std::nullopt;
+    }
+    return lcg_rid;
+  };
+
+  ul_grant_selection          selection{{}, ul_pending_bytes(slice_id)};
+  std::optional<ul_harq_mode> with_data;
+  std::optional<ul_harq_mode> configured;
+  for (const logical_channel_config_ptr& lc_cfg : cfg()) {
+    if (not lc_cfg->allowed_harq_mode.has_value()) {
+      continue;
+    }
+    const std::optional<soa::row_id> lcg_rid = slice_row(lc_cfg->lc_group);
+    if (not lcg_rid.has_value()) {
+      continue;
+    }
+    // Mode A outranks mode B, so it wins whichever channel is seen first.
+    const ul_harq_mode mode = *lc_cfg->allowed_harq_mode;
+    if (not configured.has_value() or mode == ul_harq_mode::mode_a) {
+      configured = mode;
+    }
+    if (parent->lc_mapper.ul_buf_st(*lcg_rid).value() > 0 and
+        (not with_data.has_value() or mode == ul_harq_mode::mode_a)) {
+      with_data = mode;
+      if (mode == ul_harq_mode::mode_a) {
+        // No channel left can outrank mode A with data.
+        break;
+      }
+    }
+  }
+  selection.restrictions.harq_mode = with_data.has_value() ? with_data : configured;
+  if (not selection.restrictions.is_restricted()) {
+    // Nothing closed on the grant, so every group of the slice can be served on it.
+    return selection;
+  }
+
+  // [Implementation-defined] The buffer status is reported per group, so a group is dropped only where the grant
+  // serves no channel of it. A group whose channels disagree is kept whole, and costs the grant the padding of the
+  // channels it cannot serve, rather than being split along a volume the UE never reports.
+  bounded_bitset<MAX_NOF_LCGS> served_groups(MAX_NOF_LCGS);
+  for (const logical_channel_config_ptr& lc_cfg : cfg()) {
+    if (ue_ul_ch.lcgs.contains(lc_cfg->lc_group) and selection.restrictions.admits(*lc_cfg)) {
+      served_groups.set(lc_cfg->lc_group);
+    }
+  }
+  for (const auto& [lcgid, lcg_rid] : ue_ul_ch.lcgs) {
+    if (served_groups.test(lcgid) or parent->lc_mapper.ul_slice_id(lcg_rid) != slice_id) {
+      continue;
+    }
+    const unsigned dropped = parent->ul_pending_bytes(lcgid, lcg_rid);
+    selection.pending_bytes -= std::min(selection.pending_bytes, dropped);
   }
   return selection;
 }
@@ -1319,7 +1387,7 @@ unsigned ocudu::build_dl_transport_block_info(dl_msg_tb_info&                 tb
       if (not restrictions.admits(*lc_cfgs[lcid])) {
         continue;
       }
-      restrictions.set(*lc_cfgs[lcid]);
+      restrictions.narrow(*lc_cfgs[lcid]);
     }
     total_subpdu_bytes +=
         allocate_mac_sdus(tb_info, lch_mng, units::bytes{tb_size_bytes.value() - total_subpdu_bytes}, lcid);

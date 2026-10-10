@@ -57,6 +57,8 @@ struct ue_newtx_ul_grant_request {
   units::bytes pending_bytes;
   /// Symbols that can be used for PUSCH allocation.
   ofdm_symbol_range allowed_symbols;
+  /// Restrictions the grant satisfies, as selected for the pending bytes.
+  ul_grant_restrictions restrictions;
 };
 
 /// Request for a reTx UL grant allocation.

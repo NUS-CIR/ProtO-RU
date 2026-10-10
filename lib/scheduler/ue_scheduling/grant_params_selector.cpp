@@ -592,6 +592,7 @@ static std::optional<ul_sched_context> get_ul_sched_context(const slice_ue&     
                                                             const ul_harq_process_handle* h_ul,
                                                             units::bytes                  pending_bytes,
                                                             ofdm_symbol_range             allowed_symbols,
+                                                            ul_grant_restrictions         restrictions,
                                                             unsigned                      max_rbs = MAX_NOF_PRBS)
 {
   const ue_cell& ue_cc = u.get_cc();
@@ -682,6 +683,7 @@ static std::optional<ul_sched_context> get_ul_sched_context(const slice_ue&     
   ctxt.vrb_lims                     = vrb_lims;
   ctxt.nof_rb_lims                  = nof_rb_lims;
   ctxt.pending_bytes                = pending_bytes;
+  ctxt.restrictions                 = restrictions;
   ctxt.nof_repetitions              = pusch_td_res.nof_repetitions;
   ctxt.single_tx_pusch_td_res_index = single_tx_index;
 
@@ -695,14 +697,16 @@ static std::optional<ul_sched_context> get_ul_sched_context(const slice_ue&     
   return ctxt;
 }
 
-std::optional<ul_sched_context> sched_helper::get_newtx_ul_sched_context(const slice_ue&   u,
-                                                                         slot_point        pdcch_slot,
-                                                                         slot_point        pusch_slot,
-                                                                         unsigned          uci_nof_harq_bits,
-                                                                         units::bytes      pending_bytes,
-                                                                         ofdm_symbol_range allowed_symbols)
+std::optional<ul_sched_context> sched_helper::get_newtx_ul_sched_context(const slice_ue&       u,
+                                                                         slot_point            pdcch_slot,
+                                                                         slot_point            pusch_slot,
+                                                                         unsigned              uci_nof_harq_bits,
+                                                                         units::bytes          pending_bytes,
+                                                                         ofdm_symbol_range     allowed_symbols,
+                                                                         ul_grant_restrictions restrictions)
 {
-  return get_ul_sched_context(u, pdcch_slot, pusch_slot, uci_nof_harq_bits, nullptr, pending_bytes, allowed_symbols);
+  return get_ul_sched_context(
+      u, pdcch_slot, pusch_slot, uci_nof_harq_bits, nullptr, pending_bytes, allowed_symbols, restrictions);
 }
 
 std::optional<ul_sched_context> sched_helper::get_retx_ul_sched_context(const slice_ue&               u,
@@ -714,7 +718,7 @@ std::optional<ul_sched_context> sched_helper::get_retx_ul_sched_context(const sl
                                                                         unsigned                      max_rbs)
 {
   return get_ul_sched_context(
-      u, pdcch_slot, pusch_slot, uci_nof_harq_bits, &h_ul, units::bytes{0}, allowed_symbols, max_rbs);
+      u, pdcch_slot, pusch_slot, uci_nof_harq_bits, &h_ul, units::bytes{0}, allowed_symbols, {}, max_rbs);
 }
 
 static bool resize_ul_grant_for_uci(ul_sched_context&             ctxt,

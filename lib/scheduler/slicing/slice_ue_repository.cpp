@@ -4,6 +4,7 @@
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 #include "slice_ue_repository.h"
+#include <algorithm>
 
 using namespace ocudu;
 
@@ -101,9 +102,31 @@ static units::bytes sum_allocated_ul_harq_bytes(const ue& u, std::optional<ran_s
 
 units::bytes slice_ue::pending_ul_newtx_bytes() const
 {
+  return get_newtx_bytes(units::bytes{u.logical_channels().ul_pending_bytes(slice_id)});
+}
+
+ue_logical_channel_repository::ul_grant_selection slice_ue::select_ul_grant() const
+{
+  ue_logical_channel_repository::ul_grant_selection selection = u.logical_channels().select_ul_grant(slice_id);
+  const units::bytes                                served_bytes{selection.pending_bytes};
+  const units::bytes                                slice_bytes{u.logical_channels().ul_pending_bytes(slice_id)};
+
+  // The bytes in flight are counted per slice, not per group, so they come off the slice total and the served groups
+  // cap the result. A group whose data is in flight then costs the grant padding, and only undersizes it once the
+  // bytes in flight outgrow what the groups left out hold. A grant serving every group takes the slice total as it
+  // stands, so that the minimum an SR earns outlives the bytes already in flight.
+  units::bytes newtx_bytes = get_newtx_bytes(slice_bytes);
+  if (slice_bytes.value() > 0 and selection.restrictions.is_restricted()) {
+    newtx_bytes = std::min(newtx_bytes, served_bytes);
+  }
+  selection.pending_bytes = newtx_bytes.value();
+  return selection;
+}
+
+units::bytes slice_ue::get_newtx_bytes(units::bytes slice_bytes) const
+{
   static constexpr units::bytes SR_GRANT_BYTES{512};
 
-  const units::bytes slice_bytes{u.logical_channels().ul_pending_bytes(slice_id)};
   if (slice_bytes.value() > 0) {
     const units::bytes in_flight = sum_allocated_ul_harq_bytes(u, slice_id);
     if (slice_bytes > in_flight) {
