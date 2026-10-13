@@ -6,6 +6,7 @@
 
 #include "radio_difi_data_packet.h"
 #include "radio_difi_rx_channel.h"
+#include "radio_difi_rx_timing_stats.h"
 #include "ocudu/adt/static_vector.h"
 #include "ocudu/gateways/baseband/baseband_gateway_receiver.h"
 #include "ocudu/gateways/baseband/baseband_gateway_timestamp.h"
@@ -79,6 +80,9 @@ public:
   void stop();
 
 private:
+  /// Logs the arrival margin of the datagrams received over the last report period, once a period.
+  void report_timing();
+
   /// Stream configuration.
   stream_description config;
   /// Logger.
@@ -104,6 +108,10 @@ private:
   uint64_t clock_anchor_ts = 0;
   /// Indicates whether \ref clock_anchor has been re-taken against the transmitter first packet.
   bool clock_anchor_locked_to_peer = false;
+  /// How early datagrams arrive ahead of the time their samples are due.
+  radio_difi_rx_timing_stats timing_stats;
+  /// When \ref timing_stats was last logged.
+  std::optional<std::chrono::steady_clock::time_point> last_timing_report;
 };
 
 } // namespace ocudu

@@ -26,6 +26,9 @@ static constexpr std::chrono::milliseconds MAX_TIMELINE_DEBT{50};
 /// A peer locked onto our timestamps lands within milliseconds; its own epoch is seconds or years away.
 static constexpr double SHARED_EPOCH_TOLERANCE_S = 0.1;
 
+/// How often the arrival margin of received datagrams is logged.
+static constexpr std::chrono::seconds TIMING_REPORT_PERIOD{1};
+
 radio_difi_rx_stream::radio_difi_rx_stream(const stream_description& config_, radio_event_notifier& notifier) :
   config(config_), logger(ocudulog::fetch_basic_logger(config_.stream_id_str, false))
 {
@@ -163,6 +166,25 @@ baseband_gateway_receiver::metadata radio_difi_rx_stream::receive(baseband_gatew
       }
     }
 
+    // Arrival margin: how long before the last sample of the packet is due on the anchored timeline it arrived. The
+    // kernel stamps arrival on the system clock, which is brought onto the steady clock of the timeline here; a
+    // datagram without a stamp falls back on the time it was read, which overstates its lateness.
+    if (clock_anchor.has_value() && (config.sample_rate_Hz > 0.0)) {
+      const double due_s = static_cast<double>(local_ts + packet.nof_samples - static_cast<int64_t>(clock_anchor_ts)) /
+                           config.sample_rate_Hz;
+      const auto due     = *clock_anchor + std::chrono::nanoseconds(static_cast<int64_t>(due_s * 1e9));
+      auto       arrival = std::chrono::steady_clock::now();
+      if (packet.arrival.has_value()) {
+        arrival -= std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::system_clock::now() -
+                                                                                   *packet.arrival);
+      }
+      timing_stats.record(due - arrival);
+    }
+    // A packet starting behind what the channel already holds was dropped, at least in part, for arriving late.
+    if (local_ts < static_cast<int64_t>(channel.get_next_timestamp())) {
+      timing_stats.record_late();
+    }
+
     channel.write_packet(packet, local_ts);
   };
 
@@ -236,7 +258,39 @@ baseband_gateway_receiver::metadata radio_difi_rx_stream::receive(baseband_gatew
   // computes the next expected timestamp.
   sample_count.store(base_ts + nof_requested, std::memory_order_relaxed);
 
+  report_timing();
+
   return metadata{.ts = base_ts};
+}
+
+void radio_difi_rx_stream::report_timing()
+{
+  const auto now = std::chrono::steady_clock::now();
+  if (!last_timing_report.has_value()) {
+    last_timing_report = now;
+    return;
+  }
+  if (now - *last_timing_report < TIMING_REPORT_PERIOD) {
+    return;
+  }
+  last_timing_report = now;
+
+  const std::optional<radio_difi_rx_timing_stats::summary> summary = timing_stats.get_summary();
+  timing_stats.reset();
+  if (!summary.has_value()) {
+    return;
+  }
+
+  logger.info("stream={}: DIFI receive timing. datagrams={} late={} margin_min={}us margin_p0.1={}us "
+              "margin_p1={}us margin_p50={}us rx_lag={}us",
+              config.stream_id,
+              summary->nof_datagrams,
+              summary->nof_late,
+              summary->min.count(),
+              summary->p0_1.count(),
+              summary->p1.count(),
+              summary->p50.count(),
+              RX_LAG.count());
 }
 
 void radio_difi_rx_stream::start(baseband_gateway_timestamp init_time, int64_t epoch_offset_ticks)
@@ -247,6 +301,8 @@ void radio_difi_rx_stream::start(baseband_gateway_timestamp init_time, int64_t e
   // Drop any latched epoch: the next packet re-locks onto the transmitter.
   ts_offset.reset();
   std::fill(channel_synchronized.begin(), channel_synchronized.end(), false);
+  timing_stats.reset();
+  last_timing_report.reset();
   clock_anchor.reset();
   clock_anchor_ts             = 0;
   clock_anchor_locked_to_peer = false;

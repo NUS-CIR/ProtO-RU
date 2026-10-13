@@ -10,7 +10,9 @@
 #include "ocudu/adt/span.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/radio/radio_event_notifier.h"
+#include <chrono>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -52,6 +54,8 @@ public:
     span<const uint8_t> payload;
     /// Number of IQ samples in \ref payload.
     unsigned nof_samples = 0;
+    /// When the kernel received the datagram, if it said.
+    std::optional<std::chrono::system_clock::time_point> arrival;
   };
 
   /// Outcome of an attempt to read one datagram.

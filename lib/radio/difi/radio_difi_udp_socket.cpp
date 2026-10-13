@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #include <poll.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 using namespace ocudu;
@@ -63,6 +64,13 @@ bool radio_difi_udp_socket::open_rx(const std::string& ip, uint16_t port, units:
   if (fd < 0) {
     logger.error("failed to create socket: {}", std::strerror(errno));
     return false;
+  }
+
+  // Have the kernel stamp each datagram on arrival, so a receiver can tell how early it came in rather than when it
+  // got around to reading it.
+  const int timestamp_on = 1;
+  if (::setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPNS, &timestamp_on, sizeof(timestamp_on)) < 0) {
+    logger.warning("port={}: Receive timestamps unavailable: {}", port, std::strerror(errno));
   }
 
   // Large receive buffer to absorb bursts without dropping packets. SO_RCVBUF takes an int.
@@ -136,6 +144,47 @@ expected<span<uint8_t>, difi_recv_error> radio_difi_udp_socket::try_recv(span<ui
     }
     logger.error("recvfrom error: {}", std::strerror(errno));
     return make_unexpected(difi_recv_error::failure);
+  }
+
+  return buf.first(static_cast<size_t>(n));
+}
+
+expected<span<uint8_t>, difi_recv_error>
+radio_difi_udp_socket::try_recv(std::optional<std::chrono::system_clock::time_point>& arrival, span<uint8_t> buf)
+{
+  arrival.reset();
+  if (fd < 0) {
+    return make_unexpected(difi_recv_error::failure);
+  }
+
+  struct iovec iov = {};
+  iov.iov_base     = buf.data();
+  iov.iov_len      = buf.size();
+  // Room for the one receive timestamp the socket is set up to attach.
+  alignas(struct cmsghdr) uint8_t control[CMSG_SPACE(sizeof(struct timespec))];
+  struct msghdr                   msg = {};
+  msg.msg_iov                         = &iov;
+  msg.msg_iovlen                      = 1;
+  msg.msg_control                     = control;
+  msg.msg_controllen                  = sizeof(control);
+
+  const ssize_t n = ::recvmsg(fd, &msg, MSG_DONTWAIT);
+  if (n < 0) {
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+      return make_unexpected(difi_recv_error::timeout);
+    }
+    logger.error("recvmsg error: {}", std::strerror(errno));
+    return make_unexpected(difi_recv_error::failure);
+  }
+
+  for (struct cmsghdr* cmsg = CMSG_FIRSTHDR(&msg); cmsg != nullptr; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+    if ((cmsg->cmsg_level != SOL_SOCKET) || (cmsg->cmsg_type != SCM_TIMESTAMPNS)) {
+      continue;
+    }
+    struct timespec ts = {};
+    std::memcpy(&ts, CMSG_DATA(cmsg), sizeof(ts));
+    arrival = std::chrono::system_clock::time_point(std::chrono::duration_cast<std::chrono::system_clock::duration>(
+        std::chrono::seconds(ts.tv_sec) + std::chrono::nanoseconds(ts.tv_nsec)));
   }
 
   return buf.first(static_cast<size_t>(n));

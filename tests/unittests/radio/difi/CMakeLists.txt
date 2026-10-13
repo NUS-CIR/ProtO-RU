@@ -41,3 +41,9 @@ target_include_directories(radio_difi_rx_stream_loopback_test PRIVATE
         ${CMAKE_SOURCE_DIR}/lib/radio/difi
         ${CMAKE_SOURCE_DIR}/include)
 add_test(radio_difi_rx_stream_loopback_test radio_difi_rx_stream_loopback_test)
+
+add_executable(radio_difi_rx_timing_stats_test radio_difi_rx_timing_stats_test.cpp)
+target_link_libraries(radio_difi_rx_timing_stats_test ocudu_radio_difi gtest gtest_main)
+target_include_directories(radio_difi_rx_timing_stats_test PRIVATE
+        ${CMAKE_SOURCE_DIR}/lib/radio/difi)
+add_test(radio_difi_rx_timing_stats_test radio_difi_rx_timing_stats_test)

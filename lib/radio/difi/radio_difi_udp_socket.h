@@ -11,6 +11,7 @@
 #include <chrono>
 #include <cstdint>
 #include <netinet/in.h>
+#include <optional>
 #include <string>
 #include <sys/types.h>
 
@@ -64,6 +65,12 @@ public:
   /// Lets a receiver drain a backlog with one system call per datagram, polling with wait_readable() only when
   /// the queue is empty.
   expected<span<uint8_t>, difi_recv_error> try_recv(span<uint8_t> buf);
+
+  /// \brief Same as try_recv(), and also reports when the kernel received the datagram.
+  ///
+  /// \p arrival is left empty if the kernel attached no receive timestamp or nothing was received.
+  expected<span<uint8_t>, difi_recv_error> try_recv(std::optional<std::chrono::system_clock::time_point>& arrival,
+                                                    span<uint8_t>                                         buf);
 
   /// \brief Waits for a readable datagram or \p timeout, zero polling without blocking.
   ///

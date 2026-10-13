@@ -12,6 +12,7 @@ set(SOURCES_DIFI
         radio_session_difi_impl.cpp
         radio_difi_rx_channel.cpp
         radio_difi_rx_stream.cpp
+        radio_difi_rx_timing_stats.cpp
         radio_difi_tx_channel.cpp
         radio_difi_tx_stream.cpp)
 

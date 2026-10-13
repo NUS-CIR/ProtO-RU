@@ -4,11 +4,16 @@
 
 #include "radio_difi_udp_socket.h"
 #include "ocudu/ocudulog/ocudulog.h"
+#include <arpa/inet.h>
+#include <array>
 #include <chrono>
 #include <cstring>
 #include <filesystem>
 #include <gtest/gtest.h>
+#include <optional>
+#include <sys/socket.h>
 #include <thread>
+#include <unistd.h>
 
 using namespace ocudu;
 
@@ -208,3 +213,100 @@ TEST(RadioDifiUdpSocketTest, MultiplePacketsArrivedInOrder)
 }
 
 } // namespace
+
+// The kernel stamps each datagram on arrival, so a receiver can tell how early it came in rather than when it read it.
+/// \brief Tells whether this platform's kernel stamps a datagram when it arrives rather than when it is read.
+///
+/// Some sandboxed runners stamp at the read, which no socket code can correct. A raw socket with no DIFI code in the
+/// way tells the two cases apart, so the test below still catches a regression in this code where the kernel is right.
+static bool kernel_stamps_on_arrival(uint16_t port)
+{
+  static constexpr std::chrono::milliseconds PROBE_HOLD{100};
+
+  const int rx_fd      = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  const int tx_fd      = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  bool      on_arrival = false;
+
+  sockaddr_in addr = {};
+  addr.sin_family  = AF_INET;
+  addr.sin_port    = htons(port);
+  ::inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+
+  const int timestamp_on = 1;
+  if ((rx_fd >= 0) && (tx_fd >= 0) &&
+      (::setsockopt(rx_fd, SOL_SOCKET, SO_TIMESTAMPNS, &timestamp_on, sizeof(timestamp_on)) == 0) &&
+      (::bind(rx_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0)) {
+    const uint8_t payload = 0;
+    const auto    sent    = std::chrono::system_clock::now();
+    ::sendto(tx_fd, &payload, sizeof(payload), 0, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
+    std::this_thread::sleep_for(PROBE_HOLD);
+
+    uint8_t                  data                                  = 0;
+    iovec                    iov                                   = {&data, sizeof(data)};
+    alignas(cmsghdr) uint8_t control[CMSG_SPACE(sizeof(timespec))] = {};
+    msghdr                   msg                                   = {};
+    msg.msg_iov                                                    = &iov;
+    msg.msg_iovlen                                                 = 1;
+    msg.msg_control                                                = control;
+    msg.msg_controllen                                             = sizeof(control);
+    if (::recvmsg(rx_fd, &msg, MSG_DONTWAIT) >= 0) {
+      for (cmsghdr* cmsg = CMSG_FIRSTHDR(&msg); cmsg != nullptr; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+        if ((cmsg->cmsg_level != SOL_SOCKET) || (cmsg->cmsg_type != SCM_TIMESTAMPNS)) {
+          continue;
+        }
+        timespec ts = {};
+        std::memcpy(&ts, CMSG_DATA(cmsg), sizeof(ts));
+        const std::chrono::system_clock::time_point stamp(
+            std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds(ts.tv_sec) +
+                                                                            std::chrono::nanoseconds(ts.tv_nsec)));
+        on_arrival = (stamp - sent) < (PROBE_HOLD / 2);
+      }
+    }
+  }
+
+  if (rx_fd >= 0) {
+    ::close(rx_fd);
+  }
+  if (tx_fd >= 0) {
+    ::close(tx_fd);
+  }
+  return on_arrival;
+}
+
+TEST(RadioDifiUdpSocketTest, TimestampedReceiveReportsArrival)
+{
+  if (!kernel_stamps_on_arrival(TEST_PORT + 14)) {
+    GTEST_SKIP() << "This platform stamps datagrams at the read rather than on arrival.";
+  }
+
+  // Long enough that a stamp taken at the read, rather than the arrival, cannot pass even under a slow tool.
+  static constexpr std::chrono::milliseconds HOLD{200};
+  // Slack below the send time, for a kernel clock read a little before ours.
+  static constexpr std::chrono::milliseconds CLOCK_SLACK{1};
+
+  radio_difi_udp_socket rx(test_socket_logger());
+  radio_difi_udp_socket tx(test_socket_logger());
+  ASSERT_TRUE(rx.open_rx("127.0.0.1", TEST_PORT + 13));
+  ASSERT_TRUE(tx.open_tx("127.0.0.1", TEST_PORT + 13));
+
+  const std::array<uint8_t, 4> tx_buf = {0x01, 0x02, 0x03, 0x04};
+  const auto                   sent   = std::chrono::system_clock::now();
+  ASSERT_TRUE(tx.send(tx_buf));
+
+  // Read it well after it arrived: the stamp must still say when it came in.
+  std::this_thread::sleep_for(HOLD);
+  std::optional<std::chrono::system_clock::time_point> arrival;
+  std::array<uint8_t, 64>                              rx_buf   = {};
+  const auto                                           received = rx.try_recv(arrival, rx_buf);
+  ASSERT_TRUE(received.has_value());
+  ASSERT_EQ(received->size(), tx_buf.size());
+  ASSERT_TRUE(arrival.has_value());
+  EXPECT_GE(*arrival, sent - CLOCK_SLACK);
+  EXPECT_LT(*arrival - sent, HOLD / 2) << "The stamp must be the arrival, not the read";
+
+  // An empty queue reports nothing, and no stamp.
+  const auto empty = rx.try_recv(arrival, rx_buf);
+  ASSERT_FALSE(empty.has_value());
+  EXPECT_EQ(empty.error(), difi_recv_error::timeout);
+  EXPECT_FALSE(arrival.has_value());
+}

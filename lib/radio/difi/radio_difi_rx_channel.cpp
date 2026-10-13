@@ -158,7 +158,7 @@ void radio_difi_rx_channel::begin_buffer(span<ci16_t> buffer, uint64_t base_ts)
 
 radio_difi_rx_channel::read_status radio_difi_rx_channel::try_read(data_packet& packet)
 {
-  const expected<span<uint8_t>, difi_recv_error> received = socket.try_recv(rx_buf);
+  const expected<span<uint8_t>, difi_recv_error> received = socket.try_recv(packet.arrival, rx_buf);
   if (!received.has_value()) {
     return (received.error() == difi_recv_error::timeout) ? read_status::empty : read_status::error;
   }
