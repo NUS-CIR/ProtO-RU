@@ -18,6 +18,7 @@
 #include <cstring>
 #include <ctime>
 #include <gtest/gtest.h>
+#include <thread>
 #include <type_traits>
 #include <vector>
 
@@ -110,7 +111,7 @@ protected:
   {
     radio_difi_tx_stream::stream_description desc;
     desc.ip             = "127.0.0.1";
-    desc.port           = TEST_PORT;
+    desc.channels       = {{TEST_PORT, STREAM_ID}};
     desc.stream_id      = STREAM_ID;
     desc.bit_depth      = 16;
     desc.iq_byte_order  = order;
@@ -128,6 +129,17 @@ protected:
       tx->stop();
     }
     rx_sock.close();
+  }
+
+  /// Transmits a single sample, which is what makes a pending context packet go out.
+  void transmit_one_sample()
+  {
+    const std::vector<ci16_t>             samples = {ci16_t(1, 2)};
+    simple_buffer_reader                  buf(samples);
+    baseband_gateway_transmitter_metadata meta{};
+    meta.is_empty = false;
+    meta.ts       = 0;
+    tx->transmit(buf, meta);
   }
 
   /// Receive one packet into \p buf. Returns number of bytes received, or 0 if none arrived.
@@ -371,7 +383,7 @@ protected:
 
     radio_difi_tx_stream::stream_description desc;
     desc.ip             = "127.0.0.1";
-    desc.port           = port;
+    desc.channels       = {{port, STREAM_ID}};
     desc.stream_id      = STREAM_ID;
     desc.bit_depth      = 16;
     desc.sample_rate_Hz = SRATE;
@@ -659,7 +671,9 @@ TEST_F(TxStreamLoopback, SetFreqSendsUpdatedContextPacket)
   // Change frequency and expect a new context packet.
   const double new_freq_Hz = 2.6e9;
   tx->set_freq(new_freq_Hz);
+  ASSERT_NO_FATAL_FAILURE(transmit_one_sample());
 
+  // The context packet goes out ahead of the data it precedes.
   std::vector<uint8_t> pkt;
   ASSERT_GT(recv_packet(pkt), 0);
   ASSERT_EQ(pkt.size(), DIFI_CONTEXT_PACKET_SIZE.value());
@@ -676,8 +690,10 @@ TEST_F(TxStreamLoopback, SetGainSendsUpdatedContextPacket)
   ASSERT_GT(recv_packet(ctx), 0);
 
   // Set RF gain to 6 dB, IF gain to 3 dB.
-  tx->set_gain(6.0, 3.0);
+  ASSERT_TRUE(tx->set_gain(0, 6.0, 3.0));
+  ASSERT_NO_FATAL_FAILURE(transmit_one_sample());
 
+  // The context packet goes out ahead of the data it precedes.
   std::vector<uint8_t> pkt;
   ASSERT_GT(recv_packet(pkt), 0);
   ASSERT_EQ(pkt.size(), DIFI_CONTEXT_PACKET_SIZE.value());
@@ -688,6 +704,45 @@ TEST_F(TxStreamLoopback, SetGainSendsUpdatedContextPacket)
   const int16_t  if_actual = static_cast<int16_t>(gains >> 16);
   EXPECT_EQ(rf_actual, static_cast<int16_t>(6.0 * 128));
   EXPECT_EQ(if_actual, static_cast<int16_t>(3.0 * 128));
+}
+
+// The control thread changes the frequency and gains while the radio thread transmits. The last change must still be
+// announced, and a sanitizer run must see no race.
+TEST_F(TxStreamLoopback, SettingsChangedWhileTransmittingAreAnnounced)
+{
+  static constexpr unsigned NOF_UPDATES  = 500;
+  static constexpr unsigned NOF_TRANSMIT = 200;
+  static constexpr double   FINAL_RF_dB  = 12.0;
+  static constexpr double   FINAL_IF_dB  = 5.0;
+
+  tx->start(0);
+  std::vector<uint8_t> pkt;
+  ASSERT_GT(recv_packet(pkt), 0);
+
+  std::thread control([this]() {
+    for (unsigned i = 0; i != NOF_UPDATES; ++i) {
+      tx->set_freq(2.0e9 + i);
+      tx->set_gain(0, static_cast<double>(i % 10), 0.0);
+    }
+  });
+  for (unsigned i = 0; i != NOF_TRANSMIT; ++i) {
+    transmit_one_sample();
+  }
+  control.join();
+
+  // One more change after the control thread is done, then drain everything that was sent.
+  ASSERT_TRUE(tx->set_gain(0, FINAL_RF_dB, FINAL_IF_dB));
+  transmit_one_sample();
+  std::vector<uint8_t> last_ctx;
+  while (recv_packet(pkt) > 0) {
+    if (pkt.size() == DIFI_CONTEXT_PACKET_SIZE.value()) {
+      last_ctx = pkt;
+    }
+  }
+  ASSERT_EQ(last_ctx.size(), DIFI_CONTEXT_PACKET_SIZE.value());
+  const uint32_t gains = read_u32_be(last_ctx.data() + 72);
+  EXPECT_EQ(static_cast<int16_t>(gains & 0xffffU), static_cast<int16_t>(FINAL_RF_dB * 128));
+  EXPECT_EQ(static_cast<int16_t>(gains >> 16), static_cast<int16_t>(FINAL_IF_dB * 128));
 }
 
 // Disabled by default: this writes a capture for inspection in Wireshark rather than asserting on it.
@@ -771,7 +826,7 @@ TEST(TxStreamEvents, UnderflowFiredOnTimestampGap)
 
   radio_difi_tx_stream::stream_description tx_desc;
   tx_desc.ip             = "127.0.0.1";
-  tx_desc.port           = PORT;
+  tx_desc.channels       = {{PORT, STREAM}};
   tx_desc.stream_id      = STREAM;
   tx_desc.bit_depth      = 16;
   tx_desc.sample_rate_Hz = SRATE;
@@ -818,16 +873,18 @@ TEST(TxStreamEvents, UnderflowFiredOnTimestampGap)
 /// constructor reading an indeterminate value into the logger level or the context packet gains.
 TEST(TxStreamConfig, DescriptionScalarDefaultsAreDeterministic)
 {
-  const radio_difi_tx_stream::stream_description desc;
+  const radio_difi_tx_stream::stream_description  desc;
+  const radio_difi_tx_stream::channel_description channel;
 
-  EXPECT_EQ(desc.port, 0U);
   EXPECT_EQ(desc.stream_id, 0U);
   EXPECT_EQ(desc.bit_depth, 16U);
   EXPECT_EQ(desc.sample_rate_Hz, 0.0);
   EXPECT_EQ(desc.center_freq_Hz, 0.0);
-  EXPECT_EQ(desc.rf_gain_dB, 0.0);
-  EXPECT_EQ(desc.if_gain_dB, 0.0);
   EXPECT_EQ(desc.log_level, ocudulog::basic_levels::info);
+  EXPECT_EQ(channel.port, 0U);
+  EXPECT_EQ(channel.difi_stream_id, 0U);
+  EXPECT_EQ(channel.rf_gain_dB, 0.0);
+  EXPECT_EQ(channel.if_gain_dB, 0.0);
 }
 
 /// An unsupported IQ bit depth comes from user configuration, so it must fail construction rather
@@ -843,7 +900,7 @@ TEST(TxStreamConfig, UnsupportedBitDepthIsRejected)
 
   radio_difi_tx_stream::stream_description desc;
   desc.ip            = "127.0.0.1";
-  desc.port          = PORT;
+  desc.channels      = {{PORT, 0}};
   desc.bit_depth     = 12;
   desc.stream_id_str = "test:baddepth:tx";
 
@@ -868,7 +925,7 @@ TEST(TxStreamConfig, InvalidAddressFailsConstruction)
 {
   radio_difi_tx_stream::stream_description desc;
   desc.ip            = "not.an.address";
-  desc.port          = 15042;
+  desc.channels      = {{15042, 0}};
   desc.stream_id_str = "test:badaddr:tx";
 
   null_notifier        notifier;
@@ -883,7 +940,7 @@ TEST(TxStreamConfig, SupportedBitDepthsAreAccepted)
   for (unsigned bit_depth : {8U, 16U}) {
     radio_difi_tx_stream::stream_description desc;
     desc.ip            = "127.0.0.1";
-    desc.port          = 15041;
+    desc.channels      = {{15041, 0}};
     desc.bit_depth     = bit_depth;
     desc.stream_id_str = "test:depth:tx";
 

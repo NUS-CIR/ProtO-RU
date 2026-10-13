@@ -10,7 +10,9 @@ set(SOURCES_DIFI
         radio_difi_udp_socket.cpp
         radio_factory_difi_impl.cpp
         radio_session_difi_impl.cpp
+        radio_difi_rx_channel.cpp
         radio_difi_rx_stream.cpp
+        radio_difi_tx_channel.cpp
         radio_difi_tx_stream.cpp)
 
 add_library(ocudu_radio_difi STATIC ${SOURCES_DIFI})

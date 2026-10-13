@@ -70,34 +70,34 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
       tx_gain_dB             = tx_channel.gain_dB;
     }
 
-    radio_difi_tx_stream::stream_description tx_config = {.ip             = tx_parsed->ip,
-                                                          .port           = tx_parsed->port,
-                                                          .stream_id      = stream_id,
-                                                          .bit_depth      = bit_depth,
-                                                          .iq_byte_order  = iq_byte_order,
-                                                          .sample_rate_Hz = config.sampling_rate_Hz,
-                                                          .center_freq_Hz = tx_center_freq_Hz,
-                                                          .rf_gain_dB     = tx_gain_dB,
-                                                          .if_gain_dB     = 0.0,
-                                                          .stream_id_str  = "difi:tx:" + std::to_string(stream_id),
-                                                          .log_level      = config.log_level};
+    radio_difi_tx_stream::stream_description tx_config = {
+        .ip             = tx_parsed->ip,
+        .channels       = {{.port = tx_parsed->port, .difi_stream_id = stream_id, .rf_gain_dB = tx_gain_dB}},
+        .stream_id      = stream_id,
+        .bit_depth      = bit_depth,
+        .iq_byte_order  = iq_byte_order,
+        .sample_rate_Hz = config.sampling_rate_Hz,
+        .center_freq_Hz = tx_center_freq_Hz,
+        .stream_id_str  = "difi:tx:" + std::to_string(stream_id),
+        .log_level      = config.log_level};
 
-    radio_difi_rx_stream::stream_description rx_config = {.ip             = rx_parsed->ip,
-                                                          .port           = rx_parsed->port,
-                                                          .stream_id      = stream_id,
-                                                          .bit_depth      = bit_depth,
-                                                          .iq_byte_order  = iq_byte_order,
-                                                          .sample_rate_Hz = config.sampling_rate_Hz,
-                                                          .stream_id_str  = "difi:rx:" + std::to_string(stream_id),
-                                                          .log_level      = config.log_level};
+    radio_difi_rx_stream::stream_description rx_config = {
+        .ip             = rx_parsed->ip,
+        .channels       = {{.port = rx_parsed->port, .difi_stream_id = stream_id}},
+        .stream_id      = stream_id,
+        .bit_depth      = bit_depth,
+        .iq_byte_order  = iq_byte_order,
+        .sample_rate_Hz = config.sampling_rate_Hz,
+        .stream_id_str  = "difi:rx:" + std::to_string(stream_id),
+        .log_level      = config.log_level};
 
     logger.info("Creating DIFI stream {} — tx={}:{} rx={}:{} bit_depth={} iq_byte_order={} srate={}Hz freq={}Hz "
                 "gain={}dB",
                 stream_id,
                 tx_config.ip,
-                tx_config.port,
+                tx_parsed->port,
                 rx_config.ip,
-                rx_config.port,
+                rx_parsed->port,
                 bit_depth,
                 (iq_byte_order == difi_iq_byte_order::big) ? "big" : "little",
                 config.sampling_rate_Hz,
@@ -182,14 +182,8 @@ bool radio_session_difi_impl::set_tx_gain(unsigned port_id, double gain_dB)
     return false;
   }
 
-  // Only the first channel of each stream is carried, so no other port has a context packet to advertise it in.
   const auto [stream_id, channel_id] = tx_port_map[port_id];
-  if (channel_id != 0) {
-    return false;
-  }
-
-  bb_gateways[stream_id]->get_tx_stream().set_gain(gain_dB, 0.0);
-  return true;
+  return bb_gateways[stream_id]->get_tx_stream().set_gain(channel_id, gain_dB, 0.0);
 }
 
 bool radio_session_difi_impl::set_tx_freq(unsigned stream_id, double center_freq_Hz)

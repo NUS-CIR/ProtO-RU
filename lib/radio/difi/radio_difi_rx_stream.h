@@ -5,30 +5,43 @@
 #pragma once
 
 #include "radio_difi_data_packet.h"
-#include "radio_difi_udp_socket.h"
-#include "ocudu/adt/complex.h"
+#include "radio_difi_rx_channel.h"
 #include "ocudu/gateways/baseband/baseband_gateway_receiver.h"
 #include "ocudu/gateways/baseband/baseband_gateway_timestamp.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/radio/radio_event_notifier.h"
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <optional>
+#include <string>
+#include <vector>
 
 namespace ocudu {
 
-/// Implements a gateway receiver that unpacks IQ samples from DIFI data packets received over UDP.
+/// \brief Implements a gateway receiver that unpacks IQ samples from DIFI data packets received over UDP.
+///
+/// Each channel of the buffer is filled by its own receive channel, a DIFI stream on its own UDP port. The stream
+/// paces the calls to the wall clock and maps wire timestamps onto the baseband timeline once for all channels.
 class radio_difi_rx_stream : public baseband_gateway_receiver
 {
 public:
+  /// Per-channel parameters of a DIFI receive stream.
+  struct channel_description {
+    /// Port to listen on for this channel.
+    uint16_t port = 0;
+    /// DIFI stream identifier of this channel. Packets with a different identifier are discarded.
+    uint32_t difi_stream_id = 0;
+  };
+
   /// Describes the necessary parameters to create a DIFI Rx stream.
   struct stream_description {
-    /// Address to bind the receive socket on. Use "0.0.0.0" for any interface.
+    /// Address to bind the receive sockets on, shared by every channel. Use "0.0.0.0" for any interface.
     std::string ip;
-    /// Port to listen on.
-    uint16_t port = 0;
-    /// Stream identifier. Packets with a different identifier are discarded.
-    uint32_t stream_id = 0;
+    /// Channels of the stream, one per antenna port.
+    std::vector<channel_description> channels;
+    /// Radio stream identifier reported in radio events.
+    unsigned stream_id = 0;
     /// IQ sample bit depth, either 8 or 16.
     unsigned bit_depth = 16;
     /// Byte order of 16-bit IQ components in received packets.
@@ -45,12 +58,12 @@ public:
     bool latch_peer_epoch = false;
   };
 
-  radio_difi_rx_stream(const stream_description& config_, radio_event_notifier& notifier_);
+  radio_difi_rx_stream(const stream_description& config_, radio_event_notifier& notifier);
 
   // See interface for documentation.
   metadata receive(baseband_gateway_buffer_writer& data) override;
 
-  /// Returns true if the stream was constructed successfully, including binding its socket.
+  /// Returns true if the stream was constructed successfully, including binding the sockets of all its channels.
   bool is_successful() const { return successful; }
 
   uint64_t get_sample_count() const { return sample_count.load(std::memory_order_relaxed); }
@@ -66,30 +79,18 @@ public:
 private:
   /// Stream configuration.
   stream_description config;
-  /// Radio event notifier.
-  radio_event_notifier& notifier;
   /// Logger.
   ocudulog::basic_logger& logger;
   /// Indicates whether the class was initialized successfully.
   bool successful = false;
   /// Counts the number of received samples.
   std::atomic<uint64_t> sample_count = {0};
-  /// Receive socket.
-  radio_difi_udp_socket socket;
-  /// Reusable datagram buffer, sized for the largest possible UDP payload.
-  std::vector<uint8_t> rx_buf;
-  /// Receive buffer size requested from the kernel for the socket.
-  units::bytes rx_socket_buffer_size;
+  /// Receive channels, one per antenna port.
+  std::vector<std::unique_ptr<radio_difi_rx_channel>> channels;
   /// Offset subtracted from a wire timestamp to bring it onto the baseband timeline.
   int64_t epoch_offset = 0;
   /// Offset added to a packet timestamp to place it on this stream timeline. Empty until the first packet.
   std::optional<int64_t> ts_offset;
-  /// \brief Samples of a packet that ran past the end of the previous buffer.
-  ///
-  /// A transmitter packet size need not divide the buffer size; holding the tail avoids losing it.
-  std::vector<ci16_t> carry_samples;
-  /// Timestamp of the first sample in \ref carry_samples.
-  uint64_t carry_ts = 0;
   /// \brief Reference system time associated with a timestamp.
   ///
   /// Wall clock anchor of the real-time timeline, and the sample position it maps to. This is necessary

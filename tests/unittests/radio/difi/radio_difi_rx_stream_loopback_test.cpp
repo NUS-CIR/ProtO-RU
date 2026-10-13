@@ -87,7 +87,7 @@ protected:
   {
     radio_difi_rx_stream::stream_description rx_desc;
     rx_desc.ip             = "127.0.0.1";
-    rx_desc.port           = TEST_PORT;
+    rx_desc.channels       = {{TEST_PORT, STREAM_ID}};
     rx_desc.stream_id      = STREAM_ID;
     rx_desc.bit_depth      = 16;
     rx_desc.sample_rate_Hz = SAMPLE_RATE;
@@ -97,7 +97,7 @@ protected:
 
     radio_difi_tx_stream::stream_description tx_desc;
     tx_desc.ip             = "127.0.0.1";
-    tx_desc.port           = TEST_PORT;
+    tx_desc.channels       = {{TEST_PORT, STREAM_ID}};
     tx_desc.stream_id      = STREAM_ID;
     tx_desc.bit_depth      = 16;
     tx_desc.sample_rate_Hz = SAMPLE_RATE;
@@ -275,7 +275,7 @@ TEST(RxStream8Bit, Receive8BitSamples)
 
   radio_difi_rx_stream::stream_description rx_desc;
   rx_desc.ip             = "127.0.0.1";
-  rx_desc.port           = PORT_8BIT;
+  rx_desc.channels       = {{PORT_8BIT, STREAM_8}};
   rx_desc.stream_id      = STREAM_8;
   rx_desc.bit_depth      = 8;
   rx_desc.sample_rate_Hz = SRATE;
@@ -285,7 +285,7 @@ TEST(RxStream8Bit, Receive8BitSamples)
 
   radio_difi_tx_stream::stream_description tx_desc;
   tx_desc.ip             = "127.0.0.1";
-  tx_desc.port           = PORT_8BIT;
+  tx_desc.channels       = {{PORT_8BIT, STREAM_8}};
   tx_desc.stream_id      = STREAM_8;
   tx_desc.bit_depth      = 8;
   tx_desc.sample_rate_Hz = SRATE;
@@ -347,7 +347,7 @@ TEST(RxStreamEvents, OverflowFiredOnTimestampGap)
 
   radio_difi_rx_stream::stream_description rx_desc;
   rx_desc.ip             = "127.0.0.1";
-  rx_desc.port           = PORT;
+  rx_desc.channels       = {{PORT, STREAM}};
   rx_desc.stream_id      = STREAM;
   rx_desc.bit_depth      = 16;
   rx_desc.sample_rate_Hz = SRATE;
@@ -358,7 +358,7 @@ TEST(RxStreamEvents, OverflowFiredOnTimestampGap)
   null_notifier_rx                         tx_notifier;
   radio_difi_tx_stream::stream_description tx_desc;
   tx_desc.ip             = "127.0.0.1";
-  tx_desc.port           = PORT;
+  tx_desc.channels       = {{PORT, STREAM}};
   tx_desc.stream_id      = STREAM;
   tx_desc.bit_depth      = 16;
   tx_desc.sample_rate_Hz = SRATE;
@@ -429,7 +429,7 @@ protected:
 
     radio_difi_rx_stream::stream_description rx_desc;
     rx_desc.ip             = "127.0.0.1";
-    rx_desc.port           = port;
+    rx_desc.channels       = {{port, STREAM_ID}};
     rx_desc.stream_id      = STREAM_ID;
     rx_desc.bit_depth      = 16;
     rx_desc.sample_rate_Hz = srate_Hz;
@@ -439,7 +439,7 @@ protected:
 
     radio_difi_tx_stream::stream_description tx_desc;
     tx_desc.ip             = "127.0.0.1";
-    tx_desc.port           = port;
+    tx_desc.channels       = {{port, STREAM_ID}};
     tx_desc.stream_id      = STREAM_ID;
     tx_desc.bit_depth      = 16;
     tx_desc.sample_rate_Hz = srate_Hz;
@@ -753,7 +753,7 @@ run_round_trip_16bit(difi_iq_byte_order tx_order, difi_iq_byte_order rx_order, u
 
   radio_difi_rx_stream::stream_description rx_desc;
   rx_desc.ip             = "127.0.0.1";
-  rx_desc.port           = port;
+  rx_desc.channels       = {{port, STREAM}};
   rx_desc.stream_id      = STREAM;
   rx_desc.bit_depth      = 16;
   rx_desc.iq_byte_order  = rx_order;
@@ -764,7 +764,7 @@ run_round_trip_16bit(difi_iq_byte_order tx_order, difi_iq_byte_order rx_order, u
 
   radio_difi_tx_stream::stream_description tx_desc;
   tx_desc.ip             = "127.0.0.1";
-  tx_desc.port           = port;
+  tx_desc.channels       = {{port, STREAM}};
   tx_desc.stream_id      = STREAM;
   tx_desc.bit_depth      = 16;
   tx_desc.iq_byte_order  = tx_order;
@@ -849,7 +849,7 @@ TEST(FidelityRoundTrip, RoundTrip8Bit)
 
   radio_difi_rx_stream::stream_description rx_desc;
   rx_desc.ip             = "127.0.0.1";
-  rx_desc.port           = PORT;
+  rx_desc.channels       = {{PORT, STREAM}};
   rx_desc.stream_id      = STREAM;
   rx_desc.bit_depth      = 8;
   rx_desc.sample_rate_Hz = SRATE;
@@ -859,7 +859,7 @@ TEST(FidelityRoundTrip, RoundTrip8Bit)
 
   radio_difi_tx_stream::stream_description tx_desc;
   tx_desc.ip             = "127.0.0.1";
-  tx_desc.port           = PORT;
+  tx_desc.channels       = {{PORT, STREAM}};
   tx_desc.stream_id      = STREAM;
   tx_desc.bit_depth      = 8;
   tx_desc.sample_rate_Hz = SRATE;
@@ -907,9 +907,11 @@ TEST(FidelityRoundTrip, RoundTrip8Bit)
 /// indeterminate value into the logger level.
 TEST(RxStreamConfig, DescriptionScalarDefaultsAreDeterministic)
 {
-  const radio_difi_rx_stream::stream_description desc;
+  const radio_difi_rx_stream::stream_description  desc;
+  const radio_difi_rx_stream::channel_description channel;
 
-  EXPECT_EQ(desc.port, 0U);
+  EXPECT_EQ(channel.port, 0U);
+  EXPECT_EQ(channel.difi_stream_id, 0U);
   EXPECT_EQ(desc.stream_id, 0U);
   EXPECT_EQ(desc.bit_depth, 16U);
   EXPECT_EQ(desc.sample_rate_Hz, 0.0);
@@ -927,7 +929,7 @@ TEST(RxStreamConfig, PortInUseFailsConstruction)
 
   radio_difi_rx_stream::stream_description desc;
   desc.ip             = "127.0.0.1";
-  desc.port           = PORT;
+  desc.channels       = {{PORT, 0}};
   desc.sample_rate_Hz = 1920000.0;
   desc.stream_id_str  = "test:inuse:rx";
 
@@ -951,7 +953,7 @@ TEST(RxStreamStart, DatagramsQueuedBeforeStartAreDiscarded)
 
   radio_difi_rx_stream::stream_description rx_desc;
   rx_desc.ip             = "127.0.0.1";
-  rx_desc.port           = PORT;
+  rx_desc.channels       = {{PORT, STREAM_ID}};
   rx_desc.stream_id      = STREAM_ID;
   rx_desc.sample_rate_Hz = SRATE;
   rx_desc.stream_id_str  = "test:prestart:rx";
@@ -960,7 +962,7 @@ TEST(RxStreamStart, DatagramsQueuedBeforeStartAreDiscarded)
 
   radio_difi_tx_stream::stream_description tx_desc;
   tx_desc.ip             = "127.0.0.1";
-  tx_desc.port           = PORT;
+  tx_desc.channels       = {{PORT, STREAM_ID}};
   tx_desc.stream_id      = STREAM_ID;
   tx_desc.sample_rate_Hz = SRATE;
   tx_desc.stream_id_str  = "test:prestart:tx";
