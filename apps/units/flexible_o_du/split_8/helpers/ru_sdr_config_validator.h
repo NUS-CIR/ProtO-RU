@@ -26,6 +26,10 @@ struct ru_sdr_cell_validation_config {
   bs_channel_bandwidth channel_bw_mhz;
   /// Duplex mode.
   duplex_mode dplx_mode;
+  /// Number of transmit antennas.
+  unsigned nof_antennas_dl;
+  /// Number of receive antennas.
+  unsigned nof_antennas_ul;
 };
 
 /// Validates the given SDR Radio Unit configuration. Returns true on success, false otherwise.

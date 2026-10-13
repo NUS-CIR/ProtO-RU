@@ -66,6 +66,8 @@ static std::vector<ru_sdr_cell_validation_config> get_ru_sdr_validation_dependen
         is_long_preamble(prach_info.format)
             ? get_prach_preamble_long_info(prach_info.format)
             : get_prach_preamble_short_info(prach_info.format, to_ra_subcarrier_spacing(in_cell.common_scs), false);
+    out_cell.nof_antennas_dl = in_cell.nof_antennas_dl;
+    out_cell.nof_antennas_ul = in_cell.nof_antennas_ul;
   }
 
   return out_cfg;

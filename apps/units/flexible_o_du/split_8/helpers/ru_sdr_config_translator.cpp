@@ -146,6 +146,10 @@ static void generate_radio_config(radio_configuration::radio&                   
     difi_tx_addrs = extract_zmq_ports(ru_cfg.device_arguments, "tx_addr");
     difi_rx_addrs = extract_zmq_ports(ru_cfg.device_arguments, "rx_addr");
   }
+  // DIFI carries every antenna as a stream of its own, so the port lists hold one entry per antenna, numbered by cell
+  // and then by antenna. Without a list, every stream takes the driver default port.
+  unsigned difi_tx_port_index = 0;
+  unsigned difi_rx_port_index = 0;
 
   // For each sector...
   for (unsigned sector_id = 0, e = cells.size(); sector_id != e; ++sector_id) {
@@ -199,17 +203,15 @@ static void generate_radio_config(radio_configuration::radio&                   
 
         tx_ch_config.args = zmq_tx_addr[sector_id * cell.nof_tx_antennas + port_id];
       }
+      if ((ru_cfg.device_driver == "difi") && (difi_tx_port_index < difi_tx_ports.size())) {
+        tx_ch_config.args = fmt::format("port={}", difi_tx_ports[difi_tx_port_index++]);
+      }
       tx_stream_config.channels.emplace_back(tx_ch_config);
     }
 
-    // Set DIFI stream-level args (format expected by parse_difi_stream_args: "ip=X,port=Y").
-    if (ru_cfg.device_driver == "difi") {
-      if (sector_id < difi_tx_ports.size()) {
-        const std::string ip  = difi_tx_addrs.empty() ? "127.0.0.1" : difi_tx_addrs[0];
-        tx_stream_config.args = fmt::format("ip={},port={}", ip, difi_tx_ports[sector_id]);
-      } else if (!difi_tx_ports.empty()) {
-        report_error("DIFI transmission stream arguments out of bounds\n");
-      }
+    // DIFI streams share one address, and each channel names its own port.
+    if ((ru_cfg.device_driver == "difi") && !difi_tx_addrs.empty()) {
+      tx_stream_config.args = fmt::format("ip={}", difi_tx_addrs.front());
     }
     out_cfg.tx_streams.emplace_back(tx_stream_config);
 
@@ -233,17 +235,14 @@ static void generate_radio_config(radio_configuration::radio&                   
 
         rx_ch_config.args = zmq_rx_addr[sector_id * cell.nof_rx_antennas + port_id];
       }
+      if ((ru_cfg.device_driver == "difi") && (difi_rx_port_index < difi_rx_ports.size())) {
+        rx_ch_config.args = fmt::format("port={}", difi_rx_ports[difi_rx_port_index++]);
+      }
       rx_stream_config.channels.emplace_back(rx_ch_config);
     }
 
-    // Set DIFI stream-level args (format expected by parse_difi_stream_args: "ip=X,port=Y").
-    if (ru_cfg.device_driver == "difi") {
-      if (sector_id < difi_rx_ports.size()) {
-        const std::string ip  = difi_rx_addrs.empty() ? "0.0.0.0" : difi_rx_addrs[0];
-        rx_stream_config.args = fmt::format("ip={},port={}", ip, difi_rx_ports[sector_id]);
-      } else if (!difi_rx_ports.empty()) {
-        report_error("DIFI reception stream arguments out of bounds\n");
-      }
+    if ((ru_cfg.device_driver == "difi") && !difi_rx_addrs.empty()) {
+      rx_stream_config.args = fmt::format("ip={}", difi_rx_addrs.front());
     }
     out_cfg.rx_streams.emplace_back(rx_stream_config);
   }

@@ -275,6 +275,9 @@ get_ru_sdr_validation_dependencies(const fapi::cell_configuration& config)
           ? get_prach_preamble_long_info(prach_info.format)
           : get_prach_preamble_short_info(prach_info.format, to_ra_subcarrier_spacing(config.scs_common), false);
 
+  out_cell.nof_antennas_dl = config.carrier_cfg.num_tx_ant;
+  out_cell.nof_antennas_ul = config.carrier_cfg.num_rx_ant;
+
   return out_cfg;
 }
 
