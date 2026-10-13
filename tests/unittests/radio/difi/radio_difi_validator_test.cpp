@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "radio_factory_difi_impl.h"
+#include "ocudu/radio/capabilities/radio_tx_gain_control.h"
 #include "ocudu/radio/radio_constants.h"
 #include "ocudu/radio/radio_factory.h"
 #include "ocudu/support/executors/task_worker.h"
@@ -267,6 +268,42 @@ TEST_P(RadioDifiValidatorFixture, RadioDifiValidatorTest)
     std::unique_ptr<radio_session> radio = factory->create(config, *async_task_executor, notifier);
     ASSERT_NE(radio, nullptr);
   }
+}
+
+// Transmit gain takes the flat port index of radio_tx_gain_control, numbered by stream and then by channel.
+TEST(RadioDifiSessionTest, TxGainUsesFlatPortIndex)
+{
+  // ctest runs the DIFI test binaries in parallel, so this test keeps to its own ports, 15050 upwards.
+  static constexpr unsigned BASE_PORT   = 15050;
+  static constexpr unsigned NOF_STREAMS = 2;
+
+  radio_configuration::radio config = radio_base_config;
+  config.tx_streams.clear();
+  config.rx_streams.clear();
+  for (unsigned stream_id = 0; stream_id != NOF_STREAMS; ++stream_id) {
+    const unsigned tx_port = BASE_PORT + 2 * stream_id;
+    config.tx_streams.push_back({{base_channel, base_channel}, fmt::format("ip=127.0.0.1,port={}", tx_port)});
+    config.rx_streams.push_back({{base_channel}, fmt::format("ip=127.0.0.1,port={}", tx_port + 1)});
+  }
+
+  task_worker                    async_task_worker("async_thread", 2 * RADIO_MAX_NOF_PORTS);
+  std::unique_ptr<task_executor> async_task_executor = make_task_executor_ptr(async_task_worker);
+  radio_notifier_spy             notifier;
+  radio_factory_difi_impl        factory;
+
+  std::unique_ptr<radio_session> radio = factory.create(config, *async_task_executor, notifier);
+  ASSERT_NE(radio, nullptr);
+  radio_tx_gain_control* tx_gain = radio->get_capabilities_registry().get<radio_tx_gain_control>();
+  ASSERT_NE(tx_gain, nullptr);
+
+  // Port 2 is the first channel of stream 1, which an index by stream would reject.
+  EXPECT_TRUE(tx_gain->set_tx_gain(0, 10.0));
+  EXPECT_TRUE(tx_gain->set_tx_gain(2, 10.0));
+  // The second channel of each stream is not carried yet.
+  EXPECT_FALSE(tx_gain->set_tx_gain(1, 10.0));
+  EXPECT_FALSE(tx_gain->set_tx_gain(3, 10.0));
+  // Past the last port.
+  EXPECT_FALSE(tx_gain->set_tx_gain(4, 10.0));
 }
 
 INSTANTIATE_TEST_SUITE_P(RadioDifiValidatorTest,

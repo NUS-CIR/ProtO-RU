@@ -40,6 +40,12 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
   bb_gateways.reserve(nof_streams);
 
   for (unsigned stream_id = 0; stream_id != nof_streams; ++stream_id) {
+    for (unsigned channel_id = 0, nof_channels = config.tx_streams[stream_id].channels.size();
+         channel_id != nof_channels;
+         ++channel_id) {
+      tx_port_map.emplace_back(stream_id, channel_id);
+    }
+
     // Defaults: transmit to localhost:4991.
     auto tx_parsed = parse_difi_stream_args(config.tx_streams[stream_id].args, "127.0.0.1", 4991);
     if (!tx_parsed) {
@@ -172,10 +178,17 @@ void radio_session_difi_impl::stop()
 
 bool radio_session_difi_impl::set_tx_gain(unsigned port_id, double gain_dB)
 {
-  if (port_id >= bb_gateways.size()) {
+  if (port_id >= tx_port_map.size()) {
     return false;
   }
-  bb_gateways[port_id]->get_tx_stream().set_gain(gain_dB, 0.0);
+
+  // Only the first channel of each stream is carried, so no other port has a context packet to advertise it in.
+  const auto [stream_id, channel_id] = tx_port_map[port_id];
+  if (channel_id != 0) {
+    return false;
+  }
+
+  bb_gateways[stream_id]->get_tx_stream().set_gain(gain_dB, 0.0);
   return true;
 }
 

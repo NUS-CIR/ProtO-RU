@@ -10,6 +10,7 @@
 #include "ocudu/radio/radio_session.h"
 #include "ocudu/support/executors/task_executor.h"
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace ocudu {
@@ -24,6 +25,10 @@ class radio_session_difi_impl : public radio_session,
   ocudulog::basic_logger& logger;
   /// One baseband gateway per configured stream.
   std::vector<std::unique_ptr<radio_difi_baseband_gateway>> bb_gateways;
+  /// \brief Stream and channel of each transmit port, indexed by the flat port identifier.
+  ///
+  /// Ports are numbered by stream in ascending order and then by channel, as radio_tx_gain_control defines.
+  std::vector<std::pair<unsigned, unsigned>> tx_port_map;
   /// Sample rate in Hz, kept for converting the UTC epoch offset into sample ticks at start().
   double sample_rate_Hz = 0.0;
   /// Set to true when the session has been constructed without errors.

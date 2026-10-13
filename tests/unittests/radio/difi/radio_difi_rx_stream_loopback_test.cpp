@@ -72,7 +72,7 @@ private:
 
 // ctest runs the DIFI test binaries in parallel, so no two of them may share a UDP port. This binary uses 15001 to
 // 15005, 15010 to 15017 and 15030. The transmit stream test uses 14991, 15006 to 15009 and 15040 to 15042. The socket
-// test uses 19981 upwards.
+// test uses 19981 upwards, and the validator test 15050 upwards.
 
 /// Pairs a tx stream (sending to 127.0.0.1:15001) with an rx stream (bound on
 /// 127.0.0.1:15001).  Port 15001 is chosen to avoid conflicts.
