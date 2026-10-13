@@ -28,6 +28,11 @@ static std::string trim_whitespace(const std::string& text)
 static bool validate_difi_device_arguments(const std::string& device_arguments)
 {
   static constexpr std::string_view iq_byte_order_key = "iq_byte_order";
+  static constexpr std::string_view tx_addr_key       = "tx_addr";
+  static constexpr std::string_view rx_addr_key       = "rx_addr";
+
+  unsigned nof_tx_addr = 0;
+  unsigned nof_rx_addr = 0;
 
   std::istringstream stream(device_arguments);
   std::string        argument;
@@ -38,7 +43,19 @@ static bool validate_difi_device_arguments(const std::string& device_arguments)
     }
 
     // Device arguments may be folded across lines in the configuration file, so surrounding whitespace is ignored.
-    if (trim_whitespace(argument.substr(0, equal)) != iq_byte_order_key) {
+    const std::string key = trim_whitespace(argument.substr(0, equal));
+
+    // Addresses match by prefix, since the indexed spelling of the port lists, as in tx_addr0, is also accepted.
+    if (key.compare(0, tx_addr_key.size(), tx_addr_key) == 0) {
+      ++nof_tx_addr;
+      continue;
+    }
+    if (key.compare(0, rx_addr_key.size(), rx_addr_key) == 0) {
+      ++nof_rx_addr;
+      continue;
+    }
+
+    if (key != iq_byte_order_key) {
       continue;
     }
 
@@ -47,6 +64,17 @@ static bool validate_difi_device_arguments(const std::string& device_arguments)
       fmt::print("Invalid DIFI {} '{}'. Valid values are 'big' and 'little'.\n", iq_byte_order_key, value);
       return false;
     }
+  }
+
+  // Every port of the radio shares one address per direction and differs only by UDP port, so a second address
+  // would be silently ignored.
+  if (nof_tx_addr > 1) {
+    fmt::print("DIFI takes at most one {} for all ports, but {} were given.\n", tx_addr_key, nof_tx_addr);
+    return false;
+  }
+  if (nof_rx_addr > 1) {
+    fmt::print("DIFI takes at most one {} for all ports, but {} were given.\n", rx_addr_key, nof_rx_addr);
+    return false;
   }
 
   return true;
