@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "radio_difi_udp_socket.h"
+#include "ocudu/adt/static_vector.h"
+#include "ocudu/radio/radio_constants.h"
+#include "ocudu/support/ocudu_assert.h"
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cerrno>
@@ -140,13 +143,32 @@ expected<span<uint8_t>, difi_recv_error> radio_difi_udp_socket::try_recv(span<ui
 
 bool radio_difi_udp_socket::wait_readable(std::chrono::microseconds timeout)
 {
-  if (fd < 0) {
+  radio_difi_udp_socket* const self = this;
+  return wait_any_readable(span<radio_difi_udp_socket* const>(&self, 1), timeout);
+}
+
+bool radio_difi_udp_socket::wait_any_readable(span<radio_difi_udp_socket* const> sockets,
+                                              std::chrono::microseconds          timeout)
+{
+  ocudu_assert(sockets.size() <= RADIO_MAX_NOF_CHANNELS,
+               "Cannot wait on {} sockets, at most {}.",
+               sockets.size(),
+               RADIO_MAX_NOF_CHANNELS);
+
+  static_vector<struct pollfd, RADIO_MAX_NOF_CHANNELS> pfds;
+  ocudulog::basic_logger*                              error_logger = nullptr;
+  for (const radio_difi_udp_socket* socket : sockets) {
+    if (socket->fd < 0) {
+      continue;
+    }
+    struct pollfd& pfd = pfds.emplace_back();
+    pfd.fd             = socket->fd;
+    pfd.events         = POLLIN;
+    error_logger       = &socket->logger;
+  }
+  if (pfds.empty()) {
     return false;
   }
-
-  struct pollfd pfd = {};
-  pfd.fd            = fd;
-  pfd.events        = POLLIN;
 
   // ppoll() rather than poll() so sub-millisecond budgets are honoured: at a slot of 1 ms, the
   // millisecond granularity of poll() would be the whole budget.
@@ -155,15 +177,16 @@ bool radio_difi_udp_socket::wait_readable(std::chrono::microseconds timeout)
   ts.tv_sec            = secs.count();
   ts.tv_nsec           = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout - secs).count();
 
-  const int ret = ::ppoll(&pfd, 1, &ts, nullptr);
+  const int ret = ::ppoll(pfds.data(), pfds.size(), &ts, nullptr);
   if (ret < 0) {
     if (errno == EINTR) {
       // Interrupted by a signal — treat as "nothing ready yet"; the caller re-checks its deadline.
       return false;
     }
-    logger.error("ppoll error: {}", std::strerror(errno));
+    error_logger->error("ppoll error: {}", std::strerror(errno));
     return false;
   }
 
-  return (ret > 0) && ((pfd.revents & POLLIN) != 0);
+  return (ret > 0) &&
+         std::any_of(pfds.begin(), pfds.end(), [](const struct pollfd& pfd) { return (pfd.revents & POLLIN) != 0; });
 }

@@ -272,6 +272,34 @@ const std::vector<test_case_t> radio_difi_validator_test_data = {
        return config;
      },
      "Channel argument '4993' is malformed, expected key=value.\n"},
+    // Two receive channels, each on its own port.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.rx_streams.front().channels.push_back({base_lo_frequency, 20.0, "port=4994"});
+       return config;
+     },
+     ""},
+    // A receive stream without channels.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.rx_streams.front().channels.clear();
+       return config;
+     },
+     "Every DIFI receive stream needs at least one channel.\n"},
+    // A second receive channel without a port.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.rx_streams.front().channels.push_back(base_channel);
+       return config;
+     },
+     "Channel 1 of DIFI stream 0 has no port, expected port=<number> in its arguments.\n"},
+    // Two receive channels on one port.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.rx_streams.front().channels.push_back({base_lo_frequency, 20.0, "port=4992"});
+       return config;
+     },
+     "DIFI receive port 4992 is used by more than one channel.\n"},
     // A channel port out of range.
     {[] {
        radio_configuration::radio config = radio_base_config;

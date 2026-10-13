@@ -70,6 +70,12 @@ public:
   /// Lets the caller pace itself against wall-clock time rather than the fixed socket timeout.
   bool wait_readable(std::chrono::microseconds timeout);
 
+  /// \brief Waits until any of \p sockets has a readable datagram, or \p timeout elapses.
+  ///
+  /// Closed sockets are skipped.
+  /// \return True if at least one socket is readable.
+  static bool wait_any_readable(span<radio_difi_udp_socket* const> sockets, std::chrono::microseconds timeout);
+
 private:
   /// Logger, owned by the stream that created this socket.
   ocudulog::basic_logger& logger;

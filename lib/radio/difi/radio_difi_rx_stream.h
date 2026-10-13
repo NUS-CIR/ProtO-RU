@@ -6,9 +6,11 @@
 
 #include "radio_difi_data_packet.h"
 #include "radio_difi_rx_channel.h"
+#include "ocudu/adt/static_vector.h"
 #include "ocudu/gateways/baseband/baseband_gateway_receiver.h"
 #include "ocudu/gateways/baseband/baseband_gateway_timestamp.h"
 #include "ocudu/ocudulog/ocudulog.h"
+#include "ocudu/radio/radio_constants.h"
 #include "ocudu/radio/radio_event_notifier.h"
 #include <atomic>
 #include <chrono>
@@ -91,6 +93,8 @@ private:
   int64_t epoch_offset = 0;
   /// Offset added to a packet timestamp to place it on this stream timeline. Empty until the first packet.
   std::optional<int64_t> ts_offset;
+  /// Indicates, per channel, whether its first packet since start() has been checked against \ref ts_offset.
+  static_vector<bool, RADIO_MAX_NOF_CHANNELS> channel_synchronized;
   /// \brief Reference system time associated with a timestamp.
   ///
   /// Wall clock anchor of the real-time timeline, and the sample position it maps to. This is necessary

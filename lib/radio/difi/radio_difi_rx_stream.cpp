@@ -5,6 +5,7 @@
 #include "radio_difi_rx_stream.h"
 #include "ocudu/gateways/baseband/buffer/baseband_gateway_buffer_writer.h"
 #include "ocudu/support/ocudu_assert.h"
+#include <algorithm>
 #include <cstdlib>
 #include <thread>
 
@@ -30,9 +31,10 @@ radio_difi_rx_stream::radio_difi_rx_stream(const stream_description& config_, ra
 {
   logger.set_level(config.log_level);
 
-  // Receiving on several channels is not supported yet.
-  if (config.channels.size() != 1) {
-    logger.error("A DIFI receive stream takes exactly one channel, but {} were given.", config.channels.size());
+  if (config.channels.empty() || (config.channels.size() > RADIO_MAX_NOF_CHANNELS)) {
+    logger.error("A DIFI receive stream takes between 1 and {} channels, but {} were given.",
+                 RADIO_MAX_NOF_CHANNELS,
+                 config.channels.size());
     return;
   }
 
@@ -53,6 +55,7 @@ radio_difi_rx_stream::radio_difi_rx_stream(const stream_description& config_, ra
       return;
     }
   }
+  channel_synchronized.resize(channels.size(), false);
 
   successful = true;
 }
@@ -61,6 +64,12 @@ baseband_gateway_receiver::metadata radio_difi_rx_stream::receive(baseband_gatew
 {
   const unsigned nof_requested = data.get_nof_samples();
   const uint64_t base_ts       = sample_count.load(std::memory_order_relaxed);
+  const unsigned nof_channels  = channels.size();
+
+  ocudu_assert(data.get_nof_channels() >= nof_channels,
+               "The buffer has {} channels, fewer than the {} of the stream.",
+               data.get_nof_channels(),
+               nof_channels);
 
   // Wall-clock span the requested samples represent. This call must occupy that span: receive() is the
   // only thing pacing the lower physical layer, whose uplink chain reschedules itself with no throttle
@@ -97,37 +106,17 @@ baseband_gateway_receiver::metadata radio_difi_rx_stream::receive(baseband_gatew
     deadline        = compute_deadline();
   }
 
-  radio_difi_rx_channel& channel = *channels.front();
-
   // Place the tail of a packet that straddled the end of the previous buffer before reading anything new.
-  channel.begin_buffer(data[0].first(nof_requested), base_ts);
+  for (unsigned channel_id = 0; channel_id != nof_channels; ++channel_id) {
+    channels[channel_id]->begin_buffer(data[channel_id].first(nof_requested), base_ts);
+  }
+
+  const auto plausible_offset = static_cast<int64_t>(config.sample_rate_Hz * SHARED_EPOCH_TOLERANCE_S);
 
   bool peer_active = false;
-  while (!channel.is_buffer_full()) {
-    // Take a queued datagram first and poll only when the queue is empty: under load the queue is rarely
-    // empty, so this halves the system calls per datagram.
-    radio_difi_rx_channel::data_packet packet;
-    radio_difi_rx_channel::read_status status = channel.try_read(packet);
-    if (status == radio_difi_rx_channel::read_status::empty) {
-      // The deadline bounds the whole call. Past it the wait drops to zero, so a receiver that has fallen
-      // behind drains what is queued and stops, instead of waiting for more.
-      const auto now  = std::chrono::steady_clock::now();
-      auto       wait = std::chrono::microseconds(0);
-      if (now < deadline) {
-        wait = std::chrono::duration_cast<std::chrono::microseconds>(deadline - now);
-      }
-      if (!channel.get_socket().wait_readable(wait)) {
-        break;
-      }
-      status = channel.try_read(packet);
-    }
-    if ((status == radio_difi_rx_channel::read_status::empty) ||
-        (status == radio_difi_rx_channel::read_status::error)) {
-      break;
-    }
-    if (status == radio_difi_rx_channel::read_status::discarded) {
-      continue;
-    }
+  // Places a data packet of a channel on the timeline shared by every channel of the stream.
+  auto handle_packet = [&](unsigned channel_id, const radio_difi_rx_channel::data_packet& packet) {
+    radio_difi_rx_channel& channel = *channels[channel_id];
 
     if (!peer_active) {
       peer_active = true;
@@ -149,16 +138,91 @@ baseband_gateway_receiver::metadata radio_difi_rx_stream::receive(baseband_gatew
       // Trust absolute time when the transmitter is plausibly on our clock. Translating a peer that is
       // already on it would place its uplink an arbitrary distance away, since a receiver derives the
       // subframe of a buffer purely from its timestamp.
-      const int64_t delta     = static_cast<int64_t>(channel.get_next_timestamp()) - static_cast<int64_t>(pkt_ts);
-      const int64_t plausible = static_cast<int64_t>(config.sample_rate_Hz * SHARED_EPOCH_TOLERANCE_S);
-      ts_offset               = (config.latch_peer_epoch || (std::abs(delta) > plausible)) ? delta : 0;
+      //
+      // The first packet of any channel sets the mapping for all of them: the ports of one transmitter share a clock,
+      // and a mapping per channel could leave them samples apart.
+      const int64_t delta = static_cast<int64_t>(channel.get_next_timestamp()) - static_cast<int64_t>(pkt_ts);
+      ts_offset           = (config.latch_peer_epoch || (std::abs(delta) > plausible_offset)) ? delta : 0;
+      channel_synchronized[channel_id] = true;
     }
 
-    channel.write_packet(packet, static_cast<int64_t>(pkt_ts) + *ts_offset);
+    const int64_t local_ts = static_cast<int64_t>(pkt_ts) + *ts_offset;
+
+    if (!channel_synchronized[channel_id]) {
+      // The first packet of every other channel must land on the shared mapping as close as a peer locked to our
+      // clock would. Further away, the transmitter stamps this port against another clock; the samples are kept
+      // where the timestamps put them, since shifting them would hide the fault rather than fix it.
+      channel_synchronized[channel_id] = true;
+      const int64_t distance           = local_ts - static_cast<int64_t>(channel.get_next_timestamp());
+      if (std::abs(distance) > plausible_offset) {
+        logger.warning("stream={} channel={}: DIFI channel timestamps disagree with the other channels of the "
+                       "stream. distance={} samples",
+                       config.stream_id,
+                       channel_id,
+                       distance);
+      }
+    }
+
+    channel.write_packet(packet, local_ts);
+  };
+
+  // Service every channel in turn, one datagram at a time, so a busy port cannot starve the others. Take queued
+  // datagrams first and poll only when every unfilled channel is empty: under load the queues are rarely empty, so
+  // this saves most of the system calls per datagram.
+  static_vector<bool, RADIO_MAX_NOF_CHANNELS>                   channel_failed(nof_channels, false);
+  static_vector<radio_difi_udp_socket*, RADIO_MAX_NOF_CHANNELS> idle_sockets;
+  for (;;) {
+    bool progressed = false;
+    idle_sockets.clear();
+
+    for (unsigned channel_id = 0; channel_id != nof_channels; ++channel_id) {
+      radio_difi_rx_channel& channel = *channels[channel_id];
+      if (channel_failed[channel_id] || channel.is_buffer_full()) {
+        continue;
+      }
+
+      radio_difi_rx_channel::data_packet       packet;
+      const radio_difi_rx_channel::read_status status = channel.try_read(packet);
+      if (status == radio_difi_rx_channel::read_status::empty) {
+        idle_sockets.push_back(&channel.get_socket());
+        continue;
+      }
+      if (status == radio_difi_rx_channel::read_status::error) {
+        // Leave a failing socket alone for the rest of the buffer, rather than spinning on it.
+        channel_failed[channel_id] = true;
+        continue;
+      }
+
+      progressed = true;
+      if (status == radio_difi_rx_channel::read_status::data) {
+        handle_packet(channel_id, packet);
+      }
+    }
+
+    if (progressed) {
+      continue;
+    }
+    // Every channel is full or has failed.
+    if (idle_sockets.empty()) {
+      break;
+    }
+
+    // The deadline bounds the whole call. Past it the wait drops to zero, so a receiver that has fallen
+    // behind drains what is queued and stops, instead of waiting for more.
+    const auto now  = std::chrono::steady_clock::now();
+    auto       wait = std::chrono::microseconds(0);
+    if (now < deadline) {
+      wait = std::chrono::duration_cast<std::chrono::microseconds>(deadline - now);
+    }
+    if (!radio_difi_udp_socket::wait_any_readable(idle_sockets, wait)) {
+      break;
+    }
   }
 
   // Zero-fill whatever the transmitter did not supply, so the caller always sees a full buffer.
-  channel.end_buffer();
+  for (auto& channel : channels) {
+    channel->end_buffer();
+  }
 
   // Never hand a buffer over before the wall-clock time its last sample stands for. A peer that is sample-locked to
   // this gNB would otherwise let the pair run faster than real time, shrinking every processing deadline measured
@@ -182,6 +246,7 @@ void radio_difi_rx_stream::start(baseband_gateway_timestamp init_time, int64_t e
 
   // Drop any latched epoch: the next packet re-locks onto the transmitter.
   ts_offset.reset();
+  std::fill(channel_synchronized.begin(), channel_synchronized.end(), false);
   clock_anchor.reset();
   clock_anchor_ts             = 0;
   clock_anchor_locked_to_peer = false;
