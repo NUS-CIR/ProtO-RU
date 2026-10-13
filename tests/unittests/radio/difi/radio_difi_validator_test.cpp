@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
+#include "radio_difi_stream_config.h"
 #include "radio_factory_difi_impl.h"
 #include "ocudu/radio/capabilities/radio_tx_gain_control.h"
 #include "ocudu/radio/radio_constants.h"
@@ -272,6 +273,20 @@ const std::vector<test_case_t> radio_difi_validator_test_data = {
        return config;
      },
      "Channel argument '4993' is malformed, expected key=value.\n"},
+    // A larger transmit packet size.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.args                       = "tx_port=4991,pkt_samples=7680";
+       return config;
+     },
+     ""},
+    // The largest transmit packet that fits a UDP datagram.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.args                       = "pkt_samples=16369";
+       return config;
+     },
+     ""},
     // Two receive channels, each on its own port.
     {[] {
        radio_configuration::radio config = radio_base_config;
@@ -401,6 +416,20 @@ TEST(RadioDifiSessionTest, TxGainUsesFlatPortIndex)
   }
   // Past the last port.
   EXPECT_FALSE(tx_gain->set_tx_gain(NOF_STREAMS * NOF_CHANNELS, 10.0));
+}
+
+// The packet size takes any integer from one sample to the largest packet that fits a UDP datagram, and defaults to
+// the size that divides every slot.
+TEST(RadioDifiDeviceArgsTest, PacketSize)
+{
+  EXPECT_EQ(parse_difi_pkt_samples(""), DIFI_DEFAULT_PKT_SAMPLES);
+  EXPECT_EQ(parse_difi_pkt_samples("tx_port=4991, pkt_samples = 7680 "), 7680U);
+  EXPECT_EQ(parse_difi_pkt_samples("pkt_samples=1"), 1U);
+  EXPECT_EQ(parse_difi_pkt_samples(fmt::format("pkt_samples={}", DIFI_MAX_PKT_SAMPLES)), DIFI_MAX_PKT_SAMPLES);
+  EXPECT_FALSE(parse_difi_pkt_samples(fmt::format("pkt_samples={}", DIFI_MAX_PKT_SAMPLES + 1)).has_value());
+  EXPECT_FALSE(parse_difi_pkt_samples("pkt_samples=0").has_value());
+  EXPECT_FALSE(parse_difi_pkt_samples("pkt_samples=lots").has_value());
+  EXPECT_FALSE(parse_difi_pkt_samples("pkt_samples=-1").has_value());
 }
 
 INSTANTIATE_TEST_SUITE_P(RadioDifiValidatorTest,

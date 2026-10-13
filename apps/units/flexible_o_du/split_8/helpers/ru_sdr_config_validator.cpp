@@ -7,6 +7,8 @@
 #include "ru_sdr_config_helpers.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/adt/interval.h"
+#include "ocudu/ran/phy_time_unit.h"
+#include "ocudu/support/string_parsing_utils.h"
 #include <sstream>
 #include <string_view>
 
@@ -40,6 +42,13 @@ static bool validate_difi_device_arguments(const std::string&                   
   static constexpr std::string_view rx_addr_key       = "rx_addr";
   static constexpr std::string_view tx_port_key       = "tx_port";
   static constexpr std::string_view rx_port_key       = "rx_port";
+  static constexpr std::string_view pkt_samples_key   = "pkt_samples";
+  // A transmitted data packet must fit one UDP datagram: its payload of 65507 bytes holds the 28-byte DIFI header and
+  // 4 bytes per 16-bit IQ sample.
+  static constexpr unsigned max_udp_payload_bytes = 65507;
+  static constexpr unsigned difi_header_bytes     = 28;
+  static constexpr unsigned bytes_per_iq16_sample = 4;
+  static constexpr unsigned max_pkt_samples       = (max_udp_payload_bytes - difi_header_bytes) / bytes_per_iq16_sample;
 
   unsigned nof_tx_addr = 0;
   unsigned nof_rx_addr = 0;
@@ -76,14 +85,20 @@ static bool validate_difi_device_arguments(const std::string&                   
       continue;
     }
 
-    if (key != iq_byte_order_key) {
-      continue;
-    }
-
     const std::string value = trim_whitespace(argument.substr(equal + 1));
-    if ((value != "big") && (value != "little")) {
+
+    if ((key == iq_byte_order_key) && (value != "big") && (value != "little")) {
       fmt::print("Invalid DIFI {} '{}'. Valid values are 'big' and 'little'.\n", iq_byte_order_key, value);
       return false;
+    }
+
+    if (key == pkt_samples_key) {
+      const expected<unsigned, std::string> nof_samples = parse_int<unsigned>(value);
+      if (!nof_samples.has_value() || (nof_samples.value() == 0) || (nof_samples.value() > max_pkt_samples)) {
+        fmt::print(
+            "Invalid DIFI {} '{}'. Valid values are integers from 1 to {}.\n", pkt_samples_key, value, max_pkt_samples);
+        return false;
+      }
     }
   }
 

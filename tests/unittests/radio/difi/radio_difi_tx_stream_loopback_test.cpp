@@ -91,7 +91,7 @@ static int16_t read_i16_iq(const uint8_t* p)
 // ---- Test fixture -----------------------------------------------------------
 
 // ctest runs the DIFI test binaries in parallel, so no two of them may share a UDP port. This binary uses 14991,
-// 15006 to 15009 and 15040 to 15044. The receive stream test uses 15001 to 15005, 15010 to 15017, 15030 and 15060 to
+// 15006 to 15009 and 15040 to 15045. The receive stream test uses 15001 to 15005, 15010 to 15017, 15030 and 15060 to
 // 15065. The socket test uses 19981 upwards, and the validator test 15050 to 15055.
 
 /// Creates a tx stream sending to 127.0.0.1:14991 and a matching Rx socket.
@@ -370,7 +370,7 @@ TEST_F(TxStreamLoopback, WholeBufferIsTransmittedRegardlessOfTxWindow)
 
 // ---- Fragmentation ----------------------------------------------------------
 //
-// A slot exceeds the maximum UDP payload, so transmit() splits it into MAX_PKT_SAMPLES packets: six.
+// A slot exceeds the maximum UDP payload, so transmit() splits it into packets of the default size: six.
 
 class TxFragmentation : public ::testing::Test
 {
@@ -380,7 +380,7 @@ protected:
   static constexpr uint32_t STREAM_ID = 0x0000000aU;
 
   /// Opens an Rx socket on \p port, creates a matching tx stream and drains the context packet.
-  void open(uint16_t port)
+  void open(uint16_t port, unsigned pkt_samples = DIFI_DEFAULT_PKT_SAMPLES)
   {
     ASSERT_TRUE(rx_sock.open_rx("127.0.0.1", port)) << "Failed to open Rx socket";
 
@@ -391,6 +391,7 @@ protected:
     desc.bit_depth      = 16;
     desc.sample_rate_Hz = SRATE;
     desc.center_freq_Hz = 1.8425e9;
+    desc.pkt_samples    = pkt_samples;
     desc.stream_id_str  = "test:frag:tx";
 
     tx = std::make_unique<radio_difi_tx_stream>(desc, notifier);
@@ -447,7 +448,7 @@ TEST_F(TxFragmentation, SlotSplitsIntoWholePackets)
 {
   ASSERT_NO_FATAL_FAILURE(open(15007));
 
-  const unsigned nof_frags = SLOT_LEN / radio_difi_tx_stream::MAX_PKT_SAMPLES;
+  const unsigned nof_frags = SLOT_LEN / DIFI_DEFAULT_PKT_SAMPLES;
   ASSERT_EQ(nof_frags, 6U) << "A 11520-sample slot must split into exactly 6 fragments of 1920";
 
   transmit_ramp(SLOT_LEN, 0);
@@ -459,7 +460,7 @@ TEST_F(TxFragmentation, SlotSplitsIntoWholePackets)
   for (unsigned i = 0; i != nof_frags; ++i) {
     std::vector<uint8_t> pkt;
     ASSERT_GT(recv_packet(pkt), 0) << "Fragment " << i << " was not sent";
-    ASSERT_EQ(pkt.size(), pkt_size(radio_difi_tx_stream::MAX_PKT_SAMPLES).value()) << "Size of fragment " << i;
+    ASSERT_EQ(pkt.size(), pkt_size(DIFI_DEFAULT_PKT_SAMPLES).value()) << "Size of fragment " << i;
 
     // Header carries the mod-16 packet counter and the total length in 32-bit words.
     const auto     words  = static_cast<uint32_t>(pkt.size() / 4U);
@@ -473,7 +474,7 @@ TEST_F(TxFragmentation, SlotSplitsIntoWholePackets)
     EXPECT_EQ(read_u64_be(pkt.data() + 20), expected_frac_ps[i]) << "frac_ps of fragment " << i;
 
     // Payload is contiguous: fragment i must begin at ramp sample i * 1920.
-    const auto first = static_cast<int16_t>(i * radio_difi_tx_stream::MAX_PKT_SAMPLES);
+    const auto first = static_cast<int16_t>(i * DIFI_DEFAULT_PKT_SAMPLES);
     EXPECT_EQ(read_i16_iq(pkt.data() + 28), first) << "First I sample of fragment " << i;
     EXPECT_EQ(read_i16_iq(pkt.data() + 30), static_cast<int16_t>(-first)) << "First Q of fragment " << i;
   }
@@ -488,11 +489,11 @@ TEST_F(TxFragmentation, ShortFinalFragment)
 
   // One full fragment plus a remainder that must go out as a shorter packet.
   constexpr unsigned TAIL = 500;
-  transmit_ramp(radio_difi_tx_stream::MAX_PKT_SAMPLES + TAIL, 0);
+  transmit_ramp(DIFI_DEFAULT_PKT_SAMPLES + TAIL, 0);
 
   std::vector<uint8_t> first;
   ASSERT_GT(recv_packet(first), 0) << "First fragment was not sent";
-  EXPECT_EQ(first.size(), pkt_size(radio_difi_tx_stream::MAX_PKT_SAMPLES).value());
+  EXPECT_EQ(first.size(), pkt_size(DIFI_DEFAULT_PKT_SAMPLES).value());
 
   std::vector<uint8_t> tail;
   ASSERT_GT(recv_packet(tail), 0) << "Short final fragment was not sent";
@@ -503,24 +504,44 @@ TEST_F(TxFragmentation, ShortFinalFragment)
   EXPECT_EQ((read_u32_be(tail.data()) >> 16) & 0xfU, 1U);
 
   // Its payload resumes exactly where the first fragment ended.
-  EXPECT_EQ(read_i16_iq(tail.data() + 28), static_cast<int16_t>(radio_difi_tx_stream::MAX_PKT_SAMPLES));
+  EXPECT_EQ(read_i16_iq(tail.data() + 28), static_cast<int16_t>(DIFI_DEFAULT_PKT_SAMPLES));
 
   std::vector<uint8_t> extra;
   EXPECT_EQ(recv_packet(extra), 0) << "Unexpected third packet";
+}
+
+// A configured packet size replaces the default: here the slot goes out as three packets of 3840.
+TEST_F(TxFragmentation, ConfiguredPacketSize)
+{
+  static constexpr unsigned PKT_SAMPLES = 3840;
+  ASSERT_NO_FATAL_FAILURE(open(15045, PKT_SAMPLES));
+
+  transmit_ramp(SLOT_LEN, 0);
+
+  for (unsigned i = 0, nof_frags = SLOT_LEN / PKT_SAMPLES; i != nof_frags; ++i) {
+    std::vector<uint8_t> pkt;
+    ASSERT_GT(recv_packet(pkt), 0) << "Fragment " << i << " was not sent";
+    ASSERT_EQ(pkt.size(), pkt_size(PKT_SAMPLES).value()) << "Size of fragment " << i;
+    const auto first = static_cast<int16_t>(i * PKT_SAMPLES);
+    EXPECT_EQ(read_i16_iq(pkt.data() + DIFI_DATA_HEADER_SIZE.value()), first) << "First I sample of fragment " << i;
+  }
+
+  std::vector<uint8_t> extra;
+  EXPECT_EQ(recv_packet(extra), 0) << "Unexpected packet beyond the three fragments";
 }
 
 TEST_F(TxFragmentation, ExactlyOnePacketIsNotFragmented)
 {
   ASSERT_NO_FATAL_FAILURE(open(15009));
 
-  transmit_ramp(radio_difi_tx_stream::MAX_PKT_SAMPLES, 0);
+  transmit_ramp(DIFI_DEFAULT_PKT_SAMPLES, 0);
 
   std::vector<uint8_t> pkt;
   ASSERT_GT(recv_packet(pkt), 0);
-  EXPECT_EQ(pkt.size(), pkt_size(radio_difi_tx_stream::MAX_PKT_SAMPLES).value());
+  EXPECT_EQ(pkt.size(), pkt_size(DIFI_DEFAULT_PKT_SAMPLES).value());
 
   std::vector<uint8_t> extra;
-  EXPECT_EQ(recv_packet(extra), 0) << "A buffer of exactly MAX_PKT_SAMPLES must produce one packet";
+  EXPECT_EQ(recv_packet(extra), 0) << "A buffer of exactly the packet size must produce one packet";
 }
 
 // ---- PCAP writer ------------------------------------------------------------

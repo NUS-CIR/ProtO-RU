@@ -72,7 +72,7 @@ private:
 
 // ctest runs the DIFI test binaries in parallel, so no two of them may share a UDP port. This binary uses 15001 to
 // 15005, 15010 to 15017, 15030 and 15060 to 15065. The transmit stream test uses 14991, 15006 to 15009 and 15040 to
-// 15044. The socket test uses 19981 upwards, and the validator test 15050 to 15055.
+// 15045. The socket test uses 19981 upwards, and the validator test 15050 to 15055.
 
 /// Pairs a tx stream (sending to 127.0.0.1:15001) with an rx stream (bound on
 /// 127.0.0.1:15001).  Port 15001 is chosen to avoid conflicts.
@@ -662,7 +662,7 @@ TEST_F(RxReassembly, QueuedSamplesAreConsumedWithoutWaitingWhenBehind)
   ASSERT_NO_FATAL_FAILURE(open(15014, SLOW_SRATE));
 
   // One datagram anchors the timeline.
-  constexpr unsigned NOF_ANCHOR_SAMPLES = radio_difi_tx_stream::MAX_PKT_SAMPLES;
+  constexpr unsigned NOF_ANCHOR_SAMPLES = DIFI_DEFAULT_PKT_SAMPLES;
   // Three slots follow. Everything is queued before the first receive() call, and the kernel caps SO_RCVBUF at
   // net.core.rmem_max, which defaults to 208 kB. Queueing past that drops datagrams silently, and the stream then
   // waits out its budget for samples that never arrive.

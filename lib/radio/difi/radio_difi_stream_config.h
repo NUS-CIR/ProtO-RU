@@ -57,4 +57,12 @@ bool has_unique_difi_ports(span<const uint16_t> ports, std::string_view directio
 /// \return The byte order, or std::nullopt if the key has any other value.
 std::optional<difi_iq_byte_order> parse_difi_iq_byte_order(const std::string& device_args);
 
+/// \brief Parses the number of IQ samples per transmitted data packet from the radio device arguments.
+///
+/// Looks for \c pkt_samples=N in the comma-separated \p device_args, ignoring every other key. Absent means
+/// DIFI_DEFAULT_PKT_SAMPLES.
+///
+/// \return The number of samples, or std::nullopt if the value is not an integer in [1, DIFI_MAX_PKT_SAMPLES].
+std::optional<unsigned> parse_difi_pkt_samples(const std::string& device_args);
+
 } // namespace ocudu

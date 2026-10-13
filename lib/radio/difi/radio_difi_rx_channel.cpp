@@ -10,9 +10,6 @@
 
 using namespace ocudu;
 
-/// Maximum UDP payload size in bytes.
-static constexpr size_t MAX_UDP_PAYLOAD = 65507;
-
 /// \brief Span of samples the receive socket buffer holds.
 ///
 /// The socket is the only slack while the lower physical layer is busy, so it is sized in time rather than
@@ -23,7 +20,7 @@ static constexpr std::chrono::milliseconds RX_SOCKET_BUFFER_DURATION{50};
 static constexpr uint8_t DIFI_PKT_TYPE_DATA = 0x1U;
 
 /// Largest number of IQ samples one datagram can carry, at the 8 bit depth where a sample takes two bytes.
-static constexpr size_t MAX_SAMPLES_PER_DATAGRAM = (MAX_UDP_PAYLOAD - DIFI_DATA_HEADER_SIZE.value()) / 2;
+static constexpr size_t MAX_SAMPLES_PER_DATAGRAM = (DIFI_MAX_UDP_PAYLOAD.value() - DIFI_DATA_HEADER_SIZE.value()) / 2;
 
 static inline uint32_t read_u32_be(const uint8_t* p)
 {
@@ -66,7 +63,7 @@ static void unpack_samples(const uint8_t*     payload,
 radio_difi_rx_channel::radio_difi_rx_channel(const channel_description& config_,
                                              radio_event_notifier&      notifier_,
                                              ocudulog::basic_logger&    logger_) :
-  config(config_), notifier(notifier_), socket(logger_), rx_buf(MAX_UDP_PAYLOAD)
+  config(config_), notifier(notifier_), socket(logger_), rx_buf(DIFI_MAX_UDP_PAYLOAD.value())
 {
   // Reserve the largest tail a datagram can leave behind, so the receive path never allocates.
   carry_samples.reserve(MAX_SAMPLES_PER_DATAGRAM);

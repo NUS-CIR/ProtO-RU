@@ -83,10 +83,13 @@ ocudu::parse_difi_stream_args(const std::string& args, const std::string& defaul
   return config;
 }
 
-std::optional<difi_iq_byte_order> ocudu::parse_difi_iq_byte_order(const std::string& device_args)
+/// \brief Finds the value of \p key in the comma-separated radio device arguments.
+///
+/// Device arguments may be folded across lines in the configuration file, so whitespace around keys and values is
+/// ignored. Returns std::nullopt if the key is absent.
+static std::optional<std::string> find_device_arg(const std::string& device_args, std::string_view key)
 {
-  static constexpr std::string_view IQ_BYTE_ORDER_KEY = "iq_byte_order";
-  static constexpr std::string_view WHITESPACE        = " \t\n";
+  static constexpr std::string_view WHITESPACE = " \t\n";
 
   std::istringstream ss(device_args);
   std::string        token;
@@ -96,27 +99,46 @@ std::optional<difi_iq_byte_order> ocudu::parse_difi_iq_byte_order(const std::str
       continue;
     }
 
-    // Device arguments may be folded across lines in the configuration file, so surrounding whitespace is ignored.
-    std::string key   = token.substr(0, eq);
-    std::string value = token.substr(eq + 1);
-    key.erase(0, key.find_first_not_of(WHITESPACE));
-    key.erase(key.find_last_not_of(WHITESPACE) + 1);
-    value.erase(0, value.find_first_not_of(WHITESPACE));
-    value.erase(value.find_last_not_of(WHITESPACE) + 1);
-    if (key != IQ_BYTE_ORDER_KEY) {
+    std::string token_key = token.substr(0, eq);
+    token_key.erase(0, token_key.find_first_not_of(WHITESPACE));
+    token_key.erase(token_key.find_last_not_of(WHITESPACE) + 1);
+    if (token_key != key) {
       continue;
     }
 
-    if (value == "big") {
-      return difi_iq_byte_order::big;
-    }
-    if (value == "little") {
-      return difi_iq_byte_order::little;
-    }
-    return std::nullopt;
+    std::string value = token.substr(eq + 1);
+    value.erase(0, value.find_first_not_of(WHITESPACE));
+    value.erase(value.find_last_not_of(WHITESPACE) + 1);
+    return value;
   }
 
-  return difi_iq_byte_order::big;
+  return std::nullopt;
+}
+
+std::optional<difi_iq_byte_order> ocudu::parse_difi_iq_byte_order(const std::string& device_args)
+{
+  const std::optional<std::string> value = find_device_arg(device_args, "iq_byte_order");
+  if (!value.has_value() || (*value == "big")) {
+    return difi_iq_byte_order::big;
+  }
+  if (*value == "little") {
+    return difi_iq_byte_order::little;
+  }
+  return std::nullopt;
+}
+
+std::optional<unsigned> ocudu::parse_difi_pkt_samples(const std::string& device_args)
+{
+  const std::optional<std::string> value = find_device_arg(device_args, "pkt_samples");
+  if (!value.has_value()) {
+    return DIFI_DEFAULT_PKT_SAMPLES;
+  }
+
+  const expected<unsigned, std::string> nof_samples = parse_int<unsigned>(*value);
+  if (!nof_samples.has_value() || (nof_samples.value() == 0) || (nof_samples.value() > DIFI_MAX_PKT_SAMPLES)) {
+    return std::nullopt;
+  }
+  return nof_samples.value();
 }
 
 std::optional<static_vector<uint16_t, RADIO_MAX_NOF_CHANNELS>>

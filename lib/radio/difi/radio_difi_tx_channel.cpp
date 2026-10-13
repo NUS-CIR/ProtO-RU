@@ -27,8 +27,12 @@ radio_difi_tx_channel::radio_difi_tx_channel(const channel_description& config_,
     return;
   }
 
+  ocudu_assert((config.pkt_samples > 0) && (config.pkt_samples <= DIFI_MAX_PKT_SAMPLES),
+               "Invalid number of samples per DIFI packet, i.e., {}.",
+               config.pkt_samples);
+
   // Size the packet buffer once for the largest fragment, so that transmit() never allocates on the radio thread.
-  tx_buf.resize(difi_data_packet_size(config.bit_depth, MAX_PKT_SAMPLES).value());
+  tx_buf.resize(difi_data_packet_size(config.bit_depth, config.pkt_samples).value());
 
   if (!socket.open_tx(config.ip, config.port)) {
     return;
@@ -43,10 +47,10 @@ void radio_difi_tx_channel::transmit(span<const ci16_t> samples, uint64_t timest
     return;
   }
 
-  // Fragment across consecutive data packets of at most MAX_PKT_SAMPLES each: a whole slot exceeds both
+  // Fragment across consecutive data packets of at most pkt_samples each: a whole slot exceeds both
   // the maximum UDP payload and the receive buffer of typical DIFI implementations.
   for (unsigned offset = 0, nof_samples = samples.size(); offset != nof_samples;) {
-    const unsigned nof_chunk = std::min(MAX_PKT_SAMPLES, nof_samples - offset);
+    const unsigned nof_chunk = std::min(config.pkt_samples, nof_samples - offset);
     // Each fragment carries the timestamp of its own first sample.
     const uint64_t chunk_ts = timestamp + offset;
 

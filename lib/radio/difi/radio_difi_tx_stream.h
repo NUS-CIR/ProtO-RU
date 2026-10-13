@@ -54,10 +54,9 @@ public:
     std::string stream_id_str;
     /// Logging level.
     ocudulog::basic_levels log_level = ocudulog::basic_levels::info;
+    /// IQ samples per data packet, at most DIFI_MAX_PKT_SAMPLES; larger transmit buffers are fragmented.
+    unsigned pkt_samples = DIFI_DEFAULT_PKT_SAMPLES;
   };
-
-  /// Maximum IQ samples per data packet; larger transmit buffers are fragmented.
-  static constexpr unsigned MAX_PKT_SAMPLES = radio_difi_tx_channel::MAX_PKT_SAMPLES;
 
   radio_difi_tx_stream(const stream_description& config, radio_event_notifier& notifier_);
 

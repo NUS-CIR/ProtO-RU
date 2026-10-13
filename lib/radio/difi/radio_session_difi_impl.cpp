@@ -36,6 +36,11 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
   ocudu_assert(parsed_byte_order.has_value(), "Invalid DIFI IQ byte order in the device arguments '{}'.", config.args);
   const difi_iq_byte_order iq_byte_order = parsed_byte_order.value_or(difi_iq_byte_order::big);
 
+  // Likewise for the transmit packet size.
+  const std::optional<unsigned> parsed_pkt_samples = parse_difi_pkt_samples(config.args);
+  ocudu_assert(parsed_pkt_samples.has_value(), "Invalid DIFI packet size in the device arguments '{}'.", config.args);
+  const unsigned pkt_samples = parsed_pkt_samples.value_or(DIFI_DEFAULT_PKT_SAMPLES);
+
   unsigned nof_streams = config.tx_streams.size();
   bb_gateways.reserve(nof_streams);
 
@@ -86,7 +91,8 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
                                                           .sample_rate_Hz = config.sampling_rate_Hz,
                                                           .center_freq_Hz = tx_center_freq_Hz,
                                                           .stream_id_str  = "difi:tx:" + std::to_string(stream_id),
-                                                          .log_level      = config.log_level};
+                                                          .log_level      = config.log_level,
+                                                          .pkt_samples    = pkt_samples};
 
     for (unsigned channel_id = 0, nof_channels = tx_stream.channels.size(); channel_id != nof_channels; ++channel_id) {
       const radio_difi_tx_stream::channel_description& channel = tx_config.channels.emplace_back(
@@ -124,12 +130,14 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
                   channel.difi_stream_id);
     }
 
-    logger.info("stream={}: Creating DIFI stream. tx_ip={} rx_ip={} bit_depth={} iq_byte_order={} srate={}Hz freq={}Hz",
+    logger.info("stream={}: Creating DIFI stream. tx_ip={} rx_ip={} bit_depth={} iq_byte_order={} pkt_samples={} "
+                "srate={}Hz freq={}Hz",
                 stream_id,
                 tx_config.ip,
                 rx_config.ip,
                 bit_depth,
                 (iq_byte_order == difi_iq_byte_order::big) ? "big" : "little",
+                pkt_samples,
                 config.sampling_rate_Hz,
                 tx_center_freq_Hz);
 

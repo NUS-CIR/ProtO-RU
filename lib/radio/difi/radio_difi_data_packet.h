@@ -17,6 +17,18 @@ constexpr units::bytes DIFI_DATA_HEADER_SIZE{28};
 /// Number of payload bytes per 16-bit IQ sample, two per component.
 constexpr size_t DIFI_BYTES_PER_IQ16_SAMPLE = 4;
 
+/// Largest UDP payload, and so the largest DIFI packet.
+constexpr units::bytes DIFI_MAX_UDP_PAYLOAD{65507};
+
+/// \brief [Implementation-defined] Default number of IQ samples per transmitted data packet.
+///
+/// A 7708-byte packet at 16-bit fits a 9000-byte receive buffer, and 1920 samples divide every slot.
+constexpr unsigned DIFI_DEFAULT_PKT_SAMPLES = 1920;
+
+/// Largest number of IQ samples a transmitted data packet may carry, at the widest (16-bit) sample format.
+constexpr unsigned DIFI_MAX_PKT_SAMPLES =
+    (DIFI_MAX_UDP_PAYLOAD.value() - DIFI_DATA_HEADER_SIZE.value()) / DIFI_BYTES_PER_IQ16_SAMPLE;
+
 /// \brief Byte order of the 16-bit IQ components in a DIFI data packet payload.
 enum class difi_iq_byte_order { big, little };
 

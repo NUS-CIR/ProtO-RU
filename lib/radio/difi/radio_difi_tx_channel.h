@@ -44,12 +44,9 @@ public:
     double rf_gain_dB = 0.0;
     /// IF gain in dB, encoded in the upper 16 bits of the context packet gains field.
     double if_gain_dB = 0.0;
+    /// IQ samples per data packet, at most DIFI_MAX_PKT_SAMPLES; larger transmit buffers are fragmented.
+    unsigned pkt_samples = DIFI_DEFAULT_PKT_SAMPLES;
   };
-
-  /// \brief Maximum IQ samples per data packet; larger transmit buffers are fragmented.
-  ///
-  /// 7708 bytes at 16-bit: inside one datagram and a typical 9000-byte receive buffer, and divides every slot.
-  static constexpr unsigned MAX_PKT_SAMPLES = 1920;
 
   /// \brief Creates the channel and opens its socket.
   ///

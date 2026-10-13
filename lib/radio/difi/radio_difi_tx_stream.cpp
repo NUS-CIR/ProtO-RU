@@ -23,7 +23,8 @@ radio_difi_tx_stream::radio_difi_tx_stream(const stream_description& config, rad
                                                                        .sample_rate_Hz = config.sample_rate_Hz,
                                                                        .center_freq_Hz = config.center_freq_Hz,
                                                                        .rf_gain_dB     = channel.rf_gain_dB,
-                                                                       .if_gain_dB     = channel.if_gain_dB};
+                                                                       .if_gain_dB     = channel.if_gain_dB,
+                                                                       .pkt_samples    = config.pkt_samples};
     const auto& tx_channel = channels.emplace_back(std::make_unique<radio_difi_tx_channel>(channel_config, logger));
     if (!tx_channel->is_successful()) {
       return;
