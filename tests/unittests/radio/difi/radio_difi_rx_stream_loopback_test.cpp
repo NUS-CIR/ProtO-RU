@@ -71,7 +71,7 @@ private:
 // ---- Test fixture -----------------------------------------------------------
 
 // ctest runs the DIFI test binaries in parallel, so no two of them may share a UDP port. This binary uses 15001 to
-// 15005, 15010 to 15017, 15030 and 15060 to 15065. The transmit stream test uses 14991, 15006 to 15009 and 15040 to
+// 15005, 15010 to 15017, 15030 and 15060 to 15067. The transmit stream test uses 14991, 15006 to 15009 and 15040 to
 // 15045. The socket test uses 19981 upwards, and the validator test 15050 to 15055.
 
 /// Pairs a tx stream (sending to 127.0.0.1:15001) with an rx stream (bound on
@@ -1194,4 +1194,66 @@ TEST_F(RxStreamMultiChannel, ChannelOnAnotherClockIsNotRealigned)
 
   tx_on_our_clock->stop();
   tx_on_another_clock->stop();
+}
+
+// ---- Receive lag ------------------------------------------------------------
+//
+// The receive timeline trails the transmitter's first packet by the configured lag, so the first buffer after that
+// packet is handed over no earlier than the lag.
+
+/// Returns how long the first receive() call takes once a transmitter on \p port has sent, with \p rx_lag.
+static std::chrono::steady_clock::duration first_buffer_delay(uint16_t port, std::chrono::microseconds rx_lag)
+{
+  static constexpr uint32_t STREAM      = 3;
+  static constexpr double   SAMPLE_RATE = 1920000.0;
+  static constexpr unsigned NOF_SAMPLES = 4;
+
+  null_notifier_rx                         notifier;
+  radio_difi_rx_stream::stream_description rx_desc;
+  rx_desc.ip             = "127.0.0.1";
+  rx_desc.channels       = {{port, STREAM}};
+  rx_desc.stream_id      = STREAM;
+  rx_desc.bit_depth      = 16;
+  rx_desc.sample_rate_Hz = SAMPLE_RATE;
+  rx_desc.stream_id_str  = "test:lag:rx";
+  rx_desc.rx_lag         = rx_lag;
+  radio_difi_rx_stream rx(rx_desc, notifier);
+
+  radio_difi_tx_stream::stream_description tx_desc;
+  tx_desc.ip             = "127.0.0.1";
+  tx_desc.channels       = {{port, STREAM}};
+  tx_desc.stream_id      = STREAM;
+  tx_desc.bit_depth      = 16;
+  tx_desc.sample_rate_Hz = SAMPLE_RATE;
+  tx_desc.stream_id_str  = "test:lag:tx";
+  radio_difi_tx_stream tx(tx_desc, notifier);
+  // The context packet start() sends is discarded by the receiver start().
+  tx.start(0);
+  rx.start(0);
+
+  const std::vector<ci16_t>             samples(NOF_SAMPLES, ci16_t(1, 2));
+  simple_buffer_reader_rx               reader(samples);
+  baseband_gateway_transmitter_metadata meta{};
+  meta.is_empty = false;
+  meta.ts       = 0;
+  tx.transmit(reader, meta);
+
+  simple_buffer_writer buf(NOF_SAMPLES);
+  const auto           start = std::chrono::steady_clock::now();
+  rx.receive(buf);
+  const auto delay = std::chrono::steady_clock::now() - start;
+
+  tx.stop();
+  rx.stop();
+  return delay;
+}
+
+TEST(RxStreamLag, FirstBufferWaitsForTheConfiguredLag)
+{
+  // Far apart, so that a slow run under a memory checker cannot make the short lag look like the long one.
+  static constexpr std::chrono::milliseconds LONG_LAG{200};
+  static constexpr std::chrono::milliseconds SHORT_LAG{1};
+
+  EXPECT_GE(first_buffer_delay(15066, LONG_LAG), LONG_LAG);
+  EXPECT_LT(first_buffer_delay(15067, SHORT_LAG), LONG_LAG / 2);
 }

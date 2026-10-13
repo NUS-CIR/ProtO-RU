@@ -9,6 +9,7 @@
 #include "ocudu/adt/interval.h"
 #include "ocudu/ran/phy_time_unit.h"
 #include "ocudu/support/string_parsing_utils.h"
+#include <chrono>
 #include <sstream>
 #include <string_view>
 
@@ -43,6 +44,9 @@ static bool validate_difi_device_arguments(const std::string&                   
   static constexpr std::string_view tx_port_key       = "tx_port";
   static constexpr std::string_view rx_port_key       = "rx_port";
   static constexpr std::string_view pkt_samples_key   = "pkt_samples";
+  static constexpr std::string_view rx_lag_key        = "rx_lag_us";
+  // The receive lag delays every hybrid ARQ round trip, so it is bounded to a few slots of the slowest numerology.
+  static constexpr std::chrono::microseconds max_rx_lag{20000};
   // A transmitted data packet must fit one UDP datagram: its payload of 65507 bytes holds the 28-byte DIFI header and
   // 4 bytes per 16-bit IQ sample.
   static constexpr unsigned max_udp_payload_bytes = 65507;
@@ -90,6 +94,15 @@ static bool validate_difi_device_arguments(const std::string&                   
     if ((key == iq_byte_order_key) && (value != "big") && (value != "little")) {
       fmt::print("Invalid DIFI {} '{}'. Valid values are 'big' and 'little'.\n", iq_byte_order_key, value);
       return false;
+    }
+
+    if (key == rx_lag_key) {
+      const expected<int64_t, std::string> lag_us = parse_int<int64_t>(value);
+      if (!lag_us.has_value() || (lag_us.value() < 0) || (lag_us.value() > max_rx_lag.count())) {
+        fmt::print(
+            "Invalid DIFI {} '{}'. Valid values are integers from 0 to {}.\n", rx_lag_key, value, max_rx_lag.count());
+        return false;
+      }
     }
 
     if (key == pkt_samples_key) {

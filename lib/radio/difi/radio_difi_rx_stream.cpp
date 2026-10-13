@@ -11,11 +11,6 @@
 
 using namespace ocudu;
 
-/// \brief Fixed offset by which the receive timeline trails the transmitter, applied once when anchored.
-///
-/// Keeps a backlog in the socket queue to absorb burstiness: a shortfall is zero-filled, not deferred.
-static constexpr std::chrono::microseconds RX_LAG{2000};
-
 /// \brief Maximum drift behind schedule before the timeline is re-anchored.
 ///
 /// Bounds the catch-up debt taken on across a stall. Ordinary lateness is absorbed by not waiting.
@@ -125,8 +120,8 @@ baseband_gateway_receiver::metadata radio_difi_rx_stream::receive(baseband_gatew
       peer_active = true;
       if (!clock_anchor_locked_to_peer) {
         // Re-anchor to the transmitter first packet, so the schedule is expressed relative to when it
-        // started streaming. RX_LAG is applied here, once, and every deadline is then one budget on.
-        clock_anchor                = std::chrono::steady_clock::now() + RX_LAG;
+        // started streaming. The receive lag is applied here, once, and every deadline is then one budget on.
+        clock_anchor                = std::chrono::steady_clock::now() + config.rx_lag;
         clock_anchor_ts             = channel.get_next_timestamp();
         clock_anchor_locked_to_peer = true;
         deadline                    = compute_deadline();
@@ -290,7 +285,7 @@ void radio_difi_rx_stream::report_timing()
               summary->p0_1.count(),
               summary->p1.count(),
               summary->p50.count(),
-              RX_LAG.count());
+              config.rx_lag.count());
 }
 
 void radio_difi_rx_stream::start(baseband_gateway_timestamp init_time, int64_t epoch_offset_ticks)

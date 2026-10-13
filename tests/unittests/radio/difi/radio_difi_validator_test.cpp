@@ -287,6 +287,13 @@ const std::vector<test_case_t> radio_difi_validator_test_data = {
        return config;
      },
      ""},
+    // A longer receive lag.
+    {[] {
+       radio_configuration::radio config = radio_base_config;
+       config.args                       = "rx_port=4992,rx_lag_us=5000";
+       return config;
+     },
+     ""},
     // Two receive channels, each on its own port.
     {[] {
        radio_configuration::radio config = radio_base_config;
@@ -430,6 +437,20 @@ TEST(RadioDifiDeviceArgsTest, PacketSize)
   EXPECT_FALSE(parse_difi_pkt_samples("pkt_samples=0").has_value());
   EXPECT_FALSE(parse_difi_pkt_samples("pkt_samples=lots").has_value());
   EXPECT_FALSE(parse_difi_pkt_samples("pkt_samples=-1").has_value());
+}
+
+// The receive lag takes any whole number of microseconds up to its limit, and defaults to 2 ms.
+TEST(RadioDifiDeviceArgsTest, ReceiveLag)
+{
+  static constexpr std::chrono::microseconds CONFIGURED_LAG{5000};
+
+  EXPECT_EQ(parse_difi_rx_lag(""), DIFI_DEFAULT_RX_LAG);
+  EXPECT_EQ(parse_difi_rx_lag(fmt::format("rx_port=4992, rx_lag_us = {}", CONFIGURED_LAG.count())), CONFIGURED_LAG);
+  EXPECT_EQ(parse_difi_rx_lag("rx_lag_us=0"), std::chrono::microseconds(0));
+  EXPECT_EQ(parse_difi_rx_lag(fmt::format("rx_lag_us={}", DIFI_MAX_RX_LAG.count())), DIFI_MAX_RX_LAG);
+  EXPECT_FALSE(parse_difi_rx_lag(fmt::format("rx_lag_us={}", DIFI_MAX_RX_LAG.count() + 1)).has_value());
+  EXPECT_FALSE(parse_difi_rx_lag("rx_lag_us=-1").has_value());
+  EXPECT_FALSE(parse_difi_rx_lag("rx_lag_us=2ms").has_value());
 }
 
 INSTANTIATE_TEST_SUITE_P(RadioDifiValidatorTest,

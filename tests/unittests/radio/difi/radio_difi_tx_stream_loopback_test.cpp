@@ -92,7 +92,7 @@ static int16_t read_i16_iq(const uint8_t* p)
 
 // ctest runs the DIFI test binaries in parallel, so no two of them may share a UDP port. This binary uses 14991,
 // 15006 to 15009 and 15040 to 15045. The receive stream test uses 15001 to 15005, 15010 to 15017, 15030 and 15060 to
-// 15065. The socket test uses 19981 upwards, and the validator test 15050 to 15055.
+// 15067. The socket test uses 19981 upwards, and the validator test 15050 to 15055.
 
 /// Creates a tx stream sending to 127.0.0.1:14991 and a matching Rx socket.
 /// Port 14991 is chosen to avoid conflicts with any live DIFI traffic.

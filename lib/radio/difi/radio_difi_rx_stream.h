@@ -7,6 +7,7 @@
 #include "radio_difi_data_packet.h"
 #include "radio_difi_rx_channel.h"
 #include "radio_difi_rx_timing_stats.h"
+#include "radio_difi_stream_config.h"
 #include "ocudu/adt/static_vector.h"
 #include "ocudu/gateways/baseband/baseband_gateway_receiver.h"
 #include "ocudu/gateways/baseband/baseband_gateway_timestamp.h"
@@ -55,6 +56,10 @@ public:
     std::string stream_id_str;
     /// Logging level.
     ocudulog::basic_levels log_level = ocudulog::basic_levels::info;
+    /// \brief Fixed offset by which the receive timeline trails the transmitter, applied once when anchored.
+    ///
+    /// Keeps a backlog in the socket queue to absorb burstiness: a shortfall is zero-filled, not deferred.
+    std::chrono::microseconds rx_lag = DIFI_DEFAULT_RX_LAG;
     /// \brief Latches the transmitter epoch onto this stream timeline instead of trusting it.
     ///
     /// Enable only for a peer running an unrelated epoch, such as equipment timestamping against UTC.

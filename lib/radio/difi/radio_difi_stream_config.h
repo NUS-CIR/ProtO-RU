@@ -9,6 +9,7 @@
 #include "ocudu/adt/static_vector.h"
 #include "ocudu/radio/radio_configuration.h"
 #include "ocudu/radio/radio_constants.h"
+#include <chrono>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -64,5 +65,19 @@ std::optional<difi_iq_byte_order> parse_difi_iq_byte_order(const std::string& de
 ///
 /// \return The number of samples, or std::nullopt if the value is not an integer in [1, DIFI_MAX_PKT_SAMPLES].
 std::optional<unsigned> parse_difi_pkt_samples(const std::string& device_args);
+
+/// [Implementation-defined] Default lag of the receive timeline behind the transmitter.
+constexpr std::chrono::microseconds DIFI_DEFAULT_RX_LAG{2000};
+
+/// [Implementation-defined] Largest receive lag accepted.
+constexpr std::chrono::microseconds DIFI_MAX_RX_LAG{20000};
+
+/// \brief Parses the receive lag from the radio device arguments.
+///
+/// Looks for \c rx_lag_us=N in the comma-separated \p device_args, in microseconds, ignoring every other key. Absent
+/// means DIFI_DEFAULT_RX_LAG.
+///
+/// \return The lag, or std::nullopt if the value is not an integer in [0, DIFI_MAX_RX_LAG].
+std::optional<std::chrono::microseconds> parse_difi_rx_lag(const std::string& device_args);
 
 } // namespace ocudu

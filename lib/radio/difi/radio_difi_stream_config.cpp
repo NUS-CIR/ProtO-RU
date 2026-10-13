@@ -141,6 +141,20 @@ std::optional<unsigned> ocudu::parse_difi_pkt_samples(const std::string& device_
   return nof_samples.value();
 }
 
+std::optional<std::chrono::microseconds> ocudu::parse_difi_rx_lag(const std::string& device_args)
+{
+  const std::optional<std::string> value = find_device_arg(device_args, "rx_lag_us");
+  if (!value.has_value()) {
+    return DIFI_DEFAULT_RX_LAG;
+  }
+
+  const expected<int64_t, std::string> lag_us = parse_int<int64_t>(*value);
+  if (!lag_us.has_value() || (lag_us.value() < 0) || (lag_us.value() > DIFI_MAX_RX_LAG.count())) {
+    return std::nullopt;
+  }
+  return std::chrono::microseconds(lag_us.value());
+}
+
 std::optional<static_vector<uint16_t, RADIO_MAX_NOF_CHANNELS>>
 ocudu::resolve_difi_channel_ports(const radio_configuration::stream& stream, uint16_t stream_port, unsigned stream_id)
 {

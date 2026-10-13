@@ -41,6 +41,11 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
   ocudu_assert(parsed_pkt_samples.has_value(), "Invalid DIFI packet size in the device arguments '{}'.", config.args);
   const unsigned pkt_samples = parsed_pkt_samples.value_or(DIFI_DEFAULT_PKT_SAMPLES);
 
+  // Likewise for the receive lag.
+  const std::optional<std::chrono::microseconds> parsed_rx_lag = parse_difi_rx_lag(config.args);
+  ocudu_assert(parsed_rx_lag.has_value(), "Invalid DIFI receive lag in the device arguments '{}'.", config.args);
+  const std::chrono::microseconds rx_lag = parsed_rx_lag.value_or(DIFI_DEFAULT_RX_LAG);
+
   unsigned nof_streams = config.tx_streams.size();
   bb_gateways.reserve(nof_streams);
 
@@ -116,7 +121,8 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
                                                           .iq_byte_order  = iq_byte_order,
                                                           .sample_rate_Hz = config.sampling_rate_Hz,
                                                           .stream_id_str  = "difi:rx:" + std::to_string(stream_id),
-                                                          .log_level      = config.log_level};
+                                                          .log_level      = config.log_level,
+                                                          .rx_lag         = rx_lag};
 
     for (unsigned channel_id = 0, nof_channels = rx_stream.channels.size(); channel_id != nof_channels; ++channel_id) {
       const radio_difi_rx_stream::channel_description& channel =
@@ -131,13 +137,14 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
     }
 
     logger.info("stream={}: Creating DIFI stream. tx_ip={} rx_ip={} bit_depth={} iq_byte_order={} pkt_samples={} "
-                "srate={}Hz freq={}Hz",
+                "rx_lag={}us srate={}Hz freq={}Hz",
                 stream_id,
                 tx_config.ip,
                 rx_config.ip,
                 bit_depth,
                 (iq_byte_order == difi_iq_byte_order::big) ? "big" : "little",
                 pkt_samples,
+                rx_lag.count(),
                 config.sampling_rate_Hz,
                 tx_center_freq_Hz);
 
