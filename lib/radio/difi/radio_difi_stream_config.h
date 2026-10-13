@@ -5,9 +5,14 @@
 #pragma once
 
 #include "radio_difi_data_packet.h"
+#include "ocudu/adt/span.h"
+#include "ocudu/adt/static_vector.h"
+#include "ocudu/radio/radio_configuration.h"
+#include "ocudu/radio/radio_constants.h"
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <string_view>
 
 namespace ocudu {
 
@@ -27,6 +32,22 @@ struct radio_difi_stream_config {
 std::optional<radio_difi_stream_config> parse_difi_stream_args(const std::string& args,
                                                                const std::string& default_ip   = "127.0.0.1",
                                                                uint16_t           default_port = 4991);
+
+/// \brief Resolves the UDP port of every channel of a DIFI stream.
+///
+/// Each channel names its port in its own arguments, as in \c port=4993. The first channel may leave them empty and
+/// then takes \p stream_port, the port of the stream arguments, so a single-channel configuration needs no channel
+/// arguments. \p stream_id only labels the error messages.
+///
+/// \return One port per channel, or std::nullopt if the channel arguments are malformed or a channel other than the
+/// first has no port.
+std::optional<static_vector<uint16_t, RADIO_MAX_NOF_CHANNELS>>
+resolve_difi_channel_ports(const radio_configuration::stream& stream, uint16_t stream_port, unsigned stream_id);
+
+/// \brief Checks that no UDP port appears twice among \p ports.
+///
+/// \p direction, "transmit" or "receive", only labels the error message.
+bool has_unique_difi_ports(span<const uint16_t> ports, std::string_view direction);
 
 /// \brief Parses the IQ byte order from the radio device arguments.
 ///

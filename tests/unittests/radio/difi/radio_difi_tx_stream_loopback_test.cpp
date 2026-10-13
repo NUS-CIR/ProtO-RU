@@ -13,11 +13,14 @@
 #include "ocudu/gateways/baseband/buffer/baseband_gateway_buffer_reader.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/radio/radio_event_notifier.h"
+#include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
 #include <gtest/gtest.h>
+#include <memory>
 #include <thread>
 #include <type_traits>
 #include <vector>
@@ -88,7 +91,7 @@ static int16_t read_i16_iq(const uint8_t* p)
 // ---- Test fixture -----------------------------------------------------------
 
 // ctest runs the DIFI test binaries in parallel, so no two of them may share a UDP port. This binary uses 14991,
-// 15006 to 15009 and 15040 to 15042. The receive stream test uses 15001 to 15005, 15010 to 15017 and 15030. The socket
+// 15006 to 15009 and 15040 to 15044. The receive stream test uses 15001 to 15005, 15010 to 15017 and 15030. The socket
 // test uses 19981 upwards, and the validator test 15050 upwards.
 
 /// Creates a tx stream sending to 127.0.0.1:14991 and a matching Rx socket.
@@ -947,4 +950,121 @@ TEST(TxStreamConfig, SupportedBitDepthsAreAccepted)
     radio_difi_tx_stream tx_stream(desc, notifier);
     EXPECT_TRUE(tx_stream.is_successful()) << "Bit depth " << bit_depth << " must be accepted";
   }
+}
+
+// ---- Multiple channels ------------------------------------------------------
+//
+// Each channel of a buffer is a DIFI stream of its own, on its own port and with its own stream identifier, while
+// every channel carries the same timestamps.
+
+/// In-memory buffer reader holding one vector of samples per channel.
+class multi_channel_buffer_reader : public baseband_gateway_buffer_reader
+{
+public:
+  explicit multi_channel_buffer_reader(std::vector<std::vector<ci16_t>> channels_) : channels(std::move(channels_)) {}
+
+  unsigned           get_nof_channels() const override { return channels.size(); }
+  unsigned           get_nof_samples() const override { return channels.front().size(); }
+  span<const ci16_t> get_channel_buffer(unsigned channel_idx) const override { return channels[channel_idx]; }
+
+private:
+  std::vector<std::vector<ci16_t>> channels;
+};
+
+TEST(TxStreamMultiChannel, EachChannelIsItsOwnDifiStream)
+{
+  static constexpr unsigned                           NOF_CHANNELS    = 2;
+  static constexpr std::array<uint16_t, NOF_CHANNELS> PORTS           = {15043, 15044};
+  static constexpr std::array<uint32_t, NOF_CHANNELS> DIFI_STREAM_IDS = {4, 5};
+  static constexpr std::array<double, NOF_CHANNELS>   RF_GAINS_dB     = {10.0, 20.0};
+  static constexpr double                             NEW_RF_GAIN_dB  = 30.0;
+  static constexpr double                             SRATE           = 1920000.0;
+  static constexpr unsigned                           NOF_SAMPLES     = 8;
+  // Offsets of the fields checked below, in bytes from the start of a packet.
+  static constexpr size_t STREAM_ID_OFFSET = 4;
+  static constexpr size_t TIMESTAMP_OFFSET = 16;
+  static constexpr size_t TIMESTAMP_SIZE   = 12;
+  static constexpr size_t GAINS_OFFSET     = 72;
+  // Context packet gains are in units of 1/128 dB.
+  static constexpr double GAIN_SCALE = 128.0;
+  // Mask of the RF gain within the context packet gains field.
+  static constexpr uint32_t RF_GAIN_MASK = 0xffffU;
+
+  std::array<std::unique_ptr<radio_difi_udp_socket>, NOF_CHANNELS> rx_socks;
+  for (unsigned channel_id = 0; channel_id != NOF_CHANNELS; ++channel_id) {
+    rx_socks[channel_id] = std::make_unique<radio_difi_udp_socket>(test_socket_logger());
+    ASSERT_TRUE(rx_socks[channel_id]->open_rx("127.0.0.1", PORTS[channel_id]));
+  }
+
+  std::vector<uint8_t> rx_buf(65536);
+  auto                 recv_packet = [&rx_socks, &rx_buf](unsigned channel_id) {
+    const expected<span<uint8_t>, difi_recv_error> received = recv_within(*rx_socks[channel_id], rx_buf);
+    return received.has_value() ? std::vector<uint8_t>(received->begin(), received->end()) : std::vector<uint8_t>();
+  };
+
+  null_notifier                            notifier;
+  radio_difi_tx_stream::stream_description desc;
+  desc.ip = "127.0.0.1";
+  for (unsigned channel_id = 0; channel_id != NOF_CHANNELS; ++channel_id) {
+    desc.channels.push_back({PORTS[channel_id], DIFI_STREAM_IDS[channel_id], RF_GAINS_dB[channel_id]});
+  }
+  desc.stream_id      = 0;
+  desc.bit_depth      = 16;
+  desc.sample_rate_Hz = SRATE;
+  desc.center_freq_Hz = 3.5e9;
+  desc.stream_id_str  = "test:multi:tx";
+  radio_difi_tx_stream tx(desc, notifier);
+  ASSERT_TRUE(tx.is_successful());
+
+  // Every channel announces itself with a context packet carrying its own identifier and gain.
+  tx.start(0);
+  for (unsigned channel_id = 0; channel_id != NOF_CHANNELS; ++channel_id) {
+    const std::vector<uint8_t> ctx = recv_packet(channel_id);
+    ASSERT_EQ(ctx.size(), DIFI_CONTEXT_PACKET_SIZE.value()) << "Channel " << channel_id;
+    EXPECT_EQ(read_u32_be(ctx.data() + STREAM_ID_OFFSET), DIFI_STREAM_IDS[channel_id]);
+    const auto rf_gain = static_cast<int16_t>(read_u32_be(ctx.data() + GAINS_OFFSET) & RF_GAIN_MASK);
+    EXPECT_EQ(rf_gain, static_cast<int16_t>(RF_GAINS_dB[channel_id] * GAIN_SCALE));
+  }
+
+  // Channel c carries the constant sample (c + 1, -(c + 1)), so a crossed channel shows in the payload.
+  std::vector<std::vector<ci16_t>> samples;
+  for (unsigned channel_id = 0; channel_id != NOF_CHANNELS; ++channel_id) {
+    const auto value = static_cast<int16_t>(channel_id + 1);
+    samples.emplace_back(NOF_SAMPLES, ci16_t(value, -value));
+  }
+  multi_channel_buffer_reader           buf(samples);
+  baseband_gateway_transmitter_metadata meta{};
+  meta.is_empty = false;
+  meta.ts       = 0;
+  tx.transmit(buf, meta);
+
+  std::array<std::vector<uint8_t>, NOF_CHANNELS> pkts;
+  for (unsigned channel_id = 0; channel_id != NOF_CHANNELS; ++channel_id) {
+    pkts[channel_id] = recv_packet(channel_id);
+    ASSERT_EQ(pkts[channel_id].size(), difi_data_packet_size(desc.bit_depth, NOF_SAMPLES).value())
+        << "Channel " << channel_id;
+    EXPECT_EQ(read_u32_be(pkts[channel_id].data() + STREAM_ID_OFFSET), DIFI_STREAM_IDS[channel_id]);
+    const auto value = static_cast<int16_t>(channel_id + 1);
+    EXPECT_EQ(read_i16_iq(pkts[channel_id].data() + DIFI_DATA_HEADER_SIZE.value()), value);
+    EXPECT_EQ(read_i16_iq(pkts[channel_id].data() + DIFI_DATA_HEADER_SIZE.value() + 2), -value);
+  }
+  EXPECT_TRUE(std::equal(pkts[0].begin() + TIMESTAMP_OFFSET,
+                         pkts[0].begin() + TIMESTAMP_OFFSET + TIMESTAMP_SIZE,
+                         pkts[1].begin() + TIMESTAMP_OFFSET))
+      << "Every channel must carry the same timestamp";
+
+  // A gain change goes to its own channel only, ahead of that channel's next data packet.
+  ASSERT_TRUE(tx.set_gain(1, NEW_RF_GAIN_dB, 0.0));
+  tx.transmit(buf, meta);
+  const std::vector<uint8_t> ctx = recv_packet(1);
+  ASSERT_EQ(ctx.size(), DIFI_CONTEXT_PACKET_SIZE.value());
+  EXPECT_EQ(static_cast<int16_t>(read_u32_be(ctx.data() + GAINS_OFFSET) & RF_GAIN_MASK),
+            static_cast<int16_t>(NEW_RF_GAIN_dB * GAIN_SCALE));
+  EXPECT_EQ(recv_packet(1).size(), difi_data_packet_size(desc.bit_depth, NOF_SAMPLES).value());
+  const std::vector<uint8_t> channel_0_pkt = recv_packet(0);
+  EXPECT_EQ(channel_0_pkt.size(), difi_data_packet_size(desc.bit_depth, NOF_SAMPLES).value())
+      << "Channel 0 must not resend its context packet";
+  EXPECT_FALSE(tx.set_gain(NOF_CHANNELS, NEW_RF_GAIN_dB, 0.0));
+
+  tx.stop();
 }

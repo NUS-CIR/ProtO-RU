@@ -6,6 +6,7 @@
 #include "radio_difi_stream_config.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/support/error_handling.h"
+#include <algorithm>
 #include <chrono>
 
 using namespace ocudu;
@@ -39,70 +40,85 @@ radio_session_difi_impl::radio_session_difi_impl(const radio_configuration::radi
   unsigned nof_streams = config.tx_streams.size();
   bb_gateways.reserve(nof_streams);
 
+  // DIFI stream identifiers on the wire are the flat port index of each direction, numbered by stream and then by
+  // channel, so they are unique across the radio and equal the stream index when every stream has one channel.
+  unsigned tx_difi_stream_id = 0;
+  unsigned rx_difi_stream_id = 0;
+
   for (unsigned stream_id = 0; stream_id != nof_streams; ++stream_id) {
-    for (unsigned channel_id = 0, nof_channels = config.tx_streams[stream_id].channels.size();
-         channel_id != nof_channels;
-         ++channel_id) {
-      tx_port_map.emplace_back(stream_id, channel_id);
-    }
+    const radio_configuration::stream& tx_stream = config.tx_streams[stream_id];
+    const radio_configuration::stream& rx_stream = config.rx_streams[stream_id];
 
     // Defaults: transmit to localhost:4991.
-    auto tx_parsed = parse_difi_stream_args(config.tx_streams[stream_id].args, "127.0.0.1", 4991);
+    auto tx_parsed = parse_difi_stream_args(tx_stream.args, "127.0.0.1", 4991);
     if (!tx_parsed) {
       logger.error("Failed to parse DIFI Tx stream {} arguments.", stream_id);
       return;
     }
 
     // Defaults: bind all interfaces on port 4992.
-    auto rx_parsed = parse_difi_stream_args(config.rx_streams[stream_id].args, "0.0.0.0", 4992);
+    auto rx_parsed = parse_difi_stream_args(rx_stream.args, "0.0.0.0", 4992);
     if (!rx_parsed) {
       logger.error("Failed to parse DIFI Rx stream {} arguments.", stream_id);
       return;
     }
 
-    // Advertise the configured centre frequency and gain in the context packet. set_tx_freq() and
-    // set_tx_gain() update them later, but nothing calls those during start-up.
-    double tx_center_freq_Hz = 0.0;
-    double tx_gain_dB        = 0.0;
-    if (!config.tx_streams[stream_id].channels.empty()) {
-      const auto& tx_channel = config.tx_streams[stream_id].channels.front();
-      tx_center_freq_Hz      = tx_channel.freq.center_frequency_Hz;
-      tx_gain_dB             = tx_channel.gain_dB;
+    const auto tx_ports = resolve_difi_channel_ports(tx_stream, tx_parsed->port, stream_id);
+    if (!tx_ports.has_value() || tx_ports->empty()) {
+      logger.error("Failed to resolve the DIFI Tx channel ports of stream {}.", stream_id);
+      return;
     }
 
-    radio_difi_tx_stream::stream_description tx_config = {
-        .ip             = tx_parsed->ip,
-        .channels       = {{.port = tx_parsed->port, .difi_stream_id = stream_id, .rf_gain_dB = tx_gain_dB}},
-        .stream_id      = stream_id,
-        .bit_depth      = bit_depth,
-        .iq_byte_order  = iq_byte_order,
-        .sample_rate_Hz = config.sampling_rate_Hz,
-        .center_freq_Hz = tx_center_freq_Hz,
-        .stream_id_str  = "difi:tx:" + std::to_string(stream_id),
-        .log_level      = config.log_level};
+    // Advertise the configured centre frequency and gains in the context packets. set_tx_freq() and set_tx_gain()
+    // update them later, but nothing calls those during start-up.
+    const double tx_center_freq_Hz = tx_stream.channels.front().freq.center_frequency_Hz;
 
+    radio_difi_tx_stream::stream_description tx_config = {.ip             = tx_parsed->ip,
+                                                          .channels       = {},
+                                                          .stream_id      = stream_id,
+                                                          .bit_depth      = bit_depth,
+                                                          .iq_byte_order  = iq_byte_order,
+                                                          .sample_rate_Hz = config.sampling_rate_Hz,
+                                                          .center_freq_Hz = tx_center_freq_Hz,
+                                                          .stream_id_str  = "difi:tx:" + std::to_string(stream_id),
+                                                          .log_level      = config.log_level};
+
+    for (unsigned channel_id = 0, nof_channels = tx_stream.channels.size(); channel_id != nof_channels; ++channel_id) {
+      const radio_difi_tx_stream::channel_description& channel = tx_config.channels.emplace_back(
+          radio_difi_tx_stream::channel_description{.port           = (*tx_ports)[channel_id],
+                                                    .difi_stream_id = tx_difi_stream_id++,
+                                                    .rf_gain_dB     = tx_stream.channels[channel_id].gain_dB});
+      tx_port_map.emplace_back(stream_id, channel_id);
+
+      logger.info("stream={} channel={}: Creating DIFI transmit channel. port={} difi_stream_id={} gain={}dB",
+                  stream_id,
+                  channel_id,
+                  channel.port,
+                  channel.difi_stream_id,
+                  channel.rf_gain_dB);
+    }
+
+    // Only the first receive channel of each stream is carried.
     radio_difi_rx_stream::stream_description rx_config = {
         .ip             = rx_parsed->ip,
-        .channels       = {{.port = rx_parsed->port, .difi_stream_id = stream_id}},
+        .channels       = {{.port = rx_parsed->port, .difi_stream_id = rx_difi_stream_id}},
         .stream_id      = stream_id,
         .bit_depth      = bit_depth,
         .iq_byte_order  = iq_byte_order,
         .sample_rate_Hz = config.sampling_rate_Hz,
         .stream_id_str  = "difi:rx:" + std::to_string(stream_id),
         .log_level      = config.log_level};
+    rx_difi_stream_id += std::max<unsigned>(rx_stream.channels.size(), 1U);
 
-    logger.info("Creating DIFI stream {} — tx={}:{} rx={}:{} bit_depth={} iq_byte_order={} srate={}Hz freq={}Hz "
-                "gain={}dB",
+    logger.info("stream={}: Creating DIFI stream. tx_ip={} rx={}:{} bit_depth={} iq_byte_order={} srate={}Hz freq={}Hz",
                 stream_id,
                 tx_config.ip,
-                tx_parsed->port,
                 rx_config.ip,
                 rx_parsed->port,
                 bit_depth,
                 (iq_byte_order == difi_iq_byte_order::big) ? "big" : "little",
                 config.sampling_rate_Hz,
-                tx_center_freq_Hz,
-                tx_gain_dB);
+                tx_center_freq_Hz);
 
     auto& gateway =
         bb_gateways.emplace_back(std::make_unique<radio_difi_baseband_gateway>(notifier, tx_config, rx_config));

@@ -4,6 +4,8 @@
 
 #include "radio_config_difi_validator.h"
 #include "radio_difi_stream_config.h"
+#include "ocudu/adt/static_vector.h"
+#include "ocudu/radio/radio_constants.h"
 #include "fmt/base.h"
 #include <cmath>
 
@@ -36,10 +38,39 @@ static bool validate_otw_format(radio_configuration::over_the_wire_format otw_fo
   return true;
 }
 
-static bool validate_tx_stream_args(const std::string& args)
+/// Validates the transmit streams and the ports of their channels.
+static bool validate_tx_streams(span<const radio_configuration::stream> tx_streams)
 {
-  // Default Tx: send to localhost:4991.
-  return parse_difi_stream_args(args, "127.0.0.1", 4991).has_value();
+  static_vector<uint16_t, RADIO_MAX_NOF_PORTS> ports;
+
+  for (unsigned stream_id = 0, nof_streams = tx_streams.size(); stream_id != nof_streams; ++stream_id) {
+    const radio_configuration::stream& tx_stream = tx_streams[stream_id];
+
+    if (tx_stream.channels.empty()) {
+      fmt::print("Every DIFI transmit stream needs at least one channel.\n");
+      return false;
+    }
+
+    // Default Tx: send to localhost:4991.
+    const std::optional<radio_difi_stream_config> parsed = parse_difi_stream_args(tx_stream.args, "127.0.0.1", 4991);
+    if (!parsed.has_value()) {
+      return false;
+    }
+
+    const auto channel_ports = resolve_difi_channel_ports(tx_stream, parsed->port, stream_id);
+    if (!channel_ports.has_value()) {
+      return false;
+    }
+    if (ports.size() + channel_ports->size() > ports.capacity()) {
+      fmt::print("DIFI takes at most {} transmit ports.\n", ports.capacity());
+      return false;
+    }
+    for (uint16_t port : *channel_ports) {
+      ports.push_back(port);
+    }
+  }
+
+  return has_unique_difi_ports(ports, "transmit");
 }
 
 static bool validate_rx_stream_args(const std::string& args)
@@ -60,10 +91,8 @@ bool radio_config_difi_validator::is_configuration_valid(const radio_configurati
     return false;
   }
 
-  for (const radio_configuration::stream& tx_stream : config.tx_streams) {
-    if (!validate_tx_stream_args(tx_stream.args)) {
-      return false;
-    }
+  if (!validate_tx_streams(config.tx_streams)) {
+    return false;
   }
 
   for (const radio_configuration::stream& rx_stream : config.rx_streams) {
