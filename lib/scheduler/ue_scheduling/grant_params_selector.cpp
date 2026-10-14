@@ -519,7 +519,7 @@ static bool is_csi_included(const ue_cell& ue_cc, slot_point pusch_slot, span<co
   const cell_configuration&    cell_cfg    = ue_cell_cfg.cell_cfg_common;
 
   bool include_csi = false;
-  if (ue_cell_cfg.csi_meas_cfg() != nullptr) {
+  if (ue_cell_cfg.has_csi_cfg()) {
     const bool periodic_csi = cell_cfg.bwp_res[to_bwp_id(0)].dl().csi.value().report_type == csi_report_type::periodic;
     const unsigned aperiodic_csi_prohibit_time_slots = to_underlying(cell_cfg.params.init_bwp.csi->csi_rs_period);
     if (not periodic_csi and

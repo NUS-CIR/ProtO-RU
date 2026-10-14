@@ -25,13 +25,8 @@ public:
                               .sr_period        = sr_period,
                               .sr_offset        = sr_offset}}
   {
-    csi_offset = std::get<csi_report_config::periodic_or_semi_persistent_report_on_pucch>(
-                     t_bench.get_main_ue().get_pcell().cfg().csi_meas_cfg()->csi_report_cfg_list[0].report_cfg_type)
-                     .report_slot_offset;
-
-    csi_period = std::get<csi_report_config::periodic_or_semi_persistent_report_on_pucch>(
-                     t_bench.get_main_ue().get_pcell().cfg().csi_meas_cfg()->csi_report_cfg_list[0].report_cfg_type)
-                     .report_slot_period;
+    csi_offset = t_bench.get_main_ue().get_pcell().cfg().init_bwp().ul.ue_cfg()->periodic_csi_report->offset;
+    csi_period = t_bench.cell_cfg.params.init_bwp.csi->csi_rs_period;
 
     // Set the expected SR grant to the SR resource.
     pucch_sr_only_test = test_helpers::make_pucch_info(t_bench.cell_cfg,
@@ -50,11 +45,11 @@ protected:
   sr_periodicity sr_period;
   unsigned       sr_offset;
   // Helper variables.
-  csi_report_periodicity csi_period;
-  unsigned               csi_offset;
-  unsigned               pucch_res_common{11};
-  unsigned               n_cces{0};
-  test_bench             t_bench;
+  csi_resource_periodicity csi_period;
+  unsigned                 csi_offset;
+  unsigned                 pucch_res_common{11};
+  unsigned                 n_cces{0};
+  test_bench               t_bench;
   // Expected PUCCH grants to be verified in the test.
   pucch_info pucch_sr_only_test;
   pucch_info pucch_sr_csi_test;

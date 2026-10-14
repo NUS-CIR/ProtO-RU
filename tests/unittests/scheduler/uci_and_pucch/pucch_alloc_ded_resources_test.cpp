@@ -983,10 +983,9 @@ public:
                               pucch_f2_params{.max_nof_rbs = 2U, .max_code_rate = max_pucch_code_rate::dot_35}},
         .nof_ul_dl_ports = 4})
   {
-    ocudu_assert(t_bench.get_main_ue().get_pcell().cfg().csi_meas_cfg() != nullptr,
-                 "CSI configuration needed for this test");
-    auto csi_report_cfg = create_csi_report_configuration(*t_bench.get_main_ue().get_pcell().cfg().csi_meas_cfg());
-    csi_report_size     = get_csi_report_pucch_size(csi_report_cfg).part1_size.value();
+    ocudu_assert(t_bench.get_main_ue().get_pcell().cfg().has_csi_cfg(), "CSI configuration needed for this test");
+    csi_report_size =
+        get_csi_report_pucch_size(t_bench.get_main_ue().get_pcell().cfg().csi_report()).part1_size.value();
   }
 
 protected:

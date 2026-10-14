@@ -150,7 +150,7 @@ static dci_size_config get_dci_size_config(const ue_cell_configuration& ue_cell_
   dci_sz_cfg.nof_ul_bwp_rrc         = 0;
   dci_sz_cfg.nof_ul_time_domain_res = active_bwp.ul.td_mapper().pusch_td_resources(ss_info.get_ul_dci_format()).size();
   dci_sz_cfg.report_trigger_size    = 0;
-  if (ue_cell_cfg.csi_meas_cfg() != nullptr) {
+  if (ue_cell_cfg.has_csi_cfg()) {
     dci_sz_cfg.report_trigger_size = cell_csi.value().report_trigger_size.value_or(0);
   }
   dci_sz_cfg.frequency_hopping_configured = false;
@@ -594,14 +594,13 @@ ue_cell_configuration::ue_cell_configuration(rnti_t                             
                                              const ue_cell_config_ptr&             ue_cell_params_,
                                              const std::optional<meas_gap_config>& meas_gap_cfg_,
                                              bool                                  multi_cells_configured_) :
-  crnti(crnti_),
-  cell_cfg_common(cell_cfg_common_),
-  multi_cells_configured(multi_cells_configured_),
-  nof_dl_ports(
-      ue_cell_params_->csi_meas_cfg.has_value() ? cell_cfg_common_.bwp_res[to_bwp_id(0)].dl().csi.value().nof_ports : 1)
+  crnti(crnti_), cell_cfg_common(cell_cfg_common_), multi_cells_configured(multi_cells_configured_)
 {
   // Apply UE-dedicated Config.
   reconfigure(ue_cell_params_, meas_gap_cfg_);
+  if (has_csi_cfg()) {
+    nof_dl_ports = cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.value().nof_ports;
+  }
 }
 
 ue_cell_configuration::ue_cell_configuration(const ue_cell_configuration& other) :

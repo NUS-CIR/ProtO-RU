@@ -37,8 +37,6 @@ struct ue_cell_res_config {
   /// \brief \c pusch-ServingCellConfig, used to configure UE specific PUSCH parameters that are common across the UE's
   /// BWPs of one serving cell.
   std::optional<config_ptr<pusch_serving_cell_config>> pusch_serv_cell_cfg;
-  /// \c CSI-MeasConfig.
-  std::optional<csi_meas_config> csi_meas_cfg;
   /// Timing Advance Group ID to which this cell belongs to.
   time_alignment_group::id_t tag_id{0};
 
@@ -51,7 +49,6 @@ struct ue_cell_res_config {
     bwps.clear();
     pdsch_serv_cell_cfg.reset();
     pusch_serv_cell_cfg.reset();
-    csi_meas_cfg.reset();
     tag_id = time_alignment_group::id_t{0};
   }
 

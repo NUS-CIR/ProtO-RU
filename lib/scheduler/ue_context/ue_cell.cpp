@@ -438,7 +438,7 @@ aggregation_level ue_cell::get_aggregation_level(float cqi, const search_space_i
     }
   }
 
-  if (not ss_info.cfg->is_common_search_space() and cfg().csi_meas_cfg() != nullptr) {
+  if (not ss_info.cfg->is_common_search_space() and cfg().has_csi_cfg()) {
     cqi_table = cfg().cell_cfg_common.bwp_res[ss_info.bwp->id].dl().csi.value().cqi_table;
   }
 

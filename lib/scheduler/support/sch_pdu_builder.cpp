@@ -156,7 +156,7 @@ pusch_config_params ocudu::get_pusch_config_f0_1_c_rnti(const ue_cell_configurat
   // TODO: verify if this needs to be set depending on some configuration.
   pusch.nof_harq_ack_bits = nof_harq_ack_bits;
   pusch.aperiodic_csi =
-      ue_cell_cfg.csi_meas_cfg() != nullptr and not ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report.has_value();
+      ue_cell_cfg.has_csi_cfg() and not ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report.has_value();
   if (is_csi_report_slot) {
     const csi_report_configuration& csi_rep_cfg = ue_cell_cfg.csi_report();
     // NOTE: The CSI size depends on whether the CSI is configured on PUSCH or PUCCH, as per Section 5.2.3, TS 38.214:

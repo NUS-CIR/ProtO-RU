@@ -179,14 +179,15 @@ public:
   /// own. Callers holding a \c ue_cell should use \c ue_cell::is_ul_enabled, which supplies it.
   bool is_ul_enabled(slot_point ul_slot, std::optional<std::chrono::microseconds> reported_ul_ta) const;
 
-  /// Get CSI-MeasConfig for the UE.
-  const csi_meas_config* csi_meas_cfg() const
+  /// \brief Returns whether the UE has a CSI configuration in this cell.
+  /// \remark A UE with a dedicated configuration has a CSI configuration if the cell configures CSI.
+  bool has_csi_cfg() const
   {
-    return cell_ded->csi_meas_cfg.has_value() ? &*cell_ded->csi_meas_cfg : nullptr;
+    return has_dedicated_cfg() and cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.has_value();
   }
 
   /// \brief Gets the CSI report configuration of the UE.
-  /// \remark Call it only for a UE with a CSI-MeasConfig.
+  /// \remark Call it only for a UE with a CSI configuration.
   const csi_report_configuration& csi_report() const
   {
     return cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.value().report(init_bwp().ul.ue_cfg()->csi_codebook);

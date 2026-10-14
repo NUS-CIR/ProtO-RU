@@ -166,9 +166,6 @@ ue_cell_config_ptr du_cell_config_pool::update_ue(const sched_ue_cell_config& ue
     if (serv_cell_cfg.pdsch_serv_cell_cfg.has_value()) {
       ret.pdsch_serv_cell_cfg = pdsch_serv_cell_pool.create(serv_cell_cfg.pdsch_serv_cell_cfg.value());
     }
-    if (serv_cell_cfg.csi_meas_cfg.has_value()) {
-      ret.csi_meas_cfg = serv_cell_cfg.csi_meas_cfg.value();
-    }
     ret.tag_id = serv_cell_cfg.tag_id;
 
     add_bwp(
