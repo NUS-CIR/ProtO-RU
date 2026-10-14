@@ -8,12 +8,10 @@
 #include "pucch_collision_manager.h"
 #include "ocudu/ocudulog/log_channel.h"
 #include "ocudu/ocudulog/ocudulog.h"
-#include "ocudu/ran/csi_report/csi_report_config_helpers.h"
 #include "ocudu/ran/csi_report/csi_report_on_pucch_helpers.h"
 #include "ocudu/ran/pucch/pucch_configuration.h"
 #include "ocudu/ran/pucch/pucch_uci_bits.h"
 #include "ocudu/ran/resource_allocation/ofdm_symbol_range.h"
-#include "ocudu/scheduler/config/serving_cell_config_factory.h"
 #include "ocudu/scheduler/resource_grid_util.h"
 #include "ocudu/scheduler/result/pucch_info.h"
 #include "ocudu/support/ocudu_assert.h"
@@ -55,18 +53,10 @@ struct pucch_allocator_impl::alloc_context {
   }
 };
 
-// Helper function to create the CSI report configuration from the cell configuration, if CSI is configured in the cell.
-static std::optional<csi_report_configuration> get_csi_report_cfg(const ran_cell_config& cell_cfg)
+// Helper function to get the CSI report on PUCCH of the cell, if the cell configures periodic CSI reports.
+static std::optional<csi_report_configuration> get_csi_report_cfg(const cell_dl_bwp_res_config& cell_dl_res)
 {
-  if (not cell_cfg.init_bwp.csi.has_value()) {
-    return std::nullopt;
-  }
-
-  // Note that even though the CSI-MeasConfig is not equal accross UEs, the parameters needed for the CSI report
-  // configuration are the same, so we can just compute it from the cell configuration.
-  // TODO: we should not need the complete CSI-MeasConfig to get the csi_report_configuration.
-  return create_csi_report_configuration(
-      config_helpers::make_default_ue_cell_config(cell_cfg).serv_cell_cfg.csi_meas_cfg.value());
+  return cell_dl_res.csi.has_value() ? cell_dl_res.csi->pucch_report : std::nullopt;
 }
 
 // As per Section 9.2.1, TS 38.213, Resource Set ID 1 is used once more than 2 UCI bits need to be carried on the
@@ -86,7 +76,7 @@ pucch_allocator_impl::pucch_allocator_impl(const cell_configuration& cell_cfg_,
   max_ul_grants_per_slot(max_ul_grants_per_slot_),
   cell_resources(cell_cfg_.bwp_res[to_bwp_id(0)].ul().pucch),
   res_params(cell_cfg.params.init_bwp.pucch.resources),
-  csi_report_cfg(get_csi_report_cfg(cell_cfg.params)),
+  csi_report_cfg(get_csi_report_cfg(cell_cfg_.bwp_res[to_bwp_id(0)].dl())),
   col_manager(cell_cfg_),
   logger(ocudulog::fetch_basic_logger("SCHED"))
 {

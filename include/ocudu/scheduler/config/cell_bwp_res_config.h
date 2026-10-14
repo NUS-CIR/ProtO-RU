@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "ocudu/ran/csi_report/csi_report_configuration.h"
+#include "ocudu/ran/csi_rs/csi_report_config.h"
 #include "ocudu/ran/pucch/pucch_configuration.h"
 #include "ocudu/ran/pucch/pucch_constants.h"
 #include "ocudu/scheduler/config/ran_cell_config.h"
@@ -12,10 +14,24 @@
 
 namespace ocudu {
 
+/// CSI parameters that are the same for all the UEs of a BWP.
+struct cell_csi_config {
+  /// Number of CSI-RS ports for channel measurement.
+  unsigned nof_ports;
+  /// CQI table of the CSI reports.
+  cqi_table_t cqi_table;
+  /// Size of the CSI request field in DCI Format 0_1. Present only for aperiodic CSI reports.
+  std::optional<unsigned> report_trigger_size;
+  /// CSI report on PUCCH. Present only for periodic CSI reports.
+  std::optional<csi_report_configuration> pucch_report;
+};
+
 /// This structure defines all the UE dedicated DL resources available in a given BWP.
 struct cell_dl_bwp_res_config {
   /// List of possible UE-dedicated PDCCH configs.
   std::vector<pdcch_config> ded_pdcchs;
+  /// CSI parameters. Present only if the cell configures CSI.
+  std::optional<cell_csi_config> csi;
 
   bool operator==(const cell_dl_bwp_res_config& other) const { return ded_pdcchs == other.ded_pdcchs; }
 };

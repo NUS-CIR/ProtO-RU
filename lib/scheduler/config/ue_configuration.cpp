@@ -117,15 +117,15 @@ static dci_size_config get_dci_size_config(const ue_cell_configuration& ue_cell_
                                            bool                         is_ue_configured_multiple_serving_cells,
                                            search_space_id              ss_id)
 {
-  const search_space_info&                 ss_info                    = ue_cell_cfg.search_space(ss_id);
-  const sched_bwp_config&                  init_bwp                   = ue_cell_cfg.init_bwp();
-  const sched_bwp_config&                  active_bwp                 = *ss_info.bwp;
-  const bwp_configuration&                 active_dl_bwp              = active_bwp.dl.cfg();
-  const bwp_uplink_common&                 init_ul_bwp                = init_bwp.ul.common();
-  const bwp_configuration&                 active_ul_bwp              = active_bwp.ul.cfg();
-  const std::optional<rach_config_common>& opt_rach_cfg               = active_bwp.ul.common().rach_cfg_common;
-  const csi_meas_config*                   opt_csi_meas_cfg           = ue_cell_cfg.csi_meas_cfg();
-  const auto*                              opt_pdsch_cfg              = active_bwp.dl.pdsch().ded();
+  const search_space_info&                 ss_info       = ue_cell_cfg.search_space(ss_id);
+  const sched_bwp_config&                  init_bwp      = ue_cell_cfg.init_bwp();
+  const sched_bwp_config&                  active_bwp    = *ss_info.bwp;
+  const bwp_configuration&                 active_dl_bwp = active_bwp.dl.cfg();
+  const bwp_uplink_common&                 init_ul_bwp   = init_bwp.ul.common();
+  const bwp_configuration&                 active_ul_bwp = active_bwp.ul.cfg();
+  const std::optional<rach_config_common>& opt_rach_cfg  = active_bwp.ul.common().rach_cfg_common;
+  const auto&                              cell_csi      = ue_cell_cfg.cell_cfg_common.bwp_res[active_bwp.id].dl().csi;
+  const auto*                              opt_pdsch_cfg = active_bwp.dl.pdsch().ded();
   const auto*                              opt_pdsch_serving_cell_cfg = ue_cell_cfg.pdsch_serving_cell_cfg();
 
   auto dci_sz_cfg =
@@ -150,8 +150,8 @@ static dci_size_config get_dci_size_config(const ue_cell_configuration& ue_cell_
   dci_sz_cfg.nof_ul_bwp_rrc         = 0;
   dci_sz_cfg.nof_ul_time_domain_res = active_bwp.ul.td_mapper().pusch_td_resources(ss_info.get_ul_dci_format()).size();
   dci_sz_cfg.report_trigger_size    = 0;
-  if (opt_csi_meas_cfg != nullptr and opt_csi_meas_cfg->report_trigger_size.has_value()) {
-    dci_sz_cfg.report_trigger_size = opt_csi_meas_cfg->report_trigger_size.value();
+  if (ue_cell_cfg.csi_meas_cfg() != nullptr) {
+    dci_sz_cfg.report_trigger_size = cell_csi.value().report_trigger_size.value_or(0);
   }
   dci_sz_cfg.frequency_hopping_configured = false;
   dci_sz_cfg.pusch_tx_scheme              = std::nullopt;
@@ -336,16 +336,6 @@ static dci_size_config get_dci_size_config(const ue_cell_configuration& ue_cell_
   }
 
   return dci_sz_cfg;
-}
-
-/// Find the number of DL ports for a given UE serving cell configuration.
-static unsigned compute_nof_dl_ports(const csi_meas_config& csi_meas)
-{
-  unsigned max_ports = 1;
-  for (const auto& nzp : csi_meas.nzp_csi_rs_res_list) {
-    max_ports = std::max(max_ports, nzp.res_mapping.nof_ports);
-  }
-  return max_ports;
 }
 
 static units::bits get_dl_dci_size(const search_space_info& ss_info)
@@ -607,7 +597,8 @@ ue_cell_configuration::ue_cell_configuration(rnti_t                             
   crnti(crnti_),
   cell_cfg_common(cell_cfg_common_),
   multi_cells_configured(multi_cells_configured_),
-  nof_dl_ports(ue_cell_params_->csi_meas_cfg.has_value() ? compute_nof_dl_ports(*ue_cell_params_->csi_meas_cfg) : 1)
+  nof_dl_ports(
+      ue_cell_params_->csi_meas_cfg.has_value() ? cell_cfg_common_.bwp_res[to_bwp_id(0)].dl().csi.value().nof_ports : 1)
 {
   // Apply UE-dedicated Config.
   reconfigure(ue_cell_params_, meas_gap_cfg_);

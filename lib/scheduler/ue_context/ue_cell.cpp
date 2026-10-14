@@ -439,8 +439,7 @@ aggregation_level ue_cell::get_aggregation_level(float cqi, const search_space_i
   }
 
   if (not ss_info.cfg->is_common_search_space() and cfg().csi_meas_cfg() != nullptr) {
-    // NOTE: It is assumed there is atleast one CSI report configured for UE.
-    cqi_table = cfg().csi_meas_cfg()->csi_report_cfg_list.back().cqi_table.value();
+    cqi_table = cfg().cell_cfg_common.bwp_res[ss_info.bwp->id].dl().csi.value().cqi_table;
   }
 
   // Apply the configured offset to the CQI and make sure it is in the allowed range.

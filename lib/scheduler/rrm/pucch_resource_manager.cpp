@@ -5,7 +5,6 @@
 
 #include "ocudu/scheduler/rrm/pucch_resource_manager.h"
 #include "ocudu/adt/format.h"
-#include "ocudu/ran/csi_report/csi_report_config_helpers.h"
 #include "ocudu/ran/csi_report/csi_report_on_pucch_helpers.h"
 #include "ocudu/ran/csi_rs/csi_meas_config.h"
 #include "ocudu/ran/pucch/pucch_configuration.h"
@@ -18,7 +17,6 @@
 #include "ocudu/scheduler/config/sched_cell_config_helpers.h"
 #include "ocudu/scheduler/config/serving_cell_config.h"
 #include "ocudu/scheduler/config/serving_cell_config_builder.h"
-#include "ocudu/scheduler/config/serving_cell_config_factory.h"
 #include "ocudu/scheduler/config/ue_bwp_config.h"
 #include <limits>
 #include <numeric>
@@ -41,12 +39,6 @@ void pucch_resource_manager::add_cell(du_cell_index_t cell_idx, const ran_cell_c
 
   cell_ctx.cell_params  = cell_cfg;
   cell_ctx.cell_bwp_cfg = make_cell_bwp_res_config(cell_cfg);
-  // TODO: remove these after we get rid of \c serving_cell_config.
-  if (cell_ctx.cell_params.init_bwp.csi.has_value() and
-      not cell_ctx.cell_params.init_bwp.csi->enable_aperiodic_report) {
-    cell_ctx.default_csi_report_cfg =
-        config_helpers::make_default_ue_cell_config(cell_cfg).serv_cell_cfg.csi_meas_cfg.value().csi_report_cfg_list[0];
-  }
 
   // Compute SR period and SR configuration list.
   // TODO: Handle more than one SR period.
@@ -76,7 +68,7 @@ void pucch_resource_manager::add_cell(du_cell_index_t cell_idx, const ran_cell_c
 
   // Compute CSI period and CSI configuration list (if periodic CSI reporting is configured).
   // TODO: Handle more than one CSI report period.
-  if (cell_ctx.default_csi_report_cfg.has_value()) {
+  if (cell_ctx.pucch_csi_report() != nullptr) {
     cell_ctx.csi_period_slots = to_underlying(cell_ctx.cell_params.init_bwp.csi->csi_rs_period);
     // Compute the LCM of SR and CSI periods, as they might not be multiples of each other.
     cell_ctx.lcm_csi_sr_period = std::lcm(cell_ctx.sr_period_slots, cell_ctx.csi_period_slots);
@@ -126,16 +118,15 @@ bool pucch_resource_manager::alloc_resources(ue_cell_config& cell_cfg)
   auto& free_csi_configs = cell_ctx.free_csi_configs;
 
   // Verify where there are SR and CSI resources to allocate a new UE.
-  if (free_sr_configs.empty() or (cell_ctx.default_csi_report_cfg.has_value() and free_csi_configs.empty())) {
+  const csi_report_configuration* csi_report = cell_ctx.pucch_csi_report();
+  if (free_sr_configs.empty() or (csi_report != nullptr and free_csi_configs.empty())) {
     return false;
   }
 
   // Size of the periodic CSI report of the UE.
   std::optional<unsigned> csi_report_nof_bits;
-  if (cell_ctx.default_csi_report_cfg.has_value()) {
-    csi_meas_config csi_meas_cfg     = *serv_cell_cfg.csi_meas_cfg;
-    csi_meas_cfg.csi_report_cfg_list = {*cell_ctx.default_csi_report_cfg};
-    csi_report_nof_bits = get_csi_report_pucch_size(create_csi_report_configuration(csi_meas_cfg)).part1_size.value();
+  if (csi_report != nullptr) {
+    csi_report_nof_bits = get_csi_report_pucch_size(*csi_report).part1_size.value();
   }
 
   std::optional<periodic_pucch_config> sr_cfg;
@@ -214,10 +205,10 @@ void pucch_resource_manager::dealloc_resources(const ue_cell_config& cell_cfg)
   // Return SR resource/offset to the free list.
   cell_ctx.free_sr_configs.emplace_back(periodic_pucch_config{ul_bwp.pucch.sr_res_id.value(), ul_bwp.pucch.sr_offset});
 
-  ocudu_assert(cell_ctx.default_csi_report_cfg.has_value() == ul_bwp.periodic_csi_report.has_value(),
+  ocudu_assert((cell_ctx.pucch_csi_report() != nullptr) == ul_bwp.periodic_csi_report.has_value(),
                "Periodic CSI report configuration presence mismatch between cell and UE");
   // Return CSI resource/offset to the free list if periodic CSI is configured for this cell.
-  if (cell_ctx.default_csi_report_cfg.has_value()) {
+  if (cell_ctx.pucch_csi_report() != nullptr) {
     cell_ctx.free_csi_configs.emplace_back(
         periodic_pucch_config{ul_bwp.periodic_csi_report->pucch_res_id.value(), ul_bwp.periodic_csi_report->offset});
   }
@@ -374,7 +365,7 @@ std::set<unsigned> pucch_resource_manager::compute_periodic_uci_slot_offsets(con
     slot_offsets.emplace(off);
   }
 
-  if (cell_ctx.default_csi_report_cfg.has_value()) {
+  if (cell_ctx.pucch_csi_report() != nullptr) {
     for (unsigned off = csi_offset; off < cell_ctx.lcm_csi_sr_period; off += cell_ctx.csi_period_slots) {
       slot_offsets.emplace(off);
     }

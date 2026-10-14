@@ -6,8 +6,10 @@
 #include "tests/ocudu_test_requirements.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/ran/csi_report/csi_report_config_helpers.h"
+#include "ocudu/ran/csi_report/csi_report_on_pucch_helpers.h"
 #include "ocudu/ran/tdd/tdd_ul_dl_config_formatters.h"
 #include "ocudu/scheduler/config/bwp_configuration.h"
+#include "ocudu/scheduler/config/cell_bwp_res_config.h"
 #include "ocudu/scheduler/config/csi_helper.h"
 #include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/config/serving_cell_config_factory.h"
@@ -311,3 +313,56 @@ TEST(csi_helper_test, type1_codebook_is_generated_when_type2_is_disabled)
 
   ASSERT_TRUE(std::holds_alternative<codebook_config::type1>(codebook.codebook_type));
 }
+
+TEST(cell_csi_config_test, cell_without_csi_has_no_csi_config)
+{
+  cell_config_builder_params builder;
+  builder.csi_rs_enabled = false;
+
+  ASSERT_FALSE(make_cell_bwp_res_config(config_helpers::make_default_ran_cell_config(builder)).dl.csi.has_value());
+}
+
+struct cell_csi_test_params {
+  unsigned        nof_ports;
+  bool            aperiodic;
+  pdsch_mcs_table mcs_table;
+};
+
+class cell_csi_config_test : public ::testing::TestWithParam<cell_csi_test_params>
+{};
+
+TEST_P(cell_csi_config_test, cell_csi_config_matches_the_ue_csi_meas_config)
+{
+  cell_config_builder_params builder;
+  builder.dl_carrier.nof_ant        = GetParam().nof_ports;
+  ran_cell_config cell_cfg          = config_helpers::make_default_ran_cell_config(builder);
+  cell_cfg.init_bwp.pdsch.mcs_table = GetParam().mcs_table;
+  if (GetParam().aperiodic) {
+    cell_cfg.init_bwp.csi->csi_report_slot_offset.reset();
+    cell_cfg.init_bwp.csi->enable_aperiodic_report = true;
+  }
+
+  const cell_csi_config csi = make_cell_bwp_res_config(cell_cfg).dl.csi.value();
+  const csi_meas_config ue_csi =
+      config_helpers::make_default_ue_cell_config(cell_cfg).serv_cell_cfg.csi_meas_cfg.value();
+
+  unsigned ue_nof_ports = 1;
+  for (const nzp_csi_rs_resource& res : ue_csi.nzp_csi_rs_res_list) {
+    ue_nof_ports = std::max(ue_nof_ports, res.res_mapping.nof_ports);
+  }
+  EXPECT_EQ(csi.nof_ports, ue_nof_ports);
+  EXPECT_EQ(csi.cqi_table, ue_csi.csi_report_cfg_list.front().cqi_table);
+  EXPECT_EQ(csi.report_trigger_size, ue_csi.report_trigger_size);
+  ASSERT_EQ(csi.pucch_report.has_value(), not is_pusch_configured(ue_csi));
+  if (csi.pucch_report.has_value()) {
+    EXPECT_EQ(get_csi_report_pucch_size(*csi.pucch_report).part1_size,
+              get_csi_report_pucch_size(create_csi_report_configuration(ue_csi)).part1_size);
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(cell_csi_config_test,
+                         cell_csi_config_test,
+                         ::testing::Values(cell_csi_test_params{1, false, pdsch_mcs_table::qam64},
+                                           cell_csi_test_params{2, false, pdsch_mcs_table::qam256},
+                                           cell_csi_test_params{4, false, pdsch_mcs_table::qam64},
+                                           cell_csi_test_params{4, true, pdsch_mcs_table::qam256}));

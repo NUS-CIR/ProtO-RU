@@ -67,11 +67,9 @@ private:
   struct cell_resource_context {
     ran_cell_config     cell_params;
     cell_bwp_res_config cell_bwp_cfg;
-    // Default CSI report configuration. Only set if periodic CSI reporting is configured.
-    std::optional<csi_report_config> default_csi_report_cfg;
-    unsigned                         lcm_csi_sr_period;
-    unsigned                         sr_period_slots;
-    unsigned                         csi_period_slots;
+    unsigned            lcm_csi_sr_period;
+    unsigned            sr_period_slots;
+    unsigned            csi_period_slots;
     /// Pool of SR configurations currently available to be allocated to UEs.
     std::vector<periodic_pucch_config> free_sr_configs;
     /// Pool of periodic CSI configurations currently available to be allocated to UEs.
@@ -79,6 +77,13 @@ private:
     /// UE index for randomization of resources.
     unsigned              ue_idx = 0;
     std::vector<unsigned> periodic_pucchs_per_slot;
+
+    /// CSI report on PUCCH. Null if the cell configures no periodic CSI reports.
+    const csi_report_configuration* pucch_csi_report() const
+    {
+      const auto& csi = cell_bwp_cfg.dl.csi;
+      return csi.has_value() and csi->pucch_report.has_value() ? &*csi->pucch_report : nullptr;
+    }
   };
 
   const unsigned max_pucch_grants_per_slot;

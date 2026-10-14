@@ -10,12 +10,10 @@
 #include "../support/dmrs_helpers.h"
 #include "../support/prbs_calculator.h"
 #include "../ue_context/ue_cell.h"
-#include "ocudu/ran/csi_rs/csi_report_config.h"
 #include "ocudu/ran/sch/tbs_calculator.h"
 #include "ocudu/ran/transform_precoding/transform_precoding_helpers.h"
 #include "ocudu/scheduler/support/rb_helper.h"
 #include <utility>
-#include <variant>
 
 using namespace ocudu;
 using namespace sched_helper;
@@ -522,15 +520,12 @@ static bool is_csi_included(const ue_cell& ue_cc, slot_point pusch_slot, span<co
 
   bool include_csi = false;
   if (ue_cell_cfg.csi_meas_cfg() != nullptr) {
-    // TODO: pass this through the scheduler config instead.
-    auto aperiodic_csi_prohibit_time_slots =
-        static_cast<unsigned>(ue_cell_cfg.csi_meas_cfg()->nzp_csi_rs_res_list[0].csi_res_period.value());
-    if (std::holds_alternative<csi_report_config::aperiodic_report>(
-            ue_cell_cfg.csi_meas_cfg()->csi_report_cfg_list[0].report_cfg_type) and
+    const bool     periodic_csi = cell_cfg.bwp_res[to_bwp_id(0)].dl().csi.value().pucch_report.has_value();
+    const unsigned aperiodic_csi_prohibit_time_slots = to_underlying(cell_cfg.params.init_bwp.csi->csi_rs_period);
+    if (not periodic_csi and
         ue_cc.channel_state_manager().is_aperiodic_csi_allowed(pusch_slot, aperiodic_csi_prohibit_time_slots)) {
       include_csi = true;
-    } else if (std::holds_alternative<csi_report_config::periodic_or_semi_persistent_report_on_pucch>(
-                   ue_cell_cfg.csi_meas_cfg()->csi_report_cfg_list[0].report_cfg_type)) {
+    } else if (periodic_csi) {
       // A bundle carries the UCI of any of its slots, so a periodic CSI report due in any of them has to be sized
       // for here.
       // CSI period and offset are in the UE uplink slot numbering, the slots checked here are on the gNB DL clock.
