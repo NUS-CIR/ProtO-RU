@@ -520,7 +520,7 @@ static bool is_csi_included(const ue_cell& ue_cc, slot_point pusch_slot, span<co
 
   bool include_csi = false;
   if (ue_cell_cfg.csi_meas_cfg() != nullptr) {
-    const bool     periodic_csi = cell_cfg.bwp_res[to_bwp_id(0)].dl().csi.value().pucch_report.has_value();
+    const bool periodic_csi = cell_cfg.bwp_res[to_bwp_id(0)].dl().csi.value().report_type == csi_report_type::periodic;
     const unsigned aperiodic_csi_prohibit_time_slots = to_underlying(cell_cfg.params.init_bwp.csi->csi_rs_period);
     if (not periodic_csi and
         ue_cc.channel_state_manager().is_aperiodic_csi_allowed(pusch_slot, aperiodic_csi_prohibit_time_slots)) {

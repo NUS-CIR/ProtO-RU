@@ -98,10 +98,16 @@ protected:
   /// Returns the codebook configuration currently held by the UE.
   const codebook_config& current_codebook() const
   {
-    const serving_cell_config& serv_cell_cfg = ue_res->value().cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg;
+    const ue_cell_config&      ue_cell_cfg   = ue_res->value().cell_group.cells.at(SERVING_PCELL_IDX);
+    const serving_cell_config& serv_cell_cfg = ue_cell_cfg.serv_cell_cfg;
     report_fatal_error_if_not(serv_cell_cfg.csi_meas_cfg.has_value(), "No CSI meas config for the UE");
     for (const csi_report_config& rep : serv_cell_cfg.csi_meas_cfg->csi_report_cfg_list) {
       if (rep.codebook_cfg.has_value()) {
+        // The scheduler reads the codebook from the UE BWP configuration. It must match the RRC copy.
+        const csi_codebook_type rrc_codebook =
+            std::holds_alternative<codebook_config::type2>(rep.codebook_cfg->codebook_type) ? csi_codebook_type::type2
+                                                                                            : csi_codebook_type::type1;
+        EXPECT_EQ(ue_cell_cfg.bwps[0].ul.csi_codebook, rrc_codebook);
         return rep.codebook_cfg.value();
       }
     }

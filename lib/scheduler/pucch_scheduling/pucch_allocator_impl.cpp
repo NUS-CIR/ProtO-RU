@@ -56,7 +56,10 @@ struct pucch_allocator_impl::alloc_context {
 // Helper function to get the CSI report on PUCCH of the cell, if the cell configures periodic CSI reports.
 static std::optional<csi_report_configuration> get_csi_report_cfg(const cell_dl_bwp_res_config& cell_dl_res)
 {
-  return cell_dl_res.csi.has_value() ? cell_dl_res.csi->pucch_report : std::nullopt;
+  if (not cell_dl_res.csi.has_value() or cell_dl_res.csi->pucch_report() == nullptr) {
+    return std::nullopt;
+  }
+  return *cell_dl_res.csi->pucch_report();
 }
 
 // As per Section 9.2.1, TS 38.213, Resource Set ID 1 is used once more than 2 UCI bits need to be carried on the

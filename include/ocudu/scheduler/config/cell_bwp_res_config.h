@@ -10,6 +10,7 @@
 #include "ocudu/ran/pucch/pucch_configuration.h"
 #include "ocudu/ran/pucch/pucch_constants.h"
 #include "ocudu/scheduler/config/ran_cell_config.h"
+#include "ocudu/scheduler/config/ue_bwp_config.h"
 #include <vector>
 
 namespace ocudu {
@@ -22,8 +23,29 @@ struct cell_csi_config {
   cqi_table_t cqi_table;
   /// Size of the CSI request field in DCI Format 0_1. Present only for aperiodic CSI reports.
   std::optional<unsigned> report_trigger_size;
-  /// CSI report on PUCCH. Present only for periodic CSI reports.
-  std::optional<csi_report_configuration> pucch_report;
+  /// Time domain behavior of the CSI reports.
+  csi_report_type report_type;
+  /// CSI report with the Type-I codebook.
+  csi_report_configuration type1_report;
+  /// CSI report with the Type-II codebook. Present only if the cell offers the Type-II codebook.
+  std::optional<csi_report_configuration> type2_report;
+
+  /// Gets the CSI report of a UE with the given codebook.
+  const csi_report_configuration& report(csi_codebook_type codebook) const
+  {
+    if (codebook == csi_codebook_type::type1) {
+      return type1_report;
+    }
+    ocudu_assert(type2_report.has_value(), "The cell does not offer the Type-II codebook");
+    return *type2_report;
+  }
+
+  /// Gets the CSI report on PUCCH. Null for aperiodic CSI reports.
+  const csi_report_configuration* pucch_report() const
+  {
+    // Periodic CSI reports use only the Type-I codebook.
+    return report_type == csi_report_type::periodic ? &type1_report : nullptr;
+  }
 };
 
 /// This structure defines all the UE dedicated DL resources available in a given BWP.

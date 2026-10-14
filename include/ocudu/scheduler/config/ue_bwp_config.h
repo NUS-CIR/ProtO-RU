@@ -32,6 +32,9 @@ struct ue_pucch_config {
   }
 };
 
+/// PMI codebook of the CSI reports of a UE.
+enum class csi_codebook_type : uint8_t { type1, type2 };
+
 /// \brief UE-specific information related to periodic CSI reporting configuration.
 struct ue_periodic_csi_config {
   pucch_csi_resource_id pucch_res_id;
@@ -74,14 +77,16 @@ struct ue_uplink_bwp_config {
   ue_pucch_config pucch;
   // Only present if periodic CSI reporting is enabled in the cell.
   std::optional<ue_periodic_csi_config> periodic_csi_report;
-  ue_pusch_config                       pusch;
-  std::optional<ue_cg_config>           cg;
-  ue_srs_config                         srs;
+  /// Codebook of the CSI reports. The cell must offer the Type-II codebook to set \c csi_codebook_type::type2.
+  csi_codebook_type           csi_codebook = csi_codebook_type::type1;
+  ue_pusch_config             pusch;
+  std::optional<ue_cg_config> cg;
+  ue_srs_config               srs;
 
   bool operator==(const ue_uplink_bwp_config& other) const
   {
-    return pucch == other.pucch and periodic_csi_report == other.periodic_csi_report and pusch == other.pusch and
-           srs == other.srs and cg == other.cg;
+    return pucch == other.pucch and periodic_csi_report == other.periodic_csi_report and
+           csi_codebook == other.csi_codebook and pusch == other.pusch and srs == other.srs and cg == other.cg;
   }
 };
 

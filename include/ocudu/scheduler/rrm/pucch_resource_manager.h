@@ -82,7 +82,7 @@ private:
     const csi_report_configuration* pucch_csi_report() const
     {
       const auto& csi = cell_bwp_cfg.dl.csi;
-      return csi.has_value() and csi->pucch_report.has_value() ? &*csi->pucch_report : nullptr;
+      return csi.has_value() ? csi->pucch_report() : nullptr;
     }
   };
 

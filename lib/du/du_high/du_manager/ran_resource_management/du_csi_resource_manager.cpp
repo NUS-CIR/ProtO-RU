@@ -41,7 +41,8 @@ void du_csi_resource_manager::apply_config(cell_group_config&                   
     return;
   }
 
-  serving_cell_config&  serv_cell_cfg = cell_grp_cfg.cells.at(SERVING_PCELL_IDX).serv_cell_cfg;
+  ue_cell_config&       ue_cell_cfg   = cell_grp_cfg.cells.at(SERVING_PCELL_IDX);
+  serving_cell_config&  serv_cell_cfg = ue_cell_cfg.serv_cell_cfg;
   const du_cell_config& cell_cfg      = cell_cfg_list[serv_cell_cfg.cell_index];
   if (not serv_cell_cfg.csi_meas_cfg.has_value() or not cell_cfg.ran.init_bwp.csi.has_value()) {
     return;
@@ -54,6 +55,10 @@ void du_csi_resource_manager::apply_config(cell_group_config&                   
   }
 
   const char* unsupported_reason = type2_unsupported_reason(serv_cell_cfg.cell_index, ue_caps);
+
+  // The scheduler reads the codebook from the UE BWP configuration, and RRC reads it from the CSI-MeasConfig.
+  ue_cell_cfg.init_bwp().ul.csi_codebook =
+      unsupported_reason == nullptr ? csi_codebook_type::type2 : csi_codebook_type::type1;
 
   const csi_helper::csi_meas_config_builder_params csi_params =
       config_helpers::make_csi_meas_config_builder_params(cell_cfg.ran);

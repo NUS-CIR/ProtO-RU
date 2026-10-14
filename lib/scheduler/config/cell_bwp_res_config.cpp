@@ -22,17 +22,23 @@ static std::optional<cell_csi_config> make_cell_csi_config(const ran_cell_config
   }
 
   // The UE resources of the CSI-MeasConfig do not change the cell parameters.
-  const csi_meas_config csi_meas =
-      csi_helper::make_csi_meas_config(config_helpers::make_csi_meas_config_builder_params(cell_cfg),
-                                       cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list);
+  csi_helper::csi_meas_config_builder_params params = config_helpers::make_csi_meas_config_builder_params(cell_cfg);
+  const auto&           pusch_td_alloc_list = cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
+  const csi_meas_config csi_meas            = csi_helper::make_csi_meas_config(params, pusch_td_alloc_list);
 
   cell_csi_config csi{
       .nof_ports           = cell_cfg.dl_carrier.nof_ant,
       .cqi_table           = csi_meas.csi_report_cfg_list.front().cqi_table.value(),
       .report_trigger_size = csi_meas.report_trigger_size,
+      .report_type         = is_pusch_configured(csi_meas) ? csi_report_type::aperiodic : csi_report_type::periodic,
+      .type1_report        = {},
   };
-  if (not is_pusch_configured(csi_meas)) {
-    csi.pucch_report = create_csi_report_configuration(csi_meas);
+  if (params.csi_params.type2_codebook.has_value()) {
+    csi.type2_report = create_csi_report_configuration(csi_meas);
+    params.csi_params.type2_codebook.reset();
+    csi.type1_report = create_csi_report_configuration(csi_helper::make_csi_meas_config(params, pusch_td_alloc_list));
+  } else {
+    csi.type1_report = create_csi_report_configuration(csi_meas);
   }
   return csi;
 }
