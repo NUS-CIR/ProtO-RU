@@ -7,6 +7,7 @@ add_library(sched_rrm STATIC
         configured_grant_type1_rrm.cpp
         configured_grant_type2_rrm.cpp
         configured_grant_rrm_factory.cpp
+        csi_resource_manager.cpp
         pucch_resource_manager.cpp
         srs_resource_generator.cpp
         srs_resource_manager_helpers.cpp

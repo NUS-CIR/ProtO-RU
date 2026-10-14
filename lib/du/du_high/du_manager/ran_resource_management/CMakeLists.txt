@@ -5,7 +5,6 @@
 
 add_library(du_resource_manager
         du_bearer_resource_manager.cpp
-        du_csi_resource_manager.cpp
         du_pdsch_resource_manager.cpp
         du_pusch_resource_manager.cpp
         du_ran_resource_manager_impl.cpp

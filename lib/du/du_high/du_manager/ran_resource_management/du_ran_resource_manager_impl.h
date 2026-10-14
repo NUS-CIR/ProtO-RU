@@ -6,7 +6,6 @@
 #pragma once
 
 #include "du_bearer_resource_manager.h"
-#include "du_csi_resource_manager.h"
 #include "du_drx_resource_manager.h"
 #include "du_meas_config_manager.h"
 #include "du_pdsch_resource_manager.h"
@@ -16,6 +15,7 @@
 #include "ue_capability_manager.h"
 #include "ocudu/ran/qos/five_qi.h"
 #include "ocudu/scheduler/rrm/configured_grant_type1_rrm.h"
+#include "ocudu/scheduler/rrm/csi_resource_manager.h"
 #include "ocudu/scheduler/rrm/pucch_resource_manager.h"
 #include "ocudu/scheduler/rrm/srs_resource_manager.h"
 #include <vector>
@@ -166,7 +166,7 @@ private:
   du_pusch_resource_manager pusch_res_mng;
 
   // Manager of UE CSI configuration.
-  du_csi_resource_manager csi_res_mng;
+  csi_resource_manager csi_res_mng;
 
   // Allocator of UE bearer resources.
   du_bearer_resource_manager bearer_res_mng;

@@ -77,7 +77,7 @@ du_ran_resource_manager_impl::du_ran_resource_manager_impl(span<const du_cell_co
   pucch_res_mng(scheduler_cfg.ue.max_pucchs_per_slot),
   pdsch_res_mng(cell_cfg_list, test_cfg),
   pusch_res_mng(cell_cfg_list, test_cfg),
-  csi_res_mng(cell_cfg_list, test_cfg),
+  csi_res_mng(test_cfg.test_ue.has_value() and test_cfg.test_ue->rnti != rnti_t::INVALID_RNTI),
   bearer_res_mng(srbs, qos, logger),
   // Extract Type of CG (i.e., Type1 or 2) from the first cell; all cell share the same type.
   srs_res_mng(create_srs_resource_manager(cell_cfg_list_[0].ran)),
@@ -111,6 +111,7 @@ du_ran_resource_manager_impl::du_ran_resource_manager_impl(span<const du_cell_co
     const du_cell_index_t cell_idx = to_du_cell_index(cell_idx_uint);
     pucch_res_mng.add_cell(cell_idx, cell.ran);
     srs_res_mng->add_cell(cell_idx, cell.ran);
+    csi_res_mng.add_cell(cell_idx, cell.ran);
     if (cell.ran.init_bwp.cg_cfg.has_value()) {
       cg_res_mng->add_cell(cell_idx, cell.ran);
     }
@@ -364,11 +365,12 @@ du_ran_resource_manager_impl::update_context(du_ue_index_t                      
     drx_res_mng.handle_ue_cap_update(ue_mcg.cell_group, u.ue_cap_manager.summary());
     if (ue_mcg.cell_group.cells.contains(SERVING_PCELL_IDX)) {
       pucch_res_mng.update_resources(ue_mcg.cell_group.cells.at(SERVING_PCELL_IDX), *u.ue_cap_manager.summary());
+      csi_res_mng.update_resources(
+          ue_mcg.cell_group.cells.at(SERVING_PCELL_IDX), *u.ue_cap_manager.summary(), ue_index);
     }
     update_tar_config(ue_mcg.cell_group, cell_cfg_list, *u.ue_cap_manager.summary(), ue_index, logger);
     ue_mcg.ue_specific_koffset_supported =
         supports_ue_specific_koffset(ue_mcg.cell_group, cell_cfg_list, *u.ue_cap_manager.summary());
-    csi_res_mng.update_resources(ue_mcg.cell_group, *u.ue_cap_manager.summary(), ue_index);
   }
 
   // > Update UE SRBs and DRBs.
@@ -492,7 +494,7 @@ error_type<std::string> du_ran_resource_manager_impl::allocate_cell_resources(du
 
     pdsch_res_mng.alloc_resources(ue_res.cell_group);
     pusch_res_mng.alloc_resources(ue_res.cell_group);
-    csi_res_mng.alloc_resources(ue_res.cell_group, ue_index);
+    csi_res_mng.alloc_resources(ue_res.cell_group.cells.at(SERVING_PCELL_IDX), ue_index);
   } else {
     ocudu_assert(not ue_res.cell_group.cells.contains(serv_cell_index), "Reallocation of SCell detected");
     ue_res.cell_group.cells.emplace(serv_cell_index, ue_cell_config{});
@@ -519,7 +521,6 @@ void du_ran_resource_manager_impl::deallocate_cell_resources(du_ue_index_t ue_in
     srs_res_mng->dealloc_resources(ue_res.cell_group.cells.at(SERVING_PCELL_IDX));
     pdsch_res_mng.dealloc_resources(ue_res.cell_group);
     pusch_res_mng.dealloc_resources(ue_res.cell_group);
-    csi_res_mng.dealloc_resources(ue_res.cell_group);
     cg_res_mng->reset_ue_cg_config(ue_res.cell_group.cells.at(SERVING_PCELL_IDX));
   }
   ue_res.cell_group.cells.erase(serv_cell_index);
