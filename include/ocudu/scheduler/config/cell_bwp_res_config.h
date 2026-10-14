@@ -16,13 +16,9 @@
 namespace ocudu {
 
 /// CSI parameters that are the same for all the UEs of a BWP.
-struct cell_csi_config {
-  /// Number of CSI-RS ports for channel measurement.
-  unsigned nof_ports;
+struct cell_bwp_csi_config {
   /// CQI table of the CSI reports.
   cqi_table_t cqi_table;
-  /// Size of the CSI request field in DCI Format 0_1. Present only for aperiodic CSI reports.
-  std::optional<unsigned> report_trigger_size;
   /// Time domain behavior of the CSI reports.
   csi_report_type report_type;
   /// CSI report with the Type-I codebook.
@@ -53,7 +49,7 @@ struct cell_dl_bwp_res_config {
   /// List of possible UE-dedicated PDCCH configs.
   std::vector<pdcch_config> ded_pdcchs;
   /// CSI parameters. Present only if the cell configures CSI.
-  std::optional<cell_csi_config> csi;
+  std::optional<cell_bwp_csi_config> csi;
 
   bool operator==(const cell_dl_bwp_res_config& other) const { return ded_pdcchs == other.ded_pdcchs; }
 };

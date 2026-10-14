@@ -117,15 +117,14 @@ static dci_size_config get_dci_size_config(const ue_cell_configuration& ue_cell_
                                            bool                         is_ue_configured_multiple_serving_cells,
                                            search_space_id              ss_id)
 {
-  const search_space_info&                 ss_info       = ue_cell_cfg.search_space(ss_id);
-  const sched_bwp_config&                  init_bwp      = ue_cell_cfg.init_bwp();
-  const sched_bwp_config&                  active_bwp    = *ss_info.bwp;
-  const bwp_configuration&                 active_dl_bwp = active_bwp.dl.cfg();
-  const bwp_uplink_common&                 init_ul_bwp   = init_bwp.ul.common();
-  const bwp_configuration&                 active_ul_bwp = active_bwp.ul.cfg();
-  const std::optional<rach_config_common>& opt_rach_cfg  = active_bwp.ul.common().rach_cfg_common;
-  const auto&                              cell_csi      = ue_cell_cfg.cell_cfg_common.bwp_res[active_bwp.id].dl().csi;
-  const auto*                              opt_pdsch_cfg = active_bwp.dl.pdsch().ded();
+  const search_space_info&                 ss_info                    = ue_cell_cfg.search_space(ss_id);
+  const sched_bwp_config&                  init_bwp                   = ue_cell_cfg.init_bwp();
+  const sched_bwp_config&                  active_bwp                 = *ss_info.bwp;
+  const bwp_configuration&                 active_dl_bwp              = active_bwp.dl.cfg();
+  const bwp_uplink_common&                 init_ul_bwp                = init_bwp.ul.common();
+  const bwp_configuration&                 active_ul_bwp              = active_bwp.ul.cfg();
+  const std::optional<rach_config_common>& opt_rach_cfg               = active_bwp.ul.common().rach_cfg_common;
+  const auto*                              opt_pdsch_cfg              = active_bwp.dl.pdsch().ded();
   const auto*                              opt_pdsch_serving_cell_cfg = ue_cell_cfg.pdsch_serving_cell_cfg();
 
   auto dci_sz_cfg =
@@ -151,7 +150,7 @@ static dci_size_config get_dci_size_config(const ue_cell_configuration& ue_cell_
   dci_sz_cfg.nof_ul_time_domain_res = active_bwp.ul.td_mapper().pusch_td_resources(ss_info.get_ul_dci_format()).size();
   dci_sz_cfg.report_trigger_size    = 0;
   if (ue_cell_cfg.has_csi_cfg()) {
-    dci_sz_cfg.report_trigger_size = cell_csi.value().report_trigger_size.value_or(0);
+    dci_sz_cfg.report_trigger_size = ue_cell_cfg.cell_cfg_common.csi_report_trigger_size;
   }
   dci_sz_cfg.frequency_hopping_configured = false;
   dci_sz_cfg.pusch_tx_scheme              = std::nullopt;
@@ -599,7 +598,7 @@ ue_cell_configuration::ue_cell_configuration(rnti_t                             
   // Apply UE-dedicated Config.
   reconfigure(ue_cell_params_, meas_gap_cfg_);
   if (has_csi_cfg()) {
-    nof_dl_ports = cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.value().nof_ports;
+    nof_dl_ports = cell_cfg_common.params.dl_carrier.nof_ant;
   }
 }
 

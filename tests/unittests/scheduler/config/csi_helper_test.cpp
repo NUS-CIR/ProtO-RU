@@ -347,17 +347,12 @@ TEST_P(cell_csi_config_test, cell_csi_config_matches_the_ue_csi_meas_config)
     cell_cfg.init_bwp.csi->type2_codebook.emplace();
   }
 
-  const cell_csi_config csi = make_cell_bwp_res_config(cell_cfg).dl.csi.value();
-  const csi_meas_config ue_csi =
+  const cell_bwp_csi_config csi = make_cell_bwp_res_config(cell_cfg).dl.csi.value();
+  const csi_meas_config     ue_csi =
       config_helpers::make_default_ue_cell_config(cell_cfg).serv_cell_cfg.csi_meas_cfg.value();
 
-  unsigned ue_nof_ports = 1;
-  for (const nzp_csi_rs_resource& res : ue_csi.nzp_csi_rs_res_list) {
-    ue_nof_ports = std::max(ue_nof_ports, res.res_mapping.nof_ports);
-  }
-  EXPECT_EQ(csi.nof_ports, ue_nof_ports);
   EXPECT_EQ(csi.cqi_table, ue_csi.csi_report_cfg_list.front().cqi_table);
-  EXPECT_EQ(csi.report_trigger_size, ue_csi.report_trigger_size);
+  EXPECT_EQ(csi_helper::get_csi_report_trigger_size(*cell_cfg.init_bwp.csi), ue_csi.report_trigger_size.value_or(0));
   EXPECT_EQ(csi.report_type, is_pusch_configured(ue_csi) ? csi_report_type::aperiodic : csi_report_type::periodic);
   EXPECT_EQ(csi.pucch_report() != nullptr, csi.report_type == csi_report_type::periodic);
 

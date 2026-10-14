@@ -15,7 +15,7 @@
 
 using namespace ocudu;
 
-static std::optional<cell_csi_config> make_cell_csi_config(const ran_cell_config& cell_cfg)
+static std::optional<cell_bwp_csi_config> make_cell_bwp_csi_config(const ran_cell_config& cell_cfg)
 {
   if (not cell_cfg.init_bwp.csi.has_value()) {
     return std::nullopt;
@@ -26,12 +26,10 @@ static std::optional<cell_csi_config> make_cell_csi_config(const ran_cell_config
   const auto&           pusch_td_alloc_list = cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
   const csi_meas_config csi_meas            = csi_helper::make_csi_meas_config(params, pusch_td_alloc_list);
 
-  cell_csi_config csi{
-      .nof_ports           = cell_cfg.dl_carrier.nof_ant,
-      .cqi_table           = csi_meas.csi_report_cfg_list.front().cqi_table.value(),
-      .report_trigger_size = csi_meas.report_trigger_size,
-      .report_type         = is_pusch_configured(csi_meas) ? csi_report_type::aperiodic : csi_report_type::periodic,
-      .type1_report        = {},
+  cell_bwp_csi_config csi{
+      .cqi_table    = csi_meas.csi_report_cfg_list.front().cqi_table.value(),
+      .report_type  = is_pusch_configured(csi_meas) ? csi_report_type::aperiodic : csi_report_type::periodic,
+      .type1_report = {},
   };
   if (params.csi_params.type2_codebook.has_value()) {
     csi.type2_report = create_csi_report_configuration(csi_meas);
@@ -49,7 +47,7 @@ static cell_dl_bwp_res_config make_cell_dl_bwp_res_config(const ran_cell_config&
   if (cell_cfg.init_bwp.pdcch_cfg.has_value()) {
     res.ded_pdcchs.push_back(*cell_cfg.init_bwp.pdcch_cfg);
   }
-  res.csi = make_cell_csi_config(cell_cfg);
+  res.csi = make_cell_bwp_csi_config(cell_cfg);
   return res;
 }
 

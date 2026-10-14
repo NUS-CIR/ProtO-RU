@@ -801,6 +801,12 @@ make_csi_report_configs(const csi_meas_config_builder_params&                   
   return reps;
 }
 
+unsigned ocudu::csi_helper::get_csi_report_trigger_size(const du_csi_params& csi_params)
+{
+  // [Implementation-defined] There is only one aperiodic trigger state.
+  return csi_params.enable_aperiodic_report ? 1 : 0;
+}
+
 csi_meas_config
 ocudu::csi_helper::make_csi_meas_config(const csi_meas_config_builder_params&                     params,
                                         const std::vector<pusch_time_domain_resource_allocation>& pusch_td_alloc_list)
@@ -836,7 +842,7 @@ ocudu::csi_helper::make_csi_meas_config(const csi_meas_config_builder_params&   
     report_cfg_info.csi_im_resources_for_interference = 1;
     ts.associated_report_cfg_info_list.push_back(report_cfg_info);
     csi_meas.aperiodic_trigger_state_list.push_back(ts);
-    csi_meas.report_trigger_size = 1;
+    csi_meas.report_trigger_size = get_csi_report_trigger_size(params.csi_params);
   }
 
   return csi_meas;

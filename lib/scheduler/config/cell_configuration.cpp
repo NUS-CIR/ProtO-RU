@@ -52,6 +52,8 @@ cell_configuration::cell_configuration(const scheduler_expert_config&           
   nof_slots_per_frame(get_nof_slots_per_subframe(scs_common()) * NOF_SUBFRAMES_PER_FRAME),
   zp_csi_rs_list(make_zp_csi_rs_list(params)),
   nzp_csi_rs_list(make_nzp_csi_rs_list(params)),
+  csi_report_trigger_size(
+      params.init_bwp.csi.has_value() ? csi_helper::get_csi_report_trigger_size(*params.init_bwp.csi) : 0),
   init_bwp(init_bwp_),
   // NTN parameters.
   ntn_cs_koffset(get_ntn_cs_koffset_slots(params.ntn_params, scs_common())),

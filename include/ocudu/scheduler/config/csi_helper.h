@@ -168,6 +168,10 @@ zp_csi_rs_resource_set make_periodic_zp_csi_rs_resource_set(const csi_meas_confi
 /// measurements.
 std::vector<nzp_csi_rs_resource> make_nzp_csi_rs_resource_list(const csi_meas_config_builder_params& params);
 
+/// \brief Gets \e reportTriggerSize, the size of the CSI request field in DCI Format 0_1.
+/// \return Zero if the cell configures no aperiodic CSI reports.
+unsigned get_csi_report_trigger_size(const du_csi_params& csi_params);
+
 /// \brief Generate CSI-MeasConfig.
 csi_meas_config make_csi_meas_config(const csi_meas_config_builder_params&                     params,
                                      const std::vector<pusch_time_domain_resource_allocation>& pusch_td_alloc_list);

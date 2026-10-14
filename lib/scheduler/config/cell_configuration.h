@@ -52,6 +52,8 @@ public:
   const std::vector<zp_csi_rs_resource> zp_csi_rs_list;
   /// List of nzp-CSI-RS resources.
   const std::vector<nzp_csi_rs_resource> nzp_csi_rs_list;
+  /// Size of the CSI request field in DCI Format 0_1. Zero if the cell configures no aperiodic CSI reports.
+  const unsigned csi_report_trigger_size;
   /// Initial BWP configuration for this cell.
   const sched_bwp_config& init_bwp;
   /// List of BWP config resources handled by this cell.
