@@ -40,7 +40,7 @@ validator_result validate_pucch_cfg(const serving_cell_config&           ue_cell
 
 /// \brief Validates PUSCH Config in \c sched_ue_creation_request_message used to create a UE.
 /// \param[in] ul_config Uplink configuration to be validated.
-/// \param[in] has_csi determines whether the UE has CSI enabled.
+/// \param[in] has_csi determines whether the cell configures CSI.
 /// \return In case an invalid parameter is detected, returns a string containing an error message.
 validator_result validate_pusch_cfg(const uplink_config& ul_config, bool has_csi);
 
@@ -54,7 +54,10 @@ validator_result validate_srs_cfg(const serving_cell_config& ue_cell_cfg, crb_in
 validator_result validate_nzp_csi_rs_list(span<const nzp_csi_rs_resource>               nzp_csi_rs_list,
                                           const std::optional<tdd_ul_dl_config_common>& tdd_cfg_common);
 
-/// \brief Validates CSI-MeasConfig in \c serving_cell_config passed to a UE.
+/// \brief Validates CSI-MeasConfig and the ZP-CSI-RS resources in \c serving_cell_config passed to a UE.
+///
+/// The DU builds these from the cell configuration. Thus, the DU calls this function once per cell, with the default
+/// UE configuration of the cell.
 /// \param[in] ue_cell_cfg UE serving cell configuration to be validated.
 /// \param[in] tdd_cfg_common TDD configuration, if any.
 /// \return In case an invalid parameter is detected, returns a string containing an error message.

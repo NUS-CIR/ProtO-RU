@@ -5,15 +5,11 @@
 
 #include "ocudu/scheduler/config/serving_cell_config_validator.h"
 #include "ocudu/adt/format.h"
-#include "ocudu/ran/csi_report/csi_report_config_helpers.h"
-#include "ocudu/ran/csi_report/csi_report_on_pucch_helpers.h"
 #include "ocudu/ran/csi_rs/csi_rs_config_helpers.h"
 #include "ocudu/ran/csi_rs/csi_rs_pattern.h"
 #include "ocudu/ran/pdcch/pdcch_candidates.h"
-#include "ocudu/ran/sr_configuration.h"
 #include "ocudu/ran/srs/srs_bandwidth_configuration.h"
 #include "ocudu/scheduler/config/bwp_configuration.h"
-#include "ocudu/scheduler/config/csi_helper.h"
 #include "ocudu/scheduler/config/sched_cell_config_helpers.h"
 #include "ocudu/scheduler/config/serving_cell_config.h"
 #include "ocudu/scheduler/sched_consts.h"
@@ -123,8 +119,6 @@ validator_result config_validators::validate_pdsch_cfg(const serving_cell_config
   for (const auto& pdsch : dl_lst) {
     VERIFY(pdsch.k0 <= SCHEDULER_MAX_K0, "k0={} value exceeds maximum supported k0", pdsch.k0);
   }
-
-  HANDLE_ERROR(validate_zp_csi_rs(ue_cell_cfg));
 
   // TODO: Validate other parameters.
   return {};
@@ -245,49 +239,6 @@ validator_result config_validators::validate_pucch_cfg(const serving_cell_config
     VERIFY(res_set_1.resources[res_params.res_set_size.value()].ded().ue_res_id ==
                res_params.sr_f2_res_id(pucch_sr_resource_id(0)).ded().ue_res_id,
            "With Format 0, the SR_F2 resource must be present in Resource Set ID 1");
-  }
-
-  // Verify that the PUCCH setting used for CSI report have been configured properly.
-  if (ue_cell_cfg.csi_meas_cfg.has_value() and not is_pusch_configured(*ue_cell_cfg.csi_meas_cfg)) {
-    const auto& csi = std::get<csi_report_config::periodic_or_semi_persistent_report_on_pucch>(
-        ue_cell_cfg.csi_meas_cfg->csi_report_cfg_list.front().report_cfg_type);
-    VERIFY(not csi.pucch_csi_res_list.empty(),
-           "PUCCH-CSI-ResourceList has not been configured in the CSI-reportConfig");
-
-    // Verify the PUCCH resource id that indicated in the CSI resource config exists in the PUCCH resource list.
-    const auto  csi_res_id = csi.pucch_csi_res_list.front().pucch_res_id;
-    const auto& csi_res    = pucch_cfg.pucch_res_list[csi_res_id.ded().ue_res_id];
-    VERIFY(csi_res.res_id == csi_res_id and csi_res.format() == res_params.format_234(),
-           "Invalid PUCCH resource used for CSI reporting");
-
-    // Verify the CSI/SR bits do not exceed the PUCCH F2/F3/F4 payload.
-    const auto     csi_report_cfg   = create_csi_report_configuration(ue_cell_cfg.csi_meas_cfg.value());
-    const unsigned csi_report_size  = get_csi_report_pucch_size(csi_report_cfg).part1_size.value();
-    const bool     csi_sr_collision = csi_helper::are_sr_and_csi_pucchs_scheduled_together(
-        sr_periodicity_to_slot(pucch_cfg.sr_res_list.front().period),
-        pucch_cfg.sr_res_list.front().offset,
-        to_underlying(csi.report_slot_period),
-        csi.report_slot_offset);
-
-    // If SR and CSI are reported within the same slot, 1 SR bit can be multiplexed with CSI within the same PUCCH
-    // resource.
-    unsigned sr_bits_mplexed_with_csi = csi_sr_collision ? 1U : 0U;
-    // In the PUCCH resource for CSI, there are no HARQ-ACK bits being reported; therefore we only need to check where
-    // the CSI + SR bits fit into the max payload.
-    const unsigned uci_bits_pucch_resource = csi_report_size + sr_bits_mplexed_with_csi;
-    VERIFY(res_params.max_payload_234() >= uci_bits_pucch_resource,
-           "UCI num. of bits ({}) exceeds the maximum CSI's PUCCH Format 2/3/4 payload ({})",
-           uci_bits_pucch_resource,
-           res_params.max_payload_234());
-
-    if (using_02) {
-      VERIFY(res_set_0.resources[res_params.res_set_size.value() + 1].ded().ue_res_id ==
-                 res_params.csi_f0_res_id(pucch_csi_resource_id(0)).ded().ue_res_id,
-             "With Format 0, the CSI_F0 resource must be present in Resource Set ID 0");
-
-      VERIFY(res_set_1.resources[res_params.res_set_size.value() + 1] == csi_res_id,
-             "With Format 0, the CSI resource must be present in Resource Set ID 1");
-    }
   }
 
   const auto& init_ul_bwp = ue_cell_cfg.ul_config.value().init_ul_bwp;
@@ -533,6 +484,8 @@ validator_result config_validators::validate_csi_meas_cfg(const serving_cell_con
                                                           const std::optional<tdd_ul_dl_config_common>& tdd_cfg_common,
                                                           const ul_config_common&                       ul_cfg_common)
 {
+  HANDLE_ERROR(validate_zp_csi_rs(ue_cell_cfg));
+
   if (not ue_cell_cfg.csi_meas_cfg.has_value()) {
     return {};
   }

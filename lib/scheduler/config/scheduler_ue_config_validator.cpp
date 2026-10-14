@@ -171,19 +171,11 @@ ocudu::config_validators::validate_sched_ue_creation_request_message(const sched
         HANDLE_ERROR(validate_srs_cfg(serv_cell_cfg, cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.crbs));
       }
 
-      HANDLE_ERROR(validate_pusch_cfg(serv_cell_cfg.ul_config.value(), serv_cell_cfg.csi_meas_cfg.has_value()));
+      HANDLE_ERROR(validate_pusch_cfg(serv_cell_cfg.ul_config.value(), cell_cfg.params.init_bwp.csi.has_value()));
 
       if (serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value()) {
         HANDLE_ERROR(validate_cg_cfg(serv_cell_cfg.ul_config.value(), cell_cfg));
       }
-    }
-
-    HANDLE_ERROR(validate_csi_meas_cfg(serv_cell_cfg, cell_cfg.params.tdd_cfg, cell_cfg.params.ul_cfg_common));
-
-    // At the moment, we only support the situation where all UEs have the same NZP-CSI-RS list.
-    if (serv_cell_cfg.csi_meas_cfg.has_value() and not serv_cell_cfg.csi_meas_cfg->nzp_csi_rs_res_list.empty()) {
-      VERIFY(serv_cell_cfg.csi_meas_cfg->nzp_csi_rs_res_list == cell_cfg.nzp_csi_rs_list,
-             "The NZP-CSI-RS Resource lists for the UE and the cell do not match");
     }
   }
 
