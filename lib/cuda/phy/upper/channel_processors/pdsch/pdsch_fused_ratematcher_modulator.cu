@@ -887,6 +887,9 @@ __global__ void __launch_bounds__(256, 4)
 
 /// Shape the kernels read, derived from a code block description and a transport block.
 struct fused_geometry {
+  /// \brief Number of bits the selection wraps around, N_cb of TS 38.212, Section 5.4.2.1.
+  ///
+  /// What the punctured columns leave, limited to N_ref with limited-buffer rate matching.
   int N_cb            = 0;
   int N_full          = 0;
   int k0              = 0;
@@ -1016,11 +1019,13 @@ cuda_result pdsch_fused_ratematcher_modulator::configure(const codeblock_metadat
   g.bits_per_symbol = bits_per_symbol;
   g.nof_symbols     = static_cast<int>(nof_bits) / bits_per_symbol;
 
-  int limited = g.N_cb;
+  // A limited buffer shortens the circular buffer the selection wraps around, and the starting
+  // position with it. The kernels take the same length, so the selection and k0 agree; the output
+  // layout uses N_full and does not change.
   if (cb.tb_common.Nref > 0) {
-    limited = std::min(static_cast<int>(cb.tb_common.Nref), g.N_cb);
+    g.N_cb = std::min(static_cast<int>(cb.tb_common.Nref), g.N_cb);
   }
-  g.k0 = starting_position(base_graph, Z, cb.tb_common.rv, limited);
+  g.k0 = starting_position(base_graph, Z, cb.tb_common.rv, g.N_cb);
 
   state->configured = true;
 

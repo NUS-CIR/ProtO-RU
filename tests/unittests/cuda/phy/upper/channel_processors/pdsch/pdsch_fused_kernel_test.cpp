@@ -33,18 +33,32 @@ struct fused_case {
   unsigned             rv;
   unsigned             nof_filler_bits;
   modulation_scheme    mod;
-  const char*          reaches;
+  /// Length the circular buffer is limited to, or zero for the whole of it.
+  unsigned    Nref;
+  const char* reaches;
 };
 
 const std::vector<fused_case> cases = {
-    {ldpc_base_graph_type::BG1, ldpc::LS384, 0, 0, modulation_scheme::QPSK, "base graph 1, QPSK"},
-    {ldpc_base_graph_type::BG1, ldpc::LS384, 0, 0, modulation_scheme::QAM16, "base graph 1, 16QAM"},
-    {ldpc_base_graph_type::BG1, ldpc::LS384, 2, 0, modulation_scheme::QAM64, "base graph 1, 64QAM, rv 2"},
-    {ldpc_base_graph_type::BG1, ldpc::LS256, 0, 128, modulation_scheme::QAM256, "filler bits, 256QAM"},
-    {ldpc_base_graph_type::BG2, ldpc::LS384, 0, 0, modulation_scheme::QPSK, "base graph 2, QPSK"},
-    {ldpc_base_graph_type::BG2, ldpc::LS128, 1, 64, modulation_scheme::QAM16, "base graph 2, filler bits, rv 1"},
+    {ldpc_base_graph_type::BG1, ldpc::LS384, 0, 0, modulation_scheme::QPSK, 0, "base graph 1, QPSK"},
+    {ldpc_base_graph_type::BG1, ldpc::LS384, 0, 0, modulation_scheme::QAM16, 0, "base graph 1, 16QAM"},
+    {ldpc_base_graph_type::BG1, ldpc::LS384, 2, 0, modulation_scheme::QAM64, 0, "base graph 1, 64QAM, rv 2"},
+    {ldpc_base_graph_type::BG1, ldpc::LS256, 0, 128, modulation_scheme::QAM256, 0, "filler bits, 256QAM"},
+    {ldpc_base_graph_type::BG2, ldpc::LS384, 0, 0, modulation_scheme::QPSK, 0, "base graph 2, QPSK"},
+    {ldpc_base_graph_type::BG2, ldpc::LS128, 1, 64, modulation_scheme::QAM16, 0, "base graph 2, filler bits, rv 1"},
+    // A buffer short enough that the selection passes its end, at the redundancy versions whose
+    // starting position sits late in the buffer. Without the limit the kernel wraps at the whole
+    // buffer and takes bits the limited one does not hold.
+    {ldpc_base_graph_type::BG1, ldpc::LS384, 2, 0, modulation_scheme::QAM64, 12288, "limited buffer, rv 2"},
+    {ldpc_base_graph_type::BG1, ldpc::LS384, 3, 0, modulation_scheme::QAM64, 12288, "limited buffer, rv 3"},
+    {ldpc_base_graph_type::BG1, ldpc::LS384, 0, 0, modulation_scheme::QPSK, 10752, "limited buffer, rv 0"},
+    {ldpc_base_graph_type::BG2,
+     ldpc::LS384,
+     2,
+     128,
+     modulation_scheme::QAM16,
+     8192,
+     "limited buffer, filler bits, rv 2"},
 };
-
 class pdsch_fused_kernel_test : public ::testing::Test
 {
 protected:
@@ -139,7 +153,7 @@ protected:
     cfg.tb_common.lifting_size      = c.lifting_size;
     cfg.tb_common.rv                = c.rv;
     cfg.tb_common.mod               = c.mod;
-    cfg.tb_common.Nref              = 0;
+    cfg.tb_common.Nref              = c.Nref;
     cfg.cb_specific.nof_filler_bits = c.nof_filler_bits;
     cfg.cb_specific.rm_length       = E;
     cfg.cb_specific.nof_crc_bits    = 16;
