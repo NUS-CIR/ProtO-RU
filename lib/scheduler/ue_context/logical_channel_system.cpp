@@ -461,18 +461,53 @@ void logical_channel_system::configure(soa::row_id ue_rid, logical_channel_confi
 
   // Refresh sorted channels list.
   ue_ch.sorted_channels.clear();
-  dl_transport_block_restrictions dl_restrictions;
-  ul_grant_restrictions           ul_restrictions;
   for (const auto& lc_cfg : *ue_cfg.channel_configs) {
     ue_ch.sorted_channels.push_back(lc_cfg->lcid);
-    dl_restrictions.narrow(*lc_cfg);
-    ul_restrictions.narrow(*lc_cfg);
   }
-  ue_ch.restricted_channel_present    = dl_restrictions.is_restricted();
-  ue_ul_ch.restricted_channel_present = ul_restrictions.is_restricted();
   std::sort(ue_ch.sorted_channels.begin(), ue_ch.sorted_channels.end(), [&ue_cfg](lcid_t lhs, lcid_t rhs) {
     return get_lc_prio(*ue_cfg.channel_configs.value()[lhs]) < get_lc_prio(*ue_cfg.channel_configs.value()[rhs]);
   });
+
+  refresh_restricted_slices(ue_rid);
+}
+
+void logical_channel_system::refresh_restricted_slices(soa::row_id ue_rid)
+{
+  auto  u        = ues.row(ue_rid);
+  auto& ue_ch    = u.at<ue_dl_channel_context>();
+  auto& ue_ul_ch = u.at<ue_ul_channel_context>();
+  ue_ch.restricted_slices.clear();
+  ue_ul_ch.restricted_slices.clear();
+
+  const logical_channel_config_list_ptr& lc_cfgs = u.at<ue_config_context>().channel_configs;
+  if (not lc_cfgs.has_value()) {
+    return;
+  }
+  const auto mark = [](static_vector<ran_slice_id_t, MAX_RAN_SLICES_PER_UE>& restricted,
+                       std::optional<ran_slice_id_t>                         slice_id) {
+    if (not slice_id.has_value() or std::find(restricted.begin(), restricted.end(), *slice_id) != restricted.end()) {
+      return;
+    }
+    restricted.push_back(*slice_id);
+  };
+  for (const logical_channel_config_ptr& lc_cfg : *lc_cfgs) {
+    dl_transport_block_restrictions dl_restrictions;
+    dl_restrictions.narrow(*lc_cfg);
+    if (dl_restrictions.is_restricted()) {
+      auto ch_it = ue_ch.channels.find(lc_cfg->lcid);
+      if (ch_it != ue_ch.channels.end()) {
+        mark(ue_ch.restricted_slices, lc_mapper.dl_slice_id(ch_it->second));
+      }
+    }
+    ul_grant_restrictions ul_restrictions;
+    ul_restrictions.narrow(*lc_cfg);
+    if (ul_restrictions.is_restricted()) {
+      auto lcg_it = ue_ul_ch.lcgs.find(lc_cfg->lc_group);
+      if (lcg_it != ue_ul_ch.lcgs.end()) {
+        mark(ue_ul_ch.restricted_slices, lc_mapper.ul_slice_id(lcg_it->second));
+      }
+    }
+  }
 }
 
 void logical_channel_system::deactivate(soa::row_id ue_rid)
@@ -535,6 +570,8 @@ void logical_channel_system::set_lcid_ran_slice(soa::row_id ue_rid, lcid_t lcid,
 
   // Update pending bytes for the slice.
   on_single_channel_buf_st_update(u, slice_id, lc_mapper.dl_buf_st(lc_rid).value(), 0);
+
+  refresh_restricted_slices(ue_rid);
 }
 
 void logical_channel_system::set_lcg_ran_slice(soa::row_id ue_rid, lcg_id_t lcgid, ran_slice_id_t slice_id)
@@ -573,6 +610,8 @@ void logical_channel_system::set_lcg_ran_slice(soa::row_id ue_rid, lcg_id_t lcgi
 
   // Update pending bytes for the slice.
   on_single_lcg_buf_st_update(u, lcgid, slice_id, lc_mapper.ul_buf_st(lcg_rid).value(), 0);
+
+  refresh_restricted_slices(ue_rid);
 }
 
 void logical_channel_system::deregister_lc_ran_slice(soa::row_id ue_rid, lcid_t lcid)
@@ -601,6 +640,8 @@ void logical_channel_system::deregister_lc_ran_slice(soa::row_id ue_rid, lcid_t 
       }
     }
   }
+
+  refresh_restricted_slices(ue_rid);
 }
 
 void logical_channel_system::deregister_lcg_ran_slice(soa::row_id ue_rid, lcg_id_t lcgid)
@@ -630,6 +671,8 @@ void logical_channel_system::deregister_lcg_ran_slice(soa::row_id ue_rid, lcg_id
       ue_ctxt.pending_bytes_per_slice.erase(*prev_slice_id);
     }
   }
+
+  refresh_restricted_slices(ue_rid);
 }
 
 void logical_channel_system::handle_dl_buffer_status_indication(soa::row_id ue_row_id,
@@ -1057,8 +1100,10 @@ unsigned ue_logical_channel_repository::ul_pending_bytes() const
 ue_logical_channel_repository::dl_transport_block_selection
 ue_logical_channel_repository::select_dl_transport_block(ran_slice_id_t slice_id) const
 {
-  // Nothing restricts the block, so it serves the whole slice.
-  if (not get_ue_row().at<ue_dl_channel_context>().restricted_channel_present) {
+  const auto& ue_ch = get_ue_row().at<ue_dl_channel_context>();
+  // No channel of this slice restricts the block, so it serves the whole slice.
+  if (std::find(ue_ch.restricted_slices.begin(), ue_ch.restricted_slices.end(), slice_id) ==
+      ue_ch.restricted_slices.end()) {
     return {{}, dl_pending_bytes(slice_id)};
   }
 
@@ -1112,8 +1157,9 @@ ue_logical_channel_repository::ul_grant_selection
 ue_logical_channel_repository::select_ul_grant(ran_slice_id_t slice_id) const
 {
   const auto& ue_ul_ch = get_ue_row().at<ue_ul_channel_context>();
-  // Nothing restricts the grant, so every channel of the slice can be served on it.
-  if (not ue_ul_ch.restricted_channel_present) {
+  // No channel of this slice restricts the grant, so every group of the slice can be served on it.
+  if (std::find(ue_ul_ch.restricted_slices.begin(), ue_ul_ch.restricted_slices.end(), slice_id) ==
+      ue_ul_ch.restricted_slices.end()) {
     return {{}, ul_pending_bytes(slice_id)};
   }
 

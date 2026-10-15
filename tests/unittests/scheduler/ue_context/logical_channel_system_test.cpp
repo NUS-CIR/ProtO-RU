@@ -1080,16 +1080,23 @@ protected:
 class dl_harq_feedback_logical_channel_system_test : public logical_channel_system_test, public ::testing::Test
 {
 protected:
-  void create_ue(std::optional<dl_harq_feedback> srb_feedback,
-                 std::optional<dl_harq_feedback> drb_feedback,
-                 bool                            one_slice = false)
+  logical_channel_config_list_ptr create_config(std::optional<dl_harq_feedback> srb_feedback,
+                                                std::optional<dl_harq_feedback> drb_feedback)
   {
     std::vector<logical_channel_config> configs;
     configs.push_back(config_helpers::create_default_logical_channel_config(LCID_SRB1));
     configs.back().allowed_dl_harq_feedback = srb_feedback;
     configs.push_back(config_helpers::create_default_logical_channel_config(LCID_MIN_DRB));
     configs.back().allowed_dl_harq_feedback = drb_feedback;
-    ue_lchs = lch_system.create_ue(to_du_ue_index(0), subcarrier_spacing::kHz30, false, cfg_pool.create(configs));
+    return cfg_pool.create(configs);
+  }
+
+  void create_ue(std::optional<dl_harq_feedback> srb_feedback,
+                 std::optional<dl_harq_feedback> drb_feedback,
+                 bool                            one_slice = false)
+  {
+    ue_lchs = lch_system.create_ue(
+        to_du_ue_index(0), subcarrier_spacing::kHz30, false, create_config(srb_feedback, drb_feedback));
     ue_lchs.set_lcid_ran_slice(LCID_SRB1, srb_slice);
     ue_lchs.set_lcid_ran_slice(LCID_MIN_DRB, one_slice ? srb_slice : drb_slice);
   }
@@ -1213,6 +1220,34 @@ TEST_F(dl_harq_feedback_logical_channel_system_test, an_idle_enabled_channel_lea
   const auto selection = ue_lchs.select_dl_transport_block(srb_slice);
   EXPECT_FALSE(selection.restrictions.harq_feedback.has_value());
   EXPECT_EQ(selection.pending_bytes, ue_lchs.dl_pending_bytes(srb_slice)) << "no channel is left out";
+}
+
+/// The restriction belongs to the channel, so it binds the slice the channel is mapped to at the time.
+TEST_F(dl_harq_feedback_logical_channel_system_test, a_remapped_channel_restricts_the_slice_it_moves_to)
+{
+  create_ue(dl_harq_feedback::enabled, std::nullopt);
+  ue_lchs.handle_dl_buffer_status_indication(LCID_SRB1, 100);
+  ASSERT_TRUE(ue_lchs.select_dl_transport_block(srb_slice).restrictions.harq_feedback.has_value());
+
+  ue_lchs.set_lcid_ran_slice(LCID_SRB1, drb_slice);
+
+  EXPECT_FALSE(ue_lchs.select_dl_transport_block(srb_slice).restrictions.harq_feedback.has_value())
+      << "the channel that restricted this slice left it";
+  ASSERT_TRUE(ue_lchs.select_dl_transport_block(drb_slice).restrictions.harq_feedback.has_value());
+  EXPECT_EQ(*ue_lchs.select_dl_transport_block(drb_slice).restrictions.harq_feedback, dl_harq_feedback::enabled);
+}
+
+/// A reconfiguration decides the restrictions of the blocks built after it.
+TEST_F(dl_harq_feedback_logical_channel_system_test, a_reconfigured_channel_restricts_its_slice)
+{
+  create_ue(std::nullopt, std::nullopt);
+  ue_lchs.handle_dl_buffer_status_indication(LCID_SRB1, 100);
+  ASSERT_FALSE(ue_lchs.select_dl_transport_block(srb_slice).restrictions.harq_feedback.has_value());
+
+  ue_lchs.configure(create_config(dl_harq_feedback::disabled, std::nullopt));
+
+  ASSERT_TRUE(ue_lchs.select_dl_transport_block(srb_slice).restrictions.harq_feedback.has_value());
+  EXPECT_EQ(*ue_lchs.select_dl_transport_block(srb_slice).restrictions.harq_feedback, dl_harq_feedback::disabled);
 }
 
 TEST_F(ul_harq_mode_logical_channel_system_test, unrestricted_channels_require_no_mode)

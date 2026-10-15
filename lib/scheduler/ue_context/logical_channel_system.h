@@ -332,8 +332,8 @@ private:
     static_vector<lcid_t, MAX_NOF_RB_LCIDS> sorted_channels;
     /// Context of channels currently configured.
     static_flat_map<lcid_t, soa::row_id, MAX_NOF_RB_LCIDS> channels;
-    /// Whether any configured channel restricts the transport blocks it can be multiplexed into.
-    bool restricted_channel_present = false;
+    /// Slices holding a channel that restricts the transport blocks it can be multiplexed into.
+    static_vector<ran_slice_id_t, MAX_RAN_SLICES_PER_UE> restricted_slices;
   };
   /// UE context relative to its UL channel management.
   struct ue_ul_channel_context {
@@ -341,8 +341,8 @@ private:
     static_flat_map<lcg_id_t, soa::row_id, MAX_NOF_LCGS> lcgs;
     /// Slot at which the oldest, unserved SR indication was received for this UE.
     slot_point oldest_sr_sl_rx;
-    /// Whether any configured channel restricts the grants it can be served on.
-    bool restricted_channel_present = false;
+    /// Slices holding a channel that restricts the grants it can be served on.
+    static_vector<ran_slice_id_t, MAX_RAN_SLICES_PER_UE> restricted_slices;
   };
   /// UE context relative to its DL state.
   struct ue_context {
@@ -390,6 +390,12 @@ private:
   void deregister_lc_ran_slice(soa::row_id ue_rid, lcid_t lcid);
   void set_lcg_ran_slice(soa::row_id, lcg_id_t lcgid, ran_slice_id_t slice_id);
   void deregister_lcg_ran_slice(soa::row_id ue_rid, lcg_id_t lcgid);
+
+  /// \brief Rebuilds the slices of a UE that hold a restricted logical channel.
+  ///
+  /// Runs whenever a channel configuration or a slice mapping changes, so that a slice without a restricted
+  /// channel resolves its grant without walking the channels.
+  void refresh_restricted_slices(soa::row_id ue_rid);
 
   void
   handle_dl_buffer_status_indication(soa::row_id ue_row_id, lcid_t lcid, unsigned buffer_status, slot_point hol_toa);
