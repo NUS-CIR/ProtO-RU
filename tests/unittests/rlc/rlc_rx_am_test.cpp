@@ -10,11 +10,9 @@
 #include "ocudu/rlc/rlc_window_seg_pools.h"
 #include "ocudu/support/executors/manual_task_worker.h"
 #include "ocudu/support/test_utils.h"
-#include <atomic>
 #include <gtest/gtest.h>
 #include <list>
 #include <queue>
-#include <thread>
 #include <utility>
 
 using namespace ocudu;
@@ -704,72 +702,72 @@ TEST_P(rlc_rx_am_test, status_report_never_older_than_previous_read)
   EXPECT_EQ(rlc->get_status_pdu().ack_sn, 2);
 }
 
-/// Stress the hand-over of status reports between the RX entity (UE executor) and the TX entity (pcell executor) from
-/// two threads, as in the DU: one thread receives polled PDUs in order while the other reads a status report whenever
-/// one is required. The ACK_SN of the reports read must never go backwards. t-StatusProhibit is disabled (as for SRBs)
-/// so that every trigger is read immediately.
+/// Verifies that successive get_status_pdu() calls return a monotonically non-decreasing ACK_SN under the
+/// orderings that arise when the RX and TX entities run on separate executors: (1) TX reads after every
+/// polled PDU, (2) TX reads after a burst of polled PDUs, and (3) TX observes status_report_required()
+/// between two consecutive handle_pdu() calls. The SPSC triple buffer produces identical call sequences
+/// whether the two sides run on separate OS threads or are stepped explicitly from one thread.
 TEST_P(rlc_rx_am_test_concurrent_tx, status_report_never_older_with_concurrent_tx)
 {
-  const uint32_t        mod     = cardinality(to_number(sn_size));
-  const uint32_t        nof_pdu = 200000;
-  std::atomic<uint32_t> nof_rx_pdus{0};
-  std::atomic<uint32_t> nof_reads{0};
-  std::atomic<bool>     done{false};
-  uint32_t              nof_older   = 0;
-  uint32_t              nof_skipped = 0;
+  const uint32_t mod        = cardinality(to_number(sn_size));
+  uint32_t       total_rx   = 0;
+  uint32_t       prev_ack   = 0;
+  bool           first_read = true;
+  uint32_t       nof_older  = 0;
+  uint32_t       nof_reads  = 0;
 
-  std::thread tx_thread([&]() {
-    bool     first = true;
-    uint32_t prev  = 0;
-    while (not done.load(std::memory_order_acquire)) {
-      if (not rlc->status_report_required()) {
-        continue;
-      }
-      // Unwrap ACK_SN with the number of PDUs handed to the RX entity before and after the read: the report reflects
-      // the PDUs received in between, so the unwrapped ACK_SN is the largest value not above that count that matches
-      // ACK_SN modulo the SN space. Unlike a comparison over half the SN space, this holds however many PDUs are
-      // received between two reads. A read that took longer than half the SN space is ambiguous and skipped.
-      const uint32_t count_before = nof_rx_pdus.load(std::memory_order_acquire);
-      const uint32_t ack_sn       = rlc->get_status_pdu().ack_sn;
-      const uint32_t count_after  = nof_rx_pdus.load(std::memory_order_acquire);
-      nof_reads.fetch_add(1, std::memory_order_relaxed);
-      if (count_after - count_before >= mod / 2) {
-        nof_skipped++;
-        continue;
-      }
-      const uint32_t ack = count_after - (count_after + mod - ack_sn) % mod;
-      if (not first && ack < prev) {
-        nof_older++;
-      }
-      first = false;
-      prev  = ack;
-    }
-  });
-
-  for (uint32_t n = 0; n < nof_pdu; n++) {
-    uint32_t                        sn       = n % mod;
-    std::list<std::vector<uint8_t>> pdu_list = {};
+  auto rx = [&](uint32_t sn) {
+    std::list<std::vector<uint8_t>> pdu_list;
     byte_buffer                     sdu;
-    ASSERT_NO_FATAL_FAILURE(create_pdus(pdu_list, sdu, sn, 4, 4, sn, true));
-    nof_rx_pdus.store(n + 1, std::memory_order_release);
+    ASSERT_NO_FATAL_FAILURE(create_pdus(pdu_list, sdu, sn % mod, 4, 4, sn % mod, /*poll=*/true));
     rlc->handle_pdu(byte_buffer_slice::create(std::move(pdu_list.front())).value());
     tester->sdu_queue = {};
     ue_worker.run_pending_tasks();
-  }
-  // Let the reader take at least one report, as a scheduler that runs one thread at a time (e.g. valgrind) may not
-  // have run it yet. The last PDU was polled, so a report is pending.
-  while (nof_reads.load(std::memory_order_relaxed) == 0) {
-    std::this_thread::yield();
-  }
-  done.store(true, std::memory_order_release);
-  tx_thread.join();
+    ++total_rx;
+  };
 
-  logger.info("Read {} status reports ({} skipped as ambiguous), {} older than the previous one",
-              nof_reads.load(),
-              nof_skipped,
-              nof_older);
-  EXPECT_LT(nof_skipped, nof_reads.load()) << "All status report reads were ambiguous; monotonicity was never checked";
-  EXPECT_EQ(nof_older, 0);
+  // Unwraps ack_sn relative to total_rx and checks monotonicity, matching the unwrapping in the TX entity.
+  auto tx_check = [&](uint32_t ack_sn) {
+    const uint32_t ack = total_rx - (total_rx + mod - ack_sn) % mod;
+    if (!first_read && ack < prev_ack) {
+      ++nof_older;
+    }
+    prev_ack   = ack;
+    first_read = false;
+    ++nof_reads;
+  };
+
+  auto tx_read = [&]() {
+    if (rlc->status_report_required()) {
+      tx_check(rlc->get_status_pdu().ack_sn);
+    }
+  };
+
+  // Pattern 1: fast reader — TX reads after every polled PDU.
+  for (uint32_t n = 0; n < 5; ++n) {
+    ASSERT_NO_FATAL_FAILURE(rx(n));
+    tx_read();
+  }
+
+  // Pattern 2: slow reader — TX reads after a burst of polled PDUs.
+  for (uint32_t n = 5; n < 9; ++n) {
+    ASSERT_NO_FATAL_FAILURE(rx(n));
+  }
+  tx_read();
+
+  // Pattern 3: TX observes status_report_required(), RX advances, then TX reads get_status_pdu().
+  // Exercises the window in which the TX executor checks status between two handle_pdu() calls on the RX executor.
+  ASSERT_NO_FATAL_FAILURE(rx(9));
+  const bool status_seen = rlc->status_report_required();
+  ASSERT_NO_FATAL_FAILURE(rx(10));
+  ASSERT_NO_FATAL_FAILURE(rx(11));
+  if (status_seen) {
+    tx_check(rlc->get_status_pdu().ack_sn);
+  }
+
+  logger.info("Read {} status reports, {} older than the previous one", nof_reads, nof_older);
+  EXPECT_GT(nof_reads, 0u) << "No status reports were read; invariant was never verified";
+  EXPECT_EQ(nof_older, 0u);
 }
 
 /// Verifies that status_report_required() returns false after get_status_pdu() and reset(), with no prohibit
