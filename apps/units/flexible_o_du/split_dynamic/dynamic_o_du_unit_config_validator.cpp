@@ -91,10 +91,31 @@ static std::vector<ru_sdr_cell_validation_config> get_ru_sdr_validation_dependen
   return out_cfg;
 }
 
+/// Validates the FAPI dummy configuration against the DU high test mode configuration.
+static bool validate_fapi_dummy_config(const du_high_unit_config& du_hi_cfg)
+{
+  if (!du_hi_cfg.is_testmode_enabled()) {
+    fmt::print("The FAPI dummy requires the test mode UE to be configured\n");
+    return false;
+  }
+
+  if (du_hi_cfg.test_mode_cfg.test_ue.auto_ack_indication_delay.has_value()) {
+    fmt::print("The FAPI dummy is not compatible with the test mode auto ACK indication delay\n");
+    return false;
+  }
+
+  return true;
+}
+
 bool ocudu::validate_dynamic_o_du_unit_config(const dynamic_o_du_unit_config& config)
 {
   if (!validate_o_du_high_config(config.odu_high_cfg)) {
     return false;
+  }
+
+  // The FAPI dummy replaces the DU low and the Radio Unit, so their configurations are not validated.
+  if (config.fapi_dummy_cfg.has_value()) {
+    return validate_fapi_dummy_config(config.odu_high_cfg.du_high_cfg.config);
   }
 
   auto du_low_dependencies = get_du_low_validation_dependencies(config.odu_high_cfg.du_high_cfg.config);

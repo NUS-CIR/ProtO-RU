@@ -50,6 +50,12 @@ struct worker_manager_config {
   /// RU dummy worker configuration.
   struct ru_dummy_config {};
 
+  /// FAPI dummy worker configuration.
+  struct fapi_dummy_config {
+    /// Number of cells.
+    unsigned nof_cells;
+  };
+
   /// DU low worker configuration.
   struct du_low_config {
     bool     is_sequential_mode_active;
@@ -139,6 +145,8 @@ struct worker_manager_config {
   std::optional<ru_ofh_config> ru_ofh_cfg;
   /// RU dummy configuration.
   std::optional<ru_dummy_config> ru_dummy_cfg;
+  /// FAPI dummy configuration.
+  std::optional<fapi_dummy_config> fapi_dummy_cfg;
   /// Executor metrics channel registry.
   executor_metrics_channel_registry* exec_metrics_channel_registry;
 };

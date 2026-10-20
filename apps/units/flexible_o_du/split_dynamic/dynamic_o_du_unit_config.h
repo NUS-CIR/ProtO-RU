@@ -9,6 +9,8 @@
 #include "apps/units/flexible_o_du/o_du_low/du_low_config.h"
 #include "apps/units/flexible_o_du/split_7_2/helpers/ru_ofh_config.h"
 #include "apps/units/flexible_o_du/split_8/helpers/ru_sdr_config.h"
+#include "apps/units/flexible_o_du/split_helpers/fapi_dummy_unit_config.h"
+#include <optional>
 #include <variant>
 
 namespace ocudu {
@@ -60,6 +62,8 @@ struct dynamic_o_du_unit_config {
   du_low_unit_config du_low_cfg;
   /// Radio Unit configuration.
   std::variant<ru_sdr_unit_config, ru_ofh_unit_parsed_config, ru_dummy_unit_config> ru_cfg = {ru_sdr_unit_config{}};
+  /// FAPI dummy configuration. When present, it replaces the DU low and the Radio Unit.
+  std::optional<fapi_dummy_unit_config> fapi_dummy_cfg;
 };
 
 } // namespace ocudu

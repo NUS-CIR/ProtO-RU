@@ -4,6 +4,7 @@
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 #include "dynamic_o_du_application_unit_impl.h"
+#include "apps/units/flexible_o_du/split_helpers/fapi_dummy_o_du_factory.h"
 #include "dynamic_o_du_factory.h"
 #include "dynamic_o_du_translators.h"
 #include "dynamic_o_du_unit_cli11_schema.h"
@@ -67,6 +68,9 @@ void dynamic_o_du_application_unit_impl::on_parsing_configuration_registration(C
 
 o_du_unit dynamic_o_du_application_unit_impl::create_flexible_o_du_unit(const o_du_unit_dependencies& dependencies)
 {
+  if (unit_cfg.fapi_dummy_cfg.has_value()) {
+    return create_fapi_dummy_o_du(unit_cfg.odu_high_cfg, *unit_cfg.fapi_dummy_cfg, dependencies);
+  }
   return dynamic_o_du_factory(unit_cfg).create_flexible_o_du(dependencies);
 }
 

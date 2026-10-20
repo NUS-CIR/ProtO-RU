@@ -88,6 +88,15 @@ struct worker_manager {
   cu_cp_pcap_executor_mapper& get_cu_cp_pcap_executors() { return *pcap_exec_mapper; }
   cu_up_pcap_executor_mapper& get_cu_up_pcap_executors() { return *pcap_exec_mapper; }
 
+  task_executor& get_fapi_dummy_clock_executor() const
+  {
+    ocudu_assert(fapi_dummy_clock_exec, "FAPI dummy clock executor is not available.");
+    return *fapi_dummy_clock_exec;
+  }
+
+  /// Returns the sequential executor of each FAPI dummy sector, indexed by sector.
+  const std::vector<task_executor*>& get_fapi_dummy_sector_executors() const { return fapi_dummy_sector_execs; }
+
   task_executor& get_cmd_line_executor() const { return *non_rt_medium_prio_exec; }
   task_executor& get_timer_source_executor() const { return *timer_source_exec; }
   task_executor& get_metrics_executor() const { return *metrics_exec; }
@@ -121,6 +130,12 @@ private:
 
   /// Dummy RU executor mapper.
   std::unique_ptr<ru_dummy_executor_mapper> dummy_exec_mapper;
+
+  /// FAPI dummy clock executor.
+  task_executor* fapi_dummy_clock_exec = nullptr;
+
+  /// FAPI dummy sector executors, indexed by sector.
+  std::vector<task_executor*> fapi_dummy_sector_execs;
 
   /// SDR RU executor mapper.
   std::unique_ptr<ru_sdr_executor_mapper> sdr_exec_mapper;
@@ -185,6 +200,9 @@ private:
 
   /// Helper method that creates the Radio Unit dummy executors.
   void create_ru_dummy_executors();
+
+  /// Helper method that creates the FAPI dummy executors.
+  void create_fapi_dummy_executors(const worker_manager_config::fapi_dummy_config& config);
 
   /// Helper method that creates the lower PHY executors.
   void create_lower_phy_executors(const worker_manager_config::ru_sdr_config& config);

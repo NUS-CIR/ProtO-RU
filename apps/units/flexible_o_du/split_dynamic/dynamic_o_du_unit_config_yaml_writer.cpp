@@ -51,9 +51,24 @@ static void fill_ru_dummy_config(YAML::Node node, const ru_dummy_unit_config& co
   }
 }
 
+static void fill_fapi_dummy_config_in_yaml_schema(YAML::Node& node, const fapi_dummy_unit_config& config)
+{
+  YAML::Node fapi_dummy_node = node["fapi_dummy"];
+  fapi_dummy_node["clock"] =
+      (config.clock_mode == fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime) ? "realtime" : "free_running";
+  fapi_dummy_node["ul_indication_delay_slots"]  = config.ul_indication_delay_slots;
+  fapi_dummy_node["max_processing_delay_slots"] = config.max_processing_delay_slots;
+}
+
 void ocudu::fill_dynamic_o_du_unit_config_in_yaml_schema(YAML::Node& node, const dynamic_o_du_unit_config& config)
 {
   fill_o_du_high_config_in_yaml_schema(node, config.odu_high_cfg);
+
+  if (config.fapi_dummy_cfg.has_value()) {
+    fill_fapi_dummy_config_in_yaml_schema(node, *config.fapi_dummy_cfg);
+    return;
+  }
+
   fill_du_low_config_in_yaml_schema(node, config.du_low_cfg);
 
   if (std::holds_alternative<ru_dummy_unit_config>(config.ru_cfg)) {

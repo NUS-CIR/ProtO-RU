@@ -20,6 +20,28 @@ using namespace ocudu;
 static ru_ofh_unit_parsed_config ofh_cfg;
 static ru_sdr_unit_config        sdr_cfg;
 static ru_dummy_unit_config      dummy_cfg;
+static fapi_dummy_unit_config    fapi_dummy_parsed_cfg;
+
+static void configure_cli11_fapi_dummy_args(CLI::App& app, fapi_dummy_unit_config& config)
+{
+  static const std::map<std::string, fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode> clock_modes = {
+      {"realtime", fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime},
+      {"free_running", fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::free_running}};
+  add_option(app, "--clock", config.clock_mode, "Slot clock mode. Values: realtime or free_running")
+      ->transform(CLI::CheckedTransformer(clock_modes));
+  add_option(app,
+             "--ul_indication_delay_slots",
+             config.ul_indication_delay_slots,
+             "Number of slots between an uplink slot and the notification of its indications")
+      ->capture_default_str()
+      ->check(CLI::Range(1, 32));
+  add_option(app,
+             "--max_processing_delay_slots",
+             config.max_processing_delay_slots,
+             "Number of slots a slot indication is notified in advance of the transmission time")
+      ->capture_default_str()
+      ->check(CLI::Range(1, 30));
+}
 
 static void configure_cli11_ru_dummy_args(CLI::App& app, ru_dummy_unit_config& config)
 {
@@ -81,6 +103,11 @@ void ocudu::configure_cli11_with_dynamic_o_du_unit_config_schema(CLI::App& app, 
   CLI::App* ru_dummy_subcmd = add_subcommand(app, "ru_dummy", "Dummy Radio Unit configuration")->configurable();
   configure_cli11_ru_dummy_args(*ru_dummy_subcmd, dummy_cfg);
 
+  CLI::App* fapi_dummy_subcmd =
+      add_subcommand(app, "fapi_dummy", "FAPI dummy configuration, which replaces the PHY and the Radio Unit")
+          ->configurable();
+  configure_cli11_fapi_dummy_args(*fapi_dummy_subcmd, fapi_dummy_parsed_cfg);
+
   // Metrics section.
   app_helpers::configure_cli11_with_metrics_appconfig_schema(app, dummy_cfg.metrics_cfg.metrics_cfg);
   CLI::App* metrics_subcmd = add_subcommand(app, "metrics", "Metrics configuration")->configurable();
@@ -132,9 +159,30 @@ static void manage_ru(CLI::App& app, dynamic_o_du_unit_config& parsed_cfg)
   ofh_subcmd->disabled();
 }
 
-static bool
-get_is_rt_mode_enabled(const std::variant<ru_sdr_unit_config, ru_ofh_unit_parsed_config, ru_dummy_unit_config>& ru_cfg)
+/// Sets the FAPI dummy configuration if its section is present, and warns about the ignored sections.
+static void manage_fapi_dummy(CLI::App& app, dynamic_o_du_unit_config& parsed_cfg)
 {
+  if (app.get_subcommand("fapi_dummy")->count_all() == 0) {
+    return;
+  }
+
+  parsed_cfg.fapi_dummy_cfg = fapi_dummy_parsed_cfg;
+
+  for (const char* section : {"ru_ofh", "ru_sdr", "ru_dummy", "expert_phy"}) {
+    if (app.get_subcommand(section)->count_all() != 0) {
+      fmt::println("Warning: the '{}' section is ignored, since the FAPI dummy replaces the PHY and the Radio Unit",
+                   section);
+    }
+  }
+}
+
+static bool get_is_rt_mode_enabled(const dynamic_o_du_unit_config& parsed_cfg)
+{
+  if (parsed_cfg.fapi_dummy_cfg.has_value()) {
+    return parsed_cfg.fapi_dummy_cfg->clock_mode == fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime;
+  }
+
+  const auto& ru_cfg = parsed_cfg.ru_cfg;
   if (std::holds_alternative<ru_dummy_unit_config>(ru_cfg)) {
     return true;
   }
@@ -154,6 +202,7 @@ void ocudu::autoderive_dynamic_o_du_parameters_after_parsing(CLI::App& app, dyna
 
   // Set the parsed RU.
   manage_ru(app, parsed_cfg);
+  manage_fapi_dummy(app, parsed_cfg);
 
   if (std::holds_alternative<ru_dummy_unit_config>(parsed_cfg.ru_cfg)) {
     auto& dummy = std::get<ru_dummy_unit_config>(parsed_cfg.ru_cfg);
@@ -163,8 +212,7 @@ void ocudu::autoderive_dynamic_o_du_parameters_after_parsing(CLI::App& app, dyna
   }
 
   // Derive the O-DU high parameters.
-  autoderive_o_du_high_parameters_after_parsing(
-      app, parsed_cfg.odu_high_cfg, get_is_rt_mode_enabled(parsed_cfg.ru_cfg));
+  autoderive_o_du_high_parameters_after_parsing(app, parsed_cfg.odu_high_cfg, get_is_rt_mode_enabled(parsed_cfg));
 
   // Auto derive DU low parameters.
   const auto&   cell = parsed_cfg.odu_high_cfg.du_high_cfg.config.cells_cfg.front().cell;

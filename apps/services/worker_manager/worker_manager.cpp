@@ -105,6 +105,10 @@ worker_manager::worker_manager(const worker_manager_config& worker_cfg) :
     if (worker_cfg.ru_dummy_cfg) {
       ++ru_config_count;
     }
+    // The FAPI dummy replaces the Radio Unit.
+    if (worker_cfg.fapi_dummy_cfg) {
+      ++ru_config_count;
+    }
 
     ocudu_assert(ru_config_count <= 1, "Worker manager received configuration for more than one RU type");
   }
@@ -151,6 +155,10 @@ worker_manager::worker_manager(const worker_manager_config& worker_cfg) :
 
   if (worker_cfg.ru_dummy_cfg) {
     create_ru_dummy_executors();
+  }
+
+  if (worker_cfg.fapi_dummy_cfg) {
+    create_fapi_dummy_executors(*worker_cfg.fapi_dummy_cfg);
   }
 }
 
@@ -313,6 +321,10 @@ static unsigned get_nof_prealloc_producers(const worker_manager_config& worker_c
   }
   if (worker_cfg.ru_dummy_cfg.has_value()) {
     // Include RU dummy thread.
+    nof_producers += 1;
+  }
+  if (worker_cfg.fapi_dummy_cfg.has_value()) {
+    // Include FAPI dummy clock thread.
     nof_producers += 1;
   }
   if (worker_cfg.ru_sdr_cfg.has_value()) {
@@ -692,4 +704,35 @@ void worker_manager::create_ru_dummy_executors()
                      affinity_mng.front().calcute_affinity_mask(sched_affinity_mask_types::ru),
                      os_thread_realtime_priority::max());
   dummy_exec_mapper = create_ru_dummy_executor_mapper(*exec_mng.executors().at("ru_dummy_exec"));
+}
+
+void worker_manager::create_fapi_dummy_executors(const worker_manager_config::fapi_dummy_config& config)
+{
+  using namespace execution_config_helper;
+
+  // The clock loop occupies its worker until the FAPI dummy is destroyed.
+  create_prio_worker("fapi_dummy",
+                     "fapi_dummy_exec",
+                     4,
+                     concurrent_queue_policy::locking_mpsc,
+                     std::nullopt,
+                     // Use the RU affinity of the first cell for the clock.
+                     affinity_mng.front().calcute_affinity_mask(sched_affinity_mask_types::ru),
+                     os_thread_realtime_priority::max());
+  fapi_dummy_clock_exec = exec_mng.executors().at("fapi_dummy_exec");
+
+  for (unsigned i_cell = 0; i_cell != config.nof_cells; ++i_cell) {
+    auto sector_strand =
+        make_task_strand_ptr<concurrent_queue_policy::lockfree_mpmc>(rt_hi_prio_exec, task_worker_queue_size);
+    if (exec_metrics_channel_registry) {
+      execution_decoration_config cfg;
+      cfg.metrics.emplace(fmt::format("fapi_dummy_sector_exec#{}", i_cell), *exec_metrics_channel_registry, false);
+      auto sector_decorator = decorate_executor(std::move(sector_strand), cfg);
+      fapi_dummy_sector_execs.push_back(sector_decorator.get());
+      executor_decorators_exec.push_back(std::move(sector_decorator));
+    } else {
+      fapi_dummy_sector_execs.push_back(sector_strand.get());
+      executor_decorators_exec.push_back(std::move(sector_strand));
+    }
+  }
 }
