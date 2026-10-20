@@ -9,11 +9,10 @@
 #include "ocudu/asn1/rrc_nr/dl_dcch_msg_ies.h"
 #include "ocudu/asn1/rrc_nr/ul_dcch_msg_ies.h"
 #include "ocudu/ocudulog/ocudulog.h"
-#include "ocudu/ran/csi_rs/csi_meas_config.h"
-#include "ocudu/ran/csi_rs/csi_report_config.h"
 #include "ocudu/ran/sr_configuration.h"
 #include "ocudu/ran/ssb/ssb_properties.h"
 #include "ocudu/ran/subcarrier_spacing.h"
+#include "ocudu/scheduler/config/csi_helper.h"
 #include "ocudu/scheduler/rrm/ue_capability_summary.h"
 #include "ocudu/support/enum_utils.h"
 #include <algorithm>
@@ -248,7 +247,8 @@ du_meas_config_manager::du_meas_config_manager(span<const du_cell_config> cell_c
 }
 
 // Collects SR and periodic-CSI occasions from the UE's PCell serving cell config.
-static std::vector<periodic_uci_config> collect_ul_occasions(const ue_cell_config& pcell_ue_cfg)
+static std::vector<periodic_uci_config> collect_ul_occasions(const ue_cell_config& pcell_ue_cfg,
+                                                             const du_cell_config& pcell_common)
 {
   std::vector<periodic_uci_config> out;
 
@@ -259,16 +259,11 @@ static std::vector<periodic_uci_config> collect_ul_occasions(const ue_cell_confi
     }
   }
 
-  if (pcell_ue_cfg.serv_cell_cfg.csi_meas_cfg.has_value()) {
-    for (const auto& rep : pcell_ue_cfg.serv_cell_cfg.csi_meas_cfg->csi_report_cfg_list) {
-      const auto* pucch_rep =
-          std::get_if<csi_report_config::periodic_or_semi_persistent_report_on_pucch>(&rep.report_cfg_type);
-      if (pucch_rep != nullptr &&
-          pucch_rep->report_type ==
-              csi_report_config::periodic_or_semi_persistent_report_on_pucch::report_type_t::periodic) {
-        out.push_back({to_underlying(pucch_rep->report_slot_period), pucch_rep->report_slot_offset});
-      }
-    }
+  const auto& periodic_csi = pcell_ue_cfg.bwps.front().ul.periodic_csi_report;
+  if (periodic_csi.has_value() and pcell_common.ran.init_bwp.csi.has_value()) {
+    const csi_report_periodicity period =
+        csi_helper::convert_csi_resource_period_to_report_period(pcell_common.ran.init_bwp.csi->csi_rs_period);
+    out.push_back({to_underlying(period), periodic_csi->offset});
   }
 
   return out;
@@ -310,7 +305,7 @@ void du_meas_config_manager::update_ssb_meas_gap(du_ue_resource_config&         
   const ue_cell_config& pcell_ue_cfg = ue_cfg.cell_group.cells.at(SERVING_PCELL_IDX);
   const du_cell_config& pcell_common = cell_cfg_list[pcell_ue_cfg.serv_cell_cfg.cell_index];
 
-  const auto ul_occasions = collect_ul_occasions(pcell_ue_cfg);
+  const auto ul_occasions = collect_ul_occasions(pcell_ue_cfg, pcell_common);
 
   // The periodic UL occasions are expressed in the slot numbering the gNB receives them in, while the gap is
   // anchored to the UE downlink timing, so the UEs' uplink timing advance is needed to compare the two.

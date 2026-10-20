@@ -18,9 +18,11 @@
 #include "ocudu/ran/prs/prs_constants.h"
 #include "ocudu/ran/srs/srs_bandwidth_configuration.h"
 #include "ocudu/ran/ssb/ssb_mapping.h"
+#include "ocudu/scheduler/config/csi_helper.h"
 #include "ocudu/scheduler/config/periodic_resource_sched_validator.h"
 #include "ocudu/scheduler/config/pucch_guardbands.h"
 #include "ocudu/scheduler/config/pucch_resource_generator.h"
+#include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/config/sched_cell_config_helpers.h"
 #include "ocudu/scheduler/config/serving_cell_config.h"
 #include "ocudu/scheduler/config/serving_cell_config_factory.h"
@@ -223,22 +225,26 @@ static check_outcome check_rlm_config(const du_cell_config& cell_cfg)
   if (not rlm_cfg.has_value()) {
     return {};
   }
-  const auto csi_meas_cfg = serv_cell_cfg.csi_meas_cfg;
+  const bool                       csi_enabled = cell_cfg.ran.init_bwp.csi.has_value();
+  std::vector<nzp_csi_rs_resource> nzp_csi_rs_res_list;
+  if (csi_enabled) {
+    nzp_csi_rs_res_list =
+        csi_helper::make_nzp_csi_rs_resource_list(config_helpers::make_csi_meas_config_builder_params(cell_cfg.ran));
+  }
   for (const auto& rlm_res : rlm_cfg->rlm_resources) {
     CHECK_TRUE(rlm_res.resource_purpose == radio_link_monitoring_config::radio_link_monitoring_rs::purpose::rlf,
                "Radio Link Failure is the only supported Radio Link Monitoring purpose");
-    if (not csi_meas_cfg.has_value()) {
+    if (not csi_enabled) {
       CHECK_TRUE(not std::holds_alternative<nzp_csi_rs_res_id_t>(rlm_res.detection_resource),
                  "RLM resources cannot use CSI-RS resources if CSI is not enabled");
     } else {
       if (std::holds_alternative<nzp_csi_rs_res_id_t>(rlm_res.detection_resource)) {
-        const auto&               csi_cfg   = csi_meas_cfg.value();
         const nzp_csi_rs_res_id_t csi_rs_id = std::get<nzp_csi_rs_res_id_t>(rlm_res.detection_resource);
         const auto                csi_res_it =
-            std::find_if(csi_cfg.nzp_csi_rs_res_list.begin(),
-                         csi_cfg.nzp_csi_rs_res_list.end(),
+            std::find_if(nzp_csi_rs_res_list.begin(),
+                         nzp_csi_rs_res_list.end(),
                          [csi_rs_id](const nzp_csi_rs_resource& csi_r) { return csi_r.res_id == csi_rs_id; });
-        CHECK_TRUE(csi_res_it != csi_cfg.nzp_csi_rs_res_list.end(),
+        CHECK_TRUE(csi_res_it != nzp_csi_rs_res_list.end(),
                    "RLM resource id={} points at CSI-RS resource id={}, which wasn't found in the CSI configuration",
                    fmt::underlying(rlm_res.res_id),
                    fmt::underlying(csi_rs_id));

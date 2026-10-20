@@ -691,7 +691,8 @@ protected:
   {
     ue_cfg.cell_group.cells.emplace(SERVING_PCELL_IDX, ue_cell_config{});
     ue_cfg.cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg.cell_index = to_du_cell_index(0);
-    ue_caps.supported_meas_gaps                                            = supported_meas_gap_patterns::all();
+    ue_cfg.cell_group.cells.at(SERVING_PCELL_IDX).bwps.emplace_back();
+    ue_caps.supported_meas_gaps = supported_meas_gap_patterns::all();
   }
 
   // Applies a measConfig with an SSB whose SMTC lasts 1ms every 40ms, at offset 0, together with the given

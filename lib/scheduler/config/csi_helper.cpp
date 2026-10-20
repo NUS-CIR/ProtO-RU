@@ -327,9 +327,8 @@ ocudu::csi_helper::make_periodic_zp_csi_rs_resource_set(const csi_meas_config_bu
   return zp_set;
 }
 
-/// \brief Converts a CSI resource periodicity to a suitable CSI report periodicity. Report peridiocity should be
-/// larger than the resource periodicity.
-static csi_report_periodicity convert_csi_resource_period_to_report_period(csi_resource_periodicity res_period)
+csi_report_periodicity
+ocudu::csi_helper::convert_csi_resource_period_to_report_period(csi_resource_periodicity res_period)
 {
   switch (res_period) {
     case csi_resource_periodicity::slots4:
@@ -559,7 +558,7 @@ static unsigned get_subcarrier_location_from_fd_alloc_bit_location(int     fd_al
   }
 }
 
-static std::vector<csi_im_resource> make_csi_im_resources(const csi_meas_config_builder_params& params)
+std::vector<csi_im_resource> ocudu::csi_helper::make_csi_im_resource_list(const csi_meas_config_builder_params& params)
 {
   if (params.nof_ports > 8) {
     report_error("Unsupported number of antenna ports={}", params.nof_ports);
@@ -735,7 +734,8 @@ make_csi_report_configs(const csi_meas_config_builder_params&                   
     csi_report_config::periodic_or_semi_persistent_report_on_pucch report_cfg_type{};
     report_cfg_type.report_type =
         csi_report_config::periodic_or_semi_persistent_report_on_pucch::report_type_t::periodic;
-    report_cfg_type.report_slot_period = convert_csi_resource_period_to_report_period(params.csi_params.csi_rs_period);
+    report_cfg_type.report_slot_period =
+        csi_helper::convert_csi_resource_period_to_report_period(params.csi_params.csi_rs_period);
     report_cfg_type.report_slot_offset = *params.csi_params.csi_report_slot_offset;
     pucch_resource_builder_params pucch_builder_params{};
     const unsigned                cell_res_id =
@@ -820,7 +820,7 @@ ocudu::csi_helper::make_csi_meas_config(const csi_meas_config_builder_params&   
   csi_meas.nzp_csi_rs_res_set_list = make_nzp_csi_rs_resource_sets(params);
 
   // csi-IM-Resources.
-  csi_meas.csi_im_res_list = make_csi_im_resources(params);
+  csi_meas.csi_im_res_list = make_csi_im_resource_list(params);
 
   // csi-IM-ResourceSets.
   csi_meas.csi_im_res_set_list = make_csi_im_resource_sets(params);
