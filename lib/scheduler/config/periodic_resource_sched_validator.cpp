@@ -209,11 +209,6 @@ std::vector<periodic_occasion> get_nzp_csi_rs_occasions(span<const nzp_csi_rs_re
   std::vector<periodic_occasion> occasions;
 
   for (const nzp_csi_rs_resource& res : nzp_csi_rs_res_list) {
-    if (not res.csi_res_offset.has_value() or not res.csi_res_period.has_value()) {
-      // Aperiodic NZP-CSI-RS resources do not recur, so they cannot be modelled as periodic occasions.
-      continue;
-    }
-
     const csi_rs_resource_mapping& res_mapping = res.res_mapping;
     const unsigned                 row         = csi_rs::get_csi_rs_resource_mapping_row_number(
         res_mapping.nof_ports, res_mapping.freq_density, res_mapping.cdm, res_mapping.fd_alloc);
@@ -235,8 +230,8 @@ std::vector<periodic_occasion> get_nzp_csi_rs_occasions(span<const nzp_csi_rs_re
 
     periodic_occasion occ;
     occ.origin      = {occasion_origin::signal_type::NZP_CSI_RS, static_cast<uint8_t>(res.res_id), 0};
-    occ.slot_period = to_underlying(*res.csi_res_period);
-    occ.slot_offset = *res.csi_res_offset;
+    occ.slot_period = to_underlying(res.csi_res_period);
+    occ.slot_offset = res.csi_res_offset;
     occ.crbs        = bounded_bitset<MAX_NOF_PRBS>(MAX_NOF_PRBS);
     // With a frequency density lower than one, not every CRB in the pattern's range actually carries the CSI-RS.
     for (unsigned rb = pattern.rb_begin; rb < pattern.rb_end; rb += pattern.rb_stride) {

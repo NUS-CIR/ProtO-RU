@@ -213,12 +213,9 @@ void ocudu::build_pdsch_f1_0_si_rnti(pdsch_information&                   pdsch,
 
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
     pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-    if (cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-      pdsch.tx_pwr_info.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-    }
   }
 }
 
@@ -263,12 +260,9 @@ void ocudu::build_pdsch_f1_0_p_rnti(pdsch_information&                  pdsch,
 
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
     pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-    if (cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-      pdsch.tx_pwr_info.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-    }
   }
 }
 
@@ -319,12 +313,9 @@ void ocudu::build_pdsch_f1_0_ra_rnti(pdsch_information&                   pdsch,
 
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
     pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-    if (cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-      pdsch.tx_pwr_info.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-    }
   }
 }
 
@@ -368,12 +359,9 @@ void ocudu::build_pdsch_f1_0_tc_rnti(pdsch_information&                   pdsch,
 
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
     pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-    if (cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-      pdsch.tx_pwr_info.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-    }
   }
 
   pdsch.mcs_table = pdsch_cfg.mcs_table;
@@ -423,12 +411,9 @@ void ocudu::build_pdsch_f1_0_c_rnti(pdsch_information&                  pdsch,
 
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
     pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-    if (cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-      pdsch.tx_pwr_info.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-    }
   }
 
   pdsch.mcs_table = pdsch_cfg.mcs_table;
@@ -494,12 +479,9 @@ void ocudu::build_pdsch_f1_1_c_rnti(pdsch_information&              pdsch,
 
   // Populate power offsets.
   if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
     pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-    if (cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-      pdsch.tx_pwr_info.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-    }
   }
 }
 

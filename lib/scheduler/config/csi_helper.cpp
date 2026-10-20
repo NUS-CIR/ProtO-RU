@@ -370,13 +370,9 @@ static nzp_csi_rs_resource make_common_nzp_csi_rs_resource(const csi_meas_config
   res.res_mapping.freq_density  = csi_rs_freq_density_type::three;
   res.res_mapping.freq_band_rbs = get_csi_freq_occupation_rbs(params.nof_rbs, params.nof_rbs);
 
-  res.pwr_ctrl_offset       = params.csi_params.pwr_ctrl_offset;
-  res.pwr_ctrl_offset_ss_db = 0;
-  res.scrambling_id         = params.pci;
-
-  res.csi_res_period = params.csi_params.csi_rs_period;
-
-  res.qcl_info_periodic_csi_rs = static_cast<tci_state_id_t>(0);
+  res.pwr_ctrl_offset = params.csi_params.pwr_ctrl_offset;
+  res.scrambling_id   = params.pci;
+  res.csi_res_period  = params.csi_params.csi_rs_period;
 
   return res;
 }

@@ -173,12 +173,6 @@ pdcch_ul_information* pdcch_resource_allocator_impl::alloc_ul_pdcch_helper(cell_
         search_space_configuration::ue_specific_dci_format::f0_0_and_f1_0))
           ? "0_0"
           : "0_1";
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty() and cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
-    pdcch.ctx.tx_pwr.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-  }
 
   // Allocate a position for UL PDCCH in CORESET. No other resource is derived from the CCE position of a UL DCI.
   pdcch_slot_allocator& pdcch_alloc = get_pdcch_slot_alloc(slot_alloc.slot);
@@ -240,12 +234,6 @@ pdcch_dl_information* pdcch_resource_allocator_impl::alloc_dl_pdcch_helper(cell_
       (std::get<search_space_configuration::ue_specific_dci_format>(ss_cfg.get_monitored_dci_formats()) ==
        search_space_configuration::ue_specific_dci_format::f0_0_and_f1_0);
   pdcch.ctx.context.dci_format = fallback_dci ? "1_0" : "1_1";
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty() and cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.has_value()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset and powerControlOffsetSS is configured in
-    // NZP-CSI-RS-Resource across all resources.
-    pdcch.ctx.tx_pwr.pwr_ctrl_offset_ss = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset_ss_db.value();
-  }
 
   // Allocate a position for DL PDCCH in CORESET. The HARQ-ACK of a DCI 1_0 may use a common PUCCH resource, which is
   // derived from the first CCE of the PDCCH (TS 38.213, Section 9.2.1) right after this allocation, so such a PDCCH

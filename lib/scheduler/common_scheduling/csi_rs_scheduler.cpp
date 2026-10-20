@@ -48,10 +48,9 @@ static csi_rs_info build_csi_rs_info(const bwp_configuration& bwp_cfg, const nzp
 
   fill_csi_rs_info_res_map(csi_rs, nzp_csi_rs_res.res_mapping);
 
-  csi_rs.scrambling_id     = nzp_csi_rs_res.scrambling_id;
-  csi_rs.power_ctrl_offset = nzp_csi_rs_res.pwr_ctrl_offset;
-  csi_rs.power_ctrl_offset_ss =
-      nzp_csi_rs_res.pwr_ctrl_offset_ss_db.has_value() ? *nzp_csi_rs_res.pwr_ctrl_offset_ss_db : 0;
+  csi_rs.scrambling_id        = nzp_csi_rs_res.scrambling_id;
+  csi_rs.power_ctrl_offset    = nzp_csi_rs_res.pwr_ctrl_offset;
+  csi_rs.power_ctrl_offset_ss = 0;
   // [Implementation-defined] The CSI-RS is neither precoded nor beamformed.
   csi_rs.precoding_and_beamforming = make_default_precoding();
 
@@ -93,7 +92,7 @@ void csi_rs_scheduler::run_slot(cell_slot_resource_allocator& res_grid)
   for (unsigned i = 0; i != cell_cfg.nzp_csi_rs_list.size(); ++i) {
     const nzp_csi_rs_resource& nzp_csi    = cell_cfg.nzp_csi_rs_list[i];
     const auto&                csi_rs_pdu = cached_csi_rs[cell_cfg.zp_csi_rs_list.size() + i];
-    if ((res_grid.slot - *nzp_csi.csi_res_offset).count() % (unsigned)*nzp_csi.csi_res_period == 0) {
+    if ((res_grid.slot - nzp_csi.csi_res_offset).count() % (unsigned)nzp_csi.csi_res_period == 0) {
       [[maybe_unused]] const csi_rs_info* pdu = csi_rs_pdus.emplace_back(csi_rs_pdu);
       ocudu_assert(pdu != nullptr, "Failed to allocate NZP-CSI-RS PDU");
     }

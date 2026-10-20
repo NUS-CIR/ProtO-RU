@@ -101,23 +101,18 @@ struct nzp_csi_rs_resource {
   csi_rs_resource_mapping res_mapping;
   /// Power offset of PDSCH RE to NZP CSI-RS RE. Value in dB. Values {-8,...,15}. See TS 38.214, clause 5.2.2.3.1.
   int8_t pwr_ctrl_offset;
-  /// Power offset of NZP CSI-RS RE to SSS RE. Value in dB. Values {-3, 0, 3, 6}. See TS 38.214, clause 5.2.2.3.1.
-  std::optional<int8_t> pwr_ctrl_offset_ss_db;
   /// Scrambling ID. See TS 38.214, clause 5.2.2.3.1.
   unsigned scrambling_id;
-  /// Present only for periodic and semi-persistent NZP-CSI-RS-Resources.
-  std::optional<csi_resource_periodicity> csi_res_period;
-  /// Present only for periodic and semi-persistent NZP-CSI-RS-Resources. Values {0,...,(periodicity_in_slots - 1)}.
-  std::optional<unsigned> csi_res_offset;
-  /// Present only for periodic NZP-CSI-RS-Resources (as indicated in CSI-ResourceConfig).
-  std::optional<tci_state_id_t> qcl_info_periodic_csi_rs;
+  /// Periodicity of the resource. The scheduler supports only periodic NZP-CSI-RS-Resources.
+  csi_resource_periodicity csi_res_period;
+  /// Slot offset of the resource. Values {0,...,(periodicity_in_slots - 1)}.
+  unsigned csi_res_offset;
 
   bool operator==(const nzp_csi_rs_resource& rhs) const
   {
     return res_id == rhs.res_id && res_mapping == rhs.res_mapping && pwr_ctrl_offset == rhs.pwr_ctrl_offset &&
-           pwr_ctrl_offset_ss_db == rhs.pwr_ctrl_offset_ss_db && scrambling_id == rhs.scrambling_id &&
-           csi_res_period == rhs.csi_res_period && csi_res_offset == rhs.csi_res_offset &&
-           qcl_info_periodic_csi_rs == rhs.qcl_info_periodic_csi_rs;
+           scrambling_id == rhs.scrambling_id && csi_res_period == rhs.csi_res_period &&
+           csi_res_offset == rhs.csi_res_offset;
   }
   bool operator!=(const nzp_csi_rs_resource& rhs) const { return !(rhs == *this); }
 };

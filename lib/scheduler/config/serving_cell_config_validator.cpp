@@ -402,77 +402,69 @@ config_validators::validate_nzp_csi_rs_list(span<const nzp_csi_rs_resource>     
 
   // Check: Verify that NZP-CSI-RS do not collide with each other.
   for (const auto* it = nzp_csi_rs_res_list.begin(); it != nzp_csi_rs_res_list.end(); ++it) {
-    if (it->csi_res_offset.has_value() and it->csi_res_period.has_value()) {
-      for (const auto* it2 = it + 1; it2 != nzp_csi_rs_res_list.end(); ++it2) {
-        if (it2->csi_res_offset.has_value() and it2->csi_res_period.has_value()) {
-          VERIFY(it->csi_res_period.value() == it2->csi_res_period.value(),
-                 "NZP-CSI-RS resources with different periods not supported");
+    for (const auto* it2 = it + 1; it2 != nzp_csi_rs_res_list.end(); ++it2) {
+      VERIFY(it->csi_res_period == it2->csi_res_period, "NZP-CSI-RS resources with different periods not supported");
 
-          if (*it->csi_res_offset != *it2->csi_res_offset) {
-            continue;
-          }
-          // In case that match in slot offset, ensure symbols are different.
-          VERIFY(it->res_mapping.first_ofdm_symbol_in_td != it2->res_mapping.first_ofdm_symbol_in_td,
-                 "NZP-CSI-RS resources with same slot offset and same symbol");
-          // TODO: Extend to support CSI-RS in the same symbols, but different frequency resources.
-        }
+      if (it->csi_res_offset != it2->csi_res_offset) {
+        continue;
       }
+      // In case that match in slot offset, ensure symbols are different.
+      VERIFY(it->res_mapping.first_ofdm_symbol_in_td != it2->res_mapping.first_ofdm_symbol_in_td,
+             "NZP-CSI-RS resources with same slot offset and same symbol");
+      // TODO: Extend to support CSI-RS in the same symbols, but different frequency resources.
     }
   }
 
   // Check: Verify if CSI-RS symbols allocation are on DL symbols.
   if (tdd_cfg_common.has_value()) {
     for (const nzp_csi_rs_resource& res : nzp_csi_rs_res_list) {
-      // Period and offset are specified only for periodic and semi-persistent NZP-CSI-RS-Resources.
-      if (res.csi_res_offset.has_value() and res.csi_res_period.has_value()) {
-        // Get the symbol mapping from the NZ-CSI-RS configuration.
-        const auto&   res_mapping = res.res_mapping;
-        const uint8_t row_idx     = csi_rs::get_csi_rs_resource_mapping_row_number(
-            res_mapping.nof_ports, res_mapping.freq_density, res_mapping.cdm, res_mapping.fd_alloc);
-        csi_rs_pattern_configuration csi_rs_cfg{.start_rb                 = res_mapping.freq_band_rbs.start(),
-                                                .nof_rb                   = res_mapping.freq_band_rbs.length(),
-                                                .csi_rs_mapping_table_row = static_cast<unsigned>(row_idx),
-                                                .symbol_l0                = res_mapping.first_ofdm_symbol_in_td,
-                                                .cdm                      = res_mapping.cdm,
-                                                .freq_density             = res_mapping.freq_density};
-        // symbol_l1 is only used in some configuration, and might not be provided by the higher layers; in such
-        // cases, we set an invalid value for symbol_l1, as a way to let the PHY know this value should not be used.
-        csi_rs_cfg.symbol_l1 =
-            res_mapping.first_ofdm_symbol_in_td2.has_value() ? res_mapping.first_ofdm_symbol_in_td2.value() : 0;
-        csi_rs::convert_freq_domain(
-            csi_rs_cfg.freq_allocation_ref_idx, res.res_mapping.fd_alloc, static_cast<unsigned>(row_idx));
+      // Get the symbol mapping from the NZ-CSI-RS configuration.
+      const auto&   res_mapping = res.res_mapping;
+      const uint8_t row_idx     = csi_rs::get_csi_rs_resource_mapping_row_number(
+          res_mapping.nof_ports, res_mapping.freq_density, res_mapping.cdm, res_mapping.fd_alloc);
+      csi_rs_pattern_configuration csi_rs_cfg{.start_rb                 = res_mapping.freq_band_rbs.start(),
+                                              .nof_rb                   = res_mapping.freq_band_rbs.length(),
+                                              .csi_rs_mapping_table_row = static_cast<unsigned>(row_idx),
+                                              .symbol_l0                = res_mapping.first_ofdm_symbol_in_td,
+                                              .cdm                      = res_mapping.cdm,
+                                              .freq_density             = res_mapping.freq_density};
+      // symbol_l1 is only used in some configuration, and might not be provided by the higher layers; in such
+      // cases, we set an invalid value for symbol_l1, as a way to let the PHY know this value should not be used.
+      csi_rs_cfg.symbol_l1 =
+          res_mapping.first_ofdm_symbol_in_td2.has_value() ? res_mapping.first_ofdm_symbol_in_td2.value() : 0;
+      csi_rs::convert_freq_domain(
+          csi_rs_cfg.freq_allocation_ref_idx, res.res_mapping.fd_alloc, static_cast<unsigned>(row_idx));
 
-        const unsigned tdd_period_slots    = nof_slots_per_tdd_period(tdd_cfg_common.value());
-        const unsigned csi_rs_period_slots = to_underlying(res.csi_res_period.value());
+      const unsigned tdd_period_slots    = nof_slots_per_tdd_period(tdd_cfg_common.value());
+      const unsigned csi_rs_period_slots = to_underlying(res.csi_res_period);
 
-        VERIFY(csi_rs_period_slots % tdd_period_slots == 0,
-               "Period={} of NZP-CSI-RS-ResourceId={} is not a multiple of the TDD pattern period={}",
-               csi_rs_period_slots,
+      VERIFY(csi_rs_period_slots % tdd_period_slots == 0,
+             "Period={} of NZP-CSI-RS-ResourceId={} is not a multiple of the TDD pattern period={}",
+             csi_rs_period_slots,
+             fmt::underlying(res.res_id),
+             tdd_period_slots);
+
+      const cyclic_prefix     cp{cyclic_prefix::NORMAL};
+      const ofdm_symbol_range dl_symbols =
+          get_active_tdd_dl_symbols(tdd_cfg_common.value(), res.csi_res_offset % tdd_period_slots, cp);
+
+      VERIFY(not dl_symbols.empty(),
+             "NZP-CSI-RS-ResourceId={} with offset={} is scheduled in slot={} with no DL symbols",
+             fmt::underlying(res.res_id),
+             res.csi_res_offset,
+             res.csi_res_offset % tdd_period_slots);
+
+      if (dl_symbols.length() != get_nsymb_per_slot(cp)) {
+        // In case of special slot.
+        const csi_rs_pattern csi_res_mapping = get_csi_rs_pattern(csi_rs_cfg);
+        unsigned             max_symbol_idx  = csi_res_mapping.get_reserved_pattern().symbol_mask.find_highest();
+        VERIFY(max_symbol_idx < dl_symbols.stop(),
+               "NZP-CSI-RS-ResourceId={}, with slot offset {} and symbol index {}, falls outside DL symbols {} in "
+               "special slot.",
                fmt::underlying(res.res_id),
-               tdd_period_slots);
-
-        const cyclic_prefix     cp{cyclic_prefix::NORMAL};
-        const ofdm_symbol_range dl_symbols =
-            get_active_tdd_dl_symbols(tdd_cfg_common.value(), res.csi_res_offset.value() % tdd_period_slots, cp);
-
-        VERIFY(not dl_symbols.empty(),
-               "NZP-CSI-RS-ResourceId={} with offset={} is scheduled in slot={} with no DL symbols",
-               fmt::underlying(res.res_id),
-               res.csi_res_offset.value(),
-               res.csi_res_offset.value() % tdd_period_slots);
-
-        if (dl_symbols.length() != get_nsymb_per_slot(cp)) {
-          // In case of special slot.
-          const csi_rs_pattern csi_res_mapping = get_csi_rs_pattern(csi_rs_cfg);
-          unsigned             max_symbol_idx  = csi_res_mapping.get_reserved_pattern().symbol_mask.find_highest();
-          VERIFY(max_symbol_idx < dl_symbols.stop(),
-                 "NZP-CSI-RS-ResourceId={}, with slot offset {} and symbol index {}, falls outside DL symbols {} in "
-                 "special slot.",
-                 fmt::underlying(res.res_id),
-                 res.csi_res_offset.value(),
-                 max_symbol_idx,
-                 dl_symbols);
-        }
+               res.csi_res_offset,
+               max_symbol_idx,
+               dl_symbols);
       }
     }
   }

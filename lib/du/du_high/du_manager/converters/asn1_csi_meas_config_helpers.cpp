@@ -214,37 +214,17 @@ static asn1::rrc_nr::nzp_csi_rs_res_s make_asn1_nzp_csi_rs_resource(const nzp_cs
   out.nzp_csi_rs_res_id = cfg.res_id;
   out.res_map           = make_asn1_nzp_csi_rs_resource_mapping(cfg.res_mapping);
   out.pwr_ctrl_offset   = cfg.pwr_ctrl_offset;
-  if (cfg.pwr_ctrl_offset_ss_db.has_value()) {
-    out.pwr_ctrl_offset_ss_present = true;
-    switch (cfg.pwr_ctrl_offset_ss_db.value()) {
-      case -3:
-        out.pwr_ctrl_offset_ss = nzp_csi_rs_res_s::pwr_ctrl_offset_ss_opts::db_neg3;
-        break;
-      case 0:
-        out.pwr_ctrl_offset_ss = nzp_csi_rs_res_s::pwr_ctrl_offset_ss_opts::db0;
-        break;
-      case 3:
-        out.pwr_ctrl_offset_ss = nzp_csi_rs_res_s::pwr_ctrl_offset_ss_opts::db3;
-        break;
-      case 6:
-        out.pwr_ctrl_offset_ss = nzp_csi_rs_res_s::pwr_ctrl_offset_ss_opts::db6;
-        break;
-      default:
-        ocudu_assertion_failure("Invalid power control offset SS={}", cfg.pwr_ctrl_offset_ss_db.value());
-    }
-  }
-  out.scrambling_id = cfg.scrambling_id;
+  // The power of the NZP-CSI-RS relative to the SSS is always 0 dB.
+  out.pwr_ctrl_offset_ss_present = true;
+  out.pwr_ctrl_offset_ss         = nzp_csi_rs_res_s::pwr_ctrl_offset_ss_opts::db0;
+  out.scrambling_id              = cfg.scrambling_id;
 
-  if (cfg.csi_res_period.has_value() and cfg.csi_res_offset.has_value()) {
-    out.periodicity_and_offset_present = true;
-    make_asn1_csi_resource_periodicity_and_offset(
-        out.periodicity_and_offset, cfg.csi_res_period.value(), cfg.csi_res_offset.value());
-  }
+  out.periodicity_and_offset_present = true;
+  make_asn1_csi_resource_periodicity_and_offset(out.periodicity_and_offset, cfg.csi_res_period, cfg.csi_res_offset);
 
-  if (cfg.qcl_info_periodic_csi_rs.has_value()) {
-    out.qcl_info_periodic_csi_rs_present = true;
-    out.qcl_info_periodic_csi_rs         = cfg.qcl_info_periodic_csi_rs.value();
-  }
+  // The NZP-CSI-RS is always quasi co-located with the TCI state 0.
+  out.qcl_info_periodic_csi_rs_present = true;
+  out.qcl_info_periodic_csi_rs         = 0;
 
   return out;
 }
