@@ -566,14 +566,12 @@ std::vector<csi_im_resource> ocudu::csi_helper::make_csi_im_resource_list(const 
   for (unsigned i = 0; i < zp_list.size(); ++i) {
     const zp_csi_rs_resource& zp = zp_list[i];
     res[i].res_id                = static_cast<csi_im_res_id_t>(i);
-    res[i].csi_im_res_element_pattern.emplace();
-    res[i].csi_im_res_element_pattern->pattern_type = csi_im_resource::csi_im_resource_element_pattern_type::pattern1;
-    res[i].csi_im_res_element_pattern->subcarrier_location = get_subcarrier_location_from_fd_alloc_bit_location(
+    res[i].subcarrier_location   = get_subcarrier_location_from_fd_alloc_bit_location(
         zp.res_mapping.fd_alloc.find_lowest(), zp.res_mapping.fd_alloc.size());
-    res[i].csi_im_res_element_pattern->symbol_location = zp.res_mapping.first_ofdm_symbol_in_td;
-    res[i].freq_band_rbs                               = zp.res_mapping.freq_band_rbs;
-    res[i].csi_res_period                              = *zp.period;
-    res[i].csi_res_offset                              = *zp.offset;
+    res[i].symbol_location = zp.res_mapping.first_ofdm_symbol_in_td;
+    res[i].freq_band_rbs   = zp.res_mapping.freq_band_rbs;
+    res[i].csi_res_period  = zp.period;
+    res[i].csi_res_offset  = zp.offset;
   }
   return res;
 }

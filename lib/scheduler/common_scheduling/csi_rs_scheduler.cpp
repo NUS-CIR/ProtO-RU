@@ -82,7 +82,7 @@ void csi_rs_scheduler::run_slot(cell_slot_resource_allocator& res_grid)
   // Schedule zp-CSI-RS PDUs.
   for (unsigned i = 0; i != cell_cfg.zp_csi_rs_list.size(); ++i) {
     const zp_csi_rs_resource& zp_csi = cell_cfg.zp_csi_rs_list[i];
-    if ((res_grid.slot - *zp_csi.offset).count() % (unsigned)*zp_csi.period == 0) {
+    if ((res_grid.slot - zp_csi.offset).count() % (unsigned)zp_csi.period == 0) {
       [[maybe_unused]] const csi_rs_info* pdu = csi_rs_pdus.emplace_back(cached_csi_rs[i]);
       ocudu_assert(pdu != nullptr, "Failed to allocate ZP-CSI-RS PDU");
     }

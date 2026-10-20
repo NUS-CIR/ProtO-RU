@@ -95,14 +95,14 @@ static validator_result validate_zp_csi_rs(const serving_cell_config& ue_cell_cf
     bool found = std::any_of(zp_list.begin(), zp_list.end(), [&csi_im](const zp_csi_rs_resource& zp) {
       return zp.period == csi_im.csi_res_period and zp.offset == csi_im.csi_res_offset and
              zp.res_mapping.freq_band_rbs == csi_im.freq_band_rbs and
-             zp.res_mapping.first_ofdm_symbol_in_td == csi_im.csi_im_res_element_pattern->symbol_location;
+             zp.res_mapping.first_ofdm_symbol_in_td == csi_im.symbol_location;
     });
     VERIFY(found,
            "CSI-IM does not overlap with ZP-CSI-RS. CSI-IM: {{period={} offset={} band={} symbol={}}}",
-           csi_im.csi_res_period ? fmt::to_string(fmt::underlying(*csi_im.csi_res_period)) : "none",
-           csi_im.csi_res_offset ? fmt::to_string(*csi_im.csi_res_offset) : "none",
+           fmt::underlying(csi_im.csi_res_period),
+           csi_im.csi_res_offset,
            csi_im.freq_band_rbs,
-           csi_im.csi_im_res_element_pattern->symbol_location);
+           csi_im.symbol_location);
   }
 
   return {};

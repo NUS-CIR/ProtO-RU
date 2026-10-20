@@ -263,23 +263,13 @@ std::vector<periodic_occasion> get_csi_im_occasions(span<const csi_im_resource> 
   std::vector<periodic_occasion> occasions;
 
   for (const csi_im_resource& res : csi_im_res_list) {
-    if (not res.csi_res_offset.has_value() or not res.csi_res_period.has_value() or
-        not res.csi_im_res_element_pattern.has_value()) {
-      // Aperiodic CSI-IM resources do not recur, so they cannot be modelled as periodic occasions.
-      continue;
-    }
-
-    const auto&    pattern         = *res.csi_im_res_element_pattern;
-    const unsigned nof_subcarriers = get_csi_im_pattern_nof_subcarriers(pattern.pattern_type);
-    const unsigned nof_symbols     = get_csi_im_pattern_nof_symbols(pattern.pattern_type);
-
     periodic_occasion occ;
     occ.origin      = {occasion_origin::signal_type::CSI_IM, static_cast<uint8_t>(res.res_id), 0};
-    occ.slot_period = to_underlying(*res.csi_res_period);
-    occ.slot_offset = *res.csi_res_offset;
+    occ.slot_period = to_underlying(res.csi_res_period);
+    occ.slot_offset = res.csi_res_offset;
     occ.crbs        = to_crb_bitset(get_csi_occupied_crbs(res.freq_band_rbs, dl_bwp_crbs));
-    for (unsigned sym = pattern.symbol_location, sym_end = sym + nof_symbols; sym != sym_end; ++sym) {
-      for (unsigned sc = pattern.subcarrier_location, sc_end = sc + nof_subcarriers; sc != sc_end; ++sc) {
+    for (unsigned sym = res.symbol_location, sym_end = sym + csi_im_resource::nof_symbols; sym != sym_end; ++sym) {
+      for (unsigned sc = res.subcarrier_location, sc_end = sc + csi_im_resource::nof_subcarriers; sc != sc_end; ++sc) {
         occ.re_masks[sym].set(sc);
       }
     }

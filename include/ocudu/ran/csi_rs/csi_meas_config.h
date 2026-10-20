@@ -146,59 +146,33 @@ struct nzp_csi_rs_resource_set {
 /// \brief CSI-IM-Resource is used to configure one CSI Interference Management (IM) resource.
 /// \remark See TS 38.331, \c CSI-IM-Resource.
 struct csi_im_resource {
-  /// \brief The resource element pattern type.
-  /// \remark TS 38.331, \c csi-IM-ResourceElementPattern.
-  enum class csi_im_resource_element_pattern_type { pattern0, pattern1 };
-  /// \brief The resource element pattern (Pattern0 (2,2) or Pattern1 (4,1)) with corresponding parameters
-  /// \remark See TS 38.214, clause 5.2.2.4 and TS 38.331, \c csi-IM-ResourceElementPattern.
-  struct csi_im_resource_element_pattern {
-    csi_im_resource_element_pattern_type pattern_type;
-    /// OFDM subcarrier occupancy of the CSI-IM resource for Pattern0 or Pattern1.
-    /// For Pattern0, Values {0, 2, 4, 6, 8, 10} and for Pattern1, Values {0, 4, 8}.
-    unsigned subcarrier_location;
-    /// OFDM subcarrier occupancy of the CSI-IM resource for Pattern0 or Pattern1.
-    /// For Pattern0, Values {0,...,12} and for Pattern1, Values {0,..,13}.
-    unsigned symbol_location;
+  /// Number of consecutive REs in frequency. The scheduler supports only the resource element pattern Pattern1 (4,1).
+  /// See TS 38.214, Section 5.2.2.4.
+  static constexpr unsigned nof_subcarriers = 4;
+  /// Number of consecutive OFDM symbols. The scheduler supports only the resource element pattern Pattern1 (4,1). See
+  /// TS 38.214, Section 5.2.2.4.
+  static constexpr unsigned nof_symbols = 1;
 
-    bool operator==(const csi_im_resource_element_pattern& rhs) const
-    {
-      return pattern_type == rhs.pattern_type && subcarrier_location == rhs.subcarrier_location &&
-             symbol_location == rhs.symbol_location;
-    }
-    bool operator!=(const csi_im_resource_element_pattern& rhs) const { return !(rhs == *this); }
-  };
-
-  csi_im_res_id_t                                res_id;
-  std::optional<csi_im_resource_element_pattern> csi_im_res_element_pattern;
+  csi_im_res_id_t res_id;
+  /// OFDM subcarrier occupancy of the resource element pattern. Values {0, 4, 8}.
+  unsigned subcarrier_location;
+  /// OFDM symbol occupancy of the resource element pattern. Values {0,...,13}.
+  unsigned symbol_location;
   /// RBs that the CSI resource spans, related to the CRB 0.
   crb_interval freq_band_rbs;
-  /// Present only for periodic and semi-persistent NZP-CSI-RS-Resources.
-  std::optional<csi_resource_periodicity> csi_res_period;
-  /// Present only for periodic and semi-persistent NZP-CSI-RS-Resources. Values {0,...,(periodicity_in_slots - 1)}.
-  std::optional<unsigned> csi_res_offset;
+  /// Periodicity of the resource. The scheduler supports only periodic CSI-IM resources.
+  csi_resource_periodicity csi_res_period;
+  /// Slot offset of the resource. Values {0,...,(periodicity_in_slots - 1)}.
+  unsigned csi_res_offset;
 
   bool operator==(const csi_im_resource& rhs) const
   {
-    return res_id == rhs.res_id && csi_im_res_element_pattern == rhs.csi_im_res_element_pattern &&
-           freq_band_rbs == rhs.freq_band_rbs && csi_res_period == rhs.csi_res_period &&
-           csi_res_offset == rhs.csi_res_offset;
+    return res_id == rhs.res_id && subcarrier_location == rhs.subcarrier_location &&
+           symbol_location == rhs.symbol_location && freq_band_rbs == rhs.freq_band_rbs &&
+           csi_res_period == rhs.csi_res_period && csi_res_offset == rhs.csi_res_offset;
   }
   bool operator!=(const csi_im_resource& rhs) const { return !(rhs == *this); }
 };
-
-/// \brief Number of consecutive REs in frequency occupied by a CSI-IM resource element pattern, i.e., the first
-/// parameter of the pattern name, Pattern0 (2,2) or Pattern1 (4,1). See TS 38.214, Section 5.2.2.4.
-constexpr unsigned get_csi_im_pattern_nof_subcarriers(csi_im_resource::csi_im_resource_element_pattern_type pattern)
-{
-  return pattern == csi_im_resource::csi_im_resource_element_pattern_type::pattern0 ? 2 : 4;
-}
-
-/// \brief Number of consecutive OFDM symbols occupied by a CSI-IM resource element pattern, i.e., the second
-/// parameter of the pattern name, Pattern0 (2,2) or Pattern1 (4,1). See TS 38.214, Section 5.2.2.4.
-constexpr unsigned get_csi_im_pattern_nof_symbols(csi_im_resource::csi_im_resource_element_pattern_type pattern)
-{
-  return pattern == csi_im_resource::csi_im_resource_element_pattern_type::pattern0 ? 2 : 1;
-}
 
 /// CSI-IM-ResourceSet is used to configure a set of one or more CSI Interference Management (IM) resources (their IDs)
 /// and set-specific parameters
@@ -346,9 +320,10 @@ struct zp_csi_rs_resource {
   zp_csi_rs_res_id_t id;
   /// \brief OFDM symbol and subcarrier occupancy of the ZP-CSI-RS resource within a slot.
   csi_rs_resource_mapping res_mapping;
-  /// Periodicity and slot offset for periodic/semi-persistent ZP-CSI-RS.
-  std::optional<csi_resource_periodicity> period;
-  std::optional<unsigned>                 offset;
+  /// Periodicity of the resource. The scheduler supports only periodic ZP-CSI-RS resources.
+  csi_resource_periodicity period;
+  /// Slot offset of the resource. Values {0,...,(periodicity_in_slots - 1)}.
+  unsigned offset;
 
   bool operator==(const zp_csi_rs_resource& other) const
   {

@@ -1279,15 +1279,12 @@ TEST(serving_cell_config_converter_test, test_custom_csi_meas_cfg_conversion)
   // Add new/remove configurations. Configuration need not be valid.
   dest_csi_meas_cfg.csi_im_res_list.push_back(dest_csi_meas_cfg.csi_im_res_list[0]);
   dest_csi_meas_cfg.csi_im_res_list.push_back(dest_csi_meas_cfg.csi_im_res_list[1]);
-  dest_csi_meas_cfg.csi_im_res_list.back().res_id = static_cast<csi_im_res_id_t>(1);
-  dest_csi_meas_cfg.csi_im_res_list.back().csi_im_res_element_pattern.emplace(
-      csi_im_resource::csi_im_resource_element_pattern{
-          .pattern_type        = csi_im_resource::csi_im_resource_element_pattern_type::pattern0,
-          .subcarrier_location = 2,
-          .symbol_location     = 2});
-  dest_csi_meas_cfg.csi_im_res_list.back().freq_band_rbs = {4, 4 + 48};
-  dest_csi_meas_cfg.csi_im_res_list.back().csi_res_period.emplace(csi_resource_periodicity::slots64);
-  dest_csi_meas_cfg.csi_im_res_list.back().csi_res_offset.emplace(11);
+  dest_csi_meas_cfg.csi_im_res_list.back().res_id              = static_cast<csi_im_res_id_t>(1);
+  dest_csi_meas_cfg.csi_im_res_list.back().subcarrier_location = 4;
+  dest_csi_meas_cfg.csi_im_res_list.back().symbol_location     = 2;
+  dest_csi_meas_cfg.csi_im_res_list.back().freq_band_rbs       = {4, 4 + 48};
+  dest_csi_meas_cfg.csi_im_res_list.back().csi_res_period      = csi_resource_periodicity::slots64;
+  dest_csi_meas_cfg.csi_im_res_list.back().csi_res_offset      = 11;
 
   // Add new/remove configurations.
   dest_csi_meas_cfg.csi_im_res_set_list.push_back(dest_csi_meas_cfg.csi_im_res_set_list[0]);
