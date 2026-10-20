@@ -5,6 +5,7 @@
 #include "udp_network_gateway_impl.h"
 #include "ocudu/adt/span.h"
 #include "ocudu/gateways/addr_info.h"
+#include "ocudu/instrumentation/traces/tracy_profiler.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/support/io/sockets.h"
 #include <arpa/inet.h>
@@ -75,6 +76,7 @@ void udp_network_gateway_impl::handle_pdu(byte_buffer pdu, const sockaddr_storag
 
 void udp_network_gateway_impl::handle_pdu_impl(span<udp_tx_pdu_t> pdus)
 {
+  OCUDU_ZONE_SCOPED_NC("udp_network_gateway_impl::handle_pdu_impl", tracy::Color::DarkSlateBlue);
   if (not sock_fd.is_open()) {
     logger.error("Socket not initialized");
     return;
@@ -242,6 +244,7 @@ bool udp_network_gateway_impl::create_and_bind()
 
 void udp_network_gateway_impl::receive()
 {
+  OCUDU_ZONE_SCOPED_NC("udp_network_gateway_impl::receive", tracy::Color::CadetBlue);
   if (!sock_fd.is_open()) {
     logger.error("Cannot receive on UDP gateway: Socket is not initialized.");
   }
