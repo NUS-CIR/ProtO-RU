@@ -21,9 +21,13 @@
 #include "tests/test_doubles/scheduler/scheduler_result_finder.h"
 #include "tests/test_doubles/scheduler/scheduler_test_message_validators.h"
 #include "ocudu/adt/unique_function.h"
+#include "ocudu/ran/csi_rs/csi_rs_pattern.h"
+#include "ocudu/ran/csi_rs/frequency_allocation_type.h"
+#include "ocudu/ran/dmrs/dmrs.h"
 #include "ocudu/ran/du_types.h"
 #include "ocudu/ran/duplex_mode.h"
 #include "ocudu/ran/pdcch/search_space.h"
+#include "ocudu/ran/sch/sch_segmentation.h"
 #include "ocudu/scheduler/config/logical_channel_config_factory.h"
 #include "ocudu/scheduler/config/scheduler_expert_config_factory.h"
 #include "ocudu/scheduler/support/rb_helper.h"
@@ -2223,4 +2227,317 @@ INSTANTIATE_TEST_SUITE_P(ue_grid_allocator_test,
 
 INSTANTIATE_TEST_SUITE_P(ue_grid_allocator_test,
                          ue_grid_allocator_expert_cfg_pxsch_crb_limits_tester,
+                         testing::Values(duplex_mode::FDD, duplex_mode::TDD));
+
+/// \brief Allocation of PDSCHs in slots with CSI-RS.
+///
+/// The PDSCH is rate-matched around the CSI-RS of its slot, while the TBS does not account for them (TS 38.214, Section
+/// 5.1.3.2). The UE may skip decoding a transport block in an initial transmission whose effective code rate exceeds
+/// 0.95 (TS 38.214, Section 5.1.3.1). The UEs are scheduled with the highest MCS of their MCS table.
+class ue_grid_allocator_csi_rs_test : public ue_grid_allocator_test
+{
+protected:
+  /// Maximum effective channel code rate of an initial transmission, as per TS 38.214, Section 5.1.3.1.
+  static constexpr double max_effective_code_rate = 0.95;
+
+  ue_grid_allocator_csi_rs_test(pdsch_mcs_table mcs_table_, sch_mcs_index max_mcs) :
+    ue_grid_allocator_test(test_params{[max_mcs]() {
+      scheduler_expert_config cfg = config_helpers::make_default_scheduler_expert_config();
+      cfg.ue.dl_mcs               = {max_mcs, max_mcs};
+      return cfg;
+    }()}),
+    mcs_table(mcs_table_)
+  {
+  }
+
+  const ue& add_ue(pdsch_config::resource_allocation res_alloc)
+  {
+    sched_ue_creation_request_message req =
+        sched_config_helper::create_default_sched_ue_creation_request(cell_cfg.params);
+    req.ue_index                                                 = to_du_ue_index(0);
+    req.crnti                                                    = to_rnti(0x4601);
+    (*req.cfg.cells)[0].ded->serv_cell_cfg.init_dl_bwp.pdcch_cfg = cell_cfg.bwp_res[to_bwp_id(0)].dl().ded_pdcchs[0];
+    pdsch_config& pdsch_cfg = (*req.cfg.cells)[0].ded->serv_cell_cfg.init_dl_bwp.pdsch_cfg.value();
+    pdsch_cfg.mcs_table     = mcs_table;
+    pdsch_cfg.res_alloc     = res_alloc;
+    pdsch_cfg.rbg_sz        = rbg_size::config1;
+    return ue_grid_allocator_test::add_ue(req);
+  }
+
+  /// \brief CSI-RS of a CSI measurement slot of a cell with eight antenna ports.
+  ///
+  /// An eight-port NZP-CSI-RS and a ZP-CSI-RS with the same resource mapping in another OFDM symbol, as the cell
+  /// configuration helpers generate them (TS 38.211, Table 7.4.1.5.3-1, row 6): eight resource elements per PRB each.
+  std::vector<csi_rs_info> make_eight_port_csi_rs() const
+  {
+    csi_rs_info csi_rs{};
+    csi_rs.bwp_cfg     = &cell_cfg.params.dl_cfg_common.init_dl_bwp.generic_params;
+    csi_rs.crbs        = csi_rs.bwp_cfg->crbs;
+    csi_rs.type        = csi_rs_type::CSI_RS_NZP;
+    csi_rs.row         = 6;
+    csi_rs.freq_domain = csi_rs::freq_allocation_mask_type(6);
+    csi_rs.freq_domain.fill(0, 4);
+    csi_rs.symbol0      = 4;
+    csi_rs.symbol1      = 2;
+    csi_rs.cdm_type     = csi_rs_cdm_type::fd_CDM2;
+    csi_rs.freq_density = csi_rs_freq_density_type::one;
+
+    csi_rs_info zp_csi_rs = csi_rs;
+    zp_csi_rs.type        = csi_rs_type::CSI_RS_ZP;
+    zp_csi_rs.symbol0     = 8;
+    return {csi_rs, zp_csi_rs};
+  }
+
+  /// Single-port NZP-CSI-RS (TS 38.211, Table 7.4.1.5.3-1, row 2): one resource element per PRB.
+  std::vector<csi_rs_info> make_single_port_csi_rs() const
+  {
+    csi_rs_info csi_rs{};
+    csi_rs.bwp_cfg     = &cell_cfg.params.dl_cfg_common.init_dl_bwp.generic_params;
+    csi_rs.crbs        = csi_rs.bwp_cfg->crbs;
+    csi_rs.type        = csi_rs_type::CSI_RS_NZP;
+    csi_rs.row         = 2;
+    csi_rs.freq_domain = csi_rs::freq_allocation_mask_type(12);
+    csi_rs.freq_domain.set(0);
+    csi_rs.symbol0      = 4;
+    csi_rs.symbol1      = 2;
+    csi_rs.cdm_type     = csi_rs_cdm_type::no_CDM;
+    csi_rs.freq_density = csi_rs_freq_density_type::one;
+    return {csi_rs};
+  }
+
+  /// \brief Checks the PDSCH resource elements per PRB, from which the expected MCSs are derived.
+  ///
+  /// Twelve OFDM symbols with three DM-RS symbols of type 1 and one CDM group without data: 144 - 18 = 126 resource
+  /// elements per PRB.
+  static void check_nof_re_per_prb(const pdsch_information& pdsch)
+  {
+    ASSERT_EQ(pdsch.symbols.length(), 12);
+    ASSERT_EQ(pdsch.dmrs.dmrs_symb_pos.count(), 3);
+    ASSERT_EQ(pdsch.dmrs.config_type, dmrs_config_type::type1);
+    ASSERT_EQ(pdsch.dmrs.num_dmrs_cdm_grps_no_data, 1);
+  }
+
+  /// \brief Schedules a newTx PDSCH for the UE in the next DL slot, in which the given CSI-RS are transmitted.
+  ///
+  /// \param[in] u                 UE.
+  /// \param[in] csi_rs_list       CSI-RS transmitted in the slot of the PDSCH.
+  /// \param[in] use_odd_rbgs_only Set to true to mark a VRB of every even RBG as used, so that a resource allocation
+  ///                              type 0 grant is not contiguous.
+  /// \return The PDSCH grant of the UE, if it was scheduled.
+  const dl_msg_alloc*
+  allocate_pdsch_with_csi_rs(const ue& u, span<const csi_rs_info> csi_rs_list, bool use_odd_rbgs_only = false)
+  {
+    const crb_interval     bwp_crbs = cell_cfg.params.dl_cfg_common.init_dl_bwp.generic_params.crbs;
+    const nominal_rbg_size P        = get_nominal_rbg_size(bwp_crbs.length(), rbg_size::config1);
+    const bool             found    = run_until(
+        [&]() {
+          if (not cell_cfg.is_dl_enabled(current_slot)) {
+            return;
+          }
+          auto csi_rs_pdus = res_grid[0].result_builder().dl().csi_rs();
+          for (const csi_rs_info& csi_rs : csi_rs_list) {
+            report_fatal_error_if_not(csi_rs_pdus.emplace_back(csi_rs) != nullptr,
+                                      "The CSI-RS list of the slot is full");
+          }
+          for (unsigned rbg_idx = 0, nof_rbgs = get_nof_rbgs(bwp_crbs, P); use_odd_rbgs_only and rbg_idx < nof_rbgs;
+               rbg_idx += 2) {
+            rbg_bitmap rbg(nof_rbgs);
+            rbg.set(rbg_idx);
+            used_dl_vrbs.set(convert_rbgs_to_vrbs(rbg, bwp_crbs, P).find_lowest());
+          }
+          allocate_dl_newtx_grant(slice_ues[u.ue_index], units::bytes{100000}, false);
+        },
+        [&]() { return find_ue_pdsch(u.crnti, res_grid[0].result_reader().dl().ue_grants()) != nullptr; });
+    return found ? find_ue_pdsch(u.crnti, res_grid[0].result_reader().dl().ue_grants()) : nullptr;
+  }
+
+  /// \brief Effective channel code rate of a PDSCH, as per TS 38.214, Section 5.1.3.1.
+  ///
+  /// The number of physical channel bits is derived from the resource elements to which the PHY maps the PDSCH: all the
+  /// resource elements of its PRBs and OFDM symbols, except the DM-RS ones (CDM groups without data included) and the
+  /// ones of every CSI-RS of the slot, all ports included. The test does not use VRB-to-PRB interleaving.
+  static double get_effective_code_rate(const pdsch_information& pdsch, span<const csi_rs_info> csi_rs_list)
+  {
+    // Mark the resource elements of the slot occupied by CSI-RS.
+    std::array<bounded_bitset<MAX_NOF_PRBS * NOF_SUBCARRIERS_PER_RB>, NOF_OFDM_SYM_PER_SLOT_NORMAL_CP> csi_rs_grid;
+    for (auto& symbol_res : csi_rs_grid) {
+      symbol_res.resize(MAX_NOF_PRBS * NOF_SUBCARRIERS_PER_RB);
+    }
+    for (const csi_rs_info& csi_rs : csi_rs_list) {
+      csi_rs_pattern_configuration pattern_cfg{.start_rb                 = csi_rs.crbs.start(),
+                                               .nof_rb                   = csi_rs.crbs.length(),
+                                               .csi_rs_mapping_table_row = csi_rs.row,
+                                               .freq_allocation_ref_idx  = {},
+                                               .symbol_l0                = csi_rs.symbol0,
+                                               .symbol_l1                = csi_rs.symbol1,
+                                               .cdm                      = csi_rs.cdm_type,
+                                               .freq_density             = csi_rs.freq_density};
+      csi_rs::convert_freq_domain(pattern_cfg.freq_allocation_ref_idx, csi_rs.freq_domain, csi_rs.row);
+      const csi_rs_pattern pattern = get_csi_rs_pattern(pattern_cfg);
+      for (const csi_rs_pattern_port& port : pattern.prb_patterns) {
+        for (unsigned symbol = 0; symbol != NOF_OFDM_SYM_PER_SLOT_NORMAL_CP; ++symbol) {
+          if (not port.symbol_mask.test(symbol)) {
+            continue;
+          }
+          for (unsigned crb = pattern.rb_begin; crb < pattern.rb_end; crb += pattern.rb_stride) {
+            port.re_mask.for_each(0, NOF_SUBCARRIERS_PER_RB, [&](size_t re) {
+              csi_rs_grid[symbol].set(crb * NOF_SUBCARRIERS_PER_RB + re);
+            });
+          }
+        }
+      }
+    }
+
+    // CRBs of the PDSCH.
+    const crb_interval bwp_crbs = pdsch.bwp_cfg->crbs;
+    prb_bitmap         prbs(bwp_crbs.length());
+    if (pdsch.rbs.is_type0()) {
+      prbs = pdsch.rbs.type0().convert_to<prb_bitmap>();
+    } else {
+      prbs |= pdsch.rbs.type1().convert_to<prb_interval>();
+    }
+    const crb_bitmap crbs = prb_to_crb(bwp_crbs, prbs);
+
+    // Count the resource elements of the PDSCH.
+    const unsigned nof_dmrs_re_per_rb =
+        pdsch.dmrs.num_dmrs_cdm_grps_no_data * get_nof_re_per_prb(pdsch.dmrs.config_type);
+    unsigned nof_re = 0;
+    for (unsigned symbol = pdsch.symbols.start(); symbol != pdsch.symbols.stop(); ++symbol) {
+      const bool is_dmrs_symbol = pdsch.dmrs.dmrs_symb_pos.test(symbol);
+      crbs.for_each(0, crbs.size(), [&](size_t crb) {
+        const unsigned nof_csi_rs_re =
+            csi_rs_grid[symbol].slice(crb * NOF_SUBCARRIERS_PER_RB, (crb + 1) * NOF_SUBCARRIERS_PER_RB).count();
+        // The PHY does not accept CSI-RS in OFDM symbols with DM-RS.
+        EXPECT_FALSE(is_dmrs_symbol and nof_csi_rs_re != 0);
+        nof_re += NOF_SUBCARRIERS_PER_RB - (is_dmrs_symbol ? nof_dmrs_re_per_rb : nof_csi_rs_re);
+      });
+    }
+
+    // Information bits, CRC included, over physical channel bits.
+    const pdsch_codeword& cw     = pdsch.codewords.front();
+    const sch_information sch    = get_sch_segmentation_info(units::bytes{cw.tb_size_bytes}.to_bits(),
+                                                          cw.mcs_descr.get_normalised_target_code_rate());
+    const unsigned nof_info_bits = (sch.nof_bits_per_cb.value() - sch.nof_filler_bits_per_cb.value()) * sch.nof_cb;
+    const unsigned nof_ch_bits   = nof_re * pdsch.nof_layers * get_bits_per_symbol(cw.mcs_descr.modulation);
+    return static_cast<double>(nof_info_bits) / nof_ch_bits;
+  }
+
+  const pdsch_mcs_table mcs_table;
+};
+
+class ue_grid_allocator_csi_rs_qam64_test : public ue_grid_allocator_csi_rs_test
+{
+protected:
+  /// TS 38.214, Table 5.1.3.1-1, MCS 28: 64QAM with a target code rate of 948/1024.
+  ue_grid_allocator_csi_rs_qam64_test() : ue_grid_allocator_csi_rs_test(pdsch_mcs_table::qam64, sch_mcs_index{28}) {}
+};
+
+TEST_P(ue_grid_allocator_csi_rs_qam64_test, pdsch_rate_matched_around_csi_rs_does_not_exceed_max_effective_code_rate)
+{
+  const ue&                      u           = add_ue(pdsch_config::resource_allocation::resource_allocation_type_1);
+  const std::vector<csi_rs_info> csi_rs_list = make_eight_port_csi_rs();
+
+  const dl_msg_alloc* grant = allocate_pdsch_with_csi_rs(u, csi_rs_list);
+  ASSERT_NE(grant, nullptr);
+  ASSERT_LE(get_effective_code_rate(grant->pdsch_cfg, csi_rs_list), max_effective_code_rate);
+}
+
+TEST_P(ue_grid_allocator_csi_rs_qam64_test,
+       non_contiguous_pdsch_rate_matched_around_csi_rs_does_not_exceed_max_effective_code_rate)
+{
+  const ue&                      u           = add_ue(pdsch_config::resource_allocation::resource_allocation_type_0);
+  const std::vector<csi_rs_info> csi_rs_list = make_eight_port_csi_rs();
+
+  const dl_msg_alloc* grant = allocate_pdsch_with_csi_rs(u, csi_rs_list, true);
+  ASSERT_NE(grant, nullptr);
+  ASSERT_TRUE(grant->pdsch_cfg.rbs.is_type0());
+  ASSERT_LE(get_effective_code_rate(grant->pdsch_cfg, csi_rs_list), max_effective_code_rate);
+}
+
+class ue_grid_allocator_csi_rs_qam256_test : public ue_grid_allocator_csi_rs_test
+{
+protected:
+  /// TS 38.214, Table 5.1.3.1-2, MCS 27: 256QAM with a target code rate of 948/1024.
+  ue_grid_allocator_csi_rs_qam256_test() : ue_grid_allocator_csi_rs_test(pdsch_mcs_table::qam256, sch_mcs_index{27}) {}
+};
+
+TEST_P(ue_grid_allocator_csi_rs_qam256_test, pdsch_rate_matched_around_csi_rs_does_not_exceed_max_effective_code_rate)
+{
+  const ue&                      u           = add_ue(pdsch_config::resource_allocation::resource_allocation_type_1);
+  const std::vector<csi_rs_info> csi_rs_list = make_eight_port_csi_rs();
+
+  const dl_msg_alloc* grant = allocate_pdsch_with_csi_rs(u, csi_rs_list);
+  ASSERT_NE(grant, nullptr);
+  ASSERT_LE(get_effective_code_rate(grant->pdsch_cfg, csi_rs_list), max_effective_code_rate);
+}
+
+class ue_grid_allocator_csi_rs_qam256_mcs20_test : public ue_grid_allocator_csi_rs_test
+{
+protected:
+  /// TS 38.214, Table 5.1.3.1-2, MCS 20: 256QAM with a spectral efficiency of 5.3320.
+  ue_grid_allocator_csi_rs_qam256_mcs20_test() :
+    ue_grid_allocator_csi_rs_test(pdsch_mcs_table::qam256, sch_mcs_index{20})
+  {
+  }
+};
+
+TEST_P(ue_grid_allocator_csi_rs_qam256_mcs20_test, mcs_is_lowered_according_to_the_csi_rs_overhead)
+{
+  const ue& u = add_ue(pdsch_config::resource_allocation::resource_allocation_type_1);
+
+  const dl_msg_alloc* grant = allocate_pdsch_with_csi_rs(u, make_eight_port_csi_rs());
+  ASSERT_NE(grant, nullptr);
+  check_nof_re_per_prb(grant->pdsch_cfg);
+  // 16 of the 126 resource elements per PRB are occupied by CSI-RS. MCS 17 (4.5234) is the highest MCS with a spectral
+  // efficiency not above 5.3320 * 110 / 126 = 4.6549.
+  ASSERT_EQ(grant->pdsch_cfg.codewords.front().mcs_index.value(), 17);
+}
+
+TEST_P(ue_grid_allocator_csi_rs_qam256_mcs20_test, mcs_is_lowered_with_any_csi_rs_overhead)
+{
+  const ue& u = add_ue(pdsch_config::resource_allocation::resource_allocation_type_1);
+
+  const dl_msg_alloc* grant = allocate_pdsch_with_csi_rs(u, make_single_port_csi_rs());
+  ASSERT_NE(grant, nullptr);
+  check_nof_re_per_prb(grant->pdsch_cfg);
+  // One of the 126 resource elements per PRB is occupied by CSI-RS. MCS 19 (5.1152) is the highest MCS with a spectral
+  // efficiency not above 5.3320 * 125 / 126 = 5.2897.
+  ASSERT_EQ(grant->pdsch_cfg.codewords.front().mcs_index.value(), 19);
+}
+
+class ue_grid_allocator_csi_rs_qam64_mcs17_test : public ue_grid_allocator_csi_rs_test
+{
+protected:
+  /// TS 38.214, Table 5.1.3.1-1, MCS 17: 64QAM with a spectral efficiency of 2.5664, below that of MCS 16.
+  ue_grid_allocator_csi_rs_qam64_mcs17_test() : ue_grid_allocator_csi_rs_test(pdsch_mcs_table::qam64, sch_mcs_index{17})
+  {
+  }
+};
+
+TEST_P(ue_grid_allocator_csi_rs_qam64_mcs17_test, mcs_with_a_higher_spectral_efficiency_is_skipped)
+{
+  const ue& u = add_ue(pdsch_config::resource_allocation::resource_allocation_type_1);
+
+  const dl_msg_alloc* grant = allocate_pdsch_with_csi_rs(u, make_single_port_csi_rs());
+  ASSERT_NE(grant, nullptr);
+  check_nof_re_per_prb(grant->pdsch_cfg);
+  // MCS 16 (16QAM, 2.5703) carries more bits per resource element than MCS 17 (64QAM, 2.5664). MCS 15 (2.3516) is the
+  // highest MCS with a spectral efficiency not above 2.5664 * 125 / 126 = 2.5460.
+  ASSERT_EQ(grant->pdsch_cfg.codewords.front().mcs_index.value(), 15);
+}
+
+INSTANTIATE_TEST_SUITE_P(ue_grid_allocator_test,
+                         ue_grid_allocator_csi_rs_qam256_mcs20_test,
+                         testing::Values(duplex_mode::FDD, duplex_mode::TDD));
+
+INSTANTIATE_TEST_SUITE_P(ue_grid_allocator_test,
+                         ue_grid_allocator_csi_rs_qam64_mcs17_test,
+                         testing::Values(duplex_mode::FDD, duplex_mode::TDD));
+
+INSTANTIATE_TEST_SUITE_P(ue_grid_allocator_test,
+                         ue_grid_allocator_csi_rs_qam64_test,
+                         testing::Values(duplex_mode::FDD, duplex_mode::TDD));
+
+INSTANTIATE_TEST_SUITE_P(ue_grid_allocator_test,
+                         ue_grid_allocator_csi_rs_qam256_test,
                          testing::Values(duplex_mode::FDD, duplex_mode::TDD));

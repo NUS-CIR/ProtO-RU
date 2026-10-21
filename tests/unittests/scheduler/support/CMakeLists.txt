@@ -29,6 +29,10 @@ add_executable(prbs_calculator_test prbs_calculator_test.cpp)
 target_link_libraries(prbs_calculator_test ocudu_sched ocudulog gtest gtest_main)
 add_test(prbs_calculator_test prbs_calculator_test)
 
+add_executable(csi_rs_helpers_test csi_rs_helpers_test.cpp)
+target_link_libraries(csi_rs_helpers_test ocudu_sched ocudulog GTest::gtest ocudu_gtest_main)
+gtest_discover_tests(csi_rs_helpers_test)
+
 add_executable(dmrs_helpers_test dmrs_helpers_test.cpp)
 target_link_libraries(dmrs_helpers_test ocudu_sched ocudulog GTest::gtest ocudu_gtest_main)
 gtest_discover_tests(dmrs_helpers_test)

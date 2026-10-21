@@ -205,7 +205,8 @@ static compute_ul_mcs_tbs_error is_pusch_effective_rate_valid(const pusch_config
 std::optional<sch_mcs_tbs> ocudu::compute_dl_mcs_tbs(const pdsch_config_params& pdsch_params,
                                                      sch_mcs_index              max_mcs,
                                                      unsigned                   nof_prbs,
-                                                     bool                       contains_dc)
+                                                     bool                       contains_dc,
+                                                     unsigned                   nof_csi_rs_re)
 {
   // The maximum supported code rate is 0.95, as per TS38.214, Section 5.1.3. The maximum code rate is defined for DL,
   // but we consider the same value for UL.
@@ -223,7 +224,8 @@ std::optional<sch_mcs_tbs> ocudu::compute_dl_mcs_tbs(const pdsch_config_params& 
                                                             .tb_scaling_field = pdsch_params.tb_scaling_field,
                                                             .n_prb            = nof_prbs});
 
-  // > Compute the effective code rate.
+  // > Compute the effective code rate. The TBS does not account for the CSI-RS resource elements, as per TS 38.214,
+  // Section 5.1.3.2, but the PDSCH is not mapped to them, which raises the effective code rate.
   dlsch_configuration dlsch_info{.tbs                = tbs_bytes.to_bits(),
                                  .mcs_descr          = mcs_info,
                                  .nof_rb             = nof_prbs,
@@ -233,8 +235,9 @@ std::optional<sch_mcs_tbs> ocudu::compute_dl_mcs_tbs(const pdsch_config_params& 
                                  .dmrs_symbol_mask   = pdsch_params.dmrs.dmrs_symb_pos,
                                  .nof_cdm_groups_without_data =
                                      static_cast<unsigned>(pdsch_params.dmrs.num_dmrs_cdm_grps_no_data),
-                                 .nof_layers  = pdsch_params.nof_layers,
-                                 .contains_dc = contains_dc};
+                                 .nof_layers    = pdsch_params.nof_layers,
+                                 .contains_dc   = contains_dc,
+                                 .nof_csi_rs_re = nof_csi_rs_re};
 
   float effective_code_rate = get_dlsch_information(dlsch_info).get_effective_code_rate();
 

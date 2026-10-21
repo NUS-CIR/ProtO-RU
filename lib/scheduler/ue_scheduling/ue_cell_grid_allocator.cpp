@@ -4,7 +4,9 @@
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 #include "ue_cell_grid_allocator.h"
+#include "../support/csi_rs_helpers.h"
 #include "../support/dci_builder.h"
+#include "../support/dmrs_helpers.h"
 #include "../support/repetition_helpers.h"
 #include "../ue_context/ue_drx_controller.h"
 #include "grant_params_selector.h"
@@ -106,21 +108,26 @@ std::optional<sch_mcs_tbs> ue_cell_grid_allocator::calculate_dl_mcs_tbs(const ce
                                                                         sch_mcs_index     mcs,
                                                                         unsigned          nof_layers) const
 {
-  // Reduce estimated MCS by 1 whenever CSI-RS is sent over a particular slot to account for the overhead of CSI-RS
-  // REs.
-  const auto&   pdsch_cfg = ss_info.get_pdsch_config(pdsch_td_res_index, nof_layers);
+  const auto& pdsch_cfg = ss_info.get_pdsch_config(pdsch_td_res_index, nof_layers);
+
+  // The PDSCH is rate-matched around the CSI-RS of its slot, which the TBS does not account for.
+  const unsigned nof_csi_rs_re = csi_helper::get_nof_csi_rs_re(
+      pdsch_alloc.result_reader().dl().csi_rs(), pdsch_cfg.symbols, prb_to_crb(ss_info.dl_crb_lims, prbs));
+
+  // [Implementation-defined] Lower the MCS of the link adaptation to the highest one whose spectral efficiency, as per
+  // TS 38.214, Section 5.1.3.1, does not exceed its own, scaled by the fraction of resource elements that the CSI-RS
+  // leave. The PDSCH then carries no more bits per resource element than intended. Unlike the code rate, the spectral
+  // efficiency is comparable across modulation orders.
   sch_mcs_index adjusted_mcs{mcs};
-  if (not pdsch_alloc.result_reader().dl().csi_rs().empty()) {
-    // [Implementation-defined] The max MCS values below are set empirically and should avoid the effective code rate
-    // to exceed 0.95 due to the overhead of CSI-RS REs.
-    adjusted_mcs                = adjusted_mcs == 0 ? adjusted_mcs : adjusted_mcs - 1;
-    uint8_t max_mcs_with_csi_rs = 28;
-    if (pdsch_cfg.mcs_table == pdsch_mcs_table::qam64) {
-      max_mcs_with_csi_rs = 26U;
-    } else if (pdsch_cfg.mcs_table == pdsch_mcs_table::qam256) {
-      max_mcs_with_csi_rs = 24U;
+  if (nof_csi_rs_re != 0) {
+    const unsigned nof_re                  = prbs.count() * (pdsch_cfg.symbols.length() * NOF_SUBCARRIERS_PER_RB -
+                                            calculate_nof_dmrs_per_rb(pdsch_cfg.dmrs));
+    const float    max_spectral_efficiency = pdsch_mcs_get_config(pdsch_cfg.mcs_table, mcs).get_spectral_efficiency() *
+                                          (1.0F - static_cast<float>(nof_csi_rs_re) / static_cast<float>(nof_re));
+    while (adjusted_mcs != 0 and pdsch_mcs_get_config(pdsch_cfg.mcs_table, adjusted_mcs).get_spectral_efficiency() >
+                                     max_spectral_efficiency) {
+      adjusted_mcs = adjusted_mcs - 1;
     }
-    adjusted_mcs = static_cast<sch_mcs_index>(std::min(adjusted_mcs.value(), max_mcs_with_csi_rs));
   }
 
   // If it's a new Tx, compute the MCS and TBS.
@@ -135,7 +142,9 @@ std::optional<sch_mcs_tbs> ue_cell_grid_allocator::calculate_dl_mcs_tbs(const ce
       contains_dc = contains_dc or dc_offset_helper::is_contained(tx_dc.value(), crbs);
     });
   }
-  auto mcs_tbs_info = compute_dl_mcs_tbs(pdsch_cfg, adjusted_mcs, prbs.count(), contains_dc);
+  // The effective code rate of the resulting MCS and TBS accounts for the CSI-RS resource elements, as per TS 38.214,
+  // Section 5.1.3.1.
+  auto mcs_tbs_info = compute_dl_mcs_tbs(pdsch_cfg, adjusted_mcs, prbs.count(), contains_dc, nof_csi_rs_re);
 
   return mcs_tbs_info;
 }

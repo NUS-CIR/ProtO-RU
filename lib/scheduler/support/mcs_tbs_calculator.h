@@ -31,10 +31,14 @@ struct sch_mcs_tbs {
 /// code rate is above 0.95.
 /// \param[in] nof_prbs Maximum number of PRBs available for the PUSCH transmission.
 /// \param[in] contains_dc Set to true if the transmission overlaps with the position of the DC.
+/// \param[in] nof_csi_rs_re Number of resource elements of the transmission occupied by CSI-RS.
 /// \return The MCS and TBS, if for these values the effective code rate does not exceed 0.95; else, it returns an empty
 /// optional object.
-std::optional<sch_mcs_tbs>
-compute_dl_mcs_tbs(const pdsch_config_params& pdsch_params, sch_mcs_index max_mcs, unsigned nof_prbs, bool contains_dc);
+std::optional<sch_mcs_tbs> compute_dl_mcs_tbs(const pdsch_config_params& pdsch_params,
+                                              sch_mcs_index              max_mcs,
+                                              unsigned                   nof_prbs,
+                                              bool                       contains_dc,
+                                              unsigned                   nof_csi_rs_re);
 
 /// Uplink modulation code scheme calculator errors.
 enum class compute_ul_mcs_tbs_error {

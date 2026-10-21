@@ -54,15 +54,18 @@ dlsch_information ocudu::get_dlsch_information(const dlsch_configuration& config
   unsigned nof_re_dmrs_per_rb =
       nof_symbols_dmrs * config.nof_cdm_groups_without_data * get_nof_re_per_prb(config.dmrs_type);
 
-  // Count number of RE used for CSI-RS.
-  unsigned nof_re_csi_rs_per_rb = 0;
-
   // Count number of RE used for PT-RS.
   unsigned nof_pt_rs_per_rb = 0;
 
-  // Count total number of resource elements available for DL-SCH.
-  unsigned nof_re_dl_sch = config.nof_rb * (config.nof_symbols * NOF_SUBCARRIERS_PER_RB - nof_re_dmrs_per_rb -
-                                            nof_re_csi_rs_per_rb - nof_pt_rs_per_rb);
+  // Count total number of resource elements available for DL-SCH, excluding the ones occupied by CSI-RS.
+  unsigned nof_re_dl_sch =
+      config.nof_rb * (config.nof_symbols * NOF_SUBCARRIERS_PER_RB - nof_re_dmrs_per_rb - nof_pt_rs_per_rb);
+  ocudu_assert(config.nof_csi_rs_re < nof_re_dl_sch,
+               "The number of RE occupied by CSI-RS (i.e., {}) must be less than the number of RE available for the "
+               "transmission (i.e., {}).",
+               config.nof_csi_rs_re,
+               nof_re_dl_sch);
+  nof_re_dl_sch -= config.nof_csi_rs_re;
 
   // Retrieve the modulation order.
   unsigned modulation_order = get_bits_per_symbol(config.mcs_descr.modulation);

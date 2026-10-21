@@ -63,7 +63,7 @@ TEST_P(dl_mcs_tbs_calculator_test_bench, test_values)
 
   // Run test function.
   std::optional<sch_mcs_tbs> test =
-      compute_dl_mcs_tbs(pdsch_cfg, sch_mcs_index(test_entry.max_mcs), test_entry.nof_prbs, false);
+      compute_dl_mcs_tbs(pdsch_cfg, sch_mcs_index(test_entry.max_mcs), test_entry.nof_prbs, false, 0);
 
   ASSERT_TRUE(test.has_value());
   ASSERT_EQ(GetParam().final_mcs, test.value().mcs);
@@ -84,6 +84,48 @@ INSTANTIATE_TEST_SUITE_P(
                     mcs_test_entry{.final_mcs = 3, .tbs_bytes = 561, .max_mcs = 3, .nof_prbs = 84},
                     mcs_test_entry{.final_mcs = 0, .tbs_bytes = 177, .max_mcs = 0, .nof_prbs = 55},
                     mcs_test_entry{.final_mcs = 0, .tbs_bytes = 15, .max_mcs = 0, .nof_prbs = 5}));
+
+class dl_mcs_tbs_calculator_csi_rs_test : public common_mcs_tbs_calculator_test, public ::testing::Test
+{
+protected:
+  dl_mcs_tbs_calculator_csi_rs_test() :
+    pdsch_cfg(sched_helper::get_pdsch_config_f1_0_c_rnti(
+        cell_cfg,
+        ue_cell_cfg.pdsch_serving_cell_cfg(),
+        cell_cfg.params.dl_cfg_common.init_dl_bwp.pdsch_common.pdsch_td_alloc_list[0]))
+  {
+    pdsch_cfg.mcs_table = pdsch_mcs_table::qam256;
+  }
+
+  static constexpr unsigned nof_prbs = 106;
+  /// Resource elements of a TRS slot within the PDSCH: two OFDM symbols with three resource elements per PRB.
+  static constexpr unsigned nof_trs_re = nof_prbs * 2 * 3;
+
+  pdsch_config_params pdsch_cfg;
+};
+
+TEST_F(dl_mcs_tbs_calculator_csi_rs_test, csi_rs_resource_elements_lower_an_mcs_whose_effective_code_rate_exceeds_max)
+{
+  // 256QAM table, MCS 27: 256QAM with R = 948/1024. Without CSI-RS, its effective code rate does not exceed 0.95.
+  std::optional<sch_mcs_tbs> mcs_tbs = compute_dl_mcs_tbs(pdsch_cfg, sch_mcs_index{27}, nof_prbs, false, 0);
+  ASSERT_TRUE(mcs_tbs.has_value());
+  ASSERT_EQ(mcs_tbs->mcs, 27);
+
+  // With the PDSCH rate-matched around a TRS, the effective code rate of MCS 27 exceeds 0.95, and so does the one of
+  // MCS 26 (R = 916.5/1024) for this PDSCH (OFDM symbols 2 to 13, three of them with DM-RS: 108 resource elements per
+  // PRB).
+  mcs_tbs = compute_dl_mcs_tbs(pdsch_cfg, sch_mcs_index{27}, nof_prbs, false, nof_trs_re);
+  ASSERT_TRUE(mcs_tbs.has_value());
+  ASSERT_EQ(mcs_tbs->mcs, 25);
+}
+
+TEST_F(dl_mcs_tbs_calculator_csi_rs_test, csi_rs_resource_elements_keep_an_mcs_with_margin)
+{
+  // 256QAM table, MCS 24: 256QAM with R = 841/1024.
+  std::optional<sch_mcs_tbs> mcs_tbs = compute_dl_mcs_tbs(pdsch_cfg, sch_mcs_index{24}, nof_prbs, false, nof_trs_re);
+  ASSERT_TRUE(mcs_tbs.has_value());
+  ASSERT_EQ(mcs_tbs->mcs, 24);
+}
 
 ///////////////       UL TEST         ///////////////
 

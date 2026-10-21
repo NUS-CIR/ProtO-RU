@@ -36,6 +36,10 @@ struct dlsch_configuration {
   unsigned nof_layers;
   /// Set to true if the transmission overlaps with the Direct Current (DC).
   bool contains_dc;
+  /// \brief Number of resource elements of the transmission occupied by CSI-RS, as per TS 38.214, Section 5.1.4.2.
+  ///
+  /// The count is the total over all RBs and OFDM symbols. It does not depend on the number of layers.
+  unsigned nof_csi_rs_re = 0;
 };
 
 /// Collects Downlink Shared Channel (DL-SCH) derived parameters.

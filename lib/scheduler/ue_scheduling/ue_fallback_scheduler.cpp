@@ -890,7 +890,11 @@ ue_fallback_scheduler::select_tbs(const pdsch_config_params&          pdsch_cfg,
           cell_cfg.params.dl_cfg_common.freq_info_dl.scs_carrier_list.back().tx_direct_current_location.value(),
           grant_crbs);
     }
-    std::optional<sch_mcs_tbs> mcs_tbs = compute_dl_mcs_tbs(pdsch_cfg, chosen_mcs_idx, prbs_tbs.nof_prbs, contains_dc);
+    // The fallback scheduler does not allocate PDSCHs in slots with CSI-RS, hence no CSI-RS resource element is
+    // rate-matched around.
+    static constexpr unsigned  nof_csi_rs_re = 0;
+    std::optional<sch_mcs_tbs> mcs_tbs =
+        compute_dl_mcs_tbs(pdsch_cfg, chosen_mcs_idx, prbs_tbs.nof_prbs, contains_dc, nof_csi_rs_re);
     if (mcs_tbs.has_value()) {
       chosen_mcs_idx     = mcs_tbs.value().mcs;
       prbs_tbs.tbs_bytes = mcs_tbs.value().tbs;
