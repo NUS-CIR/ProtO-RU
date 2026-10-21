@@ -7,6 +7,7 @@
 #include "ocudu/ofh/ethernet/ethernet_unique_buffer.h"
 #include "ocudu/support/ocudu_assert.h"
 #include <rte_ethdev.h>
+#include <utility>
 
 namespace ocudu {
 namespace ether {
@@ -18,16 +19,22 @@ public:
   explicit dpdk_rx_buffer_impl(::rte_mbuf* mbuf_) : mbuf(mbuf_)
   {
     ocudu_assert(mbuf, "Invalid DPDK mbuf was passed to dpdk_rx_buffer_impl");
+
+    // Some PMDs (e.g., net_memif) deliver a frame as a chain of segments, NIC ports always deliver a single segment. A
+    // frame that cannot be gathered in its first segment is discarded.
+    if (OCUDU_UNLIKELY(mbuf->nb_segs > 1) && ::rte_pktmbuf_linearize(mbuf) != 0) {
+      return;
+    }
+    frame = span<const uint8_t>(rte_pktmbuf_mtod(mbuf, const uint8_t*), mbuf->data_len);
   }
 
   /// Copy constructor is deleted.
   dpdk_rx_buffer_impl(dpdk_rx_buffer_impl& /**/) = delete;
 
   /// Move constructor.
-  dpdk_rx_buffer_impl(dpdk_rx_buffer_impl&& other) noexcept
+  dpdk_rx_buffer_impl(dpdk_rx_buffer_impl&& other) noexcept :
+    mbuf(std::exchange(other.mbuf, nullptr)), frame(std::exchange(other.frame, {}))
   {
-    mbuf       = other.mbuf;
-    other.mbuf = nullptr;
   }
 
   /// Move assignment operator.
@@ -36,8 +43,8 @@ public:
     // Free stored mbuf.
     ::rte_pktmbuf_free(mbuf);
 
-    mbuf       = other.mbuf;
-    other.mbuf = nullptr;
+    mbuf  = std::exchange(other.mbuf, nullptr);
+    frame = std::exchange(other.frame, {});
     return *this;
   }
 
@@ -47,13 +54,12 @@ public:
   span<const uint8_t> data() const override
   {
     ocudu_assert(mbuf != nullptr, "Invalid dpdk_rx_buffer_impl accessed");
-
-    ::uint8_t* eth_data = rte_pktmbuf_mtod(mbuf, uint8_t*);
-    return span<const uint8_t>(eth_data, mbuf->pkt_len);
+    return frame;
   }
 
 private:
-  ::rte_mbuf* mbuf;
+  ::rte_mbuf*         mbuf;
+  span<const uint8_t> frame;
 };
 
 } // namespace ether

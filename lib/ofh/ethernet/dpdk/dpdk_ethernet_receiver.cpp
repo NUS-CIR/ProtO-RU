@@ -103,7 +103,7 @@ void dpdk_receiver_impl::receive()
   if (!metrics_collector.disabled()) {
     uint64_t nof_bytes_received = 0;
     for (auto* mbuf : span<::rte_mbuf*>(mbufs.data(), num_frames)) {
-      nof_bytes_received += mbuf->data_len;
+      nof_bytes_received += mbuf->pkt_len;
     }
     metrics_collector.update_stats(meas.stop(), nof_bytes_received, num_frames);
   }

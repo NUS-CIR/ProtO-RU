@@ -13,8 +13,7 @@ namespace ocudu {
 namespace ether {
 
 /// DPDK configuration settings.
-constexpr unsigned MAX_BURST_SIZE  = 64;
-constexpr unsigned MAX_BUFFER_SIZE = 9600;
+constexpr unsigned MAX_BURST_SIZE = 64;
 
 /// DPDK port configuration.
 struct dpdk_port_config {

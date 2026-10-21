@@ -17,3 +17,7 @@ add_executable(ethernet_frame_pool_test ethernet_frame_pool_test.cpp)
 target_include_directories(ethernet_frame_pool_test PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(ethernet_frame_pool_test ocudu_ofh_ethernet ocudulog GTest::gtest ocudu_gtest_main)
 gtest_discover_tests(ethernet_frame_pool_test)
+
+if (DPDK_FOUND)
+    add_subdirectory(dpdk)
+endif (DPDK_FOUND)

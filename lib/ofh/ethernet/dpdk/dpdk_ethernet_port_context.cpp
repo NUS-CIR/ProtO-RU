@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 #include "ocudu/ofh/ethernet/dpdk/dpdk_ethernet_port_context.h"
+#include "ocudu/ofh/ethernet/ethernet_properties.h"
 #include <charconv>
 #include <memory>
 #include <optional>
@@ -16,6 +17,8 @@ static constexpr unsigned MBUF_CACHE_SIZE = 256;
 static constexpr unsigned RX_RING_SIZE    = 1024;
 static constexpr unsigned TX_RING_SIZE    = 1024;
 static constexpr unsigned NUM_MBUFS       = 9216;
+/// Size of the mbuf data buffers. It fits the largest frame, with the Ethernet header and a VLAN tag.
+static constexpr unsigned MAX_BUFFER_SIZE = MAX_ETH_FRAME_LENGTH + RTE_ETHER_HDR_LEN + RTE_VLAN_HLEN;
 
 /// DPDK port initialization routine.
 static bool port_init(const dpdk_port_config& config, ::rte_mempool* mem_pool, unsigned port_id)
@@ -47,7 +50,15 @@ static bool port_init(const dpdk_port_config& config, ::rte_mempool* mem_pool, u
   }
 
   // Configure MTU size.
-  if (::rte_eth_dev_set_mtu(port_id, config.mtu_size.value()) != 0) {
+  ret = ::rte_eth_dev_set_mtu(port_id, config.mtu_size.value());
+  if (ret == -ENOTSUP) {
+    // Some PMDs (e.g., net_memif) do not support configuring the MTU size and do not limit the size of the frames.
+    fmt::print("DPDK - Port does not support configuring the MTU size, the MTU size of '{}' bytes is not enforced. For "
+               "net_memif ports, set the 'bsize' device argument to '{}' bytes to receive each frame in a single "
+               "buffer\n",
+               config.mtu_size,
+               MAX_BUFFER_SIZE);
+  } else if (ret != 0) {
     uint16_t current_mtu;
     ::rte_eth_dev_get_mtu(port_id, &current_mtu);
     fmt::print("DPDK - Unable to configure MTU size to '{}' bytes, current MTU size is '{}' bytes\n",
