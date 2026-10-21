@@ -94,9 +94,9 @@ static std::vector<std::string> split_rf_driver_args(const std::string& driver_a
   return result;
 }
 
-/// Finds the ZMQ ports within the given driver arguments. Returns a vector that contains with the ZMQ transmission or
-/// reception ports.
-static std::vector<std::string> extract_zmq_ports(const std::string& driver_args, const std::string& port_id)
+/// Finds the values of the driver arguments named \c port_id, for example the ZMQ endpoints or the DIFI ports and
+/// addresses, in the order they appear.
+static std::vector<std::string> extract_stream_args(const std::string& driver_args, const std::string& port_id)
 {
   std::vector<std::string> ports;
 
@@ -133,18 +133,18 @@ static void generate_radio_config(radio_configuration::radio&                   
   out_cfg.tx_mode          = radio_configuration::to_transmission_mode(ru_cfg.expert_cfg.transmission_mode);
   out_cfg.power_ramping_us = ru_cfg.expert_cfg.power_ramping_time_us;
 
-  std::vector<std::string> zmq_tx_addr = extract_zmq_ports(ru_cfg.device_arguments, "tx_port");
-  std::vector<std::string> zmq_rx_addr = extract_zmq_ports(ru_cfg.device_arguments, "rx_port");
+  std::vector<std::string> zmq_tx_addr = extract_stream_args(ru_cfg.device_arguments, "tx_port");
+  std::vector<std::string> zmq_rx_addr = extract_stream_args(ru_cfg.device_arguments, "rx_port");
 
   std::vector<std::string> difi_tx_ports;
   std::vector<std::string> difi_rx_ports;
   std::vector<std::string> difi_tx_addrs;
   std::vector<std::string> difi_rx_addrs;
   if (ru_cfg.device_driver == "difi") {
-    difi_tx_ports = extract_zmq_ports(ru_cfg.device_arguments, "tx_port");
-    difi_rx_ports = extract_zmq_ports(ru_cfg.device_arguments, "rx_port");
-    difi_tx_addrs = extract_zmq_ports(ru_cfg.device_arguments, "tx_addr");
-    difi_rx_addrs = extract_zmq_ports(ru_cfg.device_arguments, "rx_addr");
+    difi_tx_ports = extract_stream_args(ru_cfg.device_arguments, "tx_port");
+    difi_rx_ports = extract_stream_args(ru_cfg.device_arguments, "rx_port");
+    difi_tx_addrs = extract_stream_args(ru_cfg.device_arguments, "tx_addr");
+    difi_rx_addrs = extract_stream_args(ru_cfg.device_arguments, "rx_addr");
   }
   // DIFI carries every antenna as a stream of its own, so the port lists hold one entry per antenna, numbered by cell
   // and then by antenna. Without a list, every stream takes the driver default port.

@@ -5,6 +5,7 @@
 #include "radio_difi_rx_channel.h"
 #include "ocudu/ocuduvec/copy.h"
 #include "ocudu/ocuduvec/zero.h"
+#include "ocudu/support/math/endianess_convert.h"
 #include <algorithm>
 #include <chrono>
 
@@ -21,17 +22,6 @@ static constexpr uint8_t DIFI_PKT_TYPE_DATA = 0x1U;
 
 /// Largest number of IQ samples one datagram can carry, at the 8 bit depth where a sample takes two bytes.
 static constexpr size_t MAX_SAMPLES_PER_DATAGRAM = (DIFI_MAX_UDP_PAYLOAD.value() - DIFI_DATA_HEADER_SIZE.value()) / 2;
-
-static inline uint32_t read_u32_be(const uint8_t* p)
-{
-  return (static_cast<uint32_t>(p[0]) << 24) | (static_cast<uint32_t>(p[1]) << 16) |
-         (static_cast<uint32_t>(p[2]) << 8) | static_cast<uint32_t>(p[3]);
-}
-
-static inline uint64_t read_u64_be(const uint8_t* p)
-{
-  return (static_cast<uint64_t>(read_u32_be(p)) << 32) | read_u32_be(p + 4);
-}
 
 /// Returns the number of payload bytes of one IQ sample at \p bit_depth.
 static unsigned get_bytes_per_sample(unsigned bit_depth)
@@ -169,17 +159,17 @@ radio_difi_rx_channel::read_status radio_difi_rx_channel::try_read(data_packet& 
   }
 
   // Packet type lives in bits[31:28]. Context and unknown types carry no samples.
-  const uint32_t header = read_u32_be(datagram.data());
+  const uint32_t header = read_u32_be(datagram.first(4));
   if (static_cast<uint8_t>((header >> 28) & 0xfU) != DIFI_PKT_TYPE_DATA) {
     return read_status::discarded;
   }
 
-  if (read_u32_be(datagram.data() + 4) != config.difi_stream_id) {
+  if (read_u32_be(datagram.subspan(4, 4)) != config.difi_stream_id) {
     return read_status::discarded;
   }
 
-  packet.timestamp =
-      difi_time_to_ticks(read_u32_be(datagram.data() + 16), read_u64_be(datagram.data() + 20), config.sample_rate_Hz);
+  packet.timestamp = difi_time_to_ticks(
+      read_u32_be(datagram.subspan(16, 4)), read_u64_be(datagram.subspan(20, 8)), config.sample_rate_Hz);
   packet.payload     = datagram.last(datagram.size() - DIFI_DATA_HEADER_SIZE.value());
   packet.nof_samples = static_cast<unsigned>(packet.payload.size() / get_bytes_per_sample(config.bit_depth));
   return read_status::data;

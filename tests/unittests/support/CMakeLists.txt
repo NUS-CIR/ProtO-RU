@@ -126,3 +126,7 @@ add_test(math_test math_test)
 add_executable(bit_ops_test math/bit_ops_test.cpp)
 target_link_libraries(bit_ops_test ocudu_support_math gtest ocudu_gtest_main)
 add_test(bit_ops_test bit_ops_test)
+
+add_executable(endianess_convert_test math/endianess_convert_test.cpp)
+target_link_libraries(endianess_convert_test ocudu_support_math gtest ocudu_gtest_main)
+add_test(endianess_convert_test endianess_convert_test)
