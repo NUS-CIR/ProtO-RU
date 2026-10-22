@@ -23,6 +23,17 @@ static unsigned get_pdsch_n_id(pci_t pci, const sched_bwp_config& bwp, dci_dl_fo
   return pci;
 }
 
+/// Fills the power offsets of a PDSCH that is scheduled without UE-dedicated configuration.
+static void populate_pdsch_pwr_offsets(pdsch_information& pdsch, const cell_configuration& cell_cfg)
+{
+  const auto& csi_cfg = cell_cfg.bwp_res[to_bwp_id(0)].dl().csi;
+  if (csi_cfg.has_value()) {
+    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
+    // all resources. The powerControlOffsetSS is always 0 dB.
+    pdsch.tx_pwr_info.pwr_ctrl_offset = csi_cfg->nzp_csi_rs_list.front().pwr_ctrl_offset;
+  }
+}
+
 pusch_config_params ocudu::get_pusch_config_f0_0_tc_rnti(const cell_configuration&                    cell_cfg,
                                                          const pusch_time_domain_resource_allocation& pusch_td_cfg)
 {
@@ -211,12 +222,7 @@ void ocudu::build_pdsch_f1_0_si_rnti(pdsch_information&                   pdsch,
   // [Implementation-defined] A PDSCH scheduled with DCI format 1_0 is neither precoded nor beamformed.
   pdsch.precoding_and_beamforming = make_default_precoding();
 
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
-    // all resources. The powerControlOffsetSS is always 0 dB.
-    pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-  }
+  populate_pdsch_pwr_offsets(pdsch, cell_cfg);
 }
 
 void ocudu::build_pdsch_f1_0_p_rnti(pdsch_information&                  pdsch,
@@ -258,12 +264,7 @@ void ocudu::build_pdsch_f1_0_p_rnti(pdsch_information&                  pdsch,
   // [Implementation-defined] A PDSCH scheduled with DCI format 1_0 is neither precoded nor beamformed.
   pdsch.precoding_and_beamforming = make_default_precoding();
 
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
-    // all resources. The powerControlOffsetSS is always 0 dB.
-    pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-  }
+  populate_pdsch_pwr_offsets(pdsch, cell_cfg);
 }
 
 void ocudu::build_pdsch_f1_0_ra_rnti(pdsch_information&                   pdsch,
@@ -311,12 +312,7 @@ void ocudu::build_pdsch_f1_0_ra_rnti(pdsch_information&                   pdsch,
   // [Implementation-defined] A PDSCH scheduled with DCI format 1_0 is neither precoded nor beamformed.
   pdsch.precoding_and_beamforming = make_default_precoding();
 
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
-    // all resources. The powerControlOffsetSS is always 0 dB.
-    pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-  }
+  populate_pdsch_pwr_offsets(pdsch, cell_cfg);
 }
 
 void ocudu::build_pdsch_f1_0_tc_rnti(pdsch_information&                   pdsch,
@@ -357,12 +353,7 @@ void ocudu::build_pdsch_f1_0_tc_rnti(pdsch_information&                   pdsch,
   // [Implementation-defined] A PDSCH scheduled with DCI format 1_0 is neither precoded nor beamformed.
   pdsch.precoding_and_beamforming = make_default_precoding();
 
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
-    // all resources. The powerControlOffsetSS is always 0 dB.
-    pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-  }
+  populate_pdsch_pwr_offsets(pdsch, cell_cfg);
 
   pdsch.mcs_table = pdsch_cfg.mcs_table;
 
@@ -409,12 +400,7 @@ void ocudu::build_pdsch_f1_0_c_rnti(pdsch_information&                  pdsch,
   // [Implementation-defined] A PDSCH scheduled with DCI format 1_0 is neither precoded nor beamformed.
   pdsch.precoding_and_beamforming = make_default_precoding();
 
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
-    // all resources. The powerControlOffsetSS is always 0 dB.
-    pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-  }
+  populate_pdsch_pwr_offsets(pdsch, cell_cfg);
 
   pdsch.mcs_table = pdsch_cfg.mcs_table;
 
@@ -477,12 +463,7 @@ void ocudu::build_pdsch_f1_1_c_rnti(pdsch_information&              pdsch,
   // Beamforming and precoding.
   pdsch.precoding_and_beamforming = cs_mgr.get_precoding(pdsch_cfg.nof_layers);
 
-  // Populate power offsets.
-  if (not cell_cfg.nzp_csi_rs_list.empty()) {
-    // [Implementation-defined] It is assumed that same powerControlOffset is configured in NZP-CSI-RS-Resource across
-    // all resources. The powerControlOffsetSS is always 0 dB.
-    pdsch.tx_pwr_info.pwr_ctrl_offset = cell_cfg.nzp_csi_rs_list.front().pwr_ctrl_offset;
-  }
+  populate_pdsch_pwr_offsets(pdsch, cell_cfg);
 }
 
 void ocudu::build_pusch_f0_0_tc_rnti(pusch_information&                   pusch,

@@ -59,11 +59,16 @@ static csi_rs_info build_csi_rs_info(const bwp_configuration& bwp_cfg, const nzp
 
 csi_rs_scheduler::csi_rs_scheduler(const cell_configuration& cell_cfg_) : cell_cfg(cell_cfg_)
 {
-  for (const auto& res : cell_cfg.zp_csi_rs_list) {
+  const auto& csi_cfg = cell_cfg.bwp_res[to_bwp_id(0)].dl().csi;
+  if (not csi_cfg.has_value()) {
+    return;
+  }
+
+  for (const auto& res : csi_cfg->zp_csi_rs_list) {
     cached_csi_rs.push_back(build_csi_rs_info(cell_cfg.params.dl_cfg_common.init_dl_bwp.generic_params, res));
   }
 
-  for (const auto& nzp_csi : cell_cfg.nzp_csi_rs_list) {
+  for (const auto& nzp_csi : csi_cfg->nzp_csi_rs_list) {
     cached_csi_rs.push_back(build_csi_rs_info(cell_cfg.params.dl_cfg_common.init_dl_bwp.generic_params, nzp_csi));
   }
 }
@@ -76,12 +81,14 @@ void csi_rs_scheduler::run_slot(cell_slot_resource_allocator& res_grid)
   if (not cell_cfg.is_dl_enabled(res_grid.slot)) {
     return;
   }
+  // The cache is not empty only if the cell configures CSI.
+  const cell_bwp_csi_config& csi_cfg = *cell_cfg.bwp_res[to_bwp_id(0)].dl().csi;
 
   auto csi_rs_pdus = res_grid.result_builder().dl().csi_rs();
 
   // Schedule zp-CSI-RS PDUs.
-  for (unsigned i = 0; i != cell_cfg.zp_csi_rs_list.size(); ++i) {
-    const zp_csi_rs_resource& zp_csi = cell_cfg.zp_csi_rs_list[i];
+  for (unsigned i = 0; i != csi_cfg.zp_csi_rs_list.size(); ++i) {
+    const zp_csi_rs_resource& zp_csi = csi_cfg.zp_csi_rs_list[i];
     if ((res_grid.slot - zp_csi.offset).count() % (unsigned)zp_csi.period == 0) {
       [[maybe_unused]] const csi_rs_info* pdu = csi_rs_pdus.emplace_back(cached_csi_rs[i]);
       ocudu_assert(pdu != nullptr, "Failed to allocate ZP-CSI-RS PDU");
@@ -89,9 +96,9 @@ void csi_rs_scheduler::run_slot(cell_slot_resource_allocator& res_grid)
   }
 
   // Schedule nzp-CSI-RS PDUs.
-  for (unsigned i = 0; i != cell_cfg.nzp_csi_rs_list.size(); ++i) {
-    const nzp_csi_rs_resource& nzp_csi    = cell_cfg.nzp_csi_rs_list[i];
-    const auto&                csi_rs_pdu = cached_csi_rs[cell_cfg.zp_csi_rs_list.size() + i];
+  for (unsigned i = 0; i != csi_cfg.nzp_csi_rs_list.size(); ++i) {
+    const nzp_csi_rs_resource& nzp_csi    = csi_cfg.nzp_csi_rs_list[i];
+    const auto&                csi_rs_pdu = cached_csi_rs[csi_cfg.zp_csi_rs_list.size() + i];
     if ((res_grid.slot - nzp_csi.csi_res_offset).count() % (unsigned)nzp_csi.csi_res_period == 0) {
       [[maybe_unused]] const csi_rs_info* pdu = csi_rs_pdus.emplace_back(csi_rs_pdu);
       ocudu_assert(pdu != nullptr, "Failed to allocate NZP-CSI-RS PDU");

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ocudu/ran/csi_report/csi_report_configuration.h"
+#include "ocudu/ran/csi_rs/csi_meas_config.h"
 #include "ocudu/ran/csi_rs/csi_report_config.h"
 #include "ocudu/ran/pucch/pucch_configuration.h"
 #include "ocudu/ran/pucch/pucch_constants.h"
@@ -25,6 +26,10 @@ struct cell_bwp_csi_config {
   csi_report_configuration type1_report;
   /// CSI report with the Type-II codebook. Present only if the cell offers the Type-II codebook.
   std::optional<csi_report_configuration> type2_report;
+  /// NZP-CSI-RS resources transmitted in the BWP.
+  std::vector<nzp_csi_rs_resource> nzp_csi_rs_list;
+  /// ZP-CSI-RS resources of the BWP.
+  std::vector<zp_csi_rs_resource> zp_csi_rs_list;
 
   /// Gets the CSI report of a UE with the given codebook.
   const csi_report_configuration& report(csi_codebook_type codebook) const

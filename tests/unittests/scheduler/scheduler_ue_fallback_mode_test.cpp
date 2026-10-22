@@ -141,9 +141,10 @@ public:
     // Create cell config with space for two PDCCHs in the SearchSpace#1.
     add_cell(sched_config_helper::make_default_sched_cell_configuration_request(builder_params));
 
-    ocudu_assert(not this->cell_cfg(to_du_cell_index(0)).nzp_csi_rs_list.empty(),
+    const auto& csi_cfg = this->cell_cfg(to_du_cell_index(0)).bwp_res[to_bwp_id(0)].dl().csi;
+    ocudu_assert(csi_cfg.has_value() and not csi_cfg->nzp_csi_rs_list.empty(),
                  "This test assumes a setup with NZP CSI-RS enabled");
-    ocudu_assert(not this->cell_cfg(to_du_cell_index(0)).zp_csi_rs_list.empty(),
+    ocudu_assert(csi_cfg.has_value() and not csi_cfg->zp_csi_rs_list.empty(),
                  "This test assumes a setup with ZP CSI-RS enabled");
 
     // Create a UE with a DRB active.

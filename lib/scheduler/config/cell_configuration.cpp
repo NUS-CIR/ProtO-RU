@@ -10,30 +10,11 @@
 #include "ocudu/ran/band_helper.h"
 #include "ocudu/ran/resource_block.h"
 #include "ocudu/scheduler/config/csi_helper.h"
-#include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/config/serving_cell_config_factory.h"
 
 using namespace ocudu;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static std::vector<zp_csi_rs_resource> make_zp_csi_rs_list(const ran_cell_config& cfg)
-{
-  if (!cfg.init_bwp.csi.has_value()) {
-    return {};
-  }
-  const auto csi_helper = config_helpers::make_csi_meas_config_builder_params(cfg);
-  return csi_helper::make_periodic_zp_csi_rs_resource_list(csi_helper);
-}
-
-static std::vector<nzp_csi_rs_resource> make_nzp_csi_rs_list(const ran_cell_config& cfg)
-{
-  if (!cfg.init_bwp.csi.has_value()) {
-    return {};
-  }
-  const auto csi_helper = config_helpers::make_csi_meas_config_builder_params(cfg);
-  return csi_helper::make_nzp_csi_rs_resource_list(csi_helper);
-}
 
 cell_configuration::cell_configuration(const scheduler_expert_config&                  expert_cfg_,
                                        const sched_cell_configuration_request_message& msg,
@@ -50,8 +31,6 @@ cell_configuration::cell_configuration(const scheduler_expert_config&           
   nof_ul_prbs(
       get_max_Nprb(params.ul_carrier.carrier_bw, scs_common(), band_helper::get_freq_range(params.ul_carrier.band))),
   nof_slots_per_frame(get_nof_slots_per_subframe(scs_common()) * NOF_SUBFRAMES_PER_FRAME),
-  zp_csi_rs_list(make_zp_csi_rs_list(params)),
-  nzp_csi_rs_list(make_nzp_csi_rs_list(params)),
   csi_report_trigger_size(
       params.init_bwp.csi.has_value() ? csi_helper::get_csi_report_trigger_size(*params.init_bwp.csi) : 0),
   init_bwp(init_bwp_),
