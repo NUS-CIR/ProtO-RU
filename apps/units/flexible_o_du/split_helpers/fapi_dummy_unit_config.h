@@ -17,7 +17,7 @@ struct fapi_dummy_unit_config {
   /// Number of slots between an uplink slot and the notification of its indications.
   unsigned ul_indication_delay_slots = 4;
   /// Number of slots a SLOT.indication is notified in advance of the transmission time.
-  unsigned max_processing_delay_slots = 2;
+  unsigned max_processing_delay_slots = 6;
 };
 
 } // namespace ocudu

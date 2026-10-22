@@ -168,9 +168,12 @@ static void manage_fapi_dummy(CLI::App& app, dynamic_o_du_unit_config& parsed_cf
 
   parsed_cfg.fapi_dummy_cfg = fapi_dummy_parsed_cfg;
 
-  for (const char* section : {"ru_ofh", "ru_sdr", "ru_dummy", "expert_phy"}) {
-    if (app.get_subcommand(section)->count_all() != 0) {
-      fmt::println("Warning: the '{}' section is ignored, since the FAPI dummy replaces the PHY and the Radio Unit",
+  // The sections that configure the PHY or the Radio Unit, which the FAPI dummy replaces.
+  for (const char* section : {"ru_ofh", "ru_sdr", "ru_dummy", "expert_phy", "hal", "power_calibration"}) {
+    const CLI::App* subcmd = app.get_subcommand_no_throw(section);
+    if (subcmd != nullptr && subcmd->count_all() != 0) {
+      fmt::println("Warning: the parameters of the '{}' section will be ignored, since the FAPI dummy replaces the PHY "
+                   "and the Radio Unit",
                    section);
     }
   }
