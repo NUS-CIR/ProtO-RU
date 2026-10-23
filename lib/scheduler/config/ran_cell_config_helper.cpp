@@ -484,6 +484,13 @@ unsigned config_helpers::compute_last_non_srs_symbol(const ran_cell_config& cell
   return NOF_OFDM_SYM_PER_SLOT_NORMAL_CP - nof_srs_symbols;
 }
 
+bool config_helpers::is_cg_pusch_td_res_usable(const pusch_time_domain_resource_allocation& td,
+                                               unsigned                                     last_non_srs_symbol)
+{
+  // The CG scheduler emits a single PUSCH per occasion, so a row asking for slot repetitions cannot be used.
+  return td.symbols.stop() <= last_non_srs_symbol and td.nof_repetitions.value_or(1) == 1;
+}
+
 std::optional<unsigned> config_helpers::find_cg_pusch_td_res_idx(const ran_cell_config& cell_cfg)
 {
   ocudu_assert(cell_cfg.init_bwp.cg_cfg.has_value(), "This function cannot be called if CG is not set");
@@ -496,7 +503,7 @@ std::optional<unsigned> config_helpers::find_cg_pusch_td_res_idx(const ran_cell_
   // PUSCH time-domain resources are sorted by increasing k2 first, then by decreasing symbols .stop().
   const auto& td_res = cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common.value().pusch_td_alloc_list;
   for (unsigned n = 0, sz = td_res.size(); n != sz; ++n) {
-    if (td_res[n].symbols.stop() <= last_non_srs_symbol) {
+    if (is_cg_pusch_td_res_usable(td_res[n], last_non_srs_symbol)) {
       return n;
     }
   }

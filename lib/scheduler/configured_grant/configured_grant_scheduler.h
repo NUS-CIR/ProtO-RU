@@ -43,8 +43,11 @@ public:
   /// \brief Triggers the removal of this UE from the list of UEs with pending activation.
   ///
   /// Called upon CG activation acknowledgement, either via a Configured Grant Confirmation MAC CE or a non-DTX CRC.
+  /// \param[in] pusch_slot Slot of the PUSCH that carried the confirmation: the CG PUSCH whose CRC triggered the
+  /// indication, or the PUSCH that carried the CG Confirmation MAC CE. A confirmation carried by a PUSCH that precedes
+  /// the release of an earlier activation attempt is not taken as a confirmation of the current one.
   /// \remark Idempotent. A call for a UE without a pending activation has no effect. No-op for Type 1 Configured Grant.
-  virtual void handle_cg_activation_complete_indication(du_ue_index_t ue_idx) = 0;
+  virtual void handle_cg_activation_complete_indication(du_ue_index_t ue_idx, slot_point pusch_slot) = 0;
 
   /// Notifies the scheduler that the results for a given slot were partially or fully discarded by the lower layers.
   /// \param[in] sl_tx Slot whose results were discarded.

@@ -87,8 +87,9 @@ private:
   // Processes all CG PUSCH opportunities for the given slot.
   void allocate_slot_cg_opportunities(cell_slot_resource_allocator& slot_alloc);
 
-  // Helper that runs preliminary checks on the CG opportunity validity.
-  bool validate_cg_opportunity(cell_slot_resource_allocator& slot_alloc, rnti_t rnti) const;
+  // Helper that runs preliminary checks on the CG opportunity validity, for an occasion past the first-transmission
+  // gate.
+  bool validate_cg_opportunity(cell_slot_resource_allocator& slot_alloc, const ue_cell& ue_cc) const;
 
   // Allocates a single CG PUSCH opportunity for the given RNTI.
   bool allocate_cg_opportunity(cell_slot_resource_allocator& slot_alloc, rnti_t rnti);

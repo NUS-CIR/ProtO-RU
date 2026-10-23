@@ -112,20 +112,32 @@ static validator_result validate_cg_cfg(const serving_cell_config& serv_cell_cfg
             : span<const pusch_time_domain_resource_allocation>(
                   cell_cfg.init_bwp.ul.pusch_common()->pusch_td_alloc_list);
 
-    const unsigned last_non_srs_symbol      = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
-    const auto     is_usable_for_activation = [last_non_srs_symbol](const pusch_time_domain_resource_allocation& td) {
-      return td.nof_repetitions.value_or(1) == 1 and td.symbols.stop() <= last_non_srs_symbol;
-    };
-    VERIFY(std::any_of(activation_td_list.begin(), activation_td_list.end(), is_usable_for_activation),
+    const unsigned last_non_srs_symbol = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
+    VERIFY(std::any_of(activation_td_list.begin(),
+                       activation_td_list.end(),
+                       [last_non_srs_symbol](const pusch_time_domain_resource_allocation& td) {
+                         return config_helpers::is_cg_pusch_td_res_usable(td, last_non_srs_symbol);
+                       }),
            "Configured Grant type 2 requires a PUSCH time domain resource that both ends at or before symbol {}, where "
            "the SRS region starts, and requests no slot repetitions, but none of the {} entries of the {} list "
            "qualifies",
            last_non_srs_symbol,
            activation_td_list.size(),
            has_ded_td_list ? "dedicated" : "common");
-  }
 
-  if (type2) {
+    // [Implementation-defined] Reconfiguration of TDRA list while CG is active is not supported. As a safe-guard
+    // for future refactors, we enforce that the dedicated PUSCH time domain resource list starts with the entries of
+    // the common list.
+    if (has_ded_td_list) {
+      const span<const pusch_time_domain_resource_allocation> common_td_list =
+          cell_cfg.init_bwp.ul.pusch_common()->pusch_td_alloc_list;
+      VERIFY(activation_td_list.size() >= common_td_list.size() and
+                 std::equal(common_td_list.begin(), common_td_list.end(), activation_td_list.begin()),
+             "Configured Grant type 2 requires the dedicated PUSCH time domain resource list to start with the {} "
+             "entries of the common list",
+             common_td_list.size());
+    }
+
     return {};
   }
 

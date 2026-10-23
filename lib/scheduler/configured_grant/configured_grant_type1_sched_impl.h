@@ -31,7 +31,7 @@ public:
     // No-op, only used for CG type2.
   }
 
-  void handle_cg_activation_complete_indication(du_ue_index_t ue_idx) override
+  void handle_cg_activation_complete_indication(du_ue_index_t ue_idx, slot_point pusch_slot) override
   {
     // No-op, only used for CG type2.
   }

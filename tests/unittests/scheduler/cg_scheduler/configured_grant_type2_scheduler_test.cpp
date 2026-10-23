@@ -383,13 +383,16 @@ protected:
 
   /// Sends the CG activation confirmation, which takes the UE out of the scheduler's pending-activation list and
   /// stops the activation from being retried.
-  void confirm_cg_activation(du_ue_index_t ue_idx = to_du_ue_index(0), rnti_t crnti = ue_crnti) const
+  /// \param slot_rx Slot of the PUSCH that carried the MAC CE; the last scheduled slot when invalid.
+  void confirm_cg_activation(du_ue_index_t ue_idx  = to_du_ue_index(0),
+                             rnti_t        crnti   = ue_crnti,
+                             slot_point    slot_rx = {}) const
   {
     cg_confirmation_indication_message cg_conf{};
     cg_conf.cell_index = to_du_cell_index(0);
     cg_conf.ue_index   = ue_idx;
     cg_conf.rnti       = crnti;
-    cg_conf.slot_rx    = last_result_slot();
+    cg_conf.slot_rx    = slot_rx.valid() ? slot_rx : last_result_slot();
     sched->handle_cg_confirmation_message(cg_conf);
   }
 
@@ -552,6 +555,75 @@ TEST_F(configured_grant_type2_scheduler_test, cg_activation_retry_is_not_release
 
   EXPECT_GT(third_pdcch_slot, second_pdcch_slot + static_cast<int>(min_slots_before_retry(cg_params.period_slots)))
       << "the retried activation was released again immediately: the missed-CRC counter is not reset per attempt";
+}
+
+/// \brief Late activation confirmations of a released CG Type 2 activation attempt.
+///
+/// The confirmations a released attempt drew from the UE - the CRCs of its CG PUSCHs and a CG Confirmation MAC CE - can
+/// still reach the scheduler after the retry DCI was allocated. Such a confirmation says nothing about whether the UE
+/// received the retry DCI, so it must not confirm it: otherwise the UE leaves the pending-activation list and a missed
+/// retry DCI is never detected.
+class configured_grant_type2_late_confirmation_test : public configured_grant_type2_scheduler_test
+{
+protected:
+  /// \brief Activates the UE and runs until the retry DCI, keeping the last CG PUSCH of the first attempt, whose CRC
+  /// is still outstanding.
+  void run_until_retry()
+  {
+    ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+    push_ul_data();
+
+    ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
+        << "No CG Type 2 activation DCI was allocated";
+
+    slot_point retry_pdcch_slot;
+    for (unsigned i = 0, e = missed_activation_window(cg_params.period_slots); i != e and not retry_pdcch_slot.valid();
+         ++i) {
+      run_slot();
+      if (const ul_sched_info* grant = find_ue_pusch(cs_rnti, *last_sched_result()); grant != nullptr) {
+        last_old_grant      = *grant;
+        last_old_grant_slot = last_result_slot();
+      }
+      if (find_ue_ul_pdcch(cs_rnti) != nullptr) {
+        retry_pdcch_slot = last_result_slot();
+      }
+    }
+    ASSERT_TRUE(retry_pdcch_slot.valid()) << "CG Type 2 activation was not retried";
+    ASSERT_TRUE(last_old_grant.has_value()) << "No CG PUSCH occasion followed the first activation DCI";
+    ASSERT_LT(last_old_grant_slot, retry_pdcch_slot);
+  }
+
+  /// Returns whether the retry is released and retried again, i.e. whether it was left unconfirmed.
+  bool retry_is_retried_again()
+  {
+    return run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots)).valid();
+  }
+
+  std::optional<ul_sched_info> last_old_grant;
+  slot_point                   last_old_grant_slot;
+};
+
+TEST_F(configured_grant_type2_late_confirmation_test, late_crc_of_released_attempt_does_not_confirm_retry)
+{
+  ASSERT_NO_FATAL_FAILURE(run_until_retry());
+
+  // The late CRC of the first attempt reports a transmission.
+  send_cg_crc(*last_old_grant, last_old_grant_slot, /*crc_ok=*/true, /*sinr_dB=*/10.0F);
+
+  EXPECT_TRUE(retry_is_retried_again())
+      << "the late CRC of the released activation attempt confirmed the retry, which was then never retried";
+}
+
+TEST_F(configured_grant_type2_late_confirmation_test, late_mac_ce_of_released_attempt_does_not_confirm_retry)
+{
+  ASSERT_NO_FATAL_FAILURE(run_until_retry());
+
+  // The CG Confirmation MAC CE of the first attempt, carried by one of its PUSCHs.
+  confirm_cg_activation(to_du_ue_index(0), ue_crnti, last_old_grant_slot);
+
+  EXPECT_TRUE(retry_is_retried_again())
+      << "the late CG Confirmation MAC CE of the released activation attempt confirmed the retry, which was then never "
+         "retried";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, ue_reconfiguration_without_cg_is_handled)

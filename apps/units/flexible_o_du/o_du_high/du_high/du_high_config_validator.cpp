@@ -2177,6 +2177,15 @@ static bool validate_base_cell_unit_config(const du_high_unit_base_cell_config& 
     return false;
   }
 
+  // [Implementation-defined] Configured Grants is not supported in NTN cells.
+  // NOTE: a TN cell may carry an NTN config listing only NTN neighbor cells, which does not make it an NTN cell.
+  const bool is_ntn_cell =
+      band_helper::is_ntn_band(band) or (config.ntn_cfg.has_value() and config.ntn_cfg->serving.has_value());
+  if (config.cg_cfg.periodicity_slots.has_value() and is_ntn_cell) {
+    fmt::print("Configured grants are not supported in NTN cells.\n");
+    return false;
+  }
+
   return validate_redcap_config(config, band);
 }
 

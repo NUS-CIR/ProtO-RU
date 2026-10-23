@@ -37,15 +37,14 @@ public:
 
   void start_ue_cg_activation(du_ue_index_t ue_idx) override;
 
-  void handle_cg_activation_complete_indication(du_ue_index_t ue_idx) override;
+  void handle_cg_activation_complete_indication(du_ue_index_t ue_idx, slot_point pusch_slot) override;
 
   void handle_error_indication(slot_point sl_tx, scheduler_slot_handler::error_outcome event) override;
 
   void stop() override;
 
 private:
-  // UEs whose CG configuration has been added or updated in between the last and current slot indications. Their CG
-  // resources still need to be pre-reserved over the whole resource grid.
+  // UE whose CG Type 2 activation is not confirmed yet, with the state of its current activation attempt.
   struct ue_pending_activation {
     explicit ue_pending_activation(du_ue_index_t ue_index_) : ue_index(ue_index_) {}
 
@@ -68,9 +67,17 @@ private:
     // confirmation may indicate the UE never receives the DCI for CG activation. Entries are removed either when the
     // corresponding CRC arrives or when they expire, and their position carries no meaning.
     slotted_array<slot_point, max_nof_missed_crc_events> slots_expecting_crc;
+
+    // Used to determine whether a late activation confirmation, i.e. a CRC of a CG PUSCH or a CG Confirmation MAC CE,
+    // that is received by the scheduler belongs to the previous activation attempt. If the slot of the PUSCH carrying
+    // the confirmation is older than \ref stale_confirmation_before, then the confirmation should not be used for the
+    // activation complete indication.
+    // NOTE: a CG Confirmation MAC CE of the previous attempt that only decodes in a HARQ retransmission after the
+    // release is not caught, as its PUSCH slot does not precede it; however, this scenario is very unlikely.
+    slot_point stale_confirmation_before;
   };
 
-  // Adds a UE's CG grant positions to the slot wheel, one every CG period. Used by add_reconf_ue().
+  // Adds a UE's CG grant positions to the slot wheel, one every CG period.
   void add_ue_to_wheel(const ue_cell_configuration& ue_cfg, unsigned time_domain_offset);
 
   // Scans the list of UEs pending activation and proceeds with activation procedure.
@@ -99,7 +106,8 @@ private:
 
   // Undoes an activation attempt: returns the CG resource to the pool, removes the UE from the periodic wheel and
   // drops its grant info, leaving the UE in the pending list so that run_ues_activation() retries it.
-  void release_ue_activation(ue_pending_activation& u);
+  // \param stale_confirmation_before First slot with no CG PUSCH allocated for the attempt being released.
+  void release_ue_activation(ue_pending_activation& u, slot_point stale_confirmation_before);
 
   pdcch_ul_information* alloc_pdcch_ul_information(cell_slot_resource_allocator& pdcch_alloc,
                                                    du_ue_index_t                 ue_idx) const;
@@ -116,6 +124,9 @@ private:
 
   // [Implementation-defined] Max expected delay with which lower layers report CRC for a given PUSCH.
   static constexpr unsigned max_expected_crc_delay = 50U;
+
+  // Slot of the last run_slot() call.
+  slot_point last_run_slot;
 
   // List of UEs that are waiting for to be activated for CG type2.
   std::vector<ue_pending_activation> ues_pending_activation;

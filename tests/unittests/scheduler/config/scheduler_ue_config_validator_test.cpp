@@ -144,10 +144,12 @@ protected:
       sched_config_helper::make_default_sched_cell_configuration_request();
   du_cell_group_config_pool cfg_pool;
 
-  /// \brief Validates a Type 2 CG UE whose dedicated TDRA list holds a single row.
-  /// \param nof_repetitions Repetitions that row asks for. A row asking for more than one is unusable, as the CG
+  /// \brief Validates a Type 2 CG UE whose dedicated TDRA list mirrors the cell's common list.
+  /// \param nof_repetitions Repetitions every row asks for. A row asking for more than one is unusable, as the CG
   /// scheduler emits a single PUSCH per occasion.
-  error_type<std::string> validate(uint8_t nof_repetitions)
+  /// \param prepend_row Whether to put a row absent from the common list ahead of the mirrored ones, so that the
+  /// dedicated list no longer starts with the common one.
+  error_type<std::string> validate(uint8_t nof_repetitions, bool prepend_row = false)
   {
     cell_req.ran.init_bwp.cg_cfg = cg_builder_params{.type = cg_builder_params::cg_type::type2};
 
@@ -158,13 +160,22 @@ protected:
     // A Type 2 CG carries no RRC-configured grant.
     ul_cfg.init_ul_bwp.cg_cfg->rrc_configured_ul_grant_cfg.reset();
 
-    // Give the UE a dedicated list of exactly one row, taken from the cell's common list so that it is otherwise
-    // usable, and ask for the repetitions under test. The activation resolves against the dedicated list whenever one
-    // is configured, so this row is the only candidate the scheduler would have.
-    pusch_time_domain_resource_allocation td_res =
-        cell_req.ran.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list.front();
-    td_res.nof_repetitions                            = nof_repetitions;
-    ul_cfg.init_ul_bwp.pusch_cfg->pusch_td_alloc_list = {td_res};
+    // Give the UE a dedicated list that copies the cell's common list, as the DU does, and have every row ask for the
+    // repetitions under test. The activation resolves against the dedicated list whenever one is configured, so these
+    // rows are the only candidates the scheduler would have.
+    const auto& common_list = cell_req.ran.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
+    auto&       ded_list    = ul_cfg.init_ul_bwp.pusch_cfg->pusch_td_alloc_list;
+    ded_list.assign(common_list.begin(), common_list.end());
+    if (nof_repetitions > 1) {
+      for (pusch_time_domain_resource_allocation& td_res : ded_list) {
+        td_res.nof_repetitions = nof_repetitions;
+      }
+    }
+    if (prepend_row) {
+      pusch_time_domain_resource_allocation extra_row = common_list.front();
+      ++extra_row.k2;
+      ded_list.insert(ded_list.begin(), extra_row);
+    }
 
     return config_validators::validate_sched_ue_creation_request_message(ue_req, cell_cfg);
   }
@@ -181,4 +192,13 @@ TEST_F(cg_type2_activation_td_res_validator_test, cg_type2_whose_only_td_res_ask
   ASSERT_FALSE(result.has_value());
   // Assert on the cause, so that the test cannot pass on an unrelated validation failure.
   ASSERT_NE(result.error().find("slot repetitions"), std::string::npos) << result.error();
+}
+
+TEST_F(cg_type2_activation_td_res_validator_test,
+       cg_type2_whose_ded_td_list_does_not_start_with_the_common_list_is_invalid)
+{
+  const auto result = validate(/*nof_repetitions=*/1, /*prepend_row=*/true);
+  ASSERT_FALSE(result.has_value());
+  // Assert on the cause, so that the test cannot pass on an unrelated validation failure.
+  ASSERT_NE(result.error().find("start with"), std::string::npos) << result.error();
 }

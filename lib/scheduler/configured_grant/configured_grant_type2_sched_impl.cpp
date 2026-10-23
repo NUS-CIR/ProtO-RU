@@ -17,7 +17,6 @@
 #include "cg_type2_resource_manager.h"
 #include "ocudu/ran/csi_report/csi_report_config_helpers.h"
 #include "ocudu/ran/direct_current_offset.h"
-#include "ocudu/ran/prach/ra_helper.h"
 #include "ocudu/ran/slot_pdu_capacity_constants.h"
 #include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/support/rb_helper.h"
@@ -47,26 +46,19 @@ static const search_space_info* get_cg_activation_search_space(const ue_cell_con
   return nullptr;
 }
 
-static unsigned get_max_k2(span<const pusch_time_domain_resource_allocation> pusch_td_alloc_list)
-{
-  unsigned max_k2 = 0;
-  for (const pusch_time_domain_resource_allocation& td : pusch_td_alloc_list) {
-    max_k2 = std::max(max_k2, static_cast<unsigned>(td.k2));
-  }
-  return max_k2;
-}
-
 static bool are_grants_and_rbs_free(cell_resource_allocator&                          cell_alloc,
                                     span<const pusch_time_domain_resource_allocation> pusch_td_list,
                                     unsigned                                          cg_period_slots,
                                     uint8_t                                           td_alloc,
                                     const crb_interval&                               crbs,
                                     subcarrier_spacing                                scs,
-                                    unsigned                                          last_occupied_delay,
                                     rnti_t                                            ue_rnti)
 {
+  // The scan covers the whole UL window of the grid, as a UL grant may already sit in any slot of it (e.g., dynamic
+  // PUSCH repetition bundles.
   // NOTE: the scan starts at k2, which is where the UE's first CG transmission is.
-  for (unsigned delay = pusch_td_list[td_alloc].k2; delay <= last_occupied_delay; delay += cg_period_slots) {
+  for (unsigned delay = pusch_td_list[td_alloc].k2; delay <= cell_alloc.max_ul_slot_alloc_delay;
+       delay += cg_period_slots) {
     auto& pdcch_alloc = cell_alloc[delay];
 
     // Check whether there is space for another PUSCH in the list.
@@ -154,7 +146,8 @@ void configured_grant_type2_sched_impl::rem_ue(const ue_cell_configuration& ue_c
     // RNTI that no longer exists, or for whichever UE is assigned that RNTI next.
     const unsigned nof_removed = periodic_pusch_slot_wheel.rem_ue_everywhere(ue_cfg.crnti);
     logger.error("rnti={}: UE not found in the CG scheduler UEs repo during UE removal. Swept {} stale CG grants from "
-                 "the slot wheel; its CG resource and pending activation entry cannot be reclaimed",
+                 "the slot wheel; its CG resource cannot be reclaimed, and its pending activation entry is dropped by "
+                 "the next run_ues_activation()",
                  ue_cfg.crnti,
                  nof_removed);
     return;
@@ -209,9 +202,11 @@ void configured_grant_type2_sched_impl::add_reconf_ue(const ue_cell_configuratio
 
   if (new_ul_ded != nullptr and old_ul_ded != nullptr and new_ul_ded->cg_cfg.has_value() and
       old_ul_ded->cg_cfg.has_value() and new_ul_ded->cg_cfg.value() == old_ul_ded->cg_cfg.value()) {
-    // CG configuration unchanged — nothing to do. Most reconfigurations a UE goes through do not touch its CG, and
-    // tearing the grant down for those would cost it a re-activation round trip, a gap in its CG occasions and a move
-    // to a different slot offset and set of RBs, all for no reason.
+    // CG configuration unchanged, so there is nothing to do.
+    // NOTE: the DCI 0_1 PUSCH TDRA list can change in this reconfiguration, as the dedicated list replaces the common
+    // one once the UE capabilities enable PUSCH repetitions. The index keeps selecting the same row, as the dedicated
+    // list starts with the common one (checked by the UE config validator) and the only row appended asks for
+    // repetitions, which activate_ue() never picks.
     return;
   }
 
@@ -226,6 +221,7 @@ void configured_grant_type2_sched_impl::run_slot(cell_resource_allocator& cell_a
   static constexpr unsigned look_ahead_alloc_slots = 0U;
   auto&                     pdcch_alloc            = cell_alloc[look_ahead_alloc_slots];
   const slot_point          pdcch_slot             = pdcch_alloc.slot;
+  last_run_slot                                    = pdcch_slot;
 
   // Release resources of UEs that initiated activation, but didn't ack the DCI reception or started CG transmission.
   // These UEs will be re-activated below.
@@ -355,6 +351,12 @@ void configured_grant_type2_sched_impl::ues_resource_release(slot_point slot)
   // reported for any of them, likely never received the activation DCI; release its resources prior to activating it
   // again. Note that a CRC with either OK or KO confirms the activation, since both mean the UE did transmit.
   for (auto& u : ues_pending_activation) {
+    // Reset the stale confirmation filter once every CRC of the released attempt is due, as slot_point comparisons are
+    // only meaningful within half a hyperframe.
+    if (u.stale_confirmation_before.valid() and slot > u.stale_confirmation_before + max_expected_crc_delay) {
+      u.stale_confirmation_before = {};
+    }
+
     if (not u.activation_triggered) {
       continue;
     }
@@ -374,11 +376,13 @@ void configured_grant_type2_sched_impl::ues_resource_release(slot_point slot)
 
     // "UE missed activation" detected: the UE accumulated max_nof_missed_crc_events missing CRCs for slots in which
     // CRCs were expected.
-    release_ue_activation(u);
+    // NOTE: the CG PUSCHs of this slot are allocated after this point, so all those of the attempt precede it.
+    release_ue_activation(u, slot);
   }
 }
 
-void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activation& u)
+void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activation& u,
+                                                              slot_point             stale_confirmation_before)
 {
   auto* ue_to_reset = ues.find(u.ue_index);
   if (ue_to_reset == nullptr) {
@@ -400,6 +404,7 @@ void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activat
   u.activation_triggered  = false;
   u.activation_pdcch_slot = {};
   u.slots_expecting_crc.clear();
+  u.stale_confirmation_before = stale_confirmation_before;
   // Reset the miss counter, so that the next activation attempt starts from a clean state. Without this, the UE would
   // be released again on the very next slot, as the counter would still be at its threshold.
   u.missed_grants_cnt = 0;
@@ -463,22 +468,10 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
   // NOTE: In the following, \c pusch_td_list might not be the same as the one used to compute the initial CG resources
   // (i.e, dedicated vs. common). It is assumed that the symbols intervals available in both lists are the same for each
   // of their k2 values.
-  // Furthest slot from the current one at which a UL grant may already sit. A dynamic PUSCH - allocated after the CG
-  // ones, so possibly in an earlier slot - reaches max_k2, while a Msg3 reaches k2 + Delta, as the RA scheduler places
-  // it Delta slots further out (TS 38.214, Section 6.1.2.1.1 and Table 6.1.2.1.1-5). The list is the same for every
-  // candidate, so this is computed once rather than on every call below.
-  const unsigned last_occupied_delay =
-      get_max_k2(pusch_td_list) +
-      ra_helper::get_pusch_delay_delta(cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.scs);
 
   for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
-    // Make sure the CG PUSCH symbols do not collide with the SRS ones.
-    if (pusch_td_list[td].symbols.stop() > last_non_srs_symbol) {
-      continue;
-    }
-
-    // Skip TDRA entries that sets repetitions.
-    if (pusch_td_list[td].nof_repetitions.has_value() and pusch_td_list[td].nof_repetitions.value() > 1) {
+    // Skip the TDRA entries whose symbols collide with the SRS ones, or that set repetitions.
+    if (not config_helpers::is_cg_pusch_td_res_usable(pusch_td_list[td], last_non_srs_symbol)) {
       continue;
     }
 
@@ -489,16 +482,14 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
       continue;
     }
 
-    // The resource manager only tracks the CG resources against one another, so it can hand out one whose slots are
-    // already taken by dynamic PUSCHs scheduled in an earlier slot. Check that there is room in the PUSCH list and on
-    // the grid for every CG PUSCH allocation from k2 until max_k2 before committing to this candidate.
+    // Check that there is room in the PUSCH list and on the grid for every CG PUSCH allocation from k2 until the end of
+    // the UL grid window before committing to this candidate.
     if (are_grants_and_rbs_free(cell_alloc,
                                 pusch_td_list,
                                 cg_period_slots,
                                 td,
                                 candidate_resource.value().crbs,
                                 cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.scs,
-                                last_occupied_delay,
                                 u.crnti)) {
       candidate_cg_offset.emplace(cg_offset);
       candidate_td_allocation.emplace(td);
@@ -621,7 +612,8 @@ void configured_grant_type2_sched_impl::handle_error_indication(slot_point      
                     "lower layers",
                     fmt::underlying(u.ue_index),
                     sl_tx);
-        release_ue_activation(u);
+        // The CG PUSCHs of the attempt were allocated no later than the last slot that was run.
+        release_ue_activation(u, last_run_slot + 1);
       }
     }
   }
@@ -645,7 +637,8 @@ void configured_grant_type2_sched_impl::handle_error_indication(slot_point      
   }
 }
 
-void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_idx)
+void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_idx,
+                                                                                 slot_point    pusch_slot)
 {
   const auto it =
       std::find_if(ues_pending_activation.begin(),
@@ -668,6 +661,19 @@ void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication
     logger.error("ue={}: CG activation confirmed after its activation attempt had been released. Cause: the UE did "
                  "receive the activation DCI, but no CRC arrived in time for any of its CG PUSCHs",
                  fmt::underlying(ue_idx));
+    return;
+  }
+
+  if (it->stale_confirmation_before.valid() and pusch_slot < it->stale_confirmation_before) {
+    // The confirmation (a CRC of a CG PUSCH or a CG Confirmation MAC CE) carried by a PUSCH that precedes the
+    // release of an earlier activation DCI, which release_ue_activation() has since canceled. It shows that the UE
+    // received that earlier DCI, but says nothing about whether it received the new activation DCI now awaiting
+    // confirmation, so keep waiting for a confirmation of the latter.
+    logger.warning("ue={}: Ignoring CG activation confirmation carried by PUSCH slot={}. Cause: the PUSCH belongs to "
+                   "an activation attempt canceled before slot={}",
+                   fmt::underlying(ue_idx),
+                   pusch_slot,
+                   it->stale_confirmation_before);
     return;
   }
 

@@ -87,7 +87,9 @@ public:
                                      float                      ul_sinr) = 0;
 
   /// Forwards a cell group's UE's Configured Grant activation complete indication to the scheduler.
-  virtual void handle_cg_activation_complete_indication(du_ue_index_t ue_index) = 0;
+  /// \param pusch_slot Slot of the PUSCH that carried the confirmation: the CG PUSCH whose CRC triggered the
+  /// indication, or the PUSCH that carried the CG Confirmation MAC CE.
+  virtual void handle_cg_activation_complete_indication(du_ue_index_t ue_index, slot_point pusch_slot) = 0;
 
   /// Forwards an error indication to the cell group for a past slot of the cell.
   virtual void handle_error_indication(slot_point sl_tx, scheduler_slot_handler::error_outcome event) = 0;
