@@ -63,3 +63,8 @@ gtest_discover_tests(udp_network_gateway_test PROPERTIES "LABELS;tsan")
 add_executable(udp_network_gateway_pool_depletion_test udp_network_gateway_pool_depletion_test.cpp)
 target_link_libraries(udp_network_gateway_pool_depletion_test ocudu_gateway ocudu_support ocudulog gtest gtest_main)
 gtest_discover_tests(udp_network_gateway_pool_depletion_test PROPERTIES "LABELS;tsan")
+
+add_executable(udp_network_gateway_benchmark_test udp_network_gateway_benchmark_test.cpp)
+target_link_libraries(udp_network_gateway_benchmark_test ocudu_gateway ocudu_support ocudulog gtest gtest_main)
+target_include_directories(udp_network_gateway_benchmark_test PRIVATE ${CMAKE_SOURCE_DIR})
+gtest_discover_tests(udp_network_gateway_benchmark_test PROPERTIES "LABELS;tsan")

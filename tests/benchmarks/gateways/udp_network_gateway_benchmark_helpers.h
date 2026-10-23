@@ -18,15 +18,14 @@ public:
 
   void on_new_pdu(byte_buffer pdu, const sockaddr_storage& src_addr) override
   {
-    if (n_pdus > max_pdus) {
+    if (n_pdus >= max_pdus) {
       // test is finished stop counting
       return;
     }
     rx_bytes += pdu.length();
     n_pdus++;
 
-    static bool first = true;
-    auto        t_now = std::chrono::steady_clock::now();
+    auto t_now = std::chrono::steady_clock::now();
     if (!first) {
       auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t_now - t_last);
       if (duration < t_min) {
@@ -58,6 +57,9 @@ public:
   std::chrono::microseconds get_t_sum() { return t_sum; }
   std::chrono::microseconds get_t_rx()
   {
+    if (n_pdus < 2) {
+      return std::chrono::microseconds::zero();
+    }
     if (n_pdus >= max_pdus) {
       return std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start);
     }
@@ -66,6 +68,7 @@ public:
 
 private:
   unsigned slow_inter_rx_us;
+  bool     first = true;
 
   uint64_t rx_bytes = 0;
   uint64_t n_pdus   = 0;

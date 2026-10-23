@@ -10,6 +10,7 @@
 #include "ocudu/support/io/io_broker_factory.h"
 #include <arpa/inet.h>
 #include <getopt.h>
+#include <limits>
 #include <queue>
 
 using namespace ocudu;
@@ -33,6 +34,8 @@ static void usage(const char* prog, const bench_params& params)
   fmt::print("\t-p TX port [Default {}]\n", params.tx_port);
   fmt::print("\t-P RX port [Default {}]\n", params.rx_port);
   fmt::print("\t-h Show this message\n");
+  fmt::print("Tx rates measure submissions; Rx rates use total observations over the first-to-last span.\n"
+             "Unavailable measurements print N/A. Interarrival is not latency; unobserved is not proven loss.\n");
 }
 
 static void parse_args(int argc, char** argv, bench_params& params)
@@ -77,6 +80,18 @@ int main(int argc, char** argv)
 
   bench_params params{};
   parse_args(argc, argv, params);
+  if (params.nof_pdus == 0) {
+    report_error("Number of PDUs must be greater than zero");
+  }
+  if (params.pdu_len == 0 || params.pdu_len > 9100) {
+    report_error("PDU length must be in the range [1, 9100]");
+  }
+  if (params.rx_mmsg == 0) {
+    report_error("RX max mmsg must be greater than zero");
+  }
+  if (params.nof_pdus > std::numeric_limits<uint64_t>::max() / (params.pdu_len * 8ULL)) {
+    report_error("Benchmark workload overflows the bit counter");
+  }
 
   udp_network_gateway_config gw1_cfg;
   gw1_cfg.bind_address      = "127.0.0.1";
@@ -101,8 +116,12 @@ int main(int argc, char** argv)
   gw1 = create_udp_network_gateway({gw1_cfg, gw1_dn, io_tx_executor, io_rx_executor});
   gw2 = create_udp_network_gateway({gw2_cfg, gw2_dn, io_tx_executor, io_rx_executor});
 
-  gw1->create_and_bind();
-  gw2->create_and_bind();
+  if (!gw1->create_and_bind()) {
+    report_error("Failed to bind UDP network gateway 1. bind_port={}", params.tx_port);
+  }
+  if (!gw2->create_and_bind()) {
+    report_error("Failed to bind UDP network gateway 2. bind_port={}", params.rx_port);
+  }
 
   std::unique_ptr<io_broker> epoll_broker;
 
@@ -121,18 +140,18 @@ int main(int argc, char** argv)
 
   auto t_start = std::chrono::steady_clock::now();
 
-  for (unsigned n = 0; n < params.nof_pdus; n++) {
+  for (uint64_t n = 0; n < params.nof_pdus; n++) {
     gw1->handle_pdu(pdu.copy(), gw2_addr);
   }
   auto t_end    = std::chrono::steady_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start);
+  auto duration = std::chrono::duration<double, std::micro>(t_end - t_start);
   fmt::print("Tx done\n\n");
 
   std::this_thread::sleep_for(std::chrono::milliseconds(750));
   gw1.reset();
   gw2.reset();
 
-  uint64_t tx_duration_us = duration.count();
+  double   tx_duration_us = duration.count();
   uint64_t rx_duration_us = gw2_dn.get_t_rx().count();
 
   fmt::print("Tx time: {} us\n", tx_duration_us);
@@ -149,19 +168,27 @@ int main(int argc, char** argv)
   fmt::print("Tx bits: {} b\n", tx_bits);
   fmt::print("Rx bits: {} b\n\n", rx_bits);
 
-  fmt::print("Tx data rate: {:.2f} Mbit/s\n", (long double)(tx_bits) / tx_duration_us);
-  fmt::print("Rx data rate: {:.2f} Mbit/s\n\n", (long double)(rx_bits / rx_duration_us));
+  fmt::print(tx_duration_us > 0 ? "Tx data rate: {:.2f} Mbit/s\n" : "Tx data rate: N/A\n",
+             tx_duration_us > 0 ? (long double)tx_bits / tx_duration_us : 0);
+  fmt::print(rx_duration_us > 0 ? "Rx data rate: {:.2f} Mbit/s\n\n" : "Rx data rate: N/A\n\n",
+             rx_duration_us > 0 ? (long double)rx_bits / rx_duration_us : 0);
 
-  fmt::print("Tx PDU rate: {:.2f} PDU/s\n", (double)params.nof_pdus / (duration.count() * 1e-6));
-  fmt::print("Rx PDU rate: {:.2f} PDU/s\n\n", (double)gw2_dn.get_n_pdus() / (gw2_dn.get_t_rx().count() * 1e-6));
+  fmt::print(tx_duration_us > 0 ? "Tx PDU rate: {:.2f} PDU/s\n" : "Tx PDU rate: N/A\n",
+             tx_duration_us > 0 ? params.nof_pdus / (tx_duration_us * 1e-6) : 0);
+  fmt::print(rx_duration_us > 0 ? "Rx PDU rate: {:.2f} PDU/s\n\n" : "Rx PDU rate: N/A\n\n",
+             rx_duration_us > 0 ? gw2_dn.get_n_pdus() / (rx_duration_us * 1e-6) : 0);
 
   fmt::print("Tx PDUs total: {:>7}\n", params.nof_pdus);
-  fmt::print("Rx PDUs total: {:>7} ({:.2f}% lost)\n\n",
+  fmt::print("Rx PDUs total: {:>7} ({:.2f}% unobserved)\n\n",
              gw2_dn.get_n_pdus(),
              (1 - ((double)gw2_dn.get_n_pdus() / params.nof_pdus)) * 100);
 
-  fmt::print("PDU inter arrival time (min/avg/max) [us]: {}/{}/{}\n",
-             gw2_dn.get_t_min().count(),
-             gw2_dn.get_t_sum().count() / gw2_dn.get_n_pdus(),
-             gw2_dn.get_t_max().count());
+  if (gw2_dn.get_n_pdus() > 1) {
+    fmt::print("PDU inter arrival time (min/avg/max) [us]: {}/{:.2f}/{}\n",
+               gw2_dn.get_t_min().count(),
+               (double)gw2_dn.get_t_sum().count() / (gw2_dn.get_n_pdus() - 1),
+               gw2_dn.get_t_max().count());
+  } else {
+    fmt::print("PDU inter arrival time (min/avg/max) [us]: N/A\n");
+  }
 }
