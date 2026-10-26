@@ -17,48 +17,40 @@ namespace mm256 {
 /// \param[in] cmp_data_epi16 AVX2 register storing 16bit IQ samples.
 /// \return An AVX2 register containing 18 packed bytes.
 ///
-/// \note Each 128bit lane of the input contains eight I and Q values, with each value consisting of 9 bits of data (the
-/// LSB ones) and 7 bits of padding. The function packs the eight IQ samples (only the data bits, discarding the
-/// padding) into the first 9 bytes of the respective 128bit lane of the output register (the remaining 7 bytes are
-/// padding). Thus, the return value contains 18 packed data bytes in total.
+/// \note Each 128bit lane of the input contains eight I and Q values, each of them with 9 bits of data (the LSB ones)
+/// and 7 bits of sign extension. The function packs the eight IQ samples (only the data bits) into the first 9 bytes of
+/// the respective 128bit lane of the output register (the remaining 7 bytes are padding). Thus, the return value
+/// contains 18 packed data bytes in total.
 inline __m256i pack_avx2_register_9b_be(__m256i cmp_data_epi16)
 {
-  // Input IQ samples need to be shifted in order to align bits before final packing.
-  // 0:  i0 0  0  0  0  0  0  0   i8 i7 i6 i5 i4 i3 i2 i1   <- rotate right by 1 (shift left by 7, swap bytes later)
-  // 1:  0 q8 q7 q6 q5 q4 q3 q2   q1 q0  0  0  0  0  0  0   <- shift left by 6
-  // 2:  0  0 i8 i7 i6 i5 i4 i3   i2 i1 i0  0  0  0  0  0   <- shift left by 5
-  // 3:  0  0  0 q8 q7 q6 q5 q4   q3 q2 q1 q0  0  0  0  0   <- shift left by 4
-  // 4:  0  0  0  0 i8 i7 i6 i5   i4 i3 i2 i1 i0  0  0  0   <- shift left by 3
-  // 5:  0  0  0  0  0 q8 q7 q6   q5 q4 q3 q2 q1 q0  0  0   <- shift left by 2
-  // 6:  0  0  0  0  0  0 i8 i7   i6 i5 i4 i3 i2 i1 i0  0   <- shift left by 1
-  // 7:  0  0  0  0  0  0  0 q8   q7 q6 q5 q4 q3 q2 q1 q0   <- no shift
-  // ... the same pattern ...
-  //
-  // Note, AVX2 only allows shifting 32bit words using vector of indexes, so we do it twice.
-  const __m256i shift_0_epi32      = _mm256_setr_epi32(7, 5, 3, 1, 7, 5, 3, 1);
-  const __m256i shift_1_epi32      = _mm256_setr_epi32(6, 4, 2, 0, 6, 4, 2, 0);
-  __m256i       cmp_data_sh0_epi16 = _mm256_sllv_epi32(cmp_data_epi16, shift_0_epi32);
-  __m256i       cmp_data_sh1_epi16 = _mm256_sllv_epi32(cmp_data_epi16, shift_1_epi32);
-  // Mask 16bit words to keep only 9 shifted bits.
-  const __m256i mask_even_epi16 =
-      _mm256_setr_epi32(0x0000ff80, 0x00003fe0, 0x00000ff8, 0x000003fe, 0x0000ff80, 0x00003fe0, 0x00000ff8, 0x000003fe);
-  const __m256i mask_odd_epi16 =
-      _mm256_setr_epi32(0x7fc00000, 0x1ff00000, 0x07fc0000, 0x01ff0000, 0x7fc00000, 0x1ff00000, 0x07fc0000, 0x01ff0000);
-  cmp_data_sh0_epi16 = _mm256_and_si256(cmp_data_sh0_epi16, mask_even_epi16);
-  cmp_data_sh1_epi16 = _mm256_and_si256(cmp_data_sh1_epi16, mask_odd_epi16);
+  // Keep only the 9 data bits of each sample.
+  __m256i data_epi16 = _mm256_and_si256(cmp_data_epi16, _mm256_set1_epi16(0x01ff));
 
-  // Merge two vectors to get vector of shifted IQ samples as explained above.
-  __m256i cmp_data_shifted_epi16 = _mm256_or_si256(cmp_data_sh0_epi16, cmp_data_sh1_epi16);
+  // Merge each I/Q pair into one 18bit word (I in the upper bits) stored in a 32bit element: (I * 2^9) + Q.
+  __m256i re_epi32 = _mm256_madd_epi16(data_epi16, _mm256_set1_epi32(0x00010200));
 
-  // Shuffle it and create two new vectors that can be OR'ed to produce the final result.
-  __m256i cmp_data_v0_epi16 = _mm256_shuffle_epi8(
-      cmp_data_shifted_epi16,
-      _mm256_setr_epi64x(0x0c0a0806040200ff, 0xffffffffffffff0e, 0x0c0a0806040200ff, 0xffffffffffffff0e));
-  __m256i cmp_data_v1_epi16 = _mm256_shuffle_epi8(
-      cmp_data_shifted_epi16,
-      _mm256_setr_epi64x(0x0f0d0b0907050301, 0xffffffffffffffff, 0x0f0d0b0907050301, 0xffffffffffffffff));
-  // Perform 'bitwise OR' and return the result.
-  return _mm256_or_si256(cmp_data_v0_epi16, cmp_data_v1_epi16);
+  // Merge each pair of 18bit words into one 36bit word (first RE in the upper bits) stored in a 64bit element:
+  // (RE0 * 2^18) + RE1. The multiplication takes the even 32bit elements, the shift brings the odd ones.
+  __m256i re_pair_epi64 =
+      _mm256_add_epi64(_mm256_mul_epu32(re_epi32, _mm256_set1_epi64x(1 << 18)), _mm256_srli_epi64(re_epi32, 32));
+
+  // Concatenate the two 36bit words of each 128bit lane, left-aligned in 72 bits: the upper 64 bits go to the lower
+  // 64bit element and the remaining 8 bits to the top of the upper 64bit element.
+  __m256i concat_hi_epi64 = _mm256_sllv_epi64(re_pair_epi64, _mm256_setr_epi64x(28, 56, 28, 56));
+  __m256i concat_lo_epi64 = _mm256_srli_epi64(_mm256_srli_si256(re_pair_epi64, 8), 8);
+  __m256i concat_epi64    = _mm256_or_si256(concat_hi_epi64, concat_lo_epi64);
+
+  // Convert each 64bit element to big-endian.
+  const __m256i bswap_epi64 =
+      _mm256_setr_epi64x(0x0001020304050607, 0x08090a0b0c0d0e0f, 0x0001020304050607, 0x08090a0b0c0d0e0f);
+  return _mm256_shuffle_epi8(concat_epi64, bswap_epi64);
+}
+
+/// Stores the first 9 bytes of the given register at the given address, writing at most the 9 bytes after it.
+inline void store_9_bytes(uint8_t* dest, __m128i reg)
+{
+  _mm_storel_epi64(reinterpret_cast<__m128i*>(dest), reg);
+  dest[8] = static_cast<uint8_t>(_mm_extract_epi8(reg, 8));
 }
 
 /// \brief Packs 16bit IQ values of the two input RBs using 9bit big-endian format.
@@ -84,72 +76,30 @@ inline void avx2_pack_prbs_9b_big_endian(span<uint8_t> comp_prb0_buffer,
 {
   /// Number of bytes used by 1 packed resource block with IQ samples compressed to 9 bits.
   static constexpr unsigned BYTES_PER_PRB_9BIT_COMPRESSION = 27;
+  /// Number of bytes packed from one 128bit lane (8 samples of 9 bits).
+  static constexpr unsigned BYTES_PER_LANE = 9;
 
   ocudu_assert(comp_prb0_buffer.size() == BYTES_PER_PRB_9BIT_COMPRESSION,
                "Output buffer corresponding to the first PRB has incorrect size");
   ocudu_assert(comp_prb1_buffer.size() == BYTES_PER_PRB_9BIT_COMPRESSION,
                "Output buffer corresponding to the second PRB has incorrect size");
 
-  // Returns first 18 packed bytes out of 27 for the first RB (9 bytes in each 128bit lane - same applies below).
+  // Each 128bit lane contains 9 packed bytes. Lanes are stored in order: 3 lanes per PRB.
   __m256i reg0_packed_epi8 = pack_avx2_register_9b_be(r0);
-  // Returns last 9 packed bytes out of 27 for the first RB and first 9 packed bytes for the second RB.
   __m256i reg1_packed_epi8 = pack_avx2_register_9b_be(r1);
-  // Returns last 18 packed bytes out of 27 for the second RB.
   __m256i reg2_packed_epi8 = pack_avx2_register_9b_be(r2);
 
-  // AVX2 doesn't provide instruction to store specific bytes of the lanes using a mask, so we create new vectors,
-  // and use a regular store intrinsic.
-  //
-  // Next example explains the bytes permutations performed below for each RB to group its packed IQs.
-  // r0:       {0xe959c2834776bd64, 0x8b, 0xdc0c7ca5b0ab3a56, 0x31}
-  // r1:       {0xb1e93964f248fe46, 0xaf, 0x4f0f368e76fc7a9e, 0x12}
-  // r0_tmp0:  {0xe959c2834776bd64, 0x000000000000008b, 0x0c7ca5b0ab3a5600, 0x00000000000031dc}
-  // r1_tmp0:  {0x3964f248fe460000, 0x0000000000afb1e9, 0x0000000000000000, 0x0000000000000000}
-  // r0_tmp1:  {0xe959c2834776bd64, 0x0c7ca5b0ab3a5600, 0x00000000000031dc, 0x0000000000000000}
-  // r1_tmp1:  {0x0000000000000000, 0x0000000000000000, 0x3964f248fe460000, 0x0000000000afb1e9}
-  // rb0_tmp0: {0xe959c2834776bd64, 0x0c7ca5b0ab3a568b, XXXXXXXXXXXXXXXXXX, XXXXXXXXXXXXXXXXXX}
-  // rb0_tmp1: {XXXXXXXXXXXXXXXXXX, XXXXXXXXXXXXXXXXXX, 0x3964f248fe4631dc, 0x0000000000afb1e9}
-  // select 64bit words between rb0_tmp0 and rb0_tmp1:
-  // rb0:      {0xe959c2834776bd64, 0x0c7ca5b0ab3a568b, 0x3964f248fe4631dc, 0x0000000000afb1e9}
+  // The first two lanes of each PRB are stored with full 16-byte writes. Each write is followed by another one that
+  // overwrites its 7 padding bytes, and stays inside of the PRB. The last lane only writes its 9 bytes.
+  uint8_t* prb0 = comp_prb0_buffer.data();
+  uint8_t* prb1 = comp_prb1_buffer.data();
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0), _mm256_castsi256_si128(reg0_packed_epi8));
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0 + BYTES_PER_LANE), _mm256_extracti128_si256(reg0_packed_epi8, 1));
+  store_9_bytes(prb0 + 2 * BYTES_PER_LANE, _mm256_castsi256_si128(reg1_packed_epi8));
 
-  // Pack the first input RB.
-  const __m256i shuffle_mask_0 =
-      _mm256_setr_epi64x(0x0706050403020100, 0x0f0e0d0c0b0a0908, 0x06050403020100ff, 0xffffffffffff0807);
-  __m256i reg0_tmp0_epi8 = _mm256_shuffle_epi8(reg0_packed_epi8, shuffle_mask_0);
-
-  const __m256i shuffle_mask_1 =
-      _mm256_setr_epi64x(0x050403020100ffff, 0xffffffffff080706, 0xffffffffffffffff, 0xffffffffffffffff);
-  __m256i reg1_tmp0_epi8 = _mm256_shuffle_epi8(reg1_packed_epi8, shuffle_mask_1);
-
-  __m256i reg0_tmp1_epi8 = _mm256_permutevar8x32_epi32(reg0_tmp0_epi8, _mm256_setr_epi32(0, 1, 4, 5, 6, 7, 3, 3));
-  __m256i reg1_tmp1_epi8 = _mm256_permute4x64_epi64(reg1_tmp0_epi8, 0b01001110);
-
-  const __m256i sel_mask_0_epi8 =
-      _mm256_setr_epi64x(0x0000000000000000, 0x0000000000000000, 0xffffffffffffffff, 0xffffffffffffffff);
-  __m256i prb0_tmp0_epi8 = _mm256_or_si256(reg0_tmp0_epi8, reg0_tmp1_epi8);
-  __m256i prb0_tmp1_epi8 = _mm256_or_si256(reg0_tmp1_epi8, reg1_tmp1_epi8);
-  __m256i prb0_epi8      = _mm256_blendv_epi8(prb0_tmp0_epi8, prb0_tmp1_epi8, sel_mask_0_epi8);
-
-  // Pack the second input RB.
-  const __m256i shuffle_mask_2 =
-      _mm256_setr_epi64x(0xffffffffffff0807, 0x06050403020100ff, 0x050403020100ffff, 0xffffffffff080706);
-  __m256i reg1_tmp2_epi8 = _mm256_permutevar8x32_epi32(reg1_packed_epi8, _mm256_setr_epi32(4, 5, 6, 7, 3, 3, 3, 3));
-  __m256i reg2_tmp0_epi8 = _mm256_shuffle_epi8(reg2_packed_epi8, shuffle_mask_2);
-  __m256i reg2_tmp1_epi8 = _mm256_permutevar8x32_epi32(reg2_tmp0_epi8, _mm256_setr_epi32(1, 1, 2, 3, 0, 1, 6, 7));
-
-  const __m256i sel_mask_1_epi8 =
-      _mm256_setr_epi64x(0x0000000000000000, 0x0000000000000000, 0xffffffffffffffff, 0xffffffffffffffff);
-  __m256i prb1_tmp0_epi8 = _mm256_or_si256(reg1_tmp2_epi8, reg2_tmp1_epi8);
-  __m256i prb1_tmp1_epi8 = _mm256_or_si256(reg2_tmp0_epi8, reg2_tmp1_epi8);
-  __m256i prb1_epi8      = _mm256_blendv_epi8(prb1_tmp0_epi8, prb1_tmp1_epi8, sel_mask_1_epi8);
-
-  // Write the compressed resource blocks to the memory.
-  uint8_t avx2_tmp_buffer[32];
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(avx2_tmp_buffer), prb0_epi8);
-  std::memcpy(comp_prb0_buffer.data(), avx2_tmp_buffer, BYTES_PER_PRB_9BIT_COMPRESSION);
-
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(avx2_tmp_buffer), prb1_epi8);
-  std::memcpy(comp_prb1_buffer.data(), avx2_tmp_buffer, BYTES_PER_PRB_9BIT_COMPRESSION);
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1), _mm256_extracti128_si256(reg1_packed_epi8, 1));
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1 + BYTES_PER_LANE), _mm256_castsi256_si128(reg2_packed_epi8));
+  store_9_bytes(prb1 + 2 * BYTES_PER_LANE, _mm256_extracti128_si256(reg2_packed_epi8, 1));
 }
 
 /// \brief Packs 16bit IQ values of the two input RBs using 16bit big-endian format.

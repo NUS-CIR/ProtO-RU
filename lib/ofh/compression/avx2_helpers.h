@@ -9,64 +9,52 @@
 
 #include "ocudu/adt/span.h"
 #include <immintrin.h>
+#include <limits>
 
 namespace ocudu {
 namespace ofh {
 namespace mm256 {
 
-/// Type of AVX2 intrinsic calculating min or max values between two vectors.
-using _mm256_comparator = __m256i (*)(__m256i a, __m256i b);
-
-/// \brief Finds the maximum (or minimum) 16bit sample in each of the two input resource blocks.
+/// \brief Quantizes 16 brain float values to 16bit integers, grouping even and odd elements.
 ///
-/// Finds maximum (or minimum, depending on the comparator passed as the template argument) values for each of the two
-/// RBs passed in a three AVX2 registers.
+/// Values are scaled, rounded to the nearest integer (ties to even) and saturated to the 16bit range. Each 128bit lane
+/// of the result contains the four even elements of the respective input lane followed by the four odd ones.
 ///
-/// Registers are evenly divided between two RBs so that IQ samples of each RB occupy one 128bit lane.
-/// The following diagram shows the input format. Here RBx stands for one unique RE (a pair of IQ samples, 32 bits long)
-/// pertaining to a respective RB:
-/// |       |         |         |         |         |
-/// | ----- | ------- | ------- | ------- | ------- |
-/// | \c v0_epi16: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
-/// | \c v1_epi16: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
-/// | \c v2_epi16: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
+/// \note The rounding is performed by the conversion to integers, so it assumes the default rounding mode of the MXCSR
+/// register (round to nearest even).
 ///
-/// The function first performs vertical min/max search across the three registers (comparing 16bit samples), then
-/// horizontal min/max across elements in each 128bit lane of the resulting vector. Finally, the function stores the two
-/// 16bit samples computed thus far in the output span.
-///
-/// \tparam    COMPARE  AVX2 intrinsic used for comparison, either \c mm256_min_epi16 or \c _mm256_max_epi16.
-/// \param[out] values  A span of the max (or min) samples in each of the two input RBs.
-/// \param[in] v0_epi16 AVX2 register storing first four IQ pairs of each of the two RB.
-/// \param[in] v1_epi16 AVX2 register storing second four IQ pairs of each of the two RB.
-/// \param[in] v2_epi16 AVX2 register storing last four IQ pairs of each of the two RB.
-template <_mm256_comparator COMPARE>
-inline void find_rbs_min_max_values(span<int16_t> values, __m256i v0_epi16, __m256i v1_epi16, __m256i v2_epi16)
+/// \param[in] bf16_epi16 AVX2 register storing 16 brain floats.
+/// \param[in] scale_ps   AVX2 register storing the scaling factor applied before the conversion in every element.
+inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps)
 {
-  // Find vertical min/max across every 3 16bit values in each resource block.
-  __m256i cmp_8val_epi16 = COMPARE(COMPARE(v0_epi16, v1_epi16), v2_epi16);
-  // Now 16bit vector elements look as follows:
-  // [max(I00, I08, I04), max(Q00, Q08, Q04), max(I01, I09, I05), max(Q01, Q09, Q05), ...].
+  // Unpack brain floats into two vectors of floats: even elements and odd ones.
+  __m256 even_ps = _mm256_castsi256_ps(_mm256_slli_epi32(bf16_epi16, 16));
+  __m256 odd_ps  = _mm256_castsi256_ps(_mm256_and_si256(bf16_epi16, _mm256_set1_epi32(0xffff0000)));
 
-  // Swap 64bit words inside 128bit lanes and find 4 min/max values.
-  __m256i cmp_8val_swp_epi16 = _mm256_shuffle_epi32(cmp_8val_epi16, 0x4e);
-  __m256i cmp_4val_epi16     = COMPARE(cmp_8val_epi16, cmp_8val_swp_epi16);
-  // Swap 32bit words and find 2 min/max values.
-  __m256i cmp_4val_swp_epi16 = _mm256_shuffle_epi32(cmp_4val_epi16, 0x1b);
-  __m256i cmp_2val_epi16     = COMPARE(cmp_4val_epi16, cmp_4val_swp_epi16);
-  // Swap 16bit words and find final min/max values for each RB.
-  const __m256i shuffle_mask = _mm256_setr_epi8(
-      2, 3, 0, 1, 6, 7, 4, 5, 8, 9, 10, 11, 14, 15, 12, 13, 2, 3, 0, 1, 6, 7, 4, 5, 8, 9, 10, 11, 14, 15, 12, 13);
-  __m256i cmp_2val_swp_epi16 = _mm256_shuffle_epi8(cmp_2val_epi16, shuffle_mask);
-  __m256i cmp_rb0_rb1_epi16  = COMPARE(cmp_2val_epi16, cmp_2val_swp_epi16);
+  // The conversion gives the most negative integer for the values above the 32bit range, clamp them to saturate.
+  const __m256 max_ps = _mm256_set1_ps(static_cast<float>(std::numeric_limits<int16_t>::max()));
+  even_ps             = _mm256_min_ps(_mm256_mul_ps(even_ps, scale_ps), max_ps);
+  odd_ps              = _mm256_min_ps(_mm256_mul_ps(odd_ps, scale_ps), max_ps);
 
-  // Extract minimum/maximum values for each RB.
-  values[0] = static_cast<int16_t>(_mm256_extract_epi16(cmp_rb0_rb1_epi16, 0));
-  values[1] = static_cast<int16_t>(_mm256_extract_epi16(cmp_rb0_rb1_epi16, 8));
+  // Convert to integers (rounds to nearest even in the default rounding mode) and saturate to 16 bits.
+  return _mm256_packs_epi32(_mm256_cvtps_epi32(even_ps), _mm256_cvtps_epi32(odd_ps));
 }
 
-/// \brief Finds maximum absolute value across 16bit IQ samples in each of the two input resource blocks passed in three
-/// AVX2 registers.
+/// \brief Quantizes 16 brain float values to 16bit integers.
+///
+/// Same as \ref quantize_bf16_even_odd, but the result keeps the order of the input values.
+///
+/// \param[in] bf16_epi16 AVX2 register storing 16 brain floats.
+/// \param[in] scale_ps   AVX2 register storing the scaling factor applied before the conversion in every element.
+inline __m256i quantize_bf16(__m256i bf16_epi16, __m256 scale_ps)
+{
+  // Interleave even and odd elements to restore the original order.
+  const __m256i interleave_mask =
+      _mm256_setr_epi64x(0x0b0a030209080100, 0x0f0e07060d0c0504, 0x0b0a030209080100, 0x0f0e07060d0c0504);
+  return _mm256_shuffle_epi8(quantize_bf16_even_odd(bf16_epi16, scale_ps), interleave_mask);
+}
+
+/// \brief Calculates the BFP exponents of the two input resource blocks passed in three AVX2 registers.
 ///
 /// The content of the three input AVX2 registers is represented in the table below. Here RBx means one unique RE
 /// (pair of IQ samples, 32 bits long) pertaining to a respective RB:
@@ -76,31 +64,52 @@ inline void find_rbs_min_max_values(span<int16_t> values, __m256i v0_epi16, __m2
 /// | \c rb01_epi16: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
 /// | \c rb1_epi16:  | RB1 RB1 | RB1 RB1 | RB1 RB1 | RB1 RB1 |
 ///
-/// \param[out] max_abs   A span of two maximum absolute values in the two input RBs.
+/// The exponent of a RB is the right shift required for its samples to fit in \c data_width bits (see
+/// \c iq_compression_bfp_impl::determine_exponent). It only depends on the position of the most significant bit of the
+/// maximum absolute value of the RB, so instead of the maximum the function uses the bitwise OR of the magnitudes of
+/// all samples of the RB, which has the same most significant bit and is cheaper to compute. The magnitude of a sample
+/// is its absolute value, except for negative ones, whose magnitude is one lower (O-RAN.WG4.CUS, Annex A.1.2: the most
+/// significant bit of a negative value can be one higher). Both cases are covered by xor-ing the sample with its sign.
+///
+/// The position of the most significant bit is obtained from the exponent field of the float conversion of the value,
+/// so that the exponents are calculated without leaving the vector domain.
+///
 /// \param[in] rb0_epi16  AVX2 register storing 16bit IQ pairs of the first RB.
 /// \param[in] rb01_epi16 AVX2 register storing 16bit IQ pairs of the first and second RBs.
 /// \param[in] rb1_epi16  AVX2 register storing 16bit IQ pairs of the second RB.
-inline void calculate_max_abs(span<unsigned> max_abs, __m256i rb0_epi16, __m256i rb01_epi16, __m256i rb1_epi16)
+/// \param[in] data_width BFP compression bit width.
+/// \return An AVX2 register whose lower 64 bits store the exponent of the first RB, and the upper 128bit lane the one
+/// of the second RB. Each exponent is stored as a 64bit integer, which allows using it as a shift count.
+inline __m256i calculate_exponents(__m256i rb0_epi16, __m256i rb01_epi16, __m256i rb1_epi16, unsigned data_width)
 {
-  std::array<int16_t, 2> min_values;
-  std::array<int16_t, 2> max_values;
+  // Magnitude of each sample.
+  __m256i rb0_mag_epi16  = _mm256_xor_si256(rb0_epi16, _mm256_srai_epi16(rb0_epi16, 15));
+  __m256i rb01_mag_epi16 = _mm256_xor_si256(rb01_epi16, _mm256_srai_epi16(rb01_epi16, 15));
+  __m256i rb1_mag_epi16  = _mm256_xor_si256(rb1_epi16, _mm256_srai_epi16(rb1_epi16, 15));
 
-  // Reorganize vectors to be able to vertically compare 16bit samples pertaining to the same resource block:
-  // [ RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 ]
-  // [ RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 ]
-  // [ RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 ]
-  __m256i v0_epi16 = _mm256_permute2f128_si256(rb0_epi16, rb1_epi16, 0x20);
-  __m256i v2_epi16 = _mm256_permute2f128_si256(rb0_epi16, rb1_epi16, 0x31);
-  __m256i v1_epi16 = rb01_epi16;
+  // Reorganize vectors so that each 128bit lane contains samples of the same RB, and combine them: the lower lane
+  // pertains to the first RB and the upper lane to the second one.
+  __m256i rb0_lo_epi16 = _mm256_permute2x128_si256(rb0_mag_epi16, rb1_mag_epi16, 0x20);
+  __m256i rb1_hi_epi16 = _mm256_permute2x128_si256(rb0_mag_epi16, rb1_mag_epi16, 0x31);
+  __m256i or_epi16     = _mm256_or_si256(_mm256_or_si256(rb0_lo_epi16, rb1_hi_epi16), rb01_mag_epi16);
 
-  find_rbs_min_max_values<_mm256_min_epi16>(min_values, v0_epi16, v1_epi16, v2_epi16);
-  find_rbs_min_max_values<_mm256_max_epi16>(max_values, v0_epi16, v1_epi16, v2_epi16);
+  // Horizontal OR inside each 128bit lane, the result is stored in the lowest 16 bits.
+  or_epi16 = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 8));
+  or_epi16 = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 4));
+  or_epi16 = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 2));
 
-  // O-RAN.WG4.CUS, Annex A.1.2: the most significant bit of a negative value can be one higher. As the minimum does not
-  // exceed the maximum, the result is not negative.
-  for (unsigned i_rb = 0, e = max_abs.size(); i_rb != e; ++i_rb) {
-    max_abs[i_rb] = std::max(static_cast<int>(max_values[i_rb]), std::abs(min_values[i_rb]) - 1);
-  }
+  // Keep only the result in each lane, the rest of elements are zeroed.
+  const __m256i keep_first_epi32 = _mm256_setr_epi32(0xffff, 0, 0, 0, 0xffff, 0, 0, 0);
+  __m256i       max_abs_epi32    = _mm256_and_si256(or_epi16, keep_first_epi32);
+
+  // The biased exponent of the float representation of a positive integer is 127 plus the position of its most
+  // significant bit, and zero for a null value.
+  __m256i float_exp_epi32 = _mm256_srli_epi32(_mm256_castps_si256(_mm256_cvtepi32_ps(max_abs_epi32)), 23);
+
+  // The exponent is the number of bits above the data width, taking into account the sign bit, or zero. Elements that
+  // were zeroed above end up as zero.
+  const int32_t exp_offset = 127 + static_cast<int32_t>(data_width) - 2;
+  return _mm256_max_epi32(_mm256_sub_epi32(float_exp_epi32, _mm256_set1_epi32(exp_offset)), _mm256_setzero_si256());
 }
 
 } // namespace mm256
