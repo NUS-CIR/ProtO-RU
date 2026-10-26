@@ -38,3 +38,20 @@ TEST(scheduler_cell_config_validator_test, nof_ue_contexts_above_cell_limit_is_i
 {
   ASSERT_FALSE(validate(MAX_NOF_DU_UES_PER_CELL + 1).has_value());
 }
+
+TEST(scheduler_cell_config_validator_test, periodic_csi_report_that_does_not_fit_in_the_pucch_is_invalid)
+{
+  sched_cell_configuration_request_message msg = sched_config_helper::make_default_sched_cell_configuration_request();
+  ASSERT_TRUE(msg.ran.init_bwp.csi->csi_report_slot_offset.has_value()) << "This test assumes periodic CSI reports";
+
+  // A PUCCH Format 2 resource of 1 RB, 1 symbol and the lowest code rate carries a single bit.
+  msg.ran.init_bwp.pucch.resources.f2_or_f3_or_f4_params =
+      pucch_f2_params{.nof_syms      = pucch_f2_params::nof_symbols{1},
+                      .max_nof_rbs   = pucch_f2_params::nof_rbs{1},
+                      .max_code_rate = max_pucch_code_rate::dot_08};
+
+  auto result = config_validators::validate_sched_cell_configuration_request_message(
+      msg, config_helpers::make_default_scheduler_expert_config());
+  ASSERT_FALSE(result.has_value());
+  ASSERT_NE(result.error().find("CSI report"), std::string::npos) << result.error();
+}

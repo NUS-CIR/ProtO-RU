@@ -9,11 +9,14 @@
 #include "../support/prbs_calculator.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/ran/band_helper.h"
+#include "ocudu/ran/csi_report/csi_report_config_helpers.h"
+#include "ocudu/ran/csi_report/csi_report_on_pucch_helpers.h"
 #include "ocudu/ran/duplex_mode.h"
 #include "ocudu/ran/prach/prach_configuration.h"
 #include "ocudu/ran/prach/prach_helper.h"
 #include "ocudu/ran/prach/prach_time_mapping.h"
 #include "ocudu/ran/tdd/tdd_ul_dl_config.h"
+#include "ocudu/scheduler/config/csi_helper.h"
 #include "ocudu/scheduler/config/ran_cell_config_helper.h"
 #include "ocudu/scheduler/config/serving_cell_config_factory.h"
 #include "ocudu/scheduler/config/serving_cell_config_validator.h"
@@ -339,6 +342,19 @@ error_type<std::string> config_validators::validate_sched_cell_configuration_req
     const auto csi_helper          = config_helpers::make_csi_meas_config_builder_params(msg.ran);
     const auto nzp_csi_rs_res_list = csi_helper::make_nzp_csi_rs_resource_list(csi_helper);
     HANDLE_CODE(validate_nzp_csi_rs_list(nzp_csi_rs_res_list, msg.ran.tdd_cfg));
+
+    // A periodic CSI report is sent in the PUCCH Format 2, 3 or 4 resource of the UE.
+    const auto csi_meas = csi_helper::make_csi_meas_config(
+        csi_helper, msg.ran.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list);
+    if (not is_pusch_configured(csi_meas)) {
+      const unsigned csi_report_size =
+          get_csi_report_pucch_size(create_csi_report_configuration(csi_meas)).part1_size.value();
+      const unsigned max_payload = msg.ran.init_bwp.pucch.resources.max_payload_234();
+      VERIFY(csi_report_size <= max_payload,
+             "The periodic CSI report of {} bits exceeds the maximum PUCCH Format 2/3/4 payload of {} bits",
+             csi_report_size,
+             max_payload);
+    }
   }
 
   // TODO: Validate other parameters.
