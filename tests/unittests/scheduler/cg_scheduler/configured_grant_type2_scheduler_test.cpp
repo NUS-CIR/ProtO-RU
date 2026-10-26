@@ -398,10 +398,8 @@ protected:
 
   /// \brief Reports UL pending bytes for the test UE.
   ///
-  /// The scheduler only records a CRC expectation for a CG occasion when the UE actually has UL data to send, so
-  /// missed-activation detection makes no progress without this. A single report is enough: CG PUSCH allocations
-  /// deliberately leave the logical channel buffers untouched (see allocate_cg_opportunity()), so the pending bytes
-  /// persist across occasions.
+  /// A single report is enough: CG PUSCH allocations deliberately leave the logical channel buffers untouched (see
+  /// allocate_cg_opportunity()), so the pending bytes persist across occasions.
   void push_ul_data(rnti_t crnti = ue_crnti, du_ue_index_t ue_idx = to_du_ue_index(0))
   {
     push_bsr(ul_bsr_indication_message{
@@ -469,30 +467,18 @@ protected:
 /// Safety margin, in slots, added on top of the CG period when waiting for a CG event to show up.
 constexpr unsigned safety_margin = 20U;
 
-/// Mirrors ue_pending_activation::max_nof_missed_crc_events: the number of CG PUSCH occasions whose expected CRC must
-/// go missing before the scheduler gives up on an activation attempt and retries it.
-constexpr unsigned nof_missed_crcs_for_release = 5U;
-/// Mirrors configured_grant_type2_sched_impl::max_expected_crc_delay: slots the scheduler waits for the CRC of a CG
-/// occasion before counting that occasion as missed.
+/// Mirrors configured_grant_type2_sched_impl::max_expected_crc_delay: slots after the first CG transmission of an
+/// activation DCI by which the UE must have confirmed it.
 constexpr unsigned max_expected_crc_delay = 50U;
 
-/// \brief Upper bound, in slots, on how long the scheduler takes to detect a missed activation and emit the retry DCI.
+/// \brief Upper bound, in slots, from an activation DCI to the re-activation DCI that follows when it is not confirmed.
 ///
-/// The UE gets one CG occasion per period and each occasion is only counted as missed \c max_expected_crc_delay slots
-/// after it elapsed, so the first miss lands one expiry delay in and the rest follow one per period. Rounded up
-/// generously: this is only how long a test waits before giving up, so a loose bound costs nothing on the happy path.
-static unsigned missed_activation_window(unsigned period_slots)
+/// The deadline is k2 + max_expected_crc_delay slots after the DCI, and the re-activation DCI then waits for a PDCCH
+/// slot from which a TDRA row lands on the CG offset, at most one CG period later. Rounded up generously: this is only
+/// how long a test waits before giving up.
+static unsigned reactivation_window(unsigned period_slots)
 {
-  return max_expected_crc_delay + (nof_missed_crcs_for_release + 2) * period_slots + 2 * safety_margin;
-}
-
-/// \brief Lower bound, in slots, on the same detection: the scheduler cannot possibly have seen
-/// \c nof_missed_crcs_for_release distinct occasions go by in less than this.
-///
-/// Used to assert that a retry is driven by accumulated misses and not emitted immediately.
-static unsigned min_slots_before_retry(unsigned period_slots)
-{
-  return (nof_missed_crcs_for_release - 1) * period_slots;
+  return SCHEDULER_MAX_K2 + max_expected_crc_delay + period_slots + 2 * safety_margin;
 }
 
 TEST_F(configured_grant_type2_scheduler_test, add_reconf_ue_does_not_schedule_cg_before_ue_is_ready)
@@ -508,123 +494,156 @@ TEST_F(configured_grant_type2_scheduler_test, add_reconf_ue_does_not_schedule_cg
   }
 }
 
-TEST_F(configured_grant_type2_scheduler_test, cg_activation_is_retried_when_ue_does_not_confirm_activation)
+/// Slots of the UL PDCCHs and CG PUSCHs of the test UE seen over a run of slots.
+struct cg_activity {
+  std::vector<slot_point> pdcch_slots;
+  std::vector<slot_point> pusch_slots;
+};
+
+TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_resent_for_the_same_grant)
 {
+  // The UE confirms every activation DCI it receives with a CG Confirmation MAC CE. With no confirmation by the
+  // deadline, the scheduler must send a new activation DCI for the same grant, as the UE may already be transmitting on
+  // it. No UL data is reported: the re-activation must not depend on it.
   ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
 
-  // Missed-activation detection counts CG occasions that the UE had data for but produced no CRC, so the UE must have
-  // UL data pending for the retry to ever trigger.
-  push_ul_data();
+  const std::optional<cg_activation_grant_params> first =
+      run_until_cg_activation(cg_params.period_slots + safety_margin);
+  ASSERT_TRUE(first.has_value()) << "No CG Type 2 activation DCI was allocated";
+  const slot_point first_pdcch_slot = last_result_slot();
 
-  // First activation attempt: the scheduler allocates the DCI that activates the Type 2 CG.
-  const slot_point first_pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first_pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
+  const std::optional<cg_activation_grant_params> second =
+      run_until_cg_activation(reactivation_window(cg_params.period_slots));
+  ASSERT_TRUE(second.has_value()) << "the unconfirmed CG Type 2 activation was never re-sent";
   ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
 
-  // Neither a confirmation message nor any CRC is sent, so from the scheduler's perspective the UE never gave a sign
-  // of having received the activation DCI. Once nof_missed_crcs_for_release occasions have gone by unanswered, the
-  // scheduler must release the CG resources it reserved and retry the activation with a new DCI.
-  const slot_point second_pdcch_slot = run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots));
-  ASSERT_TRUE(second_pdcch_slot.valid())
-      << "CG Type 2 activation was not retried after the UE failed to confirm the first activation DCI";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
-
-  // The retry must be driven by accumulated missed CRCs, not emitted right after the first attempt.
-  EXPECT_GT(second_pdcch_slot, first_pdcch_slot + static_cast<int>(min_slots_before_retry(cg_params.period_slots)))
-      << "CG Type 2 activation was retried before enough CG occasions went unanswered";
+  EXPECT_GT(last_result_slot(), first_pdcch_slot + static_cast<int>(max_expected_crc_delay))
+      << "the activation was re-sent before its confirmation deadline";
+  EXPECT_EQ(second->vrbs, first->vrbs) << "the re-activation DCI moved the UE to other RBs";
+  EXPECT_EQ(second->mcs, first->mcs) << "the re-activation DCI changed the MCS";
 }
 
-TEST_F(configured_grant_type2_scheduler_test, cg_activation_retry_is_not_released_again_immediately)
+TEST_F(configured_grant_type2_scheduler_test, cg_puschs_keep_their_offset_while_the_activation_is_unconfirmed)
 {
-  // Regression test: release_ue_activation() used to reset the missed-CRC bookkeeping but not the miss counter, which
-  // stayed at its threshold. The next attempt was then torn down on the very next slot, before the UE had any chance
-  // to transmit, leaving the UE in an activate/release loop that churned CG resources and the periodic wheel every
-  // slot. Each retry must get a full detection window of its own.
+  // The UE may already be transmitting on the grant, so its CG occasions must keep being allocated while the
+  // activation is unconfirmed, and the re-activation DCI must not move them to another offset.
   ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  push_ul_data();
-
   ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
       << "No CG Type 2 activation DCI was allocated";
 
-  const slot_point second_pdcch_slot = run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots));
-  ASSERT_TRUE(second_pdcch_slot.valid()) << "CG Type 2 activation was not retried a first time";
+  cg_activity activity;
+  for (unsigned i = 0, e = 2 * reactivation_window(cg_params.period_slots); i != e; ++i) {
+    run_slot();
+    if (find_ue_ul_pdcch(cs_rnti) != nullptr) {
+      activity.pdcch_slots.push_back(last_result_slot());
+    }
+    if (find_ue_pusch(cs_rnti, *last_sched_result()) != nullptr) {
+      activity.pusch_slots.push_back(last_result_slot());
+    }
+  }
+  ASSERT_FALSE(activity.pdcch_slots.empty()) << "the unconfirmed CG Type 2 activation was never re-sent";
+  ASSERT_FALSE(activity.pusch_slots.empty()) << "no CG PUSCH was allocated while the activation was unconfirmed";
 
-  const slot_point third_pdcch_slot = run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots));
-  ASSERT_TRUE(third_pdcch_slot.valid()) << "CG Type 2 activation was not retried a second time";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
-
-  EXPECT_GT(third_pdcch_slot, second_pdcch_slot + static_cast<int>(min_slots_before_retry(cg_params.period_slots)))
-      << "the retried activation was released again immediately: the missed-CRC counter is not reset per attempt";
+  const unsigned offset = activity.pusch_slots.front().count() % cg_params.period_slots;
+  for (slot_point sl : activity.pusch_slots) {
+    EXPECT_EQ(sl.count() % cg_params.period_slots, offset)
+        << fmt::format("the CG PUSCH of slot {} left the CG offset", sl);
+  }
+  for (unsigned i = 1; i != activity.pusch_slots.size(); ++i) {
+    EXPECT_EQ(activity.pusch_slots[i] - activity.pusch_slots[i - 1], static_cast<int>(cg_params.period_slots))
+        << "a CG occasion was skipped while the activation was unconfirmed";
+  }
 }
 
-/// \brief Late activation confirmations of a released CG Type 2 activation attempt.
-///
-/// The confirmations a released attempt drew from the UE - the CRCs of its CG PUSCHs and a CG Confirmation MAC CE - can
-/// still reach the scheduler after the retry DCI was allocated. Such a confirmation says nothing about whether the UE
-/// received the retry DCI, so it must not confirm it: otherwise the UE leaves the pending-activation list and a missed
-/// retry DCI is never detected.
-class configured_grant_type2_late_confirmation_test : public configured_grant_type2_scheduler_test
+TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_resent_until_confirmed)
 {
-protected:
-  /// \brief Activates the UE and runs until the retry DCI, keeping the last CG PUSCH of the first attempt, whose CRC
-  /// is still outstanding.
-  void run_until_retry()
-  {
-    ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-    push_ul_data();
+  // Each activation DCI gets a confirmation deadline of its own, and the re-activations stop once the UE confirms.
+  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
+      << "No CG Type 2 activation DCI was allocated";
 
-    ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-        << "No CG Type 2 activation DCI was allocated";
+  const slot_point second_pdcch_slot = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots));
+  ASSERT_TRUE(second_pdcch_slot.valid()) << "CG Type 2 activation was not re-sent a first time";
 
-    slot_point retry_pdcch_slot;
-    for (unsigned i = 0, e = missed_activation_window(cg_params.period_slots); i != e and not retry_pdcch_slot.valid();
-         ++i) {
-      run_slot();
-      if (const ul_sched_info* grant = find_ue_pusch(cs_rnti, *last_sched_result()); grant != nullptr) {
-        last_old_grant      = *grant;
-        last_old_grant_slot = last_result_slot();
-      }
-      if (find_ue_ul_pdcch(cs_rnti) != nullptr) {
-        retry_pdcch_slot = last_result_slot();
-      }
-    }
-    ASSERT_TRUE(retry_pdcch_slot.valid()) << "CG Type 2 activation was not retried";
-    ASSERT_TRUE(last_old_grant.has_value()) << "No CG PUSCH occasion followed the first activation DCI";
-    ASSERT_LT(last_old_grant_slot, retry_pdcch_slot);
-  }
+  const slot_point third_pdcch_slot = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots));
+  ASSERT_TRUE(third_pdcch_slot.valid()) << "CG Type 2 activation was not re-sent a second time";
+  EXPECT_GT(third_pdcch_slot, second_pdcch_slot + static_cast<int>(max_expected_crc_delay))
+      << "the second re-activation did not wait for the deadline of the first one";
 
-  /// Returns whether the retry is released and retried again, i.e. whether it was left unconfirmed.
-  bool retry_is_retried_again()
-  {
-    return run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots)).valid();
-  }
+  confirm_cg_activation();
+  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window(cg_params.period_slots)).valid())
+      << "CG Type 2 activation was re-sent after the UE confirmed it";
+}
 
-  std::optional<ul_sched_info> last_old_grant;
-  slot_point                   last_old_grant_slot;
+TEST_F(configured_grant_type2_scheduler_test, late_confirmation_of_an_earlier_activation_dci_confirms_the_grant)
+{
+  // Every activation DCI carries the same grant, so a confirmation that answers an earlier DCI confirms the grant just
+  // as well as one that answers the latest.
+  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
+      << "No CG Type 2 activation DCI was allocated";
+  const slot_point first_pdcch_slot = last_result_slot();
+  ASSERT_TRUE(run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots)).valid())
+      << "the unconfirmed CG Type 2 activation was never re-sent";
+
+  // The CG Confirmation MAC CE drawn by the first DCI, carried by a PUSCH that precedes the re-activation.
+  confirm_cg_activation(to_du_ue_index(0), ue_crnti, first_pdcch_slot + 1);
+
+  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window(cg_params.period_slots)).valid())
+      << "a late confirmation did not confirm the grant";
+}
+
+/// A CRC outcome for a CG PUSCH occasion, together with whether it confirms the activation.
+struct cg_crc_confirmation_params {
+  std::string          name;
+  bool                 crc_ok;
+  std::optional<float> sinr_dB;
+  /// Only a CRC OK proves the UE holds the grant.
+  bool confirms;
 };
 
-TEST_F(configured_grant_type2_late_confirmation_test, late_crc_of_released_attempt_does_not_confirm_retry)
+/// Formatter for CRC confirmation params, used by gtest. Avoids the fallback raw-byte printer, which reads
+/// uninitialized padding bytes.
+void PrintTo(const cg_crc_confirmation_params& value, ::std::ostream* os)
 {
-  ASSERT_NO_FATAL_FAILURE(run_until_retry());
-
-  // The late CRC of the first attempt reports a transmission.
-  send_cg_crc(*last_old_grant, last_old_grant_slot, /*crc_ok=*/true, /*sinr_dB=*/10.0F);
-
-  EXPECT_TRUE(retry_is_retried_again())
-      << "the late CRC of the released activation attempt confirmed the retry, which was then never retried";
+  *os << value.name;
 }
 
-TEST_F(configured_grant_type2_late_confirmation_test, late_mac_ce_of_released_attempt_does_not_confirm_retry)
+class configured_grant_type2_crc_confirmation_test : public configured_grant_scheduler_test,
+                                                     public ::testing::WithParamInterface<cg_crc_confirmation_params>
 {
-  ASSERT_NO_FATAL_FAILURE(run_until_retry());
+protected:
+  configured_grant_type2_crc_confirmation_test() : configured_grant_scheduler_test(cg_test_params{.type2 = true}) {}
+};
 
-  // The CG Confirmation MAC CE of the first attempt, carried by one of its PUSCHs.
-  confirm_cg_activation(to_du_ue_index(0), ue_crnti, last_old_grant_slot);
+TEST_P(configured_grant_type2_crc_confirmation_test, only_a_crc_ok_confirms_the_activation)
+{
+  // A CRC OK on a CG PUSCH proves the UE holds the grant, as only this UE transmits on its CG resource. A CRC KO does
+  // not, whatever its SINR: the UE may not have transmitted at all.
+  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
+      << "No CG Type 2 activation DCI was allocated";
 
-  EXPECT_TRUE(retry_is_retried_again())
-      << "the late CG Confirmation MAC CE of the released activation attempt confirmed the retry, which was then never "
-         "retried";
+  const ul_sched_info* grant = run_until_next_cg_pusch();
+  ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
+  send_cg_crc(*grant, last_result_slot(), GetParam().crc_ok, GetParam().sinr_dB);
+
+  const bool reactivated = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots)).valid();
+  EXPECT_NE(reactivated, GetParam().confirms)
+      << (GetParam().confirms ? "CG Type 2 activation was re-sent although a CRC OK confirmed it"
+                              : "CG Type 2 activation was taken as confirmed by a CRC KO");
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    cg_crc_outcome,
+    configured_grant_type2_crc_confirmation_test,
+    ::testing::Values(
+        cg_crc_confirmation_params{"crc_ok", true, 10.0F, true},
+        cg_crc_confirmation_params{"crc_ko_above_sinr_threshold", false, 10.0F, false},
+        cg_crc_confirmation_params{"crc_ko_without_sinr", false, std::nullopt, false},
+        cg_crc_confirmation_params{"crc_ko_dtx", false, -20.0F, false},
+        cg_crc_confirmation_params{"crc_ko_infinite_sinr", false, std::numeric_limits<float>::infinity(), false}),
+    [](const auto& p) { return p.param.name; });
 
 TEST_F(configured_grant_type2_scheduler_test, ue_reconfiguration_without_cg_is_handled)
 {
@@ -721,145 +740,8 @@ TEST_F(configured_grant_type2_scheduler_test, config_applied_after_confirmation_
       << "the CG PUSCH rate changed after a repeated configuration-applied indication: the UE was activated twice";
 }
 
-/// A CRC outcome for a CG PUSCH occasion, together with whether it should count as the UE having transmitted.
-struct cg_crc_confirmation_params {
-  std::string name;
-  bool        crc_ok;
-  /// The gNB reports a CG PUSCH as DTX when a CRC KO comes with a SINR below scheduler_ue_expert_config::
-  /// cg_pusch_sinr_threshold_dB (-8 dB by default), or with a non-finite one; anything else, a CRC KO carrying no
-  /// SINR included, means the UE did transmit.
-  std::optional<float> sinr_dB;
-};
-
-/// Formatter for CRC confirmation params, used by gtest. Avoids the fallback raw-byte printer, which reads
-/// uninitialized padding bytes.
-void PrintTo(const cg_crc_confirmation_params& value, ::std::ostream* os)
-{
-  *os << value.name;
-}
-
-class configured_grant_type2_crc_confirmation_test : public configured_grant_scheduler_test,
-                                                     public ::testing::WithParamInterface<cg_crc_confirmation_params>
-{
-protected:
-  configured_grant_type2_crc_confirmation_test() : configured_grant_scheduler_test(cg_test_params{.type2 = true}) {}
-};
-
-TEST_P(configured_grant_type2_crc_confirmation_test, non_dtx_crc_confirms_activation_and_stops_retries)
-{
-  // A CRC indication that is not a DTX proves the UE transmitted on its CG occasion, which can only happen if it
-  // received the activation DCI. That confirms the activation just as a confirmation message would, so the scheduler
-  // must stop retrying. Note that a CRC KO confirms as much as a CRC OK: both mean the UE did transmit.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-
-  // Without pending UL data the retry would never trigger and this test would pass vacuously.
-  push_ul_data();
-
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
-
-  const ul_sched_info* grant = run_until_next_cg_pusch();
-  ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
-  send_cg_crc(*grant, last_result_slot(), GetParam().crc_ok, GetParam().sinr_dB);
-
-  // The UE is now confirmed, so no further activation DCI may be sent, even well past the point where a missed
-  // activation would have been detected.
-  const unsigned window = missed_activation_window(cg_params.period_slots);
-  for (unsigned i = 0; i != window; ++i) {
-    run_slot();
-    ASSERT_EQ(find_ue_ul_pdcch(cs_rnti), nullptr)
-        << "CG Type 2 activation was retried even though a non-DTX CRC confirmed it";
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(cg_crc_outcome,
-                         configured_grant_type2_crc_confirmation_test,
-                         ::testing::Values(cg_crc_confirmation_params{"crc_ok", true, 10.0F},
-                                           cg_crc_confirmation_params{"crc_ko_above_sinr_threshold", false, 10.0F},
-                                           cg_crc_confirmation_params{"crc_ko_without_sinr", false, std::nullopt}),
-                         [](const auto& p) { return p.param.name; });
-
-TEST_F(configured_grant_type2_scheduler_test, dtx_crc_does_not_confirm_activation)
-{
-  // A CRC KO whose SINR is below cg_pusch_sinr_threshold_dB means the gNB detected nothing on the CG occasion, i.e.
-  // the UE did not transmit. That says nothing about whether it received the activation DCI, so it must not confirm
-  // the activation and the retry must still go ahead.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  push_ul_data();
-
-  const slot_point first_pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first_pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
-
-  const ul_sched_info* grant = run_until_next_cg_pusch();
-  ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
-  // Well below the -8 dB default threshold, so the PUSCH is reported as DTX.
-  send_cg_crc(*grant, last_result_slot(), /*crc_ok=*/false, /*sinr_dB=*/-20.0F);
-
-  const slot_point retry_pdcch_slot = run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots));
-  EXPECT_TRUE(retry_pdcch_slot.valid())
-      << "CG Type 2 activation was treated as confirmed by a DTX, so it was never retried";
-}
-
-TEST_F(configured_grant_type2_scheduler_test, ko_crc_with_infinite_sinr_does_not_confirm_activation)
-{
-  // An occasion the UE did not transmit on can yield an infinite SINR from a degenerate noise estimate, which sails
-  // past cg_pusch_sinr_threshold_dB and would otherwise read as a transmission. A CRC KO reporting a perfect SINR is
-  // self-contradictory, so it must not confirm the activation: doing so drops the UE from the pending-activation list
-  // and permanently disables the missed-activation detection, leaving the CG never re-activated.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  push_ul_data();
-
-  const slot_point first_pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first_pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
-
-  const ul_sched_info* grant = run_until_next_cg_pusch();
-  ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
-  send_cg_crc(*grant,
-              last_result_slot(),
-              /*crc_ok=*/false,
-              /*sinr_dB=*/std::numeric_limits<float>::infinity());
-
-  const slot_point retry_pdcch_slot = run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots));
-  EXPECT_TRUE(retry_pdcch_slot.valid())
-      << "CG Type 2 activation was treated as confirmed by a CRC KO reporting an infinite SINR, so it was never "
-         "retried";
-}
-
-TEST_F(configured_grant_type2_scheduler_test, discarded_cg_pusch_does_not_count_as_a_missed_activation)
-{
-  // A CG PUSCH that the lower layers discarded never reached the PHY, so no CRC will ever be reported for it. That
-  // silence says nothing about whether the UE received the activation DCI, so the occasion must not count towards
-  // missed-activation detection. If every CG occasion is discarded, the activation must never be retried.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  push_ul_data();
-
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
-
-  unsigned       nof_discarded = 0;
-  const unsigned window        = missed_activation_window(cg_params.period_slots);
-  for (unsigned i = 0; i != window; ++i) {
-    run_slot();
-    ASSERT_EQ(find_ue_ul_pdcch(cs_rnti), nullptr)
-        << "CG Type 2 activation was retried although every CG PUSCH was discarded by the lower layers";
-    if (find_ue_pusch(cs_rnti, *last_sched_result()) == nullptr) {
-      continue;
-    }
-    // Report the CG PUSCH of this slot as discarded. Only the PUSCH is dropped: a discarded activation PDCCH is a
-    // separate condition that invalidates the attempt outright.
-    scheduler_slot_handler::error_outcome err{};
-    err.pusch_and_pucch_discarded = true;
-    sched->handle_error_indication(last_result_slot(), to_du_cell_index(0), err);
-    ++nof_discarded;
-  }
-
-  // Guard against a vacuous pass: the detector must have had enough occasions to release the UE, had they counted.
-  EXPECT_GE(nof_discarded, nof_missed_crcs_for_release)
-      << "too few CG occasions were discarded to exercise missed-activation detection";
-}
-
-/// Type 2 CG whose period is shorter than max_expected_crc_delay, so CG occasions elapse faster than the scheduler
-/// retires them and the per-UE list of slots expecting a CRC is driven to its capacity.
+/// Type 2 CG whose period is shorter than max_expected_crc_delay, so several CG occasions elapse before the
+/// confirmation deadline.
 class configured_grant_type2_short_period_test : public configured_grant_scheduler_test
 {
 protected:
@@ -870,25 +752,18 @@ protected:
   }
 };
 
-TEST_F(configured_grant_type2_short_period_test, missed_activation_is_detected_when_crc_expectations_saturate)
+TEST_F(configured_grant_type2_short_period_test, unconfirmed_activation_is_resent_for_the_same_grant)
 {
-  // More occasions are outstanding than the fixed-capacity list of slots expecting a CRC can hold, so the scheduler
-  // stops recording new ones until an entry is retired. That must neither trip the container's bounds nor stall
-  // detection: the activation still has to be retried.
-  // The list saturates once its capacity-th occasion arrives before the first one is retired.
-  static_assert((nof_missed_crcs_for_release - 1) * 10U <= max_expected_crc_delay,
-                "CG period must be short enough for the CRC expectation list to reach capacity");
-
   ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  push_ul_data();
 
-  const slot_point first_pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first_pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
+  const std::optional<cg_activation_grant_params> first =
+      run_until_cg_activation(cg_params.period_slots + safety_margin);
+  ASSERT_TRUE(first.has_value()) << "No CG Type 2 activation DCI was allocated";
 
-  const slot_point retry_pdcch_slot = run_until_next_ul_pdcch(missed_activation_window(cg_params.period_slots));
-  ASSERT_TRUE(retry_pdcch_slot.valid())
-      << "CG Type 2 activation was never retried: saturated CRC expectations stalled missed-activation detection";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
+  const std::optional<cg_activation_grant_params> second =
+      run_until_cg_activation(reactivation_window(cg_params.period_slots));
+  ASSERT_TRUE(second.has_value()) << "the unconfirmed CG Type 2 activation was never re-sent";
+  EXPECT_EQ(second->vrbs, first->vrbs) << "the re-activation DCI moved the UE to other RBs";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, activation_dci_f0_1_is_a_valid_cg_activation)
@@ -1309,31 +1184,29 @@ TEST_F(configured_grant_type2_srs_test, activation_picks_a_td_allocation_that_av
       << "every TD allocation of this cell already avoids SRS, so nothing was skipped";
 }
 
-TEST_F(configured_grant_type2_scheduler_test, discarded_activation_pdcch_is_retried_without_waiting_for_missed_crcs)
+TEST_F(configured_grant_type2_scheduler_test, discarded_activation_pdcch_is_resent_without_waiting_for_the_deadline)
 {
-  // When the lower layers discard the PDCCHs of a slot, the activation DCI never reaches the UE, so the UE will never
-  // transmit and no CRC will ever arrive to reveal it. The missed-CRC detector cannot help either: it only arms while
-  // the UE has UL data pending. The scheduler must therefore invalidate the attempt as soon as the error indication
-  // arrives and retry it, rather than leaving the UE with a grant it knows nothing about.
+  // When the lower layers discard the PDCCHs of a slot, the activation DCI never reaches the UE. The scheduler must
+  // re-send it as soon as the error indication arrives, for the same grant, rather than wait for the confirmation
+  // deadline.
   ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
 
-  const slot_point first_pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first_pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
+  const std::optional<cg_activation_grant_params> first =
+      run_until_cg_activation(cg_params.period_slots + safety_margin);
+  ASSERT_TRUE(first.has_value()) << "No CG Type 2 activation DCI was allocated";
+  const slot_point first_pdcch_slot = last_result_slot();
 
-  // Report the PDCCHs of the activation slot as discarded. Only the PDCCH is dropped here: a discarded CG PUSCH is a
-  // separate condition, which merely drops the CRC expectation of that occasion.
   scheduler_slot_handler::error_outcome err{};
   err.pdcch_discarded = true;
   sched->handle_error_indication(first_pdcch_slot, to_du_cell_index(0), err);
 
-  const slot_point retry_pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(retry_pdcch_slot.valid()) << "the CG Type 2 activation was never retried after its PDCCH was discarded";
+  const std::optional<cg_activation_grant_params> retry =
+      run_until_cg_activation(cg_params.period_slots + safety_margin);
+  ASSERT_TRUE(retry.has_value()) << "the CG Type 2 activation was never re-sent after its PDCCH was discarded";
   ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
-
-  // Note that no UL data was ever reported for this UE, so the missed-CRC detector never armed: the retry can only
-  // have come from the error indication.
-  EXPECT_LT(retry_pdcch_slot - first_pdcch_slot, static_cast<int>(min_slots_before_retry(cg_params.period_slots)))
-      << "the retry did not follow the error indication promptly";
+  EXPECT_LT(last_result_slot() - first_pdcch_slot, static_cast<int>(max_expected_crc_delay))
+      << "the re-activation did not follow the error indication promptly";
+  EXPECT_EQ(retry->vrbs, first->vrbs) << "the re-activation DCI moved the UE to other RBs";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, removing_a_ue_still_pending_activation_is_clean)

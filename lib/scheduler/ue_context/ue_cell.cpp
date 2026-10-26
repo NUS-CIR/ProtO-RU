@@ -192,9 +192,7 @@ expected<ue_cell::crc_outcome, ue_cell::crc_not_concluded> ue_cell::handle_crc_p
   // HARQ with matching ID and UCI slot was found.
 
   // With CG, a CRC KO is assumed to be a DTX (PUSCH wasn't transmitted) when the SINR measurement is below
-  // cg_pusch_sinr_threshold_dB, or it is non-finite. A CRC KO carrying no SINR at all is instead taken as a KO; this is
-  // because re-activating a UE that did receive the activation DCI is worse than leaving a missed activation
-  // undetected.
+  // cg_pusch_sinr_threshold_dB, or it is non-finite. A CRC KO carrying no SINR at all is instead taken as a KO.
   const bool is_cg = h_ul->is_cg();
   if (is_cg and not combined_crc_success and crc_pdu.ul_sinr_dB.has_value() and
       (not std::isfinite(crc_pdu.ul_sinr_dB.value()) or

@@ -7,7 +7,6 @@
 
 #include "cg_type2_resource_manager.h"
 #include "configured_grant_scheduler_base.h"
-#include "ocudu/adt/slotted_array.h"
 #include "ocudu/scheduler/result/pdcch_info.h"
 
 namespace ocudu {
@@ -17,9 +16,9 @@ class pdcch_resource_allocator;
 /// \brief CG Type 2 scheduler.
 ///
 /// The grant only becomes usable once an activation DCI scrambled with the CS-RNTI has been sent and the UE has
-/// confirmed it, so this class adds the resource pool, the activation procedure and the detection of a UE that never
-/// received the activation. Once a UE is activated, its CG occasions are scheduled by
-/// \ref configured_grant_scheduler_base like a Type 1 one.
+/// confirmed it, so this class adds the resource pool, the activation procedure and the re-activation of a UE that does
+/// not confirm it. From the activation DCI on, its CG occasions are scheduled by \ref configured_grant_scheduler_base
+/// like a Type 1 one.
 class configured_grant_type2_sched_impl : public configured_grant_scheduler_base
 {
 public:
@@ -37,56 +36,38 @@ public:
 
   void start_ue_cg_activation(du_ue_index_t ue_idx) override;
 
-  void handle_cg_activation_complete_indication(du_ue_index_t ue_idx, slot_point pusch_slot) override;
+  void handle_cg_activation_complete_indication(du_ue_index_t ue_idx) override;
 
   void handle_error_indication(slot_point sl_tx, scheduler_slot_handler::error_outcome event) override;
 
   void stop() override;
 
 private:
-  // UE whose CG Type 2 activation is not confirmed yet, with the state of its current activation attempt.
+  // UE whose CG Type 2 activation is not confirmed yet, with the state of its latest activation DCI.
   struct ue_pending_activation {
     explicit ue_pending_activation(du_ue_index_t ue_index_) : ue_index(ue_index_) {}
 
     du_ue_index_t ue_index;
-    // Set once an activation DCI has been allocated for this UE and cleared when that attempt is abandoned, so that
-    // run_ues_activation() knows whether an activation is still outstanding.
-    bool activation_triggered = false;
-    // Slot in which the activation PDCCH was allocated. Needed to detect that the activation DCI never reached the UE,
-    // because the lower layers discarded the PDCCHs of that slot.
+    // Slot in which the PDCCH of the latest activation DCI was allocated; invalid until the first one is allocated.
+    // Needed to detect that the activation DCI never reached the UE, because the lower layers discarded the PDCCHs of
+    // that slot.
     slot_point activation_pdcch_slot;
-
-    // Number of PUSCH occasions for which an expected CRC indication never arrived. Reset when the activation attempt
-    // is abandoned, so that each attempt starts from a clean state.
-    unsigned missed_grants_cnt = 0;
-
-    // [Implementation-defined] After 5 PUSCH grants expecting non-DTX CRC, we assume the UE hasn't received the
-    // activation DCI.
-    static constexpr unsigned max_nof_missed_crc_events = 5U;
-    // Container that stores the slot_points at which the GNB expects CRC indications; missing these without activation
-    // confirmation may indicate the UE never receives the DCI for CG activation. Entries are removed either when the
-    // corresponding CRC arrives or when they expire, and their position carries no meaning.
-    slotted_array<slot_point, max_nof_missed_crc_events> slots_expecting_crc;
-
-    // Used to determine whether a late activation confirmation, i.e. a CRC of a CG PUSCH or a CG Confirmation MAC CE,
-    // that is received by the scheduler belongs to the previous activation attempt. If the slot of the PUSCH carrying
-    // the confirmation is older than \ref stale_confirmation_before, then the confirmation should not be used for the
-    // activation complete indication.
-    // NOTE: a CG Confirmation MAC CE of the previous attempt that only decodes in a HARQ retransmission after the
-    // release is not caught, as its PUSCH slot does not precede it; however, this scenario is very unlikely.
-    slot_point stale_confirmation_before;
+    // Slot by which the latest activation DCI must be confirmed; invalid while no activation DCI is awaiting
+    // confirmation.
+    slot_point confirmation_deadline;
+    // Set when the latest activation DCI was not confirmed by its deadline, or its PDCCH was discarded. The UE then
+    // gets a new activation DCI for the same grant.
+    bool reactivation_due = false;
   };
 
   // Adds a UE's CG grant positions to the slot wheel, one every CG period.
   void add_ue_to_wheel(const ue_cell_configuration& ue_cfg, unsigned time_domain_offset);
 
-  // Scans the list of UEs pending activation and proceeds with activation procedure.
+  // Scans the list of UEs pending activation and sends the activation DCIs of this slot.
   void run_ues_activation(cell_resource_allocator& cell_alloc);
 
-  // Schedules DCI for CG type 2 activation, containing all the required information for CG grant (i.e., VRBs, MCS,
-  // TDRA, CG offset, etc.).
-  /// Outcome of an attempt to activate one UE, which tells run_ues_activation() whether the UEs queued behind it are
-  /// worth trying in this slot.
+  /// Outcome of an attempt to send an activation DCI to one UE, which tells run_ues_activation() whether the UEs queued
+  /// behind it are worth trying in this slot.
   enum class activation_outcome {
     /// The activation DCI was allocated.
     success,
@@ -98,16 +79,17 @@ private:
     stop_slot
   };
 
-  activation_outcome activate_ue(cell_resource_allocator& cell_alloc, ue& ue_index);
+  // Picks a CG resource, offset and TDRA row for a UE with no grant yet, and sends the activation DCI for them.
+  activation_outcome activate_ue(cell_resource_allocator& cell_alloc, ue_pending_activation& pending, ue& u);
 
-  // Scans the list of UEs that got CG activation initiated, but never acked it; for those UEs, proceed with releasing
-  // the previously allocated resources.
-  void ues_resource_release(slot_point slot);
+  // Sends a new activation DCI for the grant the UE already holds: same resource, offset, VRBs and MCS.
+  activation_outcome reactivate_ue(cell_resource_allocator& cell_alloc, ue_pending_activation& pending, ue& u);
 
-  // Undoes an activation attempt: returns the CG resource to the pool, removes the UE from the periodic wheel and
-  // drops its grant info, leaving the UE in the pending list so that run_ues_activation() retries it.
-  // \param stale_confirmation_before First slot with no CG PUSCH allocated for the attempt being released.
-  void release_ue_activation(ue_pending_activation& u, slot_point stale_confirmation_before);
+  // Records an activation DCI sent in \c pdcch_slot, whose first CG transmission is in \c first_tx_slot.
+  void on_activation_dci_allocated(ue_pending_activation& pending, slot_point pdcch_slot, slot_point first_tx_slot);
+
+  // Marks for re-activation the UEs whose latest activation DCI was not confirmed by its deadline.
+  void check_confirmation_deadlines(slot_point slot);
 
   pdcch_ul_information* alloc_pdcch_ul_information(cell_slot_resource_allocator& pdcch_alloc,
                                                    du_ue_index_t                 ue_idx) const;
@@ -115,18 +97,11 @@ private:
   // Any CG configuration is handled here: for CG Type 2 the grant is established by the activation DCI, not by RRC.
   bool has_cg_grant_cfg(const ue_cell_configuration& ue_cfg) const override;
 
-  // Records the slot as one in which a CRC indication is expected, which is how ues_resource_release() detects a UE
-  // that never received the activation DCI.
-  void on_cg_pusch_allocated(const ue& u, slot_point pusch_slot) override;
-
   pdcch_resource_allocator& pdcch_sch;
   cg_type2_resource_manager res_mng;
 
   // [Implementation-defined] Max expected delay with which lower layers report CRC for a given PUSCH.
   static constexpr unsigned max_expected_crc_delay = 50U;
-
-  // Slot of the last run_slot() call.
-  slot_point last_run_slot;
 
   // List of UEs that are waiting for to be activated for CG type2.
   std::vector<ue_pending_activation> ues_pending_activation;

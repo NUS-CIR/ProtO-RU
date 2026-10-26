@@ -460,8 +460,7 @@ void cell_group_event_handler_impl::handle_slice_reconfiguration(const du_cell_s
   slice_sched.handle_slice_reconfiguration_request(req);
 }
 
-void cell_group_event_handler_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_index,
-                                                                             slot_point    pusch_slot)
+void cell_group_event_handler_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_index)
 {
   // This notification can come either from a MAC-CE Configured Grant Confirmation, or from the reception of a non-DTX
   // CRC.
@@ -480,7 +479,7 @@ void cell_group_event_handler_impl::handle_cg_activation_complete_indication(du_
     return;
   }
 
-  cg_sched->handle_cg_activation_complete_indication(ue_index, pusch_slot);
+  cg_sched->handle_cg_activation_complete_indication(ue_index);
 }
 
 void cell_group_event_handler_impl::handle_error_indication(slot_point                            sl_tx,

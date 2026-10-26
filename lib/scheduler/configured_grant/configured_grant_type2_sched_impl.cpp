@@ -171,9 +171,8 @@ void configured_grant_type2_sched_impl::rem_ue(const ue_cell_configuration& ue_c
     return;
   }
 
-  // Return the CG resource acquired at activation time to the resource manager pool. Note that UEs whose activation
-  // already timed out have been released by ues_resource_release(), which also erased their grant info; those return
-  // above, so the resource cannot be deallocated twice.
+  // Return the CG resource acquired at activation time to the resource manager pool. The UE keeps it across
+  // re-activations, so this, add_reconf_ue() and stop() are the only places it is returned.
   res_mng.deallocate_resource(cg_params->time_offset, cg_params->resource_id, ue_cfg.crnti);
 
   // Remove the UE from the periodic wheel using the CG offset recorded at activation time, so that the entries removed
@@ -182,8 +181,6 @@ void configured_grant_type2_sched_impl::rem_ue(const ue_cell_configuration& ue_c
   // missing entry is not reported as an error here.
   (void)periodic_pusch_slot_wheel.rem_ue(ue_cfg.crnti, cg_params->time_offset);
 
-  // This is the case of UEs that started the activation, which, however, failed; they had been already removed from the
-  // periodic wheel.
   ue_cg_state_mng.reset_state();
 }
 
@@ -221,13 +218,11 @@ void configured_grant_type2_sched_impl::run_slot(cell_resource_allocator& cell_a
   static constexpr unsigned look_ahead_alloc_slots = 0U;
   auto&                     pdcch_alloc            = cell_alloc[look_ahead_alloc_slots];
   const slot_point          pdcch_slot             = pdcch_alloc.slot;
-  last_run_slot                                    = pdcch_slot;
 
-  // Release resources of UEs that initiated activation, but didn't ack the DCI reception or started CG transmission.
-  // These UEs will be re-activated below.
-  ues_resource_release(pdcch_slot);
+  // Mark for re-activation the UEs that did not confirm their latest activation DCI in time; they are served below.
+  check_confirmation_deadlines(pdcch_slot);
 
-  // Scan the UEs that are ready for activation and allocate the activation DCI.
+  // Scan the UEs that are ready for activation and allocate the activation DCIs.
   run_ues_activation(cell_alloc);
 
   // Reserve the CG resources in the grid and allocate the CG PUSCH occasions of this slot.
@@ -242,23 +237,6 @@ void configured_grant_type2_sched_impl::stop()
   // without this the resources would stay marked as taken and the pool would drain over deactivation cycles.
   res_mng.reset();
   configured_grant_scheduler_base::stop();
-}
-
-void configured_grant_type2_sched_impl::on_cg_pusch_allocated(const ue& u, slot_point pusch_slot)
-{
-  // Save slots at which the UE has non-zero UL pending bytes, which will be used for missing activation detection.
-  if (not u.logical_channels().has_ul_pending_bytes()) {
-    return;
-  }
-
-  auto it =
-      std::find_if(ues_pending_activation.begin(),
-                   ues_pending_activation.end(),
-                   [ue_idx = u.ue_index](const ue_pending_activation& ue_it) { return ue_idx == ue_it.ue_index; });
-  if (it != ues_pending_activation.end() and it->slots_expecting_crc.size() != it->slots_expecting_crc.capacity()) {
-    const size_t first_available = it->slots_expecting_crc.find_first_empty();
-    it->slots_expecting_crc.emplace(first_available, pusch_slot);
-  }
 }
 
 void configured_grant_type2_sched_impl::start_ue_cg_activation(du_ue_index_t ue_idx)
@@ -300,17 +278,33 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
     return;
   }
 
-  // Every activation of this slot is issued from this loop, so a local counter is enough to ration them; no state has
-  // to survive the call.
-  unsigned nof_activations = 0;
+  // Every activation of this slot is issued from this function, so a local counter is enough to ration them; no state
+  // has to survive the call.
+  unsigned                      nof_activations = 0;
+  cell_slot_resource_allocator& pdcch_alloc     = cell_alloc[0U];
 
+  // Returns whether no activation DCI can be added to this slot, for any UE.
+  const auto is_slot_full = [&]() {
+    if (nof_activations == MAX_CG_ACTIVATION_PDCCHS_PER_SLOT) {
+      // Ration the activation DCIs, so that they do not consume the PDCCH space the dynamic grants need. The UEs left
+      // in the list keep their place and are served over the next slots.
+      return true;
+    }
+    if (pdcch_alloc.result_builder().dl().ul_pdcchs().full()) {
+      logger.info("Stopping CG Type 2 activations at slot={}. Cause: max PDCCH grants reached", pdcch_slot);
+      return true;
+    }
+    return false;
+  };
+
+  // Re-activations go first: each one can only be served in the slots from which a TDRA row lands on the UE's CG
+  // offset, whereas a first activation can be served in any slot.
   for (size_t i = 0; i != ues_pending_activation.size();) {
     ue_pending_activation& u = ues_pending_activation[i];
 
     // Drop the entries of UEs that are no longer in the repository. rem_ue() normally takes a UE out of this list,
     // but it cannot do so when the UE context is already gone by the time it runs. Such an entry must not be left
-    // behind: activate_ue() would keep failing on it, and the break below would stop every UE queued after it from
-    // ever being activated.
+    // behind: activate_ue() would keep failing on it.
     auto* ue_it = ues.find(u.ue_index);
     if (ue_it == nullptr) {
       logger.error("ue={}: Dropping stale CG Type 2 activation. Cause: UE not found in the CG scheduler UEs repo",
@@ -319,99 +313,80 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
       ues_pending_activation.pop_back();
       continue;
     }
-
-    // Activate UEs with no activation outstanding: either they have never been activated, or a previous attempt was
-    // abandoned by release_ue_activation() because the UE gave no sign of having received the activation DCI.
-    if (not u.activation_triggered) {
-      if (nof_activations == MAX_CG_ACTIVATION_PDCCHS_PER_SLOT) {
-        // Ration the activation DCIs, so that a burst of UEs coming up at once does not consume the PDCCH space the
-        // dynamic grants need. The UEs left in the list keep their place and are activated over the next slots.
-        break;
-      }
-      const activation_outcome outcome = activate_ue(cell_alloc, *ue_it);
-      if (outcome == activation_outcome::stop_slot) {
-        // The resource that ran out is shared by every UE, so the ones queued behind would fail the same way.
-        break;
-      }
-      if (outcome == activation_outcome::success) {
-        ++nof_activations;
-        u.activation_triggered  = true;
-        u.activation_pdcch_slot = pdcch_slot;
-      }
-      // On skip_ue the UE keeps its place in the list and is retried on a later slot, while the ones behind it get
-      // their turn now: its failure says nothing about whether they can be activated.
-    }
     ++i;
+
+    if (not u.reactivation_due) {
+      continue;
+    }
+    if (is_slot_full()) {
+      return;
+    }
+    if (not ue_it->get_pcell().is_pdcch_enabled(pdcch_slot)) {
+      continue;
+    }
+    if (reactivate_ue(cell_alloc, u, *ue_it) == activation_outcome::success) {
+      ++nof_activations;
+    }
+  }
+
+  // First activations, for the UEs that have no activation DCI outstanding or due.
+  for (ue_pending_activation& u : ues_pending_activation) {
+    if (u.reactivation_due or u.confirmation_deadline.valid()) {
+      continue;
+    }
+    if (is_slot_full()) {
+      return;
+    }
+    ue& ue_ref = ues[u.ue_index];
+    if (not ue_ref.get_pcell().is_pdcch_enabled(pdcch_slot)) {
+      continue;
+    }
+    const activation_outcome outcome = activate_ue(cell_alloc, u, ue_ref);
+    if (outcome == activation_outcome::stop_slot) {
+      // No more resources available for any UE; exit here.
+      return;
+    }
+    if (outcome == activation_outcome::success) {
+      ++nof_activations;
+    }
+    // On skip_ue the UE keeps its place in the list and is retried on a later slot, while the ones behind it get their
+    // turn now: its failure says nothing about whether they can be activated.
   }
 }
 
-void configured_grant_type2_sched_impl::ues_resource_release(slot_point slot)
+void configured_grant_type2_sched_impl::check_confirmation_deadlines(slot_point slot)
 {
-  // A UE that had CG PUSCH occasions allocated while it had UL data to send, and for which no CRC indication was ever
-  // reported for any of them, likely never received the activation DCI; release its resources prior to activating it
-  // again. Note that a CRC with either OK or KO confirms the activation, since both mean the UE did transmit.
-  for (auto& u : ues_pending_activation) {
-    // Reset the stale confirmation filter once every CRC of the released attempt is due, as slot_point comparisons are
-    // only meaningful within half a hyperframe.
-    if (u.stale_confirmation_before.valid() and slot > u.stale_confirmation_before + max_expected_crc_delay) {
-      u.stale_confirmation_before = {};
-    }
-
-    if (not u.activation_triggered) {
+  // The UE confirms every activation DCI it receives with a CG Confirmation MAC CE, sent in its first UL transmission
+  // after the DCI (TS 38.321, Sections 5.4.1 and 5.8.2). With no confirmation by the deadline, either the UE missed the
+  // DCI or its confirmation was lost; in both cases a new activation DCI for the same grant is the remedy.
+  // NOTE: the deadline is checked on every slot and lies at most k2 + max_expected_crc_delay slots after the DCI, so
+  // the slot_point comparison stays within half a hyperframe.
+  for (ue_pending_activation& u : ues_pending_activation) {
+    if (not u.confirmation_deadline.valid() or slot <= u.confirmation_deadline) {
       continue;
     }
-
-    // Note: iterate by index rather than by iterator, since erase() trims the trailing empty slots of the container
-    // and would invalidate the loop's end bound.
-    for (size_t i = 0; i != u.slots_expecting_crc.capacity(); ++i) {
-      if (u.slots_expecting_crc.contains(i) and slot > u.slots_expecting_crc[i] + max_expected_crc_delay) {
-        ++u.missed_grants_cnt;
-        (void)u.slots_expecting_crc.erase(i);
-      }
-    }
-
-    if (u.missed_grants_cnt < u.max_nof_missed_crc_events) {
-      continue;
-    }
-
-    // "UE missed activation" detected: the UE accumulated max_nof_missed_crc_events missing CRCs for slots in which
-    // CRCs were expected.
-    // NOTE: the CG PUSCHs of this slot are allocated after this point, so all those of the attempt precede it.
-    release_ue_activation(u, slot);
+    logger.info("ue={}: Re-activating CG Type 2. Cause: the activation DCI of slot={} was not confirmed by slot={}",
+                fmt::underlying(u.ue_index),
+                u.activation_pdcch_slot,
+                u.confirmation_deadline);
+    u.confirmation_deadline = {};
+    u.reactivation_due      = true;
   }
 }
 
-void configured_grant_type2_sched_impl::release_ue_activation(ue_pending_activation& u,
-                                                              slot_point             stale_confirmation_before)
+void configured_grant_type2_sched_impl::on_activation_dci_allocated(ue_pending_activation& pending,
+                                                                    slot_point             pdcch_slot,
+                                                                    slot_point             first_tx_slot)
 {
-  auto* ue_to_reset = ues.find(u.ue_index);
-  if (ue_to_reset == nullptr) {
-    logger.error("ue={}: UE not found in the CG scheduler UEs repo while releasing it from activation",
-                 fmt::underlying(u.ue_index));
-    return;
-  }
-
-  auto&       ue_cg_state_mng = ue_to_reset->get_pcell().get_conf_grant_state_manager();
-  const auto& cg_params       = ue_cg_state_mng.get_grant_params();
-  if (cg_params.has_value()) {
-    res_mng.deallocate_resource(cg_params->time_offset, cg_params->resource_id, ue_to_reset->crnti);
-
-    // Remove the UE from the periodic wheel, as it will be assign a new resource and CG offset.
-    (void)periodic_pusch_slot_wheel.rem_ue(ue_to_reset->crnti, cg_params->time_offset);
-  }
-  // Set the UE as "not CG activated".
-  ue_cg_state_mng.reset_state();
-  u.activation_triggered  = false;
-  u.activation_pdcch_slot = {};
-  u.slots_expecting_crc.clear();
-  u.stale_confirmation_before = stale_confirmation_before;
-  // Reset the miss counter, so that the next activation attempt starts from a clean state. Without this, the UE would
-  // be released again on the very next slot, as the counter would still be at its threshold.
-  u.missed_grants_cnt = 0;
+  pending.activation_pdcch_slot = pdcch_slot;
+  pending.confirmation_deadline = first_tx_slot + max_expected_crc_delay;
+  pending.reactivation_due      = false;
 }
 
 configured_grant_type2_sched_impl::activation_outcome
-configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_alloc, ue& u)
+configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_alloc,
+                                               ue_pending_activation&   pending,
+                                               ue&                      u)
 {
   if (res_mng.get_nof_free_resources() == 0) {
     logger.error("ue={}: Failed to activate CG PUSCH type2. Cause: no available resources",
@@ -420,17 +395,6 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
   }
 
   auto& pdcch_alloc = cell_alloc[0U];
-  if (pdcch_alloc.result_builder().dl().ul_pdcchs().full()) {
-    logger.info("Stopping CG Type 2 activations at slot={}. Cause: max PDCCH grants reached", pdcch_alloc.slot);
-    return activation_outcome::stop_slot;
-  }
-
-  if (not u.get_pcell().is_pdcch_enabled(pdcch_alloc.slot)) {
-    logger.debug("ue={}: Deferring CG Type 2 activation at slot={}. Cause: UE cannot receive a PDCCH in this slot",
-                 fmt::underlying(u.ue_index),
-                 pdcch_alloc.slot);
-    return activation_outcome::skip_ue;
-  }
 
   const auto slot_pdcch = pdcch_alloc.slot;
   // The index put in the activation DCI is resolved by the UE against the table of that DCI's own format, which is 0_1
@@ -559,8 +523,71 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
   // cg_slot_wheel::rem_ue() removes exactly the entries inserted here.
   add_ue_to_wheel(u.get_pcell().cfg(), candidate_cg_offset.value());
 
+  on_activation_dci_allocated(pending, slot_pdcch, slot_pdcch + pusch_td_list[candidate_td_allocation.value()].k2);
+
   // NOTE: the HARQ reconfiguration is done during the reconfiguration /ref add_reconf_ue(), to avoid reconfiguring the
   // HARQs while there are in-flight PUSCHs.
+  return activation_outcome::success;
+}
+
+configured_grant_type2_sched_impl::activation_outcome
+configured_grant_type2_sched_impl::reactivate_ue(cell_resource_allocator& cell_alloc,
+                                                 ue_pending_activation&   pending,
+                                                 ue&                      u)
+{
+  auto&       pdcch_alloc     = cell_alloc[0U];
+  auto&       ue_cg_state_mng = u.get_pcell().get_conf_grant_state_manager();
+  const auto& cg_params       = ue_cg_state_mng.get_grant_params();
+  ocudu_assert(
+      cg_params.has_value(), "ue={}: CG Type 2 re-activation of a UE with no grant", fmt::underlying(u.ue_index));
+
+  // The new DCI keeps the grant the UE may already be transmitting on, so it must land on the same CG offset and use
+  // the same symbols, which the grid reservations follow. The TDRA row may differ, which gives more than one PDCCH
+  // slot per CG period to send it from.
+  const slot_point slot_pdcch     = pdcch_alloc.slot;
+  const auto&      pusch_td_list  = u.get_pcell().active_bwp().ul.td_mapper().pusch_td_resources(dci_ul_format::f0_1);
+  const ofdm_symbol_range symbols = pusch_td_list[cg_params->time_domain_allocation].symbols;
+  const unsigned          last_non_srs_symbol = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
+  std::optional<uint8_t>  td_alloc;
+  for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
+    const pusch_time_domain_resource_allocation& td_res   = pusch_td_list[td];
+    const slot_point                             first_tx = slot_pdcch + td_res.k2;
+    // NOTE: an earlier first transmission than the one the first-transmission gate holds is skipped, as the grid
+    // reservations before that gate are not in place. This can happen in the case of dropped PDCCH due to error
+    // indication plus with small CG periodicity.
+    if (config_helpers::is_cg_pusch_td_res_usable(td_res, last_non_srs_symbol) and td_res.symbols == symbols and
+        first_tx.count() % cg_params->periodicity_slots == cg_params->time_offset and
+        not ue_cg_state_mng.is_before_first_tx(first_tx)) {
+      td_alloc = td;
+      break;
+    }
+  }
+  if (not td_alloc.has_value()) {
+    // No row lands on the CG offset from this slot; a later slot of the CG period will do.
+    return activation_outcome::skip_ue;
+  }
+
+  pdcch_ul_information* pdcch = alloc_pdcch_ul_information(pdcch_alloc, u.ue_index);
+  if (pdcch == nullptr) {
+    return activation_outcome::skip_ue;
+  }
+
+  // NOTE: existence was already validated by alloc_pdcch_ul_information(), which allocated the PDCCH in this
+  // SearchSpace; the DCI must be built against the same one, as its size depends on it.
+  const search_space_info& ss_info = *get_cg_activation_search_space(u.get_pcell().cfg());
+  build_dci_f0_1_cg_activation(pdcch->dci,
+                               u.get_pcell().cfg(),
+                               ss_info.cfg->get_id(),
+                               cg_params->vrbs,
+                               *td_alloc,
+                               sch_mcs_index{cg_params->mcs});
+
+  // The row has the same symbols as the stored one, so the TBS and the grid reservations stay valid.
+  ue_cg_state_mng.set_time_domain_allocation(*td_alloc);
+
+  on_activation_dci_allocated(pending, slot_pdcch, slot_pdcch + pusch_td_list[*td_alloc].k2);
+
+  logger.debug("ue={}: Re-sent CG Type 2 activation DCI at slot={}", fmt::underlying(u.ue_index), slot_pdcch);
   return activation_outcome::success;
 }
 
@@ -601,44 +628,25 @@ configured_grant_type2_sched_impl::alloc_pdcch_ul_information(cell_slot_resource
 void configured_grant_type2_sched_impl::handle_error_indication(slot_point                            sl_tx,
                                                                 scheduler_slot_handler::error_outcome event)
 {
-  if (event.pdcch_discarded) {
-    // A CG occasion needs no PDCCH of its own, so the only PDCCH this scheduler puts on the grid is the activation
-    // DCI. If it was discarded, the UE never learnt about the grant and will never transmit on it, so no CRC will ever
-    // arrive to reveal that. Waiting for the missing-CRC detector would not help either: it only arms while the UE has
-    // pending UL bytes. Invalidate the attempt now, so that run_ues_activation() retries it in this same slot.
-    for (ue_pending_activation& u : ues_pending_activation) {
-      if (u.activation_pdcch_slot.valid() and u.activation_pdcch_slot == sl_tx) {
-        logger.info("ue={}: Retrying CG Type 2 activation. Cause: the activation PDCCH of slot={} was discarded by the "
-                    "lower layers",
-                    fmt::underlying(u.ue_index),
-                    sl_tx);
-        // The CG PUSCHs of the attempt were allocated no later than the last slot that was run.
-        release_ue_activation(u, last_run_slot + 1);
-      }
-    }
-  }
-
-  // Only a discarded PUSCH means no CRC indication will be reported for the slot. When just the PDCCH was discarded,
-  // the CG PUSCH still reached the PHY, so a CRC is still expected.
-  if (not event.pusch_and_pucch_discarded) {
+  if (not event.pdcch_discarded) {
     return;
   }
 
-  // The CG PUSCH of this slot never reached the PHY, so its missing CRC indication says nothing about whether the UE
-  // received the activation. Drop the expectation, otherwise it would count towards a spurious re-activation.
+  // A CG occasion needs no PDCCH of its own, so the only PDCCH this scheduler puts on the grid is the activation DCI.
+  // If it was discarded, the UE never received it, so re-activate the UE without waiting for the confirmation deadline.
   for (ue_pending_activation& u : ues_pending_activation) {
-    auto it = std::find(u.slots_expecting_crc.begin(), u.slots_expecting_crc.end(), sl_tx);
-    if (it != u.slots_expecting_crc.end()) {
-      u.slots_expecting_crc.erase(it);
-      logger.debug("ue={}: Dropped expected CG CRC for slot={}. Cause: PUSCH was discarded by the lower layers",
-                   fmt::underlying(u.ue_index),
-                   sl_tx);
+    if (u.confirmation_deadline.valid() and u.activation_pdcch_slot == sl_tx) {
+      logger.info("ue={}: Re-activating CG Type 2. Cause: the activation PDCCH of slot={} was discarded by the lower "
+                  "layers",
+                  fmt::underlying(u.ue_index),
+                  sl_tx);
+      u.confirmation_deadline = {};
+      u.reactivation_due      = true;
     }
   }
 }
 
-void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_idx,
-                                                                                 slot_point    pusch_slot)
+void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_idx)
 {
   const auto it =
       std::find_if(ues_pending_activation.begin(),
@@ -649,34 +657,15 @@ void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication
     return;
   }
 
-  if (not it->activation_triggered) {
-    // The activation this confirms was already given up on by release_ue_activation(), which inferred from the CRCs
-    // missing on the UE's CG PUSCHs that the UE had never received the activation DCI. The confirmation proves that
-    // inference wrong: the UE did receive it and is transmitting on a CG resource that has since been returned to the
-    // pool and may already have been handed to another UE. Nothing here can stop that, as the scheduler has no
-    // deactivation DCI to send, so report it and leave the entry queued: re-activating the UE is what ends the
-    // overlap, whereas dropping the entry here would strand it on the stale resource for good.
-    // NOTE: a UE whose UL SINR is persistently too low for its CG PUSCHs to decode reaches this while receiving the
-    // downlink perfectly well, so this is not limited to a UE that is losing PDCCHs.
-    logger.error("ue={}: CG activation confirmed after its activation attempt had been released. Cause: the UE did "
-                 "receive the activation DCI, but no CRC arrived in time for any of its CG PUSCHs",
-                 fmt::underlying(ue_idx));
+  if (not it->activation_pdcch_slot.valid()) {
+    // No activation DCI has been sent for the UE's current CG configuration, so this confirms an earlier one.
+    logger.warning("ue={}: Ignoring CG activation confirmation. Cause: no activation DCI was sent for the current CG "
+                   "configuration",
+                   fmt::underlying(ue_idx));
     return;
   }
 
-  if (it->stale_confirmation_before.valid() and pusch_slot < it->stale_confirmation_before) {
-    // The confirmation (a CRC of a CG PUSCH or a CG Confirmation MAC CE) carried by a PUSCH that precedes the
-    // release of an earlier activation DCI, which release_ue_activation() has since canceled. It shows that the UE
-    // received that earlier DCI, but says nothing about whether it received the new activation DCI now awaiting
-    // confirmation, so keep waiting for a confirmation of the latter.
-    logger.warning("ue={}: Ignoring CG activation confirmation carried by PUSCH slot={}. Cause: the PUSCH belongs to "
-                   "an activation attempt canceled before slot={}",
-                   fmt::underlying(ue_idx),
-                   pusch_slot,
-                   it->stale_confirmation_before);
-    return;
-  }
-
+  // Every activation DCI sent to the UE carries the same grant, so the confirmation holds whichever DCI it answers.
   logger.info("ue={}: CG activation notified", fmt::underlying(ue_idx));
 
   std::swap(*it, ues_pending_activation.back());

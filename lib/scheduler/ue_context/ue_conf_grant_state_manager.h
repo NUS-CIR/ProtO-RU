@@ -63,6 +63,15 @@ public:
   /// occasions. \ref clear_first_tx_slot() disables it as soon as the first occasion is reached.
   bool is_before_first_tx(slot_point slot) const { return first_tx_slot.has_value() and slot < first_tx_slot.value(); }
 
+  /// \brief Replaces the TDRA row of the active CG allocation, leaving the rest of its state untouched.
+  /// \remark The new row must have the same symbols as the current one, as the grid reservations follow them.
+  void set_time_domain_allocation(uint8_t td_alloc)
+  {
+    if (state.has_value()) {
+      state->time_domain_allocation = td_alloc;
+    }
+  }
+
   /// Disarms the first-transmission gate, once an occasion at or after it has been reached.
   void clear_first_tx_slot() { first_tx_slot.reset(); }
 

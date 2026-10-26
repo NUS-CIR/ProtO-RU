@@ -516,12 +516,13 @@ void cell_event_manager::handle_ue_crc(slot_point sl_rx, const ul_crc_pdu_indica
     return;
   }
 
-  // Notify the CG scheduler that a CRC PDU (that wasn't DTX) has been received for a CG PUSCH of this UE. Only a CG
-  // PUSCH confirms a CG activation; a CRC for a dynamic grant says nothing about whether the UE received the activation
-  // DCI. Type 1 CG has no activation, so its CRCs are not forwarded.
+  // Notify the CG scheduler that a CG PUSCH of this UE was decoded. A CRC OK proves the UE holds the grant, as only
+  // this UE transmits on its CG resource; a CRC KO does not, as it may not come from a transmission of the UE. A CRC
+  // for a dynamic grant says nothing about the activation DCI. Type 1 CG has no activation, so its CRCs are not
+  // forwarded.
   // NOTE: a CG PUSCH implies that the cell has a CG configured.
-  if (outcome.is_cg and cell_cfg.params.init_bwp.cg_cfg->is_type2()) {
-    ue_ev_handler.handle_cg_activation_complete_indication(crc.ue_index, sl_rx);
+  if (outcome.is_cg and crc.tb_crc_success and cell_cfg.params.init_bwp.cg_cfg->is_type2()) {
+    ue_ev_handler.handle_cg_activation_complete_indication(crc.ue_index);
   }
 
   // Process Timing Advance Offset.
@@ -902,11 +903,10 @@ void cell_event_manager::handle_cg_confirmation_message(const cg_confirmation_in
   if (cg_ptr == nullptr) {
     return;
   }
-  dispatcher->push("CG confirmation",
-                   [this, ue_idx = cg_conf_ind.ue_index, slot_rx = cg_conf_ind.slot_rx, cg_ptr = std::move(cg_ptr)]() {
-                     ue_ev_handler.handle_cg_activation_complete_indication(ue_idx, slot_rx);
-                     ev_logger.enqueue(*cg_ptr);
-                   });
+  dispatcher->push("CG confirmation", [this, ue_idx = cg_conf_ind.ue_index, cg_ptr = std::move(cg_ptr)]() {
+    ue_ev_handler.handle_cg_activation_complete_indication(ue_idx);
+    ev_logger.enqueue(*cg_ptr);
+  });
 }
 
 void cell_event_manager::handle_uci_indication_timeout(slot_point uci_slot, rnti_t crnti, const uci_action& action)
