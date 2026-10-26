@@ -39,6 +39,15 @@ protected:
   /// \param[in] samples - Quantized samples.
   void log_post_quantization_rms(span<const int16_t> samples);
 
+  /// \brief Prints to the log the root mean square (RMS) value of the given samples once quantized.
+  ///
+  /// The samples are only quantized if the debug level of the logger is enabled, so that implementations that quantize
+  /// the samples on the fly do not need to store the quantized values.
+  ///
+  /// \param[in] in         Brain float samples to quantize.
+  /// \param[in] data_width Bit width of the quantized samples.
+  void log_quantization_rms(span<const bf16_t> in, unsigned data_width);
+
   ocudulog::basic_logger& logger;
   /// IQ data scaling for every IQ bit width.
   const iq_scaling_table scaling_table;

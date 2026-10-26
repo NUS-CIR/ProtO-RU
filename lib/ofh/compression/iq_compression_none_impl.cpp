@@ -90,6 +90,21 @@ bool iq_compression_none_impl::decompress(span<cbf16_t>                output,
   return true;
 }
 
+void iq_compression_none_impl::log_quantization_rms(span<const bf16_t> in, unsigned data_width)
+{
+  if (OCUDU_LIKELY(!logger.debug.enabled())) {
+    return;
+  }
+
+  static constexpr size_t MAX_NOF_SAMPLES = 2 * NOF_SUBCARRIERS_PER_RB * MAX_NOF_PRBS;
+  ocudu_assert(in.size() <= MAX_NOF_SAMPLES, "Number of samples exceeds the maximum number of PRBs");
+
+  std::array<int16_t, MAX_NOF_SAMPLES> quantized;
+  span<int16_t>                        quantized_span(quantized.data(), in.size());
+  quantizer(data_width).to_fixed_point(quantized_span, in, scaling_table.get_compression_iq_scaling(data_width));
+  log_post_quantization_rms(quantized_span);
+}
+
 void iq_compression_none_impl::log_post_quantization_rms(span<const int16_t> samples)
 {
   if (OCUDU_UNLIKELY(logger.debug.enabled() && !samples.empty())) {

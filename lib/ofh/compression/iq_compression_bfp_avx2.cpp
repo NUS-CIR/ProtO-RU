@@ -13,50 +13,6 @@
 using namespace ocudu;
 using namespace ofh;
 
-/// \brief Compresses pairs of PRBs using 16bit samples.
-///
-/// Samples that already use all the bits of the data width are not shifted, so the exponent is always zero. The
-/// conversion to big-endian is merged with the reordering of the quantized samples.
-static void compress_prb_pairs_16b(uint8_t*      out,
-                                   const bf16_t* in,
-                                   unsigned      nof_prb_pairs,
-                                   unsigned      prb_size,
-                                   __m256        scale_ps,
-                                   uint8_t       comp_param)
-{
-  // AVX2 register size in a number of 16bit words.
-  static constexpr unsigned AVX2_REG_SIZE = 16;
-
-  const __m256i bswap_mask_epi8 =
-      _mm256_setr_epi64x(0x0a0b020308090001, 0x0e0f06070c0d0405, 0x0a0b020308090001, 0x0e0f06070c0d0405);
-  for (unsigned pair = 0; pair != nof_prb_pairs; ++pair) {
-    __m256i rb0_epi16 = _mm256_shuffle_epi8(
-        mm256::quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps),
-        bswap_mask_epi8);
-    __m256i rb01_epi16 =
-        _mm256_shuffle_epi8(mm256::quantize_bf16_even_odd(
-                                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE)), scale_ps),
-                            bswap_mask_epi8);
-    __m256i rb1_epi16 =
-        _mm256_shuffle_epi8(mm256::quantize_bf16_even_odd(
-                                _mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE * 2)), scale_ps),
-                            bswap_mask_epi8);
-
-    // Write the compression parameter followed by the samples of each PRB.
-    uint8_t* prb0 = out;
-    uint8_t* prb1 = prb0 + prb_size;
-    prb0[0]       = comp_param;
-    _mm256_storeu_si256(reinterpret_cast<__m256i*>(prb0 + 1), rb0_epi16);
-    _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0 + 33), _mm256_castsi256_si128(rb01_epi16));
-    prb1[0] = comp_param;
-    _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1 + 1), _mm256_extracti128_si256(rb01_epi16, 1));
-    _mm256_storeu_si256(reinterpret_cast<__m256i*>(prb1 + 17), rb1_epi16);
-
-    in += AVX2_REG_SIZE * 3;
-    out += prb_size * 2;
-  }
-}
-
 void iq_compression_bfp_avx2::compress(span<uint8_t>                buffer,
                                        span<const cbf16_t>          iq_data,
                                        const ru_compression_params& params)
@@ -160,7 +116,8 @@ void iq_compression_bfp_avx2::compress(span<uint8_t>                buffer,
   // quantization of the next pair is done before packing the current one to overlap the long dependency chains.
   unsigned nof_prb_pairs = nof_prbs / 2;
   if (params.data_width == MAX_IQ_WIDTH) {
-    compress_prb_pairs_16b(buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, exponent_offset);
+    // Samples that already use all the bits of the data width are not shifted, so the exponent is always zero.
+    mm256::compress_prb_pairs_16b<true>(buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, exponent_offset);
     rb += nof_prb_pairs * 2;
     input_it += NOF_SAMPLES_PER_PRB * 2 * nof_prb_pairs;
   } else if (nof_prb_pairs != 0) {

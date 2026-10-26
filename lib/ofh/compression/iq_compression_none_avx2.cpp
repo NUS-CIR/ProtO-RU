@@ -16,19 +16,20 @@ void iq_compression_none_avx2::compress(span<uint8_t>                buffer,
                                         span<const cbf16_t>          iq_data,
                                         const ru_compression_params& params)
 {
+  // Use generic implementation if AVX2 utils don't support requested bit width.
+  if (!mm256::iq_width_packing_supported(params.data_width)) {
+    iq_compression_none_impl::compress(buffer, iq_data, params);
+    return;
+  }
+
   // Number of quantized samples per resource block.
   static constexpr size_t NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
   // AVX2 register size in a number of 16-bit words.
   static constexpr size_t AVX2_REG_SIZE = 16;
 
-  // Quantizer object.
-  quantizer q(params.data_width);
-
-  // Use generic implementation if AVX512 utils don't support requested bit width.
-  if (!mm256::iq_width_packing_supported(params.data_width)) {
-    iq_compression_none_impl::compress(buffer, iq_data, params);
-    return;
-  }
+  // Compression bit width. It is kept in a local variable, as otherwise it is reloaded after every write to the output
+  // buffer.
+  const unsigned data_width = params.data_width;
 
   // Number of input PRBs.
   unsigned nof_prbs = (iq_data.size() / NOF_SUBCARRIERS_PER_RB);
@@ -38,48 +39,65 @@ void iq_compression_none_avx2::compress(span<uint8_t>                buffer,
 
   ocudu_assert(buffer.size() >= prb_size * nof_prbs, "Output buffer doesn't have enough space to decompress PRBs");
 
-  // Auxiliary arrays used for float to fixed point conversion of the input data.
-  std::array<int16_t, NOF_SAMPLES_PER_PRB * MAX_NOF_PRBS> input_quantized;
+  log_quantization_rms({reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U}, data_width);
 
-  span<const bf16_t> float_samples_span(reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U);
-  span<int16_t>      input_quantized_span(input_quantized.data(), float_samples_span.size());
-  q.to_fixed_point(
-      input_quantized_span, float_samples_span, scaling_table.get_compression_iq_scaling(params.data_width));
+  // Quantizer object, which defines the gain and the largest quantized value.
+  const quantizer q(data_width);
 
-  log_post_quantization_rms(input_quantized_span);
+  // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
+  const float  full_scale = static_cast<float>((1 << (data_width - 1)) - 1);
+  const float  iq_scaling = scaling_table.get_compression_iq_scaling(data_width);
+  const __m256 scale_ps   = _mm256_set1_ps(full_scale * iq_scaling);
 
-  unsigned sample_idx = 0;
-  unsigned rb         = 0;
+  const auto* input_it = reinterpret_cast<const bf16_t*>(iq_data.data());
+  unsigned    rb       = 0;
+
   // One AVX2 register stores 8 16-bit IQ pairs. We can process 2 PRBs at a time by using 3 AVX2 registers.
-  for (size_t rb_index_end = (nof_prbs / 2) * 2; rb != rb_index_end; rb += 2) {
-    // Get view over bytes corresponding to two PRBs processed in this iteration.
-    span<uint8_t> comp_prb0_buffer(&buffer[rb * prb_size], prb_size);
-    span<uint8_t> comp_prb1_buffer(&buffer[(rb + 1) * prb_size], prb_size);
+  unsigned nof_prb_pairs = nof_prbs / 2;
+  if (data_width == MAX_IQ_WIDTH) {
+    mm256::compress_prb_pairs_16b<false>(buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, 0);
+    rb += nof_prb_pairs * 2;
+    input_it += NOF_SAMPLES_PER_PRB * 2 * nof_prb_pairs;
+  } else {
+    // The scaled samples above the full scale saturate in the float domain, and the ones below the negative full scale
+    // in the 16-bit domain, as the conversion to integers gives the most negative value if it overflows.
+    const __m256  max_ps           = _mm256_set1_ps(full_scale);
+    const __m256i min_epi16        = _mm256_set1_epi16(static_cast<int16_t>(-full_scale));
+    auto          quantize_prb_reg = [&](const bf16_t* in) {
+      return _mm256_max_epi16(
+          mm256::quantize_bf16(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps, max_ps), min_epi16);
+    };
 
-    // Load symbols.
-    const auto* start_it   = input_quantized.begin() + sample_idx;
-    __m256i     rb0_epi16  = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(start_it + 0));
-    __m256i     rb01_epi16 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(start_it + AVX2_REG_SIZE));
-    __m256i     rb1_epi16  = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(start_it + AVX2_REG_SIZE * 2));
+    for (unsigned pair = 0; pair != nof_prb_pairs; ++pair) {
+      // Get view over bytes corresponding to two PRBs processed in this iteration.
+      span<uint8_t> comp_prb0_buffer(&buffer[rb * prb_size], prb_size);
+      span<uint8_t> comp_prb1_buffer(&buffer[(rb + 1) * prb_size], prb_size);
 
-    // Pack 2 PRBs using utility function and save compression parameters.
-    mm256::pack_prbs_big_endian(
-        comp_prb0_buffer, comp_prb1_buffer, rb0_epi16, rb01_epi16, rb1_epi16, params.data_width);
+      // Load and quantize symbols.
+      __m256i rb0_epi16  = quantize_prb_reg(input_it);
+      __m256i rb01_epi16 = quantize_prb_reg(input_it + AVX2_REG_SIZE);
+      __m256i rb1_epi16  = quantize_prb_reg(input_it + AVX2_REG_SIZE * 2);
 
-    sample_idx += (NOF_SAMPLES_PER_PRB * 2);
+      // Pack 2 PRBs using utility function.
+      mm256::pack_prbs_big_endian(comp_prb0_buffer, comp_prb1_buffer, rb0_epi16, rb01_epi16, rb1_epi16, data_width);
+
+      input_it += NOF_SAMPLES_PER_PRB * 2;
+      rb += 2;
+    }
   }
 
   // Use generic implementation for the remaining resource blocks.
   for (; rb != nof_prbs; ++rb) {
-    span<const int16_t> input_quantized_last_rb(&input_quantized[sample_idx], NOF_SAMPLES_PER_PRB);
+    std::array<int16_t, NOF_SAMPLES_PER_PRB> input_quantized;
+    q.to_fixed_point(input_quantized, span<const bf16_t>(input_it, NOF_SAMPLES_PER_PRB), iq_scaling);
 
     // View over output bytes corresponding to the current PRB.
     span<uint8_t> out_compr_prb(&buffer[rb * prb_size], prb_size);
 
     bit_buffer bit_buf = bit_buffer::from_bytes(out_compr_prb);
-    pack_bytes(bit_buf, input_quantized_last_rb, params.data_width);
+    pack_bytes(bit_buf, input_quantized, data_width);
 
-    sample_idx += NOF_SAMPLES_PER_PRB;
+    input_it += NOF_SAMPLES_PER_PRB;
   }
 }
 
