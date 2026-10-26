@@ -129,9 +129,9 @@ void uci_scheduler_impl::add_ue_to_grid(const ue_cell_configuration& ue_cfg, boo
   const unsigned sr_period_slots = sr_periodicity_to_slot(cell_cfg.params.init_bwp.pucch.sr_period);
   add_resource(ue_cfg.crnti, ue_ul_cfg->pucch.sr_offset, sr_period_slots, true);
 
-  if (ue_ul_cfg->periodic_csi_report.has_value()) {
+  if (ue_ul_cfg->csi.periodic_report.has_value()) {
     const unsigned csi_period_slots = to_underlying(cell_cfg.params.init_bwp.csi->csi_rs_period);
-    add_resource(ue_cfg.crnti, ue_ul_cfg->periodic_csi_report->offset, csi_period_slots, false);
+    add_resource(ue_cfg.crnti, ue_ul_cfg->csi.periodic_report->offset, csi_period_slots, false);
   }
 
   // Register the UE in the list of recently configured UEs.
@@ -149,7 +149,7 @@ void uci_scheduler_impl::reconf_ue(const ue_cell_configuration& new_ue_cfg, cons
   const ue_uplink_bwp_config* new_ul_cfg = new_ue_cfg.init_bwp().ul.ue_cfg();
   const ue_uplink_bwp_config* old_ul_cfg = old_ue_cfg.init_bwp().ul.ue_cfg();
   if (new_ul_cfg != nullptr and old_ul_cfg != nullptr) {
-    if (new_ul_cfg->pucch == old_ul_cfg->pucch and new_ul_cfg->periodic_csi_report == old_ul_cfg->periodic_csi_report) {
+    if (new_ul_cfg->pucch == old_ul_cfg->pucch and new_ul_cfg->csi.periodic_report == old_ul_cfg->csi.periodic_report) {
       // Nothing changed.
       return;
     }
@@ -169,9 +169,9 @@ void uci_scheduler_impl::rem_ue(const ue_cell_configuration& ue_cfg)
   const unsigned sr_period_slots = sr_periodicity_to_slot(cell_cfg.params.init_bwp.pucch.sr_period);
   rem_resource(ue_cfg.crnti, ue_ul_cfg->pucch.sr_offset, sr_period_slots, true);
 
-  if (ue_ul_cfg->periodic_csi_report.has_value()) {
+  if (ue_ul_cfg->csi.periodic_report.has_value()) {
     const unsigned csi_period_slots = to_underlying(cell_cfg.params.init_bwp.csi->csi_rs_period);
-    rem_resource(ue_cfg.crnti, ue_ul_cfg->periodic_csi_report->offset, csi_period_slots, false);
+    rem_resource(ue_cfg.crnti, ue_ul_cfg->csi.periodic_report->offset, csi_period_slots, false);
   }
 }
 

@@ -259,7 +259,7 @@ static std::vector<periodic_uci_config> collect_ul_occasions(const ue_cell_confi
     }
   }
 
-  const auto& periodic_csi = pcell_ue_cfg.bwps.front().ul.periodic_csi_report;
+  const auto& periodic_csi = pcell_ue_cfg.bwps.front().ul.csi.periodic_report;
   if (periodic_csi.has_value() and pcell_common.ran.init_bwp.csi.has_value()) {
     const csi_report_periodicity period =
         csi_helper::convert_csi_resource_period_to_report_period(pcell_common.ran.init_bwp.csi->csi_rs_period);

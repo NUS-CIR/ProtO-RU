@@ -46,6 +46,19 @@ struct ue_periodic_csi_config {
   }
 };
 
+/// UE-specific information related to the CSI reports.
+struct ue_csi_config {
+  /// Present only if periodic CSI reporting is enabled in the cell.
+  std::optional<ue_periodic_csi_config> periodic_report;
+  /// Codebook of the CSI reports. The cell must offer the Type-II codebook to set \c csi_codebook_type::type2.
+  csi_codebook_type codebook = csi_codebook_type::type1;
+
+  bool operator==(const ue_csi_config& other) const
+  {
+    return periodic_report == other.periodic_report and codebook == other.codebook;
+  }
+};
+
 struct ue_pusch_config {
   tx_scheme_codebook tx_cfg;
   /// Whether to enable TP?
@@ -74,19 +87,15 @@ struct ue_srs_config {
 ///
 /// \remark Only meaningful when associated to its \ref cell_uplink_bwp_config.
 struct ue_uplink_bwp_config {
-  ue_pucch_config pucch;
-  // Only present if periodic CSI reporting is enabled in the cell.
-  std::optional<ue_periodic_csi_config> periodic_csi_report;
-  /// Codebook of the CSI reports. The cell must offer the Type-II codebook to set \c csi_codebook_type::type2.
-  csi_codebook_type           csi_codebook = csi_codebook_type::type1;
+  ue_pucch_config             pucch;
+  ue_csi_config               csi;
   ue_pusch_config             pusch;
   std::optional<ue_cg_config> cg;
   ue_srs_config               srs;
 
   bool operator==(const ue_uplink_bwp_config& other) const
   {
-    return pucch == other.pucch and periodic_csi_report == other.periodic_csi_report and
-           csi_codebook == other.csi_codebook and pusch == other.pusch and srs == other.srs and cg == other.cg;
+    return pucch == other.pucch and csi == other.csi and pusch == other.pusch and srs == other.srs and cg == other.cg;
   }
 };
 

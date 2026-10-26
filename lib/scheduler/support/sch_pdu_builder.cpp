@@ -110,7 +110,7 @@ pusch_config_params ocudu::get_pusch_config_f0_0_c_rnti(const cell_configuration
     // NOTE: The CSI size depends on whether the CSI is configured on PUSCH or PUCCH, as per Section 5.2.3, TS 38.214:
     // "For both Type I and Type II reports configured for PUCCH but transmitted on PUSCH, the determination of the
     // payload for CSI part 1 and CSI part 2 follows that of PUCCH as described in clause 5.2.4."
-    if (not ue_cell_cfg->init_bwp().ul.ue_cfg()->periodic_csi_report.has_value()) {
+    if (not ue_cell_cfg->init_bwp().ul.ue_cfg()->csi.periodic_report.has_value()) {
       csi_report_size csi_size     = get_csi_report_pusch_size(csi_rep_cfg);
       pusch.nof_csi_part1_bits     = csi_size.part1_size.value();
       pusch.max_nof_csi_part2_bits = csi_size.part2_max_size.value();
@@ -167,13 +167,13 @@ pusch_config_params ocudu::get_pusch_config_f0_1_c_rnti(const ue_cell_configurat
   // TODO: verify if this needs to be set depending on some configuration.
   pusch.nof_harq_ack_bits = nof_harq_ack_bits;
   pusch.aperiodic_csi =
-      ue_cell_cfg.has_csi_cfg() and not ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report.has_value();
+      ue_cell_cfg.has_csi_cfg() and not ue_cell_cfg.init_bwp().ul.ue_cfg()->csi.periodic_report.has_value();
   if (is_csi_report_slot) {
     const csi_report_configuration& csi_rep_cfg = ue_cell_cfg.csi_report();
     // NOTE: The CSI size depends on whether the CSI is configured on PUSCH or PUCCH, as per Section 5.2.3, TS 38.214:
     // "For both Type I and Type II reports configured for PUCCH but transmitted on PUSCH, the determination of the
     // payload for CSI part 1 and CSI part 2 follows that of PUCCH as described in clause 5.2.4."
-    if (not ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report.has_value()) {
+    if (not ue_cell_cfg.init_bwp().ul.ue_cfg()->csi.periodic_report.has_value()) {
       csi_report_size csi_size     = get_csi_report_pusch_size(csi_rep_cfg);
       pusch.nof_csi_part1_bits     = csi_size.part1_size.value();
       pusch.max_nof_csi_part2_bits = csi_size.part2_max_size.value();

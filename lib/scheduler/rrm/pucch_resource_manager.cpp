@@ -176,12 +176,12 @@ bool pucch_resource_manager::alloc_resources(ue_cell_config& cell_cfg)
   ul_bwp.pucch.sr_res_id = pucch_sr_resource_id(sr_cfg->res);
   ul_bwp.pucch.sr_offset = sr_cfg->offset;
   if (csi_cfg.has_value()) {
-    ul_bwp.periodic_csi_report.emplace(ue_periodic_csi_config{
+    ul_bwp.csi.periodic_report.emplace(ue_periodic_csi_config{
         .pucch_res_id = pucch_csi_resource_id(csi_cfg->res),
         .offset       = csi_cfg->offset,
     });
   } else {
-    ul_bwp.periodic_csi_report.reset();
+    ul_bwp.csi.periodic_report.reset();
   }
 
   // Fill the serving cell config with the PUCCH-related configuration.
@@ -205,19 +205,19 @@ void pucch_resource_manager::dealloc_resources(const ue_cell_config& cell_cfg)
   // Return SR resource/offset to the free list.
   cell_ctx.free_sr_configs.emplace_back(periodic_pucch_config{ul_bwp.pucch.sr_res_id.value(), ul_bwp.pucch.sr_offset});
 
-  ocudu_assert((cell_ctx.pucch_csi_report() != nullptr) == ul_bwp.periodic_csi_report.has_value(),
+  ocudu_assert((cell_ctx.pucch_csi_report() != nullptr) == ul_bwp.csi.periodic_report.has_value(),
                "Periodic CSI report configuration presence mismatch between cell and UE");
   // Return CSI resource/offset to the free list if periodic CSI is configured for this cell.
   if (cell_ctx.pucch_csi_report() != nullptr) {
     cell_ctx.free_csi_configs.emplace_back(
-        periodic_pucch_config{ul_bwp.periodic_csi_report->pucch_res_id.value(), ul_bwp.periodic_csi_report->offset});
+        periodic_pucch_config{ul_bwp.csi.periodic_report->pucch_res_id.value(), ul_bwp.csi.periodic_report->offset});
   }
 
   // Remove the SR and CSI offsets from the PUCCH grants-per-slot counter.
   for (auto offset : compute_periodic_uci_slot_offsets(
            cell_ctx,
            ul_bwp.pucch.sr_offset,
-           ul_bwp.periodic_csi_report.has_value() ? ul_bwp.periodic_csi_report->offset : 0)) {
+           ul_bwp.csi.periodic_report.has_value() ? ul_bwp.csi.periodic_report->offset : 0)) {
     ocudu_assert(offset < cell_ctx.periodic_pucchs_per_slot.size(),
                  "Index exceeds the size of the PUCCH grants vector");
     ocudu_assert(cell_ctx.periodic_pucchs_per_slot[offset] != 0,

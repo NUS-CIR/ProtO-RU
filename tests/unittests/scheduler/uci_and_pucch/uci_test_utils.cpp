@@ -267,7 +267,7 @@ void test_bench::add_ue()
   ue_cell.init_bwp().ul.pucch.sr_offset                                         = params.sr_offset;
   ue_cell.serv_cell_cfg.ul_config->init_ul_bwp.pucch_cfg->sr_res_list[0].offset = params.sr_offset;
   if (params.csi_period.has_value()) {
-    ue_cell.init_bwp().ul.periodic_csi_report.value().offset = params.csi_offset;
+    ue_cell.init_bwp().ul.csi.periodic_report.value().offset = params.csi_offset;
     auto& csi_report = std::get<csi_report_config::periodic_or_semi_persistent_report_on_pucch>(
         ue_cell.serv_cell_cfg.csi_meas_cfg.value().csi_report_cfg_list[0].report_cfg_type);
     csi_report.report_slot_offset = params.csi_offset;

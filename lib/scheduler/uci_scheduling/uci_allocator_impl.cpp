@@ -57,7 +57,7 @@ add_csi_to_uci_on_pusch(uci_info::csi_info& uci_csi, const ue_cell_configuration
   // NOTE: The CSI size depends on whether the CSI is configured on PUSCH or PUCCH, as per Section 5.2.3, TS 38.214:
   // "For both Type I and Type II reports configured for PUCCH but transmitted on PUSCH, the determination of the
   // payload for CSI part 1 and CSI part 2 follows that of PUCCH as described in clause 5.2.4."
-  if (not ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report.has_value()) {
+  if (not ue_cell_cfg.init_bwp().ul.ue_cfg()->csi.periodic_report.has_value()) {
     csi_report_size csi_size   = get_csi_report_pusch_size(uci_csi.csi_rep_cfg);
     uci_csi.csi_part1_nof_bits = csi_size.part1_size.value();
 
@@ -235,8 +235,8 @@ std::optional<uci_allocation> uci_allocator_impl::alloc_harq_ack(cell_resource_a
 
     unsigned nof_available_harq_bits = 0U;
 
-    if (ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report.has_value() and
-        csi_helper::is_csi_reporting_slot(*ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report,
+    if (ue_cell_cfg.init_bwp().ul.ue_cfg()->csi.periodic_report.has_value() and
+        csi_helper::is_csi_reporting_slot(*ue_cell_cfg.init_bwp().ul.ue_cfg()->csi.periodic_report,
                                           cell_cfg.params.init_bwp.csi->csi_rs_period,
                                           ue_ul_slot)) {
       // TODO: Remove this when the PUCCH allocator handle properly more than 2 HARQ-ACK bits + CSI.

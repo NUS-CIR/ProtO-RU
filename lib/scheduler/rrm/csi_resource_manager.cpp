@@ -52,7 +52,7 @@ void csi_resource_manager::apply_config(ue_cell_config&                         
   const char* unsupported_reason = type2_unsupported_reason(cell_ctx, ue_caps);
 
   // The scheduler reads the codebook from the UE BWP configuration, and RRC reads it from the CSI-MeasConfig.
-  ue_cell_cfg.init_bwp().ul.csi_codebook =
+  ue_cell_cfg.init_bwp().ul.csi.codebook =
       unsupported_reason == nullptr ? csi_codebook_type::type2 : csi_codebook_type::type1;
 
   for (csi_report_config& report_cfg : serv_cell_cfg.csi_meas_cfg->csi_report_cfg_list) {

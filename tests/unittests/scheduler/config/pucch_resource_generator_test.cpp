@@ -216,8 +216,8 @@ TEST_P(pucch_resource_generator_test, ue_pucch_config_builder_test)
         const ue_bwp_config ue_bwp_cfg{
             .ul =
                 {
-                    .pucch               = {.res_set_cfg_id = res_set_cfg_id, .sr_res_id = sr_res_id},
-                    .periodic_csi_report = ue_periodic_csi_config{.pucch_res_id = csi_res_id},
+                    .pucch = {.res_set_cfg_id = res_set_cfg_id, .sr_res_id = sr_res_id},
+                    .csi   = {.periodic_report = ue_periodic_csi_config{.pucch_res_id = csi_res_id}},
                 },
         };
 

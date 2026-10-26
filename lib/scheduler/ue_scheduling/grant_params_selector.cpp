@@ -530,7 +530,7 @@ static bool is_csi_included(const ue_cell& ue_cc, slot_point pusch_slot, span<co
       // for here.
       // CSI period and offset are in the UE uplink slot numbering, the slots checked here are on the gNB DL clock.
       const auto is_csi_slot = [&](slot_point sl) {
-        return csi_helper::is_csi_reporting_slot(*ue_cell_cfg.init_bwp().ul.ue_cfg()->periodic_csi_report,
+        return csi_helper::is_csi_reporting_slot(*ue_cell_cfg.init_bwp().ul.ue_cfg()->csi.periodic_report,
                                                  cell_cfg.params.init_bwp.csi->csi_rs_period,
                                                  cell_cfg.dl_to_ue_ul_slot(sl));
       };

@@ -107,7 +107,7 @@ protected:
         const csi_codebook_type rrc_codebook =
             std::holds_alternative<codebook_config::type2>(rep.codebook_cfg->codebook_type) ? csi_codebook_type::type2
                                                                                             : csi_codebook_type::type1;
-        EXPECT_EQ(ue_cell_cfg.bwps[0].ul.csi_codebook, rrc_codebook);
+        EXPECT_EQ(ue_cell_cfg.bwps[0].ul.csi.codebook, rrc_codebook);
         return rep.codebook_cfg.value();
       }
     }

@@ -190,7 +190,7 @@ public:
   /// \remark Call it only for a UE with a CSI configuration.
   const csi_report_configuration& csi_report() const
   {
-    return cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.value().report(init_bwp().ul.ue_cfg()->csi_codebook);
+    return cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.value().report(init_bwp().ul.ue_cfg()->csi.codebook);
   }
 
   /// PDSCH parameters common to all BWPs.

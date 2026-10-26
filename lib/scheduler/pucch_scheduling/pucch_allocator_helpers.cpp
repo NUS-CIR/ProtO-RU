@@ -30,14 +30,14 @@ const pucch_resource& pucch_helper::get_harq_resource(const ue_cell_configuratio
       return cell_res.get_ded(res_params.sr_res_id(ue_bwp.pucch.sr_res_id));
     }
     ocudu_assert(pri == res_params.res_set_size.value() + 1, "Invalid PRI={} for Resource Set 0", pri);
-    return cell_res.get_ded(res_params.csi_f0_res_id(ue_bwp.periodic_csi_report->pucch_res_id));
+    return cell_res.get_ded(res_params.csi_f0_res_id(ue_bwp.csi.periodic_report->pucch_res_id));
   }
 
   if (pri == res_params.res_set_size.value()) {
     return cell_res.get_ded(res_params.sr_f2_res_id(ue_bwp.pucch.sr_res_id));
   }
   ocudu_assert(pri == res_params.res_set_size.value() + 1, "Invalid PRI={} for Resource Set 1", pri);
-  return cell_res.get_ded(res_params.csi_res_id(ue_bwp.periodic_csi_report->pucch_res_id));
+  return cell_res.get_ded(res_params.csi_res_id(ue_bwp.csi.periodic_report->pucch_res_id));
 }
 
 template const pucch_resource& pucch_helper::get_harq_resource<0>(const ue_cell_configuration&, unsigned);
@@ -54,11 +54,11 @@ const pucch_resource& pucch_helper::get_sr_resource(const ue_cell_configuration&
 const pucch_resource& pucch_helper::get_csi_resource(const ue_cell_configuration& ue_cfg)
 {
   const auto& ue_bwp = *ue_cfg.init_bwp().ul.ue_cfg();
-  ocudu_assert(ue_bwp.periodic_csi_report.has_value(),
+  ocudu_assert(ue_bwp.csi.periodic_report.has_value(),
                "CSI resource requested, but periodic CSI reporting is not configured for the UE");
   const auto& res_params = ue_cfg.cell_cfg_common.params.init_bwp.pucch.resources;
   const auto& cell_res   = ue_cfg.cell_cfg_common.bwp_res[to_bwp_id(0)].ul().pucch;
-  return cell_res.get_ded(res_params.csi_res_id(ue_bwp.periodic_csi_report->pucch_res_id));
+  return cell_res.get_ded(res_params.csi_res_id(ue_bwp.csi.periodic_report->pucch_res_id));
 }
 
 const pucch_resource& pucch_helper::get_common_resource(const cell_configuration&      cell_cfg,

@@ -25,7 +25,7 @@ public:
                               .sr_period        = sr_period,
                               .sr_offset        = sr_offset}}
   {
-    csi_offset = t_bench.get_main_ue().get_pcell().cfg().init_bwp().ul.ue_cfg()->periodic_csi_report->offset;
+    csi_offset = t_bench.get_main_ue().get_pcell().cfg().init_bwp().ul.ue_cfg()->csi.periodic_report->offset;
     csi_period = t_bench.cell_cfg.params.init_bwp.csi->csi_rs_period;
 
     // Set the expected SR grant to the SR resource.
