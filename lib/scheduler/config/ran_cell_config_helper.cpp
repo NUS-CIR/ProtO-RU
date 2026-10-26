@@ -471,10 +471,9 @@ uint8_t config_helpers::compute_max_nof_candidates(aggregation_level aggr_lvl, c
 
 unsigned config_helpers::compute_last_non_srs_symbol(const ran_cell_config& cell_cfg)
 {
-  // The cell's SRS resources are whole blocks of srs_cfg.nof_symbols anchored at the last symbol of the slot (see
-  // generate_cell_srs_list()), so the region actually occupied is the largest multiple of that length that fits in the
-  // configured budget: what is left of max_nof_symbols below it is too short for another resource and stays free.
-  // Sizing a PUSCH against the whole budget instead would give up those symbols for nothing.
+  // The cell's SRS resources are whole blocks of srs_cfg.nof_symbols anchored at the last symbol of the slot, so the
+  // region actually occupied is the largest multiple of that length that fits in the configured budget: what is left of
+  // max_nof_symbols below it is too short for another resource and stays free.
   const srs_builder_params& srs_cfg         = cell_cfg.init_bwp.srs_cfg;
   const unsigned            srs_res_syms    = static_cast<unsigned>(srs_cfg.nof_symbols);
   const unsigned            nof_srs_symbols = srs_cfg.srs_type_enabled != srs_type::disabled
@@ -497,10 +496,14 @@ std::optional<unsigned> config_helpers::find_cg_pusch_td_res_idx(const ran_cell_
   ocudu_assert(cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common.has_value(),
                "PUSCH Config Common must be configured.");
 
+  /// The list is sorted by increasing k2 first, then by decreasing \c symbols.stop(), so the first qualifying entry is
+  /// the one with both the lowest k2 and the most symbols among those that avoid the SRS.
+
   // Symbols left free by the SRS, which sits at the end of the slot.
   const unsigned last_non_srs_symbol = compute_last_non_srs_symbol(cell_cfg);
 
-  // PUSCH time-domain resources are sorted by increasing k2 first, then by decreasing symbols .stop().
+  // PUSCH time-domain resources are sorted by increasing k2 first, then by decreasing \c symbols.stop(), so the first
+  // qualifying entry is the one with both the lowest k2 and the most symbols among those that avoid the SRS.
   const auto& td_res = cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common.value().pusch_td_alloc_list;
   for (unsigned n = 0, sz = td_res.size(); n != sz; ++n) {
     if (is_cg_pusch_td_res_usable(td_res[n], last_non_srs_symbol)) {

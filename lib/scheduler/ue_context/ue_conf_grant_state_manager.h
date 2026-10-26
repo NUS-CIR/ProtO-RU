@@ -15,9 +15,8 @@ namespace ocudu {
 
 /// \brief Parameters of an active CG allocation.
 ///
-/// The parameters are only meaningful as a set: either the UE has an active CG and all of them are valid, or it has
-/// none and none of them are. \ref ue_conf_grant_state_manager hands them out wrapped in a \c std::optional, so that
-/// the activation check cannot be skipped.
+/// \remark The parameters are only meaningful as a set: either the UE has an active CG and all of them are valid, or it
+/// has none and none of them are.
 struct cg_grant_params {
   unsigned     periodicity_slots;
   unsigned     time_offset;
@@ -29,10 +28,7 @@ struct cg_grant_params {
   unsigned resource_id;
 };
 
-/// /brief Class that keeps track of CG state variables.
-///
-/// Motivated by CG type 2, in which TBS, MCS, VRBs and slot offset and TD allocation can potentially change during the
-/// scheduling life. The class provides an API that can be used for both CG type 1 and type 2.
+/// Class that keeps track of CG state variables.
 class ue_conf_grant_state_manager
 {
 public:
@@ -51,16 +47,7 @@ public:
     return slot.count() % state->periodicity_slots == state->time_offset;
   }
 
-  /// \brief Test whether \c slot precedes the first occasion the UE will transmit on.
-  ///
-  /// With CG Type 2 the occasions recur every period from a phase derived from the activation DCI, so the ones that
-  /// fall between the activation and the first transmission at \c slot_pdcch + k2 belong to that phase but predate the
-  /// grant. The UE does not transmit on them, and the slot wheel - a ring indexed by slot modulo its length - cannot
-  /// express the distinction, as anything omitted from it is omitted on every period thereafter.
-  /// \remark The gate is only used between the activation and the first occasion, i.e. for at most k2 slots. Keeping
-  /// it enabled indefinitely would be unsound: \c slot_point comparisons are only meaningful within half a hyperframe,
-  /// so a stale first-transmission slot would eventually read as being in the future again and suppress real
-  /// occasions. \ref clear_first_tx_slot() disables it as soon as the first occasion is reached.
+  /// Test whether \c slot precedes the first occasion the UE will transmit on.
   bool is_before_first_tx(slot_point slot) const { return first_tx_slot.has_value() and slot < first_tx_slot.value(); }
 
   /// \brief Replaces the TDRA row of the active CG allocation, leaving the rest of its state untouched.

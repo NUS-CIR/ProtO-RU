@@ -5,6 +5,7 @@
 
 #include "ocudu/scheduler/config/scheduler_cell_config_validator.h"
 #include "../support/dmrs_helpers.h"
+#include "../support/pdcch/search_space_helper.h"
 #include "../support/pdsch/pdsch_default_time_allocation.h"
 #include "../support/prbs_calculator.h"
 #include "ocudu/adt/format.h"
@@ -268,6 +269,21 @@ static error_type<std::string> validate_cg_cfg(const sched_cell_configuration_re
 {
   if (not msg.ran.init_bwp.cg_cfg.has_value()) {
     return {};
+  }
+
+  // A Type 2 CG is activated by a DCI format 0_1 scrambled with the CS-RNTI, which needs a UE-specific SearchSpace
+  // monitored with that format. The UE dedicated PDCCH configuration is taken from the cell one, so without such a
+  // SearchSpace here, every UE given the CG would be rejected by the UE configuration validator.
+  if (msg.ran.init_bwp.cg_cfg->is_type2()) {
+    const auto& pdcch_cfg = msg.ran.init_bwp.pdcch_cfg;
+    VERIFY(pdcch_cfg.has_value() and std::any_of(pdcch_cfg->search_spaces.begin(),
+                                                 pdcch_cfg->search_spaces.end(),
+                                                 [](const search_space_configuration& ss) {
+                                                   return not ss.is_common_search_space() and
+                                                          pdcch_helper::get_ul_dci_format(ss) == dci_ul_format::f0_1;
+                                                 }),
+           "Configured Grant type 2 requires a UE-specific SearchSpace monitored with DCI format 0_1, to carry the "
+           "activation DCI");
   }
 
   // The CG PUSCH must leave the SRS region at the end of the slot free, so at least one PUSCH time domain resource has

@@ -462,8 +462,7 @@ void cell_group_event_handler_impl::handle_slice_reconfiguration(const du_cell_s
 
 void cell_group_event_handler_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_index)
 {
-  // This notification can come either from a MAC-CE Configured Grant Confirmation, or from the reception of a non-DTX
-  // CRC.
+  // This notification can come either from a MAC-CE Configured Grant Confirmation, or from the reception of a CRC OK.
 
   if (cg_sched == nullptr) {
     // CG Confirmation received in a cell with no configured grants configured.

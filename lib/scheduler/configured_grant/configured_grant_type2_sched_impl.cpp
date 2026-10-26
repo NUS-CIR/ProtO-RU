@@ -55,7 +55,7 @@ static bool are_grants_and_rbs_free(cell_resource_allocator&                    
                                     rnti_t                                            ue_rnti)
 {
   // The scan covers the whole UL window of the grid, as a UL grant may already sit in any slot of it (e.g., dynamic
-  // PUSCH repetition bundles.
+  // PUSCH repetition bundles).
   // NOTE: the scan starts at k2, which is where the UE's first CG transmission is.
   for (unsigned delay = pusch_td_list[td_alloc].k2; delay <= cell_alloc.max_ul_slot_alloc_delay;
        delay += cg_period_slots) {
@@ -98,6 +98,14 @@ bool configured_grant_type2_sched_impl::has_cg_grant_cfg(const ue_cell_configura
 {
   const auto* ul_ded = ue_cfg.init_bwp().ul.ded();
   return ul_ded != nullptr and ul_ded->cg_cfg.has_value();
+}
+
+std::vector<configured_grant_type2_sched_impl::ue_pending_activation>::iterator
+configured_grant_type2_sched_impl::find_pending(du_ue_index_t ue_idx)
+{
+  return std::find_if(ues_pending_activation.begin(),
+                      ues_pending_activation.end(),
+                      [ue_idx](const ue_pending_activation& u) { return u.ue_index == ue_idx; });
 }
 
 void configured_grant_type2_sched_impl::add_ue_to_wheel(const ue_cell_configuration& ue_cfg,
@@ -154,10 +162,7 @@ void configured_grant_type2_sched_impl::rem_ue(const ue_cell_configuration& ue_c
   }
 
   // UE only added to the UEs pending activation list.
-  auto ue_to_rem_it =
-      std::find_if(ues_pending_activation.begin(),
-                   ues_pending_activation.end(),
-                   [ue_idx = u->ue_index](const ue_pending_activation& ue_it) { return ue_idx == ue_it.ue_index; });
+  auto ue_to_rem_it = find_pending(u->ue_index);
   if (ue_to_rem_it != ues_pending_activation.end()) {
     std::swap(*ue_to_rem_it, ues_pending_activation.back());
     ues_pending_activation.pop_back();
@@ -253,19 +258,15 @@ void configured_grant_type2_sched_impl::start_ue_cg_activation(du_ue_index_t ue_
   }
 
   if (u->get_pcell().get_conf_grant_state_manager().get_grant_params().has_value()) {
-    // This handle the case of a UE that has an active CG configured and that goes through a reconfiguration (in which
-    // it preserve its CG config, without modifying it). Starting a second activation here would add the UE to the
-    // periodic wheel at a second offset, doubling its CG PUSCH rate, and would leak the resource acquired by the first
-    // one.
-    // A reconfiguration that actually changes the CG goes through add_reconf_ue() -> rem_ue(), which erases the
-    // grant info, so the legitimate re-activation is not affected by this check.
+    // The UE already holds a grant: its activation is either in progress, with the UE already in the pending list, or
+    // confirmed. A confirmed UE gets here after a reconfiguration that leaves its CG unchanged; queuing it again would
+    // have activate_ue() acquire a second resource and add the UE to the wheel at a second offset.
+    // NOTE: a reconfiguration that changes the CG goes through add_reconf_ue() -> rem_ue(), which clears the grant, so
+    // the UE is queued for a new activation.
     return;
   }
 
-  auto ue_it = std::find_if(ues_pending_activation.begin(), ues_pending_activation.end(), [ue_idx](const auto& elem) {
-    return elem.ue_index == ue_idx;
-  });
-  if (ue_it == ues_pending_activation.end()) {
+  if (find_pending(ue_idx) == ues_pending_activation.end()) {
     ues_pending_activation.emplace_back(ue_idx);
   }
 }
@@ -282,6 +283,12 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
   // has to survive the call.
   unsigned                      nof_activations = 0;
   cell_slot_resource_allocator& pdcch_alloc     = cell_alloc[0U];
+
+  // Returns whether the UE can be sent an activation DCI in this slot. A UE in fallback is skipped until it applies its
+  // new configuration: until then, the size of the DCI format 0_1 it decodes is not known.
+  const auto can_receive_activation_dci = [pdcch_slot](const ue& u) {
+    return u.get_pcell().is_pdcch_enabled(pdcch_slot) and not u.get_pcell().is_in_fallback_mode();
+  };
 
   // Returns whether no activation DCI can be added to this slot, for any UE.
   const auto is_slot_full = [&]() {
@@ -321,7 +328,7 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
     if (is_slot_full()) {
       return;
     }
-    if (not ue_it->get_pcell().is_pdcch_enabled(pdcch_slot)) {
+    if (not can_receive_activation_dci(*ue_it)) {
       continue;
     }
     if (reactivate_ue(cell_alloc, u, *ue_it) == activation_outcome::success) {
@@ -338,7 +345,7 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
       return;
     }
     ue& ue_ref = ues[u.ue_index];
-    if (not ue_ref.get_pcell().is_pdcch_enabled(pdcch_slot)) {
+    if (not can_receive_activation_dci(ue_ref)) {
       continue;
     }
     const activation_outcome outcome = activate_ue(cell_alloc, u, ue_ref);
@@ -396,20 +403,13 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
 
   auto& pdcch_alloc = cell_alloc[0U];
 
-  const auto slot_pdcch = pdcch_alloc.slot;
-  // The index put in the activation DCI is resolved by the UE against the table of that DCI's own format, which is 0_1
-  // (TS 38.214, Section 6.1.2.3 and Table 6.1.2.1.1-1A): pusch-TimeDomainAllocationListDCI-0-1 when configured, and the
-  // cell's common list otherwise. Indexing the common list directly would mean a different row to the UE whenever the
-  // DCI-0-1 list is configured, which it is once PUSCH repetition Type A is enabled.
-  const auto& pusch_td_list = u.get_pcell().active_bwp().ul.td_mapper().pusch_td_resources(dci_ul_format::f0_1);
+  const auto                                              slot_pdcch    = pdcch_alloc.slot;
+  const span<const pusch_time_domain_resource_allocation> pusch_td_list = get_cg_pusch_td_list(u.get_pcell().cfg());
 
   // For type2 CG, the TD allocation is not defined yet at this point; the scheduler will choose the symbols that do
   // not collide with SRS. In the following, we proceed under that assumption.
 
   // Compute PUSCH symbols to avoid overlapping with SRS.
-  // NOTE: this must use the same bound as find_cg_pusch_td_res_idx(), which the cell configuration validator and the
-  // CG PRB sizing go through. Subtracting the whole srs_cfg.max_nof_symbols budget here instead would reserve symbols
-  // no SRS resource can occupy, and this loop would then skip the very time-domain resource those two picked.
   const unsigned last_non_srs_symbol = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
 
   // Find k2 for which there is a CG resource available.
@@ -439,7 +439,7 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
       continue;
     }
 
-    // The Resource manager doesn't assign a resource if the slot not fully UL-enabled.
+    // The Resource manager doesn't assign a resource if the slot is not fully UL-enabled.
     const unsigned cg_offset = (slot_pdcch + pusch_td_list[td].k2).count() % cg_period_slots;
     candidate_resource       = res_mng.request_resource(cg_offset, u.crnti);
     if (not candidate_resource.has_value()) {
@@ -468,47 +468,32 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
 
   // No available resources.
   if (not candidate_cg_offset.has_value()) {
-    // Every time-domain candidate was rejected: its symbols overlap the SRS, it asks for repetitions, or the resource
-    // or grid space at its offset is taken. All of those depend on this UE's own TD list and offsets, so another UE
-    // may still be activated in this slot.
+    // Do not stop the activation for all UEs at this point; \ref are_grants_and_rbs_free() can still fail a UE due to a
+    // PUSCH allocated for it, which implies nothing for the other UEs.
     logger.info("ue={}: Failed to activate CG PUSCH type2. Cause: no usable PUSCH time domain resource",
                 fmt::underlying(u.ue_index));
     return activation_outcome::skip_ue;
   }
 
-  // Check if DCI can be allocated.
-  pdcch_ul_information* pdcch = alloc_pdcch_ul_information(pdcch_alloc, u.ue_index);
+  const unsigned     bwp_crb_start = cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.crbs.start();
+  const vrb_interval vrbs = rb_helper::crb_to_vrb_ul_non_interleaved(candidate_resource.value().crbs, bwp_crb_start);
+  const auto         mcs  = static_cast<uint8_t>(cell_cfg.params.init_bwp.cg_cfg.value().mcs);
 
-  if (pdcch == nullptr) {
-    // The PDCCH list was checked above, so a failure here is specific to this UE: either it monitors no SearchSpace
-    // with DCI format 0_1, or its CQI calls for an aggregation level that does not fit in the CCEs left.
+  if (not alloc_activation_dci(pdcch_alloc, u, vrbs, candidate_td_allocation.value(), mcs)) {
+    // The PDCCH list was checked by the caller, so a failure here is specific to this UE: either it monitors no
+    // SearchSpace with DCI format 0_1, or its CQI calls for an aggregation level that does not fit in the CCEs left.
     res_mng.deallocate_resource(candidate_cg_offset.value(), candidate_resource.value().id, u.crnti);
     return activation_outcome::skip_ue;
   }
 
-  // NOTE: existence was already validated by alloc_pdcch_ul_information(), which allocated the PDCCH in this
-  // SearchSpace; the DCI must be built against the same one, as its size depends on it.
-  const search_space_info& ss_info       = *get_cg_activation_search_space(u.get_pcell().cfg());
-  const unsigned           bwp_crb_start = cell_cfg.params.ul_cfg_common.init_ul_bwp.generic_params.crbs.start();
-  const vrb_interval       vrbs          = rb_helper::crb_to_vrb_ul_non_interleaved(
-      crb_interval{candidate_resource.value().crbs.start(), candidate_resource.value().crbs.stop()}, bwp_crb_start);
-
-  const auto mcs = static_cast<uint8_t>(cell_cfg.params.init_bwp.cg_cfg.value().mcs);
-  // The DCI size is derived from the SearchSpace it is sent in, and get_cg_activation_search_space() only returns
-  // SearchSpaces monitored with DCI format 0_1.
-  build_dci_f0_1_cg_activation(pdcch->dci,
-                               u.get_pcell().cfg(),
-                               ss_info.cfg->get_id(),
-                               vrbs,
-                               candidate_td_allocation.value(),
-                               sch_mcs_index{mcs});
-
   pusch_config_params pusch_params = build_cg_pusch_cfg_params(u.get_pcell().cfg(), candidate_td_allocation.value());
   const units::bytes  tbs          = compute_ul_tbs_unsafe(pusch_params, sch_mcs_index{mcs}, vrbs.length());
 
-  // Set "CG activated" (i.e., DCI has been sent) for the UE.
   // NOTE: Set the first time CG transmission slot: this is to skip the allocations that fall in between PDCCH slot and
   // PDCCH slot + k2 (only applies to cases with cg_period_slots <= k2).
+  const slot_point first_tx_slot = slot_pdcch + pusch_td_list[candidate_td_allocation.value()].k2;
+
+  // Set "CG activated" (i.e., DCI has been sent) for the UE.
   u.get_pcell().get_conf_grant_state_manager().update_state(cg_period_slots,
                                                             tbs,
                                                             vrbs,
@@ -516,14 +501,13 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
                                                             candidate_td_allocation.value(),
                                                             candidate_cg_offset.value(),
                                                             candidate_resource.value().id,
-                                                            slot_pdcch +
-                                                                pusch_td_list[candidate_td_allocation.value()].k2);
+                                                            first_tx_slot);
 
   // The UE must be added to the wheel at the same offset that was recorded in the CG state manager above, so that
   // cg_slot_wheel::rem_ue() removes exactly the entries inserted here.
   add_ue_to_wheel(u.get_pcell().cfg(), candidate_cg_offset.value());
 
-  on_activation_dci_allocated(pending, slot_pdcch, slot_pdcch + pusch_td_list[candidate_td_allocation.value()].k2);
+  on_activation_dci_allocated(pending, slot_pdcch, first_tx_slot);
 
   // NOTE: the HARQ reconfiguration is done during the reconfiguration /ref add_reconf_ue(), to avoid reconfiguring the
   // HARQs while there are in-flight PUSCHs.
@@ -544,9 +528,9 @@ configured_grant_type2_sched_impl::reactivate_ue(cell_resource_allocator& cell_a
   // The new DCI keeps the grant the UE may already be transmitting on, so it must land on the same CG offset and use
   // the same symbols, which the grid reservations follow. The TDRA row may differ, which gives more than one PDCCH
   // slot per CG period to send it from.
-  const slot_point slot_pdcch     = pdcch_alloc.slot;
-  const auto&      pusch_td_list  = u.get_pcell().active_bwp().ul.td_mapper().pusch_td_resources(dci_ul_format::f0_1);
-  const ofdm_symbol_range symbols = pusch_td_list[cg_params->time_domain_allocation].symbols;
+  const slot_point                                        slot_pdcch    = pdcch_alloc.slot;
+  const span<const pusch_time_domain_resource_allocation> pusch_td_list = get_cg_pusch_td_list(u.get_pcell().cfg());
+  const ofdm_symbol_range symbols             = pusch_td_list[cg_params->time_domain_allocation].symbols;
   const unsigned          last_non_srs_symbol = config_helpers::compute_last_non_srs_symbol(cell_cfg.params);
   std::optional<uint8_t>  td_alloc;
   for (uint8_t td = 0, sz = pusch_td_list.size(); td != sz; ++td) {
@@ -567,20 +551,9 @@ configured_grant_type2_sched_impl::reactivate_ue(cell_resource_allocator& cell_a
     return activation_outcome::skip_ue;
   }
 
-  pdcch_ul_information* pdcch = alloc_pdcch_ul_information(pdcch_alloc, u.ue_index);
-  if (pdcch == nullptr) {
+  if (not alloc_activation_dci(pdcch_alloc, u, cg_params->vrbs, *td_alloc, cg_params->mcs)) {
     return activation_outcome::skip_ue;
   }
-
-  // NOTE: existence was already validated by alloc_pdcch_ul_information(), which allocated the PDCCH in this
-  // SearchSpace; the DCI must be built against the same one, as its size depends on it.
-  const search_space_info& ss_info = *get_cg_activation_search_space(u.get_pcell().cfg());
-  build_dci_f0_1_cg_activation(pdcch->dci,
-                               u.get_pcell().cfg(),
-                               ss_info.cfg->get_id(),
-                               cg_params->vrbs,
-                               *td_alloc,
-                               sch_mcs_index{cg_params->mcs});
 
   // The row has the same symbols as the stored one, so the TBS and the grid reservations stay valid.
   ue_cg_state_mng.set_time_domain_allocation(*td_alloc);
@@ -591,38 +564,42 @@ configured_grant_type2_sched_impl::reactivate_ue(cell_resource_allocator& cell_a
   return activation_outcome::success;
 }
 
-pdcch_ul_information*
-configured_grant_type2_sched_impl::alloc_pdcch_ul_information(cell_slot_resource_allocator& pdcch_alloc,
-                                                              du_ue_index_t                 ue_idx) const
+bool configured_grant_type2_sched_impl::alloc_activation_dci(cell_slot_resource_allocator& pdcch_alloc,
+                                                             ue&                           u,
+                                                             vrb_interval                  vrbs,
+                                                             uint8_t                       td_alloc,
+                                                             uint8_t                       mcs)
 {
-  ue&                          u           = ues[ue_idx];
-  ue_cell&                     ue_cc       = *u.find_cell(cell_cfg.cell_index);
+  ue_cell&                     ue_cc       = u.get_pcell();
   const ue_cell_configuration& ue_cell_cfg = ue_cc.cfg();
 
   const search_space_info* ss_info = get_cg_activation_search_space(ue_cell_cfg);
   if (ss_info == nullptr) {
     logger.error(
         "ue={}: Failed to allocate CG DCI activation. Cause: no UE-specific SearchSpace monitored with DCI format 0_1",
-        ue_idx);
-    return nullptr;
+        fmt::underlying(u.ue_index));
+    return false;
   }
 
   const aggregation_level aggr_lvl =
       ue_cc.get_aggregation_level(ue_cc.link_adaptation_controller().get_effective_cqi(), *ss_info, false);
   ocudu_assert(u.ue_cfg_dedicated() != nullptr and u.ue_cfg_dedicated()->get_cs_rnti().has_value(),
                "UE={} with CG config doesn't have CS-RNTI allocated",
-               ue_idx);
+               fmt::underlying(u.ue_index));
   // The CS-RNTI only scrambles the DCI CRC: TS 38.213, Section 10.1 hashes the UE-specific SearchSpace candidates
   // with the C-RNTI whichever RNTI the CRC carries, so this is the ordinary UE PDCCH allocation.
   pdcch_ul_information* pdcch = pdcch_sch.alloc_ul_pdcch_ue(
       pdcch_alloc, u.ue_cfg_dedicated()->get_cs_rnti().value(), ue_cell_cfg, ss_info->cfg->get_id(), aggr_lvl);
-
   if (pdcch == nullptr) {
     logger.info("ue={} rnti={}: Failed to activate CG type2. Cause: No space in PDCCH for DCI activation",
                 fmt::underlying(u.ue_index),
                 u.crnti);
+    return false;
   }
-  return pdcch;
+
+  // The DCI size is derived from the SearchSpace it is sent in, so it must be the one the PDCCH was allocated in.
+  build_dci_f0_1_cg_activation(pdcch->dci, ue_cell_cfg, ss_info->cfg->get_id(), vrbs, td_alloc, sch_mcs_index{mcs});
+  return true;
 }
 
 void configured_grant_type2_sched_impl::handle_error_indication(slot_point                            sl_tx,
@@ -648,10 +625,7 @@ void configured_grant_type2_sched_impl::handle_error_indication(slot_point      
 
 void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication(du_ue_index_t ue_idx)
 {
-  const auto it =
-      std::find_if(ues_pending_activation.begin(),
-                   ues_pending_activation.end(),
-                   [ue_idx](const ue_pending_activation& ue_to_rem) { return ue_idx == ue_to_rem.ue_index; });
+  const auto it = find_pending(ue_idx);
   if (it == ues_pending_activation.end()) {
     // This UE has been already removed from the UE pending activation list.
     return;

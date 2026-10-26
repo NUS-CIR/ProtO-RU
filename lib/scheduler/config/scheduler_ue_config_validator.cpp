@@ -86,8 +86,7 @@ static validator_result validate_cg_cfg(const serving_cell_config& serv_cell_cfg
   if (type2) {
     // The activation DCI is scrambled with the CS-RNTI, which a UE only monitors unconditionally in a UE-specific
     // SearchSpace (TS 38.213, Section 10.1), and of the UL formats TS 38.213, Table 10.2-1 allows for the activation
-    // only 0_1 is supported. A UE without such a SearchSpace could never be activated, and since it stays queued,
-    // run_ues_activation() would retry it on every slot and hold back every UE behind it. Type 1 needs no activation
+    // only 0_1 is supported. A UE without such a SearchSpace could never be activated. Type 1 needs no activation
     // DCI, hence no such SearchSpace.
     const auto is_uss_with_dci_f0_1 = [](const search_space_configuration& ss) {
       return not ss.is_common_search_space() and pdcch_helper::get_ul_dci_format(ss) == dci_ul_format::f0_1;
@@ -99,11 +98,9 @@ static validator_result validate_cg_cfg(const serving_cell_config& serv_cell_cfg
            "Configured Grant type 2 requires a UE-specific SearchSpace monitored with DCI format 0_1, to carry the "
            "activation DCI");
 
-    // A Type 2 CG has no configured time-domain row: activate_ue() picks one at activation, from the same list the
+    // A Type 2 CG has no configured time-domain row: the scheduler picks one at activation, from the same list the
     // activation DCI is resolved against, and skips the rows that overlap the SRS region or ask for slot repetitions.
-    // If none survives, activation fails on every attempt, and since the UE stays queued it holds back every UE behind
-    // it - so check here that at least one usable row exists rather than let the cell come up with a CG that can never
-    // be activated.
+    // If none is found, activation fails on every attempt.
     const bool has_ded_td_list =
         bwp_ul_ded_cfg.pusch_cfg.has_value() and not bwp_ul_ded_cfg.pusch_cfg->pusch_td_alloc_list.empty();
     const span<const pusch_time_domain_resource_allocation> activation_td_list =
@@ -145,10 +142,7 @@ static validator_result validate_cg_cfg(const serving_cell_config& serv_cell_cfg
 
   // TS 38.214, Section 6.1.2.3: a Type 1 CG with PUSCH repetition Type A selects its TDRA table as for DCI format 0_0
   // in a UE-specific search space, i.e. by Table 6.1.2.1.1-1. The only dedicated list that table admits is
-  // pusch-TimeDomainAllocationList in pusch-Config, which is not modelled here: pusch_config::pusch_td_alloc_list
-  // carries pusch-TimeDomainAllocationListDCI-0-1, which Table 6.1.2.1.1-1 never mentions and which only applies to
-  // DCI format 0_1. A Type 1 CG index therefore always refers to the cell's common list, as reserve_cg_resources()
-  // reads it.
+  // pusch-TimeDomainAllocationList in pusch-Config, which is not modelled here.
   const span<const pusch_time_domain_resource_allocation> pusch_td_list =
       span<const pusch_time_domain_resource_allocation>(cell_cfg.init_bwp.ul.pusch_common()->pusch_td_alloc_list);
   VERIFY(
@@ -247,9 +241,8 @@ ocudu::config_validators::validate_sched_ue_reconfiguration_message(const sched_
                                                                     const cell_configuration&               cell_cfg)
 {
   // A reconfiguration carries a delta: an absent cell list leaves the UE's cell configuration untouched, so there is
-  // nothing to check. The entries it does carry are complete ServingCellConfigs rather than deltas of their own -
-  // du_cell_config_pool::update_ue() builds the new configuration from the entry alone - so the very same per-cell
-  // checks as for a UE creation apply to them.
+  // nothing to check. The entries it does carry are complete ServingCellConfigs rather than deltas of their own, so the
+  // very same per-cell checks as for a UE creation apply to them.
   if (not msg.cfg.cells.has_value()) {
     return {};
   }

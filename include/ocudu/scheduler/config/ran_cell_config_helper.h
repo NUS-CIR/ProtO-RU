@@ -55,12 +55,6 @@ uint8_t compute_max_nof_candidates(aggregation_level aggr_lvl, const coreset_con
 
 /// \brief Returns the first symbol of the slot that the cell's SRS resources can never occupy.
 ///
-/// The SRS resources are whole blocks of \c srs_cfg.nof_symbols anchored at the last symbol of the slot and laid down
-/// while they still fit within \c srs_cfg.max_nof_symbols (see \c generate_cell_srs_list()), so the region actually
-/// occupied is the largest multiple of the block length that fits in that budget. Whatever is left of the budget below
-/// it is too short to hold another resource and stays free, hence treating the whole budget as occupied would give up
-/// usable symbols; with a block length that does not divide the budget at all, no SRS resource is generated and the
-/// entire slot is free.
 /// \return The number of symbols in the slot, if SRS is disabled or no SRS resource fits.
 unsigned compute_last_non_srs_symbol(const ran_cell_config& cell_cfg);
 
@@ -72,8 +66,6 @@ bool is_cg_pusch_td_res_usable(const pusch_time_domain_resource_allocation& td, 
 /// \brief Finds the index, into the cell's common PUSCH time-domain resource list, of the resource a Configured Grant
 /// PUSCH should use, i.e. the first one that \ref is_cg_pusch_td_res_usable() accepts.
 ///
-/// The list is sorted by increasing k2 first, then by decreasing \c symbols.stop(), so the first qualifying entry is
-/// the one with both the lowest k2 and the most symbols among those that avoid the SRS.
 /// \return The index of that resource, or \c std::nullopt if every resource in the list overlaps the SRS region, in
 /// which case no CG PUSCH can be placed in the cell at all.
 /// \remark This function must only be called if the cell has CG enabled (i.e. \c cell_cfg.init_bwp.cg_cfg is set).

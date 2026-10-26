@@ -2177,6 +2177,15 @@ static bool validate_base_cell_unit_config(const du_high_unit_base_cell_config& 
     return false;
   }
 
+  // A Type 2 CG is activated by a DCI format 0_1 scrambled with the CS-RNTI, which needs a UE-specific SearchSpace
+  // monitored with that format.
+  if (config.cg_cfg.periodicity_slots.has_value() and config.cg_cfg.type2 and
+      (config.pdcch_cfg.dedicated.ss2_type == search_space_configuration::type_t::common or
+       not config.pdcch_cfg.dedicated.dci_format_0_1_and_1_1)) {
+    fmt::print("Configured grants Type 2 require SearchSpace#2 to be UE-specific and monitored with DCI format 0_1.\n");
+    return false;
+  }
+
   // [Implementation-defined] Configured Grants is not supported in NTN cells.
   // NOTE: a TN cell may carry an NTN config listing only NTN neighbor cells, which does not make it an NTN cell.
   const bool is_ntn_cell =

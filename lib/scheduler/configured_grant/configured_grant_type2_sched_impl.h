@@ -48,15 +48,11 @@ private:
     explicit ue_pending_activation(du_ue_index_t ue_index_) : ue_index(ue_index_) {}
 
     du_ue_index_t ue_index;
-    // Slot in which the PDCCH of the latest activation DCI was allocated; invalid until the first one is allocated.
-    // Needed to detect that the activation DCI never reached the UE, because the lower layers discarded the PDCCHs of
-    // that slot.
+    // Slot of the PDCCH of the latest activation DCI; invalid until the first one is allocated.
     slot_point activation_pdcch_slot;
-    // Slot by which the latest activation DCI must be confirmed; invalid while no activation DCI is awaiting
-    // confirmation.
+    // Slot by which the latest activation DCI must be confirmed; invalid while none awaits confirmation.
     slot_point confirmation_deadline;
-    // Set when the latest activation DCI was not confirmed by its deadline, or its PDCCH was discarded. The UE then
-    // gets a new activation DCI for the same grant.
+    // Whether the UE is due a new activation DCI for its current grant.
     bool reactivation_due = false;
   };
 
@@ -66,16 +62,13 @@ private:
   // Scans the list of UEs pending activation and sends the activation DCIs of this slot.
   void run_ues_activation(cell_resource_allocator& cell_alloc);
 
-  /// Outcome of an attempt to send an activation DCI to one UE, which tells run_ues_activation() whether the UEs queued
-  /// behind it are worth trying in this slot.
+  // Outcome of an attempt to send an activation DCI to one UE.
   enum class activation_outcome {
-    /// The activation DCI was allocated.
+    // The activation DCI was allocated.
     success,
-    /// This UE could not be activated, for a reason of its own: no PDCCH space at the aggregation level its CQI calls
-    /// for, no SearchSpace carrying DCI format 0_1, or no time-domain resource it can use. Another UE may well
-    /// succeed, so the caller moves on to the next one.
+    // This UE could not be activated but another UE may well succeed.
     skip_ue,
-    /// No UE can be activated in this slot, as the resource that ran out is shared by all of them.
+    // No UE can be activated in this slot, as the resource that ran out is shared by all of them.
     stop_slot
   };
 
@@ -91,8 +84,16 @@ private:
   // Marks for re-activation the UEs whose latest activation DCI was not confirmed by its deadline.
   void check_confirmation_deadlines(slot_point slot);
 
-  pdcch_ul_information* alloc_pdcch_ul_information(cell_slot_resource_allocator& pdcch_alloc,
-                                                   du_ue_index_t                 ue_idx) const;
+  // Allocates the activation PDCCH in the UE's activation SearchSpace and fills in the activation DCI. Returns false
+  // if the UE has no such SearchSpace or the PDCCH does not fit.
+  bool alloc_activation_dci(cell_slot_resource_allocator& pdcch_alloc,
+                            ue&                           u,
+                            vrb_interval                  vrbs,
+                            uint8_t                       td_alloc,
+                            uint8_t                       mcs);
+
+  // Returns the pending activation entry of a UE, or the end of the list if it has none.
+  std::vector<ue_pending_activation>::iterator find_pending(du_ue_index_t ue_idx);
 
   // Any CG configuration is handled here: for CG Type 2 the grant is established by the activation DCI, not by RRC.
   bool has_cg_grant_cfg(const ue_cell_configuration& ue_cfg) const override;

@@ -45,10 +45,6 @@ struct cg_test_params {
   unsigned max_nof_cell_cg_rbs = 10;
   /// When true, periodic SRS is enabled in the cell, which reserves the last symbols of every UL slot.
   bool srs_enabled = false;
-  /// \brief When true, the UE-dedicated SearchSpace is set to monitor DCI formats 0_0/1_0 instead of 0_1/1_1.
-  ///
-  /// The CG Type 2 activation is only built as a DCI format 0_1, so a UE with such a SearchSpace cannot be activated.
-  bool ue_ss_dci_f0_0 = false;
   /// \brief When true, a second entry is appended to the cell PUSCH time domain resource list.
   ///
   /// The default cell carries a single entry, which makes the time domain allocation index the Type 2 activation DCI
@@ -147,10 +143,6 @@ protected:
           .nof_harq_processes = cg_params.nof_harq_procs,
           .max_nof_cell_cg_rbs = cg_params.max_nof_cell_cg_rbs,
       };
-    }
-    if (cg_params.ue_ss_dci_f0_0) {
-      cell_req.ran.init_bwp.pdcch_cfg->search_spaces[0].set_non_ss0_monitored_dci_formats(
-          search_space_configuration::ue_specific_dci_format::f0_0_and_f1_0);
     }
     if (cg_params.extra_pusch_td_alloc) {
       cell_req.ran.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list.push_back(extra_pusch_td_res);
@@ -969,34 +961,6 @@ TEST_F(configured_grant_type2_scheduler_test, cg_puschs_recur_at_the_configured_
   }
 }
 
-/// Type 2 CG whose only UE-specific SearchSpace is monitored with DCI formats 0_0/1_0.
-class configured_grant_type2_unsupported_dci_format_test : public configured_grant_scheduler_test
-{
-protected:
-  configured_grant_type2_unsupported_dci_format_test() :
-    configured_grant_scheduler_test(cg_test_params{.type2 = true, .ue_ss_dci_f0_0 = true})
-  {
-  }
-};
-
-TEST_F(configured_grant_type2_unsupported_dci_format_test, ue_with_no_dci_f0_1_search_space_is_never_activated)
-{
-  // TS 38.213, Table 10.2-1 allows the activation to be carried by either UL DCI format, but only format 0_1 is
-  // built. A UE that monitors none of its UE-specific SearchSpaces with that format therefore cannot be reached, and
-  // the scheduler must simply leave it unactivated: sending the activation in the format the UE does monitor would
-  // make it decode a DCI of the wrong size, and granting the CG PUSCH occasions anyway would have it stay silent
-  // while the gNB reserved and decoded resources for it every period.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-
-  for (unsigned i = 0; i != cg_params.period_slots + safety_margin; ++i) {
-    run_slot();
-    ASSERT_EQ(find_ue_ul_pdcch(cs_rnti), nullptr)
-        << "a CG Type 2 activation DCI was sent to a UE that monitors no SearchSpace with DCI format 0_1";
-    ASSERT_EQ(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
-        << "CG PUSCH scheduled for a UE whose CG was never activated";
-  }
-}
-
 /// \brief Fixture for CG Type 2 tests with more than one UE.
 ///
 /// The CG band is widened so that several CG resources fit side by side at each slot offset, which is what lets two
@@ -1315,6 +1279,26 @@ TEST_F(configured_grant_type2_scheduler_test, reconfiguration_that_leaves_the_cg
         << "the CG occasions moved to a different slot offset";
   }
   EXPECT_GE(nof_cg_puschs, 3U) << "the CG occasions stopped after a reconfiguration that did not change the CG";
+}
+
+TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_paused_while_the_ue_is_in_fallback)
+{
+  // A reconfiguration puts the UE in fallback until it applies the new configuration, during which the size of the DCI
+  // format 0_1 it decodes is not known. An activation still awaiting confirmation must not be re-sent in that window,
+  // and must resume once the UE applies the configuration.
+  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
+      << "No CG Type 2 activation DCI was allocated";
+
+  // A reconfiguration that leaves the CG unchanged, not yet applied by the UE.
+  ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/false));
+  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window(cg_params.period_slots)).valid())
+      << "a CG Type 2 activation DCI was sent while the UE was in fallback";
+
+  sched->handle_ue_config_applied(to_du_ue_index(0));
+  const slot_point resumed_pdcch_slot = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots));
+  ASSERT_TRUE(resumed_pdcch_slot.valid()) << "the activation did not resume after the UE applied its configuration";
+  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
 }
 
 TEST_F(configured_grant_type2_scheduler_test, cell_deactivation_returns_cg_resources_to_the_pool)

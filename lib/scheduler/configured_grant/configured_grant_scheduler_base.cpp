@@ -111,16 +111,7 @@ void configured_grant_scheduler_base::reserve_cg_resources(cell_slot_resource_al
     return;
   }
 
-  // For PUSCH repetition Type A (i.e. with no pusch-RepTypeIndicator configured), a Type 1 CG selects its TDRA table as
-  // for DCI format 0_0 in a UE-specific SearchSpace (TS 38.214, Section 6.1.2.3), i.e. by Table 6.1.2.1.1-1. The only
-  // dedicated list that table admits is pusch-TimeDomainAllocationList in pusch-Config, which is not modelled here -
-  // pusch_config::pusch_td_alloc_list carries pusch-TimeDomainAllocationListDCI-0-1, which that table never mentions.
-  // So the applicable list is always the cell's common one, which is what the mapper returns for f0_0.
-  // NOTE: a Type 2 CG follows the table of its activation DCI instead, hence f0_1; the grant state manager this reads
-  // from was filled from that list by activate_ue().
-  const bool  is_type1 = ue_cc.cfg().init_bwp().ul.ded()->cg_cfg->rrc_configured_ul_grant_cfg.has_value();
-  const auto& pusch_td_list =
-      ue_cc.active_bwp().ul.td_mapper().pusch_td_resources(is_type1 ? dci_ul_format::f0_0 : dci_ul_format::f0_1);
+  const span<const pusch_time_domain_resource_allocation> pusch_td_list = get_cg_pusch_td_list(ue_cc.cfg());
 
   const auto& cg_params = ue_cc.get_conf_grant_state_manager().get_grant_params();
   if (not cg_params.has_value()) {

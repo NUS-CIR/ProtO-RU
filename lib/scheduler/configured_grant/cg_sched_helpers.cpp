@@ -23,6 +23,23 @@ harq_id_t ocudu::get_cg_harq_id(slot_point                      pusch_slot,
   return to_harq_id((current_symbol / periodicity_sym) % static_cast<unsigned>(nof_harq_processes));
 }
 
+span<const pusch_time_domain_resource_allocation> ocudu::get_cg_pusch_td_list(const ue_cell_configuration& ue_cell_cfg)
+{
+  // TS 38.214, Section 6.1.2.3. A Type 1 CG selects its TDRA table as for DCI format 0_0 in a UE-specific SearchSpace,
+  // i.e. by Table 6.1.2.1.1-1, whose only dedicated option is pusch-TimeDomainAllocationList in pusch-Config; that IE
+  // is not modelled here (pusch_config::pusch_td_alloc_list carries pusch-TimeDomainAllocationListDCI-0-1), so a Type 1
+  // CG always lands on the cell's common list. A Type 2 CG instead uses the table of the DCI that activated it, which
+  // is format 0_1, i.e. pusch-TimeDomainAllocationListDCI-0-1 when configured and the common list otherwise
+  // (Table 6.1.2.1.1-1A).
+  // NOTE: the UE config validator applies the same rule to the raw serving cell configuration.
+  const auto* ul_ded = ue_cell_cfg.init_bwp().ul.ded();
+  ocudu_assert(ul_ded != nullptr and ul_ded->cg_cfg.has_value(),
+               "rnti={}: PUSCH TDRA list requested for a UE with no CG configured",
+               ue_cell_cfg.crnti);
+  const bool is_type1 = ul_ded->cg_cfg->rrc_configured_ul_grant_cfg.has_value();
+  return ue_cell_cfg.init_bwp().ul.td_mapper().pusch_td_resources(is_type1 ? dci_ul_format::f0_0 : dci_ul_format::f0_1);
+}
+
 pusch_config_params ocudu::build_cg_pusch_cfg_params(const ue_cell_configuration& ue_cell_cfg,
                                                      uint8_t                      time_domain_allocation)
 {
@@ -35,16 +52,7 @@ pusch_config_params ocudu::build_cg_pusch_cfg_params(const ue_cell_configuration
   const auto* ul_ded = ue_cell_cfg.init_bwp().ul.ded();
   const auto& cg_cfg = ul_ded->cg_cfg.value();
 
-  // TS 38.214, Section 6.1.2.3. A Type 1 CG selects its TDRA table as for DCI format 0_0 in a UE-specific SearchSpace,
-  // i.e. by Table 6.1.2.1.1-1, whose only dedicated option is pusch-TimeDomainAllocationList in pusch-Config; that IE
-  // is not modelled here, so a Type 1 CG always lands on the cell's common list. A Type 2 CG instead uses the table of
-  // the DCI that activated it, which is format 0_1, i.e. pusch-TimeDomainAllocationListDCI-0-1 when configured and the
-  // common list otherwise (Table 6.1.2.1.1-1A) - which is what the mapper returns for f0_1.
-  const bool  is_type1 = cg_cfg.rrc_configured_ul_grant_cfg.has_value();
-  const auto& pusch_td_list =
-      ue_cell_cfg.init_bwp().ul.td_mapper().pusch_td_resources(is_type1 ? dci_ul_format::f0_0 : dci_ul_format::f0_1);
-
-  const pusch_time_domain_resource_allocation& pusch_td_cfg = pusch_td_list[time_domain_allocation];
+  const pusch_time_domain_resource_allocation& pusch_td_cfg = get_cg_pusch_td_list(ue_cell_cfg)[time_domain_allocation];
   pusch_config_params                          pusch_params;
   pusch_params.symbols = pusch_td_cfg.symbols;
 

@@ -221,3 +221,44 @@ TEST_F(du_high_ue_koffset_config_test, a_wider_threshold_asks_for_a_wider_margin
   set_koffset_params(5.0F, 4ms);
   ASSERT_FALSE(validate());
 }
+
+// A Type 2 CG is activated by a DCI format 0_1 scrambled with the CS-RNTI, which only a UE-specific SearchSpace
+// monitored with that format can carry. A configuration that leaves SearchSpace#2 without it is rejected at startup,
+// rather than every UE failing the reconfiguration that adds its CG.
+class du_high_cg_type2_config_test : public ::testing::Test
+{
+protected:
+  du_high_cg_type2_config_test() : app("du_high config validator test")
+  {
+    configure_cli11_with_du_high_config_schema(app, parsed_cfg);
+    app.parse("");
+    autoderive_du_high_parameters_after_parsing(parsed_cfg.config);
+    cell().cg_cfg.periodicity_slots = 40;
+    cell().cg_cfg.type2             = true;
+  }
+
+  du_high_unit_base_cell_config& cell() { return parsed_cfg.config.cells_cfg.front().cell; }
+
+  bool validate() const { return validate_du_high_config(parsed_cfg.config); }
+
+  CLI::App              app;
+  du_high_parsed_config parsed_cfg;
+};
+
+TEST_F(du_high_cg_type2_config_test, ue_specific_search_space_with_dci_f0_1_is_valid)
+{
+  ASSERT_TRUE(validate());
+}
+
+TEST_F(du_high_cg_type2_config_test, common_search_space_is_rejected)
+{
+  cell().pdcch_cfg.dedicated.ss2_type               = search_space_configuration::type_t::common;
+  cell().pdcch_cfg.dedicated.dci_format_0_1_and_1_1 = false;
+  ASSERT_FALSE(validate());
+}
+
+TEST_F(du_high_cg_type2_config_test, fallback_dci_formats_are_rejected)
+{
+  cell().pdcch_cfg.dedicated.dci_format_0_1_and_1_1 = false;
+  ASSERT_FALSE(validate());
+}
