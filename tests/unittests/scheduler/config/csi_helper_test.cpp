@@ -351,7 +351,7 @@ TEST_P(cell_csi_config_test, cell_csi_config_matches_the_ue_csi_meas_config)
   const csi_meas_config     ue_csi =
       config_helpers::make_default_ue_cell_config(cell_cfg).serv_cell_cfg.csi_meas_cfg.value();
 
-  EXPECT_EQ(csi.cqi_table, ue_csi.csi_report_cfg_list.front().cqi_table);
+  EXPECT_EQ(get_cqi_table(GetParam().mcs_table), ue_csi.csi_report_cfg_list.front().cqi_table);
   EXPECT_EQ(csi_helper::get_csi_report_trigger_size(*cell_cfg.init_bwp.csi), ue_csi.report_trigger_size.value_or(0));
   EXPECT_EQ(csi.report_type, is_pusch_configured(ue_csi) ? csi_report_type::aperiodic : csi_report_type::periodic);
   EXPECT_EQ(csi.pucch_report() != nullptr, csi.report_type == csi_report_type::periodic);

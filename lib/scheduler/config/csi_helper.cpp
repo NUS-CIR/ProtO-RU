@@ -774,20 +774,7 @@ make_csi_report_configs(const csi_meas_config_builder_params&                   
   reps[0].subband_size                          = csi_report_config::subband_size_t::value1;
 
   // Set CQI table of CSI-ReportConfig according to the MCS table used for PDSCH.
-  cqi_table_t cqi_table = cqi_table_t::table1;
-  switch (params.mcs_table) {
-    case pdsch_mcs_table::qam64:
-      cqi_table = cqi_table_t::table1;
-      break;
-    case pdsch_mcs_table::qam256:
-      cqi_table = cqi_table_t::table2;
-      break;
-    case pdsch_mcs_table::qam64LowSe:
-      cqi_table = cqi_table_t::table3;
-      break;
-    default:
-      report_error("Invalid MCS table={}\n", static_cast<unsigned>(params.mcs_table));
-  }
+  const cqi_table_t cqi_table = get_cqi_table(params.mcs_table);
   for (auto& csi_report_cfg : reps) {
     csi_report_cfg.cqi_table = cqi_table;
   }

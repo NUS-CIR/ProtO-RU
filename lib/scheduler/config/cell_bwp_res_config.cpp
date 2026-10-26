@@ -27,7 +27,6 @@ static std::optional<cell_bwp_csi_config> make_cell_bwp_csi_config(const ran_cel
   const csi_meas_config csi_meas            = csi_helper::make_csi_meas_config(params, pusch_td_alloc_list);
 
   cell_bwp_csi_config csi{
-      .cqi_table       = csi_meas.csi_report_cfg_list.front().cqi_table.value(),
       .report_type     = is_pusch_configured(csi_meas) ? csi_report_type::aperiodic : csi_report_type::periodic,
       .type1_report    = {},
       .type2_report    = std::nullopt,

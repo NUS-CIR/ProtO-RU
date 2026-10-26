@@ -18,8 +18,6 @@ namespace ocudu {
 
 /// CSI parameters that are the same for all the UEs of a BWP.
 struct cell_bwp_csi_config {
-  /// CQI table of the CSI reports.
-  cqi_table_t cqi_table;
   /// Time domain behavior of the CSI reports.
   csi_report_type report_type;
   /// CSI report with the Type-I codebook.

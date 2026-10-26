@@ -16,20 +16,7 @@ using namespace odu;
 
 static void set_pdsch_mcs_table(serving_cell_config& cell_cfg, pdsch_mcs_table mcs_table)
 {
-  cqi_table_t cqi_table;
-  switch (mcs_table) {
-    case pdsch_mcs_table::qam64:
-      cqi_table = cqi_table_t::table1;
-      break;
-    case pdsch_mcs_table::qam256:
-      cqi_table = cqi_table_t::table2;
-      break;
-    case pdsch_mcs_table::qam64LowSe:
-      cqi_table = cqi_table_t::table3;
-      break;
-    default:
-      report_error("Invalid MCS table={}\n", fmt::underlying(mcs_table));
-  }
+  const cqi_table_t cqi_table = get_cqi_table(mcs_table);
 
   // Set MCS index table for PDSCH. See TS 38.214, Table 5.1.3.1-[1-3].
   if (cell_cfg.init_dl_bwp.pdsch_cfg.has_value()) {

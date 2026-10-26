@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
+#include "lib/scheduler/support/pdcch_aggregation_level_calculator.h"
 #include "lib/scheduler/ue_context/ue_cell_repository.h"
 #include "lib/scheduler/ue_context/ue_repository.h"
 #include "tests/ocudu_test_requirements.h"
@@ -348,4 +349,26 @@ TEST_F(ue_configuration_test, search_spaces_pdcch_candidate_lists_does_not_surpa
     // given numerology as per TS 38.213 Table 10.1-2.
     ASSERT_LE(pdcch_candidates_count, max_candidates);
   }
+}
+
+TEST_F(ue_configuration_test, when_ue_pdsch_does_not_use_qam256_then_aggregation_level_follows_the_cqi_table_1)
+{
+  // The cell MCS table is qam256, which maps to the CQI table 2.
+  (*ue_create_msg.cfg.cells)[0].ded->serv_cell_cfg.init_dl_bwp.pdsch_cfg->mcs_table = pdsch_mcs_table::qam64;
+
+  const cell_configuration& cell_cfg = add_cell();
+  cell_ues.emplace(cell_cfg, nullptr);
+  ue_db.register_cell(*cell_ues);
+  ue_cell& ue_cc = add_ue(ue_create_msg).get_pcell();
+
+  const search_space_info& ss       = ue_cc.cfg().search_space(to_search_space_id(2));
+  const unsigned           dci_size = ss.dci_sz.format1_1_ue_size->total.value();
+  const float              cqi      = 3;
+  const aggregation_level  al_table1 =
+      map_cqi_to_aggregation_level(cqi, cqi_table_t::table1, ss.cfg->get_nof_candidates(), dci_size);
+  const aggregation_level al_table2 =
+      map_cqi_to_aggregation_level(cqi, cqi_table_t::table2, ss.cfg->get_nof_candidates(), dci_size);
+  ASSERT_NE(al_table1, al_table2) << "This test cannot tell the CQI tables apart";
+
+  ASSERT_EQ(ue_cc.get_aggregation_level(cqi, ss, true), al_table1);
 }
