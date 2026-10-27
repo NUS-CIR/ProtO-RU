@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "ocudu/adt/span.h"
-#include "ocudu/support/error_handling.h"
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -231,111 +229,6 @@ inline void unpack_prb_block_pair(__m256i& even_epi32, __m256i& odd_epi32, const
     // Sign extend the samples from the top of their words, the bits of the following sample are shifted out.
     even_epi32 = _mm256_srai_epi32(_mm256_slli_epi32(samples_epi16, 16), 32 - LAYOUT::SAMPLE_BITS);
     odd_epi32  = _mm256_srai_epi32(samples_epi16, 32 - LAYOUT::SAMPLE_BITS);
-  }
-}
-
-/// \brief Unpacks packed 9bit IQ samples stored as bytes in big-endian format to an array of 16bit signed values.
-///
-/// \param[out] unpacked_iq_data A span of 16bit integers, corresponding to \c NOF_CARRIERS_PER_RB unpacked IQ pairs.
-/// \param[in]  packed_data      A span of 27 packed bytes.
-///
-/// \note The \c unpacked_iq_data parameter should be sized to store 32 output IQ samples: it is 24 IQ samples of one RB
-/// rounded up to 32-byte boundary required by AVX2 intrinsics.
-inline void avx2_unpack_prb_9b_be(span<int16_t> unpacked_iq_data, span<const uint8_t> packed_data)
-{
-  constexpr size_t avx2_size_short_words = 16;
-  ocudu_assert(unpacked_iq_data.size() >= avx2_size_short_words * 2, "Wrong unpacked data span size");
-
-  // Load input, 27 bytes (fits in one AVX2 register).
-  // Mask-load for epi8 is not available, so we do in a few steps.
-  __m128i packed_data_high =
-      _mm_srli_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(packed_data.data() + 11)), 5);
-  __m128i packed_data_low  = _mm_loadu_si128(reinterpret_cast<const __m128i*>(packed_data.data()));
-  __m256i packed_data_epi8 = _mm256_permute2f128_si256(
-      _mm256_castsi128_si256(packed_data_low), _mm256_castsi128_si256(packed_data_high), 0x20);
-
-  // Duplicate input words (it is required since below in the code every byte will be used twice:
-  // to provide MSB bits of the current IQ sample and LSB bits of the previous IQ sample).
-  __m256i packed_data_0_epi8 = _mm256_permute4x64_epi64(packed_data_epi8, 0b10010100);
-  __m256i packed_data_1_epi8 = _mm256_permute4x64_epi64(packed_data_epi8, 0b00001110);
-
-  // Swap bytes for little-endian representation.
-  // As a result each pair of bytes will contain all bits of a single I or Q sample.
-  const __m256i shuffle_mask_0_epi8 =
-      _mm256_setr_epi64x(0x0304020301020001, 0x0708060705060405, 0x0405030402030102, 0x0809070806070506);
-  const __m256i shuffle_mask_1_epi8 =
-      _mm256_setr_epi64x(0x0506040503040203, 0x090a080907080607, 0xffffffffffffffff, 0xffffffffffffffff);
-  __m256i packed_data_0_le_epi8 = _mm256_shuffle_epi8(packed_data_0_epi8, shuffle_mask_0_epi8);
-  __m256i packed_data_1_le_epi8 = _mm256_shuffle_epi8(packed_data_1_epi8, shuffle_mask_1_epi8);
-
-  // Do logical shift left, then arithmetical shift right in order to sign extend values.
-  // Note, AVX2 only allows to shift 32bit words using vector of indexes, so we do it twice.
-  const __m256i shl_0_epi32 = _mm256_setr_epi32(0, 2, 4, 6, 0, 2, 4, 6);
-  const __m256i shl_1_epi32 = _mm256_setr_epi32(1, 3, 5, 7, 1, 3, 5, 7);
-  // Mask 16bit words to use only shifted bits.
-  const __m256i mask_even_epi16 = _mm256_set1_epi32(0x0000ffff);
-  const __m256i mask_odd_epi16  = _mm256_set1_epi32(0xffff0000);
-
-  __m256i unpacked_data_00_epi16 = _mm256_sllv_epi32(packed_data_0_le_epi8, shl_0_epi32);
-  __m256i unpacked_data_01_epi16 = _mm256_sllv_epi32(packed_data_0_le_epi8, shl_1_epi32);
-  __m256i unpacked_data_10_epi16 = _mm256_sllv_epi32(packed_data_1_le_epi8, shl_0_epi32);
-  __m256i unpacked_data_11_epi16 = _mm256_sllv_epi32(packed_data_1_le_epi8, shl_1_epi32);
-  unpacked_data_00_epi16         = _mm256_and_si256(unpacked_data_00_epi16, mask_even_epi16);
-  unpacked_data_01_epi16         = _mm256_and_si256(unpacked_data_01_epi16, mask_odd_epi16);
-  unpacked_data_10_epi16         = _mm256_and_si256(unpacked_data_10_epi16, mask_even_epi16);
-  unpacked_data_11_epi16         = _mm256_and_si256(unpacked_data_11_epi16, mask_odd_epi16);
-
-  // Merge two vectors to get vector of shifted 16bit IQ samples, right-shift it to sign-extend values.
-  __m256i unpacked_data_0_epi16 = _mm256_srai_epi16(_mm256_or_si256(unpacked_data_00_epi16, unpacked_data_01_epi16), 7);
-  __m256i unpacked_data_1_epi16 = _mm256_srai_epi16(_mm256_or_si256(unpacked_data_10_epi16, unpacked_data_11_epi16), 7);
-
-  // Write results.
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(unpacked_iq_data.data()), unpacked_data_0_epi16);
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(unpacked_iq_data.subspan(16, 8).data()), unpacked_data_1_epi16);
-}
-
-/// \brief Unpacks packed 16bit IQ samples stored as bytes in big-endian format to an array of 16bit signed values.
-///
-/// \param[out] unpacked_iq_data A span of 16bit integers, corresponding to \c NOF_CARRIERS_PER_RB unpacked IQ pairs.
-/// \param[in]  packed_data      A span of 48 packed bytes.
-inline void avx2_unpack_prb_16b_be(span<int16_t> unpacked_iq_data, span<const uint8_t> packed_data)
-{
-  // Load input, 48 bytes (need two AVX2 registers).
-  const __m256i rd_mask_last_bytes = _mm256_setr_epi32(0x80000000, 0x80000000, 0x80000000, 0x80000000, 0, 0, 0, 0);
-
-  __m256i reg0_epi16 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(packed_data.data()));
-  __m256i reg1_epi16 = _mm256_maskload_epi32(reinterpret_cast<const int*>(packed_data.data() + 32), rd_mask_last_bytes);
-
-  // Swap bytes for Little-endian representation.
-  const __m256i shuffle_mask_epi8 =
-      _mm256_setr_epi64x(0x0607040502030001, 0x0e0f0c0d0a0b0809, 0x0607040502030001, 0x0e0f0c0d0a0b0809);
-
-  __m256i reg0_unpacked_data_epi16 = _mm256_shuffle_epi8(reg0_epi16, shuffle_mask_epi8);
-  __m256i reg1_unpacked_data_epi16 = _mm256_shuffle_epi8(reg1_epi16, shuffle_mask_epi8);
-
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(unpacked_iq_data.data()), reg0_unpacked_data_epi16);
-  _mm256_maskstore_epi32(reinterpret_cast<int*>(unpacked_iq_data.data() + 16),
-                         _mm256_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0, 0, 0, 0),
-                         reg1_unpacked_data_epi16);
-}
-
-/// \brief Unpacks packed IQ samples stored as bytes in big-endian format to an array of 16bit signed values.
-///
-/// \param[out] unpacked_iq_data A span of 32 16bit integers, corresponding to \c NOF_CARRIERS_PER_RB unpacked IQ pairs.
-/// \param[in]  packed_data      A span of input packed bytes.
-/// \param[in]  iq_width         Bit width of the packed IQ samples.
-///
-/// \note The \c unpacked_iq_data parameter should be sized to store 32 output IQ samples: it is 24 IQ samples of one RB
-/// rounded up to 32-byte boundary required by AVX2 intrinsics.
-inline void unpack_prb_big_endian(span<int16_t> unpacked_iq_data, span<const uint8_t> packed_data, unsigned iq_width)
-{
-  switch (iq_width) {
-    case 9:
-      return avx2_unpack_prb_9b_be(unpacked_iq_data, packed_data);
-    case 16:
-      return avx2_unpack_prb_16b_be(unpacked_iq_data, packed_data);
-    default:
-      report_fatal_error("Unsupported bit width");
   }
 }
 

@@ -134,27 +134,15 @@ bool iq_compression_none_avx2::decompress(span<cbf16_t>                iq_data,
                "Input does not contain enough bytes to decompress {} PRBs",
                nof_prbs);
 
-  // Quantizer object.
-  quantizer q(params.data_width);
+  // Scaling of the decompressed samples, including the quantizer gain.
+  const float  iq_scaling   = scaling_table.get_decompression_iq_scaling(params.data_width);
+  const __m256 scale_ps     = _mm256_set1_ps(quantizer(params.data_width).to_float(1) * iq_scaling);
+  auto         get_exponent = [](const uint8_t* /* prb */) { return 0; };
 
-  constexpr size_t avx2_size_iqs = 16;
-  constexpr size_t prb_size      = divide_ceil(NOF_SUBCARRIERS_PER_RB * 2, avx2_size_iqs) * avx2_size_iqs;
-  alignas(64) std::array<int16_t, prb_size * MAX_NOF_PRBS> unpacked_iq_data;
-
-  unsigned idx = 0;
-  for (unsigned rb = 0; rb != nof_prbs; ++rb) {
-    span<const uint8_t> comp_prb_buffer(&compressed_data[rb * comp_prb_size], comp_prb_size);
-
-    // Unpack resource block.
-    span<int16_t> unpacked_prb_span(&unpacked_iq_data[idx], prb_size);
-    mm256::unpack_prb_big_endian(unpacked_prb_span, comp_prb_buffer, params.data_width);
-
-    idx += (NOF_SUBCARRIERS_PER_RB * 2);
+  if (params.data_width == MAX_IQ_WIDTH) {
+    mm256::decompress_prbs<16, false>(iq_data.data(), compressed_data.data(), nof_prbs, scale_ps, get_exponent);
+  } else {
+    mm256::decompress_prbs<9, false>(iq_data.data(), compressed_data.data(), nof_prbs, scale_ps, get_exponent);
   }
-
-  span<int16_t> unpacked_iq_int16_span(unpacked_iq_data.data(), iq_data.size() * 2);
-  // Convert to complex brain float samples.
-  q.to_brain_float(iq_data, unpacked_iq_int16_span, scaling_table.get_decompression_iq_scaling(params.data_width));
-
   return true;
 }
