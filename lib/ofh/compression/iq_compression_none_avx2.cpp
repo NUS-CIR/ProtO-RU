@@ -65,25 +65,39 @@ void iq_compression_none_avx2::compress(span<uint8_t>                buffer,
     const __m256i min_epi16        = _mm256_set1_epi16(static_cast<int16_t>(-full_scale));
     auto          quantize_prb_reg = [&](const bf16_t* in) {
       return _mm256_max_epi16(
-          mm256::quantize_bf16(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps, max_ps), min_epi16);
+          mm256::quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps, max_ps),
+          min_epi16);
     };
 
-    for (unsigned pair = 0; pair != nof_prb_pairs; ++pair) {
-      // Get view over bytes corresponding to two PRBs processed in this iteration.
-      span<uint8_t> comp_prb0_buffer(&buffer[rb * prb_size], prb_size);
-      span<uint8_t> comp_prb1_buffer(&buffer[(rb + 1) * prb_size], prb_size);
+    // Quantized samples of a pair of PRBs, with the register layout of mm256::avx2_pack_prbs_9b_big_endian().
+    struct prb_pair_state {
+      __m256i rb0_epi16;
+      __m256i rb01_epi16;
+      __m256i rb1_epi16;
+    };
+    auto prepare_prb_pair = [&](unsigned pair) {
+      const bf16_t* in = input_it + pair * 2 * NOF_SAMPLES_PER_PRB;
+      return prb_pair_state{
+          quantize_prb_reg(in), quantize_prb_reg(in + AVX2_REG_SIZE), quantize_prb_reg(in + AVX2_REG_SIZE * 2)};
+    };
+    auto emit_prb_pair = [&](const prb_pair_state& state, unsigned pair) {
+      uint8_t* prb0 = &buffer[pair * 2 * prb_size];
+      mm256::avx2_pack_prbs_9b_big_endian(prb0, prb0 + prb_size, state.rb0_epi16, state.rb01_epi16, state.rb1_epi16);
+    };
 
-      // Load and quantize symbols.
-      __m256i rb0_epi16  = quantize_prb_reg(input_it);
-      __m256i rb01_epi16 = quantize_prb_reg(input_it + AVX2_REG_SIZE);
-      __m256i rb1_epi16  = quantize_prb_reg(input_it + AVX2_REG_SIZE * 2);
-
-      // Pack 2 PRBs using utility function.
-      mm256::pack_prbs_big_endian(comp_prb0_buffer, comp_prb1_buffer, rb0_epi16, rb01_epi16, rb1_epi16, data_width);
-
-      input_it += NOF_SAMPLES_PER_PRB * 2;
-      rb += 2;
+    // Software pipelined loop: the next pair is quantized before packing the current one, so that the CPU overlaps
+    // the two dependency chains.
+    if (nof_prb_pairs != 0) {
+      prb_pair_state current = prepare_prb_pair(0);
+      for (unsigned pair = 1; pair != nof_prb_pairs; ++pair) {
+        prb_pair_state next = prepare_prb_pair(pair);
+        emit_prb_pair(current, pair - 1);
+        current = next;
+      }
+      emit_prb_pair(current, nof_prb_pairs - 1);
     }
+    rb += nof_prb_pairs * 2;
+    input_it += nof_prb_pairs * 2 * NOF_SAMPLES_PER_PRB;
   }
 
   // Use generic implementation for the remaining resource blocks.

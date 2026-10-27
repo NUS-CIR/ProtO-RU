@@ -12,176 +12,71 @@ namespace ocudu {
 namespace ofh {
 namespace mm256 {
 
-/// \brief Packs 16bit IQ samples in one AVX2 register using 9bit big-endian format.
+/// \brief Packs the 16bit IQ samples of one AVX2 register using 9bit big-endian format.
 ///
-/// \param[in] cmp_data_epi16 AVX2 register storing 16bit IQ samples.
-/// \return An AVX2 register containing 18 packed bytes.
+/// Each 128bit lane of the input holds the four I samples followed by the four Q samples of four REs (the layout of
+/// \ref quantize_bf16_even_odd). The output is the bit stream I0 Q0 I1 Q1 I2 Q2 I3 Q3, 9 bits per sample and most
+/// significant bit first, stored in the first 9 bytes of the respective lane of the output register. The remaining 7
+/// bytes of each lane are zero.
 ///
-/// \note Each 128bit lane of the input contains eight I and Q values, each of them with 9 bits of data (the LSB ones)
-/// and 7 bits of sign extension. The function packs the eight IQ samples (only the data bits) into the first 9 bytes of
-/// the respective 128bit lane of the output register (the remaining 7 bytes are padding). Thus, the return value
-/// contains 18 packed data bytes in total.
-inline __m256i pack_avx2_register_9b_be(__m256i cmp_data_epi16)
+/// \param[in] samples_epi16 AVX2 register storing 16bit IQ samples, only the lower 9 bits of each are packed.
+/// \return An AVX2 register containing 9 packed bytes in each 128bit lane.
+inline __m256i pack_avx2_register_9b_be(__m256i samples_epi16)
 {
-  // Keep only the 9 data bits of each sample.
-  __m256i data_epi16 = _mm256_and_si256(cmp_data_epi16, _mm256_set1_epi16(0x01ff));
+  // Keep the 9 data bits of each sample and shift the j-th sample of the stream left by 7 - j, so that its two bytes
+  // become the bits it contributes to the output bytes j and j + 1. AVX2 has no 16bit variable shift, but a
+  // multiplication by a power of two is equivalent as the shifted values fit in 16 bits.
+  //                        I0   I1  I2  I3  Q0  Q1  Q2  Q3
+  const __m256i shift_epi16 = _mm256_setr_epi16(128, 32, 8, 2, 64, 16, 4, 1, 128, 32, 8, 2, 64, 16, 4, 1);
+  __m256i shifted_epi16 = _mm256_mullo_epi16(_mm256_and_si256(samples_epi16, _mm256_set1_epi16(0x01ff)), shift_epi16);
 
-  // Merge each I/Q pair into one 18bit word (I in the upper bits) stored in a 32bit element: (I * 2^9) + Q.
-  __m256i re_epi32 = _mm256_madd_epi16(data_epi16, _mm256_set1_epi32(0x00010200));
-
-  // Merge each pair of 18bit words into one 36bit word (first RE in the upper bits) stored in a 64bit element:
-  // (RE0 * 2^18) + RE1. The multiplication takes the even 32bit elements, the shift brings the odd ones.
-  __m256i re_pair_epi64 =
-      _mm256_add_epi64(_mm256_mul_epu32(re_epi32, _mm256_set1_epi64x(1 << 18)), _mm256_srli_epi64(re_epi32, 32));
-
-  // Concatenate the two 36bit words of each 128bit lane, left-aligned in 72 bits: the upper 64 bits go to the lower
-  // 64bit element and the remaining 8 bits to the top of the upper 64bit element.
-  __m256i concat_hi_epi64 = _mm256_sllv_epi64(re_pair_epi64, _mm256_setr_epi64x(28, 56, 28, 56));
-  __m256i concat_lo_epi64 = _mm256_srli_epi64(_mm256_srli_si256(re_pair_epi64, 8), 8);
-  __m256i concat_epi64    = _mm256_or_si256(concat_hi_epi64, concat_lo_epi64);
-
-  // Convert each 64bit element to big-endian.
-  const __m256i bswap_epi64 =
-      _mm256_setr_epi64x(0x0001020304050607, 0x08090a0b0c0d0e0f, 0x0001020304050607, 0x08090a0b0c0d0e0f);
-  return _mm256_shuffle_epi8(concat_epi64, bswap_epi64);
+  // Output byte j is the high byte of the j-th sample of the stream OR the low byte of the previous one, byte 8 is the
+  // low byte of the last sample.
+  const __m256i high_bytes_epi8 =
+      _mm256_setr_epi64x(0x0f070d050b030901, 0xffffffffffffffff, 0x0f070d050b030901, 0xffffffffffffffff);
+  const __m256i low_bytes_epi8 =
+      _mm256_setr_epi64x(0x060c040a020800ff, 0xffffffffffffff0e, 0x060c040a020800ff, 0xffffffffffffff0e);
+  return _mm256_or_si256(_mm256_shuffle_epi8(shifted_epi16, high_bytes_epi8),
+                         _mm256_shuffle_epi8(shifted_epi16, low_bytes_epi8));
 }
 
-/// Stores the first 9 bytes of the given register at the given address, writing at most the 9 bytes after it.
+/// Stores the first 9 bytes of the given register at the given address.
 inline void store_9_bytes(uint8_t* dest, __m128i reg)
 {
+  // Two overlapping 8 byte stores, the second one shifted by one byte.
   _mm_storel_epi64(reinterpret_cast<__m128i*>(dest), reg);
-  dest[8] = static_cast<uint8_t>(_mm_extract_epi8(reg, 8));
+  _mm_storel_epi64(reinterpret_cast<__m128i*>(dest + 1), _mm_srli_si128(reg, 1));
 }
 
-/// \brief Packs 16bit IQ values of the two input RBs using 9bit big-endian format.
+/// \brief Packs the 16bit IQ samples of two RBs using 9bit big-endian format.
 ///
-/// The following diagram shows the input format. Here RBx stands for one unique RE (pair of IQ samples, 32 bits long)
-/// pertaining to a respective RB:
-/// |       |         |         |         |         |
-/// | ----- | ------- | ------- | ------- | ------- |
-/// | \c r0: | RB0 RB0 | RB0 RB0 | RB0 RB0 | RB0 RB0 |
-/// | \c r1: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
-/// | \c r2: | RB1 RB1 | RB1 RB1 | RB1 RB1 | RB1 RB1 |
+/// The three input registers hold the samples of the first RB, the samples of the first and second RBs (one per 128bit
+/// lane) and the samples of the second RB, with the layout of \ref quantize_bf16_even_odd in each lane.
 ///
-/// \param[out] comp_prb0_buffer Buffer dedicated for storing compressed packed bytes of the first PRB.
-/// \param[out] comp_prb1_buffer Buffer dedicated for storing compressed packed bytes of the second PRB.
-/// \param[in] r0                AVX2 register storing 16bit IQ samples of the first RB.
-/// \param[in] r1                AVX2 register storing 16bit IQ samples of the first and second RB.
-/// \param[in] r2                AVX2 register storing 16bit IQ samples of the second RB.
-inline void avx2_pack_prbs_9b_big_endian(span<uint8_t> comp_prb0_buffer,
-                                         span<uint8_t> comp_prb1_buffer,
-                                         __m256i       r0,
-                                         __m256i       r1,
-                                         __m256i       r2)
+/// \param[out] prb0 Output bytes of the first PRB, 27 bytes.
+/// \param[out] prb1 Output bytes of the second PRB, 27 bytes.
+/// \param[in] rb0_epi16  AVX2 register storing the first 16 samples of the first RB.
+/// \param[in] rb01_epi16 AVX2 register storing the last 8 samples of the first RB and the first 8 of the second RB.
+/// \param[in] rb1_epi16  AVX2 register storing the last 16 samples of the second RB.
+inline void
+avx2_pack_prbs_9b_big_endian(uint8_t* prb0, uint8_t* prb1, __m256i rb0_epi16, __m256i rb01_epi16, __m256i rb1_epi16)
 {
-  /// Number of bytes used by 1 packed resource block with IQ samples compressed to 9 bits.
-  static constexpr unsigned BYTES_PER_PRB_9BIT_COMPRESSION = 27;
-  /// Number of bytes packed from one 128bit lane (8 samples of 9 bits).
+  // Number of bytes packed from one 128bit lane (8 samples of 9 bits).
   static constexpr unsigned BYTES_PER_LANE = 9;
 
-  ocudu_assert(comp_prb0_buffer.size() == BYTES_PER_PRB_9BIT_COMPRESSION,
-               "Output buffer corresponding to the first PRB has incorrect size");
-  ocudu_assert(comp_prb1_buffer.size() == BYTES_PER_PRB_9BIT_COMPRESSION,
-               "Output buffer corresponding to the second PRB has incorrect size");
+  __m256i rb0_packed_epi8  = pack_avx2_register_9b_be(rb0_epi16);
+  __m256i rb01_packed_epi8 = pack_avx2_register_9b_be(rb01_epi16);
+  __m256i rb1_packed_epi8  = pack_avx2_register_9b_be(rb1_epi16);
 
-  // Each 128bit lane contains 9 packed bytes. Lanes are stored in order: 3 lanes per PRB.
-  __m256i reg0_packed_epi8 = pack_avx2_register_9b_be(r0);
-  __m256i reg1_packed_epi8 = pack_avx2_register_9b_be(r1);
-  __m256i reg2_packed_epi8 = pack_avx2_register_9b_be(r2);
+  // The first two lanes of each PRB are stored with full 16 byte writes, as the following write overwrites their 7
+  // padding bytes and stays inside of the PRB. The last lane only writes its 9 bytes.
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0), _mm256_castsi256_si128(rb0_packed_epi8));
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0 + BYTES_PER_LANE), _mm256_extracti128_si256(rb0_packed_epi8, 1));
+  store_9_bytes(prb0 + 2 * BYTES_PER_LANE, _mm256_castsi256_si128(rb01_packed_epi8));
 
-  // The first two lanes of each PRB are stored with full 16-byte writes. Each write is followed by another one that
-  // overwrites its 7 padding bytes, and stays inside of the PRB. The last lane only writes its 9 bytes.
-  uint8_t* prb0 = comp_prb0_buffer.data();
-  uint8_t* prb1 = comp_prb1_buffer.data();
-  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0), _mm256_castsi256_si128(reg0_packed_epi8));
-  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0 + BYTES_PER_LANE), _mm256_extracti128_si256(reg0_packed_epi8, 1));
-  store_9_bytes(prb0 + 2 * BYTES_PER_LANE, _mm256_castsi256_si128(reg1_packed_epi8));
-
-  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1), _mm256_extracti128_si256(reg1_packed_epi8, 1));
-  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1 + BYTES_PER_LANE), _mm256_castsi256_si128(reg2_packed_epi8));
-  store_9_bytes(prb1 + 2 * BYTES_PER_LANE, _mm256_extracti128_si256(reg2_packed_epi8, 1));
-}
-
-/// \brief Packs 16bit IQ values of the two input RBs using 16bit big-endian format.
-///
-/// The following diagram shows the input format. Here RBx stands for one unique RE (pair of IQ samples, 32 bits long)
-/// pertaining to a respective RB:
-/// |       |         |         |         |         |
-/// | ----- | ------- | ------- | ------- | ------- |
-/// | \c r0: | RB0 RB0 | RB0 RB0 | RB0 RB0 | RB0 RB0 |
-/// | \c r1: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
-/// | \c r2: | RB1 RB1 | RB1 RB1 | RB1 RB1 | RB1 RB1 |
-///
-/// \param[out] comp_prb0_buffer Buffer dedicated for storing compressed packed bytes of the first PRB.
-/// \param[out] comp_prb1_buffer Buffer dedicated for storing compressed packed bytes of the second PRB.
-/// \param[in] r0                AVX2 register storing 16bit IQ samples of the first RB.
-/// \param[in] r1                AVX2 register storing 16bit IQ samples of the first and second RB.
-/// \param[in] r2                AVX2 register storing 16bit IQ samples of the second RB.
-inline void avx2_pack_prbs_16b_big_endian(span<uint8_t> comp_prb0_buffer,
-                                          span<uint8_t> comp_prb1_buffer,
-                                          __m256i       r0,
-                                          __m256i       r1,
-                                          __m256i       r2)
-{
-  static constexpr unsigned BYTES_PER_PRB_NO_COMPRESSION = 48;
-
-  ocudu_assert(comp_prb0_buffer.size() == BYTES_PER_PRB_NO_COMPRESSION,
-               "Output buffer corresponding to the first PRB has incorrect size");
-  ocudu_assert(comp_prb1_buffer.size() == BYTES_PER_PRB_NO_COMPRESSION,
-               "Output buffer corresponding to the second PRB has incorrect size");
-
-  // Swap bytes to convert from big-endian format and write them directly to the output memory.
-  const __m256i shuffle_mask_epi8 =
-      _mm256_setr_epi64x(0x0607040502030001, 0x0e0f0c0d0a0b0809, 0x0607040502030001, 0x0e0f0c0d0a0b0809);
-
-  __m256i reg0_swp_epi16 = _mm256_shuffle_epi8(r0, shuffle_mask_epi8);
-  __m256i reg1_swp_epi16 = _mm256_shuffle_epi8(r1, shuffle_mask_epi8);
-  __m256i reg2_swp_epi16 = _mm256_shuffle_epi8(r2, shuffle_mask_epi8);
-
-  uint8_t* data = comp_prb0_buffer.data();
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(data), reg0_swp_epi16);
-  _mm256_maskstore_epi32(reinterpret_cast<int*>(data + 32),
-                         _mm256_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0, 0, 0, 0),
-                         reg1_swp_epi16);
-
-  data = comp_prb1_buffer.data();
-  _mm_maskstore_epi32(reinterpret_cast<int*>(data),
-                      _mm_set_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff),
-                      _mm256_extracti128_si256(reg1_swp_epi16, 0x1));
-  _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + 16), reg2_swp_epi16);
-}
-
-/// \brief Packs 16bit IQ values of the two RBs using the specified width and big-endian format.
-///
-/// The following diagram shows the input format. Here RBx stands for one unique RE (pair of IQ samples, 32 bits long)
-/// pertaining to a respective RB):
-/// |       |         |         |         |         |
-/// | ----- | ------- | ------- | ------- | ------- |
-/// | \c r0: | RB0 RB0 | RB0 RB0 | RB0 RB0 | RB0 RB0 |
-/// | \c r1: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
-/// | \c r2: | RB1 RB1 | RB1 RB1 | RB1 RB1 | RB1 RB1 |
-///
-/// \param[out] comp_prb0_buffer Buffer dedicated for storing compressed packed bytes of the first PRB.
-/// \param[out] comp_prb1_buffer Buffer dedicated for storing compressed packed bytes of the second PRB.
-/// \param[in] r0                AVX2 register storing 16bit IQ pairs of the first PRB.
-/// \param[in] r1                AVX2 register storing 16bit IQ pairs of the first and second PRB.
-/// \param[in] r2                AVX2 register storing 16bit IQ pairs of the second PRB.
-/// \param[in] iq_width          Bit width of the resulting packed IQ samples.
-inline void pack_prbs_big_endian(span<uint8_t> comp_prb0_buffer,
-                                 span<uint8_t> comp_prb1_buffer,
-                                 __m256i       r0,
-                                 __m256i       r1,
-                                 __m256i       r2,
-                                 unsigned      iq_width)
-{
-  switch (iq_width) {
-    case 9:
-      return avx2_pack_prbs_9b_big_endian(comp_prb0_buffer, comp_prb1_buffer, r0, r1, r2);
-    case 16:
-      return avx2_pack_prbs_16b_big_endian(comp_prb0_buffer, comp_prb1_buffer, r0, r1, r2);
-    default:
-      report_fatal_error("Unsupported bit width");
-  }
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1), _mm256_extracti128_si256(rb01_packed_epi8, 1));
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(prb1 + BYTES_PER_LANE), _mm256_castsi256_si128(rb1_packed_epi8));
+  store_9_bytes(prb1 + 2 * BYTES_PER_LANE, _mm256_extracti128_si256(rb1_packed_epi8, 1));
 }
 
 /// \brief Unpacks packed 9bit IQ samples stored as bytes in big-endian format to an array of 16bit signed values.

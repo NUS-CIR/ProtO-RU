@@ -4,6 +4,14 @@
 
 /// \file
 /// \brief AVX2 support for OFH Compression algorithms.
+///
+/// The compressors process two PRBs at a time, as their 48 samples fill exactly three AVX2 registers of 16 16bit
+/// samples. Each 128bit lane holds four REs of a single PRB, so the registers hold the following PRBs:
+/// |                 | lane 0 | lane 1 |
+/// | --------------- | ------ | ------ |
+/// | first register  | RB0    | RB0    |
+/// | second register | RB0    | RB1    |
+/// | third register  | RB1    | RB1    |
 
 #pragma once
 
@@ -16,13 +24,20 @@ namespace ocudu {
 namespace ofh {
 namespace mm256 {
 
-/// \brief Quantizes 16 brain float values to 16bit integers, grouping even and odd elements.
+/// \brief Quantizes 16 brain float values to 16bit integers, grouping the even and odd elements.
 ///
-/// Values are scaled, rounded to the nearest integer (ties to even) and saturated to the 16bit range. Each 128bit lane
-/// of the result contains the four even elements of the respective input lane followed by the four odd ones.
+/// The values are scaled, rounded to the nearest integer (ties to even) and saturated to the 16bit range. Each 128bit
+/// lane of the result holds the four even elements of the respective input lane followed by the four odd ones, that is
+/// the I samples followed by the Q samples:
+/// |                 | 128bit lane 0                     | 128bit lane 1                     |
+/// | --------------- | --------------------------------- | --------------------------------- |
+/// | \c bf16_epi16:  | I0 Q0 I1 Q1 I2 Q2 I3 Q3           | I4 Q4 I5 Q5 I6 Q6 I7 Q7           |
+/// | return value:   | I0 I1 I2 I3 Q0 Q1 Q2 Q3           | I4 I5 I6 I7 Q4 Q5 Q6 Q7           |
 ///
-/// \note The rounding is performed by the conversion to integers, so it assumes the default rounding mode of the MXCSR
-/// register (round to nearest even).
+/// It gives the same values as \c ocuduvec::convert, whose vector types cannot be used here as they widen to AVX512
+/// when the build enables it. The callers fold the reordering of the samples into their own shuffles.
+///
+/// \note The conversion to integers rounds according to the MXCSR register, it assumes the default rounding mode.
 ///
 /// \param[in] bf16_epi16 AVX2 register storing 16 brain floats.
 /// \param[in] scale_ps   AVX2 register storing the scaling factor applied before the conversion in every element.
@@ -30,7 +45,7 @@ namespace mm256 {
 /// Larger values saturate at it, but there is no lower limit other than the one of the 16bit range.
 inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps, __m256 max_ps = _mm256_set1_ps(INT16_MAX))
 {
-  // Unpack brain floats into two vectors of floats: even elements and odd ones.
+  // Unpack brain floats into two vectors of floats: even elements and odd ones. Same as ocudu_simd_bf16_loadu().
   __m256 even_ps = _mm256_castsi256_ps(_mm256_slli_epi32(bf16_epi16, 16));
   __m256 odd_ps  = _mm256_castsi256_ps(_mm256_and_si256(bf16_epi16, _mm256_set1_epi32(0xffff0000)));
 
@@ -42,33 +57,18 @@ inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps, __m25
   return _mm256_packs_epi32(_mm256_cvtps_epi32(even_ps), _mm256_cvtps_epi32(odd_ps));
 }
 
-/// \brief Quantizes 16 brain float values to 16bit integers.
-///
-/// Same as \ref quantize_bf16_even_odd, but the result keeps the order of the input values.
-///
-/// \param[in] bf16_epi16 AVX2 register storing 16 brain floats.
-/// \param[in] scale_ps   AVX2 register storing the scaling factor applied before the conversion in every element.
-/// \param[in] max_ps     AVX2 register storing the largest scaled value in every element, up to the 16bit maximum.
-inline __m256i quantize_bf16(__m256i bf16_epi16, __m256 scale_ps, __m256 max_ps = _mm256_set1_ps(INT16_MAX))
-{
-  // Interleave even and odd elements to restore the original order.
-  const __m256i interleave_mask =
-      _mm256_setr_epi64x(0x0b0a030209080100, 0x0f0e07060d0c0504, 0x0b0a030209080100, 0x0f0e07060d0c0504);
-  return _mm256_shuffle_epi8(quantize_bf16_even_odd(bf16_epi16, scale_ps, max_ps), interleave_mask);
-}
-
 /// \brief Quantizes and packs pairs of PRBs using 16bit big-endian samples.
 ///
-/// The compression parameter of the PRBs, if any, is not affected by the quantization. The conversion to big-endian is
-/// merged with the reordering of the quantized samples.
+/// A single byte shuffle restores the order of the samples quantized by \ref quantize_bf16_even_odd and converts them
+/// to big-endian.
 ///
 /// \tparam HAS_COMP_PARAM Whether each PRB starts with a compression parameter byte.
 /// \param[out] out          Output bytes of the PRBs.
 /// \param[in] in            Input samples of the PRBs.
 /// \param[in] nof_prb_pairs Number of pairs of PRBs to process.
-/// \param[in] prb_size      Size in bytes of one compressed PRB.
+/// \param[in] prb_size      Size in bytes of one compressed PRB, including the compression parameter if present.
 /// \param[in] scale_ps      AVX2 register storing the scaling factor applied before the conversion in every element.
-/// \param[in] comp_param    Compression parameter written at the start of each PRB.
+/// \param[in] comp_param    Compression parameter written at the start of each PRB, if present.
 template <bool HAS_COMP_PARAM>
 inline void compress_prb_pairs_16b(uint8_t*      out,
                                    const bf16_t* in,
@@ -82,9 +82,13 @@ inline void compress_prb_pairs_16b(uint8_t*      out,
   // Offset of the samples inside a PRB.
   static constexpr unsigned SAMPLES_OFFSET = HAS_COMP_PARAM ? 1 : 0;
 
+  // Takes the 16bit elements 0, 4, 1, 5, 2, 6, 3, 7 of each lane with their two bytes swapped:
+  // input lane:  I0 I1 I2 I3 Q0 Q1 Q2 Q3 (little-endian)
+  // output lane: I0 Q0 I1 Q1 I2 Q2 I3 Q3 (big-endian)
   const __m256i bswap_mask_epi8 =
       _mm256_setr_epi64x(0x0a0b020308090001, 0x0e0f06070c0d0405, 0x0a0b020308090001, 0x0e0f06070c0d0405);
   for (unsigned pair = 0; pair != nof_prb_pairs; ++pair) {
+    // Same register layout as calculate_exponents(): RB0 only, RB0 and RB1 (one per 128bit lane), RB1 only.
     __m256i rb0_epi16 = _mm256_shuffle_epi8(
         quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps), bswap_mask_epi8);
     __m256i rb01_epi16 = _mm256_shuffle_epi8(
@@ -94,7 +98,9 @@ inline void compress_prb_pairs_16b(uint8_t*      out,
         quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE * 2)), scale_ps),
         bswap_mask_epi8);
 
-    // Write the samples of each PRB, preceded by the compression parameter if present.
+    // Write the 48 bytes of each PRB, preceded by the compression parameter if present: the first PRB takes the 8 REs
+    // of rb0 and the 4 REs of the lower lane of rb01, the second PRB the 4 REs of the upper lane of rb01 and the 8 REs
+    // of rb1.
     uint8_t* prb0 = out;
     uint8_t* prb1 = prb0 + prb_size;
     if (HAS_COMP_PARAM) {
@@ -111,60 +117,50 @@ inline void compress_prb_pairs_16b(uint8_t*      out,
   }
 }
 
-/// \brief Calculates the BFP exponents of the two input resource blocks passed in three AVX2 registers.
+/// \brief Calculates the BFP exponents of two resource blocks passed in three AVX2 registers.
 ///
-/// The content of the three input AVX2 registers is represented in the table below. Here RBx means one unique RE
-/// (pair of IQ samples, 32 bits long) pertaining to a respective RB:
-/// |       |         |         |         |         |
-/// | ----- | ------- | ------- | ------- | ------- |
-/// | \c rb0_epi16:  | RB0 RB0 | RB0 RB0 | RB0 RB0 | RB0 RB0 |
-/// | \c rb01_epi16: | RB0 RB0 | RB0 RB0 | RB1 RB1 | RB1 RB1 |
-/// | \c rb1_epi16:  | RB1 RB1 | RB1 RB1 | RB1 RB1 | RB1 RB1 |
+/// The exponent of a RB is the right shift required for its samples to fit in \c data_width bits, as given by
+/// \c iq_compression_bfp_impl::determine_exponent. It depends only on the position of the most significant bit of the
+/// largest magnitude of the RB, so the function computes the bitwise OR of the magnitudes instead of the maximum where
+/// it is cheaper. The magnitude is the number of bits needed by a sample besides the sign: a positive \f$x\f$ needs as
+/// many bits as \f$x\f$, and a negative one as many as \f$|x|-1\f$ (for example, -256 fits in 9 bits while 256 does
+/// not), see O-RAN.WG4.CUS Annex A.1.2.
 ///
-/// The exponent of a RB is the right shift required for its samples to fit in \c data_width bits (see
-/// \c iq_compression_bfp_impl::determine_exponent). It only depends on the position of the most significant bit of the
-/// maximum absolute value of the RB, so instead of the maximum the function uses the bitwise OR of the magnitudes of
-/// all samples of the RB, which has the same most significant bit and is cheaper to compute. The magnitude of a sample
-/// is its absolute value, except for negative ones, whose magnitude is one lower (O-RAN.WG4.CUS, Annex A.1.2: the most
-/// significant bit of a negative value can be one higher). Both cases are covered by xor-ing the sample with its sign.
-///
-/// The position of the most significant bit is obtained from the exponent field of the float conversion of the value,
-/// so that the exponents are calculated without leaving the vector domain.
-///
-/// \param[in] rb0_epi16  AVX2 register storing 16bit IQ pairs of the first RB.
-/// \param[in] rb01_epi16 AVX2 register storing 16bit IQ pairs of the first and second RBs.
-/// \param[in] rb1_epi16  AVX2 register storing 16bit IQ pairs of the second RB.
+/// \param[in] rb0_epi16  AVX2 register storing 16bit IQ samples of the first RB (see the file brief).
+/// \param[in] rb01_epi16 AVX2 register storing 16bit IQ samples of the first and second RBs.
+/// \param[in] rb1_epi16  AVX2 register storing 16bit IQ samples of the second RB.
 /// \param[in] data_width BFP compression bit width.
-/// \return An AVX2 register whose lower 64 bits store the exponent of the first RB, and the upper 128bit lane the one
-/// of the second RB. Each exponent is stored as a 64bit integer, which allows using it as a shift count.
+/// \return An AVX2 register whose lower 64 bits store the exponent of the first RB, and the lower 64 bits of the upper
+/// 128bit lane the one of the second RB, the rest of bits are zero. Each 128bit lane is a shift count for
+/// \c _mm256_sra_epi16, which shifts all the elements by the 64bit value in the lower half of its count operand.
 inline __m256i calculate_exponents(__m256i rb0_epi16, __m256i rb01_epi16, __m256i rb1_epi16, unsigned data_width)
 {
-  // Magnitude of each sample.
-  __m256i rb0_mag_epi16  = _mm256_xor_si256(rb0_epi16, _mm256_srai_epi16(rb0_epi16, 15));
-  __m256i rb01_mag_epi16 = _mm256_xor_si256(rb01_epi16, _mm256_srai_epi16(rb01_epi16, 15));
-  __m256i rb1_mag_epi16  = _mm256_xor_si256(rb1_epi16, _mm256_srai_epi16(rb1_epi16, 15));
+  // Reorganize the registers so that each 128bit lane contains samples of the same RB. The integer permute avoids a
+  // bypass delay between the floating point and integer domains on some CPUs.
+  __m256i rb0_lo_epi16 = _mm256_permute2x128_si256(rb0_epi16, rb1_epi16, 0x20);
+  __m256i rb1_hi_epi16 = _mm256_permute2x128_si256(rb0_epi16, rb1_epi16, 0x31);
 
-  // Reorganize vectors so that each 128bit lane contains samples of the same RB, and combine them: the lower lane
-  // pertains to the first RB and the upper lane to the second one.
-  __m256i rb0_lo_epi16 = _mm256_permute2x128_si256(rb0_mag_epi16, rb1_mag_epi16, 0x20);
-  __m256i rb1_hi_epi16 = _mm256_permute2x128_si256(rb0_mag_epi16, rb1_mag_epi16, 0x31);
-  __m256i or_epi16     = _mm256_or_si256(_mm256_or_si256(rb0_lo_epi16, rb1_hi_epi16), rb01_mag_epi16);
+  // The magnitude of a sample x is max(x, ~x): ~x = -x - 1 is negative for positive values and |x| - 1 for negative
+  // ones. The maximum magnitude of each lane is then the maximum of its largest sample and the inverted smallest one.
+  __m256i max_epi16 = _mm256_max_epi16(_mm256_max_epi16(rb0_lo_epi16, rb1_hi_epi16), rb01_epi16);
+  __m256i min_epi16 = _mm256_min_epi16(_mm256_min_epi16(rb0_lo_epi16, rb1_hi_epi16), rb01_epi16);
+  __m256i mag_epi16 = _mm256_max_epi16(max_epi16, _mm256_xor_si256(min_epi16, _mm256_set1_epi32(-1)));
 
   // Horizontal OR inside each 128bit lane, the result is stored in the lowest 16 bits.
-  or_epi16 = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 8));
-  or_epi16 = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 4));
-  or_epi16 = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 2));
+  __m256i or_epi16 = _mm256_or_si256(mag_epi16, _mm256_srli_si256(mag_epi16, 8));
+  or_epi16         = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 4));
+  or_epi16         = _mm256_or_si256(or_epi16, _mm256_srli_si256(or_epi16, 2));
 
   // Keep only the result in each lane, the rest of elements are zeroed.
   const __m256i keep_first_epi32 = _mm256_setr_epi32(0xffff, 0, 0, 0, 0xffff, 0, 0, 0);
   __m256i       max_abs_epi32    = _mm256_and_si256(or_epi16, keep_first_epi32);
 
-  // The biased exponent of the float representation of a positive integer is 127 plus the position of its most
-  // significant bit, and zero for a null value.
+  // Position of the most significant bit: the exponent field (bits 30 to 23) of the float conversion of an integer in
+  // [2^p, 2^(p+1)) is 127 + p, and it is zero for a null value.
   __m256i float_exp_epi32 = _mm256_srli_epi32(_mm256_castps_si256(_mm256_cvtepi32_ps(max_abs_epi32)), 23);
 
-  // The exponent is the number of bits above the data width, taking into account the sign bit, or zero. Elements that
-  // were zeroed above end up as zero.
+  // The magnitude has p + 1 bits and a signed integer of data_width bits holds data_width - 1 of them, so the exponent
+  // is max(0, (p + 1) - (data_width - 1)). Null values and the zeroed elements end up as zero.
   const int32_t exp_offset = 127 + static_cast<int32_t>(data_width) - 2;
   return _mm256_max_epi32(_mm256_sub_epi32(float_exp_epi32, _mm256_set1_epi32(exp_offset)), _mm256_setzero_si256());
 }
