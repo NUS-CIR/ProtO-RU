@@ -6,10 +6,8 @@
 #include "avx512_helpers.h"
 #include "packing_utils_avx512.h"
 #include "quantizer.h"
-#include "ocudu/ocuduvec/prod.h"
 #include "ocudu/ofh/compression/compression_properties.h"
-#include "ocudu/support/math/math_utils.h"
-#include "ocudu/support/units.h"
+#include "ocudu/support/cpu_features.h"
 #include <algorithm>
 
 using namespace ocudu;
@@ -197,42 +195,34 @@ bool iq_compression_bfp_avx512::decompress(span<cbf16_t>                iq_data,
                "Input does not contain enough bytes to decompress {} PRBs",
                nof_prbs);
 
-  const float fixp_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0f;
-  // Scaling of the decompressed samples, including the quantizer gain.
-  const float iq_scaling = scaling_table.get_decompression_iq_scaling(params.data_width) / fixp_gain;
+  // Scaling of the decompressed samples before the exponent, including the quantizer gain, as in
+  // decompress_prb_generic().
+  const float scale =
+      quantizer(Q_BIT_WIDTH).to_float(1) * scaling_table.get_decompression_iq_scaling(params.data_width);
 
-  // Determine array size so that AVX512 store operation doesn't write the data out of array bounds.
-  constexpr size_t avx512_size_iqs = 32;
-  constexpr size_t prb_size        = divide_ceil(NOF_SUBCARRIERS_PER_RB * 2, avx512_size_iqs) * avx512_size_iqs;
-
-  alignas(64) std::array<int16_t, MAX_NOF_PRBS * prb_size> unpacked_iq_data;
-  alignas(64) std::array<float, MAX_NOF_SUBCARRIERS * 2>   unpacked_iq_scaling;
-
-  unsigned idx = 0;
-  for (unsigned c_prb_idx = 0; c_prb_idx != nof_prbs; ++c_prb_idx) {
-    // Get view over compressed PRB bytes.
-    span<const uint8_t> comp_prb_buffer(&compressed_data[c_prb_idx * comp_prb_size], comp_prb_size);
-
-    uint8_t exponent = decode_bfp_exponent(comp_prb_buffer[0]);
-    float   scaler   = 1 << exponent;
-
-    // Get view over the bytes following the compression parameter.
-    comp_prb_buffer = comp_prb_buffer.last(comp_prb_buffer.size() - sizeof(exponent));
-
-    // Unpack resource block.
-    span<int16_t> unpacked_prb_span(&unpacked_iq_data[idx], prb_size);
-    mm512::unpack_prb_big_endian(unpacked_prb_span, comp_prb_buffer, params.data_width);
-
-    // Save scaling factor.
-    std::fill(&unpacked_iq_scaling[idx], &unpacked_iq_scaling[idx] + (NOF_SUBCARRIERS_PER_RB * 2), scaler * iq_scaling);
-
-    idx += (NOF_SUBCARRIERS_PER_RB * 2);
+  // The rounding to brain float is faster with the AVX512_BF16 instruction set, which is checked at run time.
+  static const bool use_bf16             = cpu_supports_feature(cpu_feature::avx512bf16);
+  auto              decompress_prb_quads = [&](auto bits, auto bf16) {
+    mm512::decompress_prb_quads<decltype(bits)::value, true, decltype(bf16)::value>(
+        iq_data.data(), compressed_data.data(), nof_prbs, scale);
+  };
+  auto dispatch_bf16 = [&](auto bits) {
+    if (use_bf16) {
+      decompress_prb_quads(bits, std::true_type());
+    } else {
+      decompress_prb_quads(bits, std::false_type());
+    }
+  };
+  switch (params.data_width) {
+    case 9:
+      dispatch_bf16(std::integral_constant<unsigned, 9>());
+      break;
+    case 14:
+      dispatch_bf16(std::integral_constant<unsigned, 14>());
+      break;
+    default:
+      dispatch_bf16(std::integral_constant<unsigned, 16>());
+      break;
   }
-  span<int16_t> unpacked_iq_int16_span(unpacked_iq_data.data(), iq_data.size() * 2);
-  span<float>   unpacked_iq_scaling_span(unpacked_iq_scaling.data(), iq_data.size() * 2);
-
-  // Scale unpacked IQ samples using saved exponents and convert to complex samples.
-  ocuduvec::convert(iq_data, unpacked_iq_int16_span, unpacked_iq_scaling_span);
-
   return true;
 }

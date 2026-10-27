@@ -4,10 +4,13 @@
 
 #pragma once
 
-#include "avx512_helpers.h"
+#include "ocudu/adt/span.h"
+#include "ocudu/ran/resource_block.h"
 #include "ocudu/support/error_handling.h"
 #include <algorithm>
 #include <array>
+#include <cstdint>
+#include <immintrin.h>
 
 namespace ocudu {
 namespace ofh {
@@ -249,6 +252,299 @@ inline void pack_prb_quad_16b_big_endian(uint8_t* out,
                             mask,
                             _mm512_permutex2var_epi8(rb3_epi16, _mm512_loadu_si512(index3.data()), comp_param_epi16));
   }
+}
+
+/// \brief Layout of a quad of PRBs unpacked into 32bit elements, see \ref unpack_prb_quad_pair.
+///
+/// The packed bytes of the quad are loaded into source registers of 64 bytes. The 96 samples of the quad are spread
+/// over three pairs of AVX512 registers of 16 32bit elements, each one holding a sample. The two registers of a pair
+/// hold the even and odd samples of the same 32 consecutive samples of the quad. The 32 samples of a pair are gathered
+/// from at most two source registers, as 16bit words unless some sample spans more than two bytes.
+///
+/// \tparam BITS           Bit width of the packed samples.
+/// \tparam HAS_COMP_PARAM Whether each PRB starts with a compression parameter byte.
+template <unsigned BITS, bool HAS_COMP_PARAM>
+struct prb_quad_unpack_layout {
+  static_assert((BITS > 8) && (BITS <= 16), "The samples must fit in 16bit words and span at least two bytes");
+
+  /// Bit width of the packed samples.
+  static constexpr unsigned SAMPLE_BITS = BITS;
+  /// Scaling of the unpacked samples: the 16bit ones are left at the top of their 32bit elements.
+  static constexpr float SAMPLE_SCALE = (BITS == 16) ? 0x1p-16F : 1.0F;
+  /// Number of samples of a PRB.
+  static constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
+  /// Size in bytes of one packed PRB, including the compression parameter if present.
+  static constexpr unsigned PRB_SIZE = 3 * BITS + (HAS_COMP_PARAM ? 1 : 0);
+  /// Size in bytes of the quad.
+  static constexpr unsigned QUAD_SIZE = 4 * PRB_SIZE;
+  /// Size in bytes of a source register.
+  static constexpr unsigned SOURCE_SIZE = 64;
+  /// Number of source registers.
+  static constexpr unsigned NOF_SOURCES = (QUAD_SIZE + SOURCE_SIZE - 1) / SOURCE_SIZE;
+  /// Number of register pairs.
+  static constexpr unsigned NOF_PAIRS = 3;
+  /// Number of samples of a register pair.
+  static constexpr unsigned NOF_SAMPLES_PER_PAIR = 32;
+  /// Byte offset of the samples inside of a PRB.
+  static constexpr unsigned SAMPLES_OFFSET = HAS_COMP_PARAM ? 1 : 0;
+
+  /// Position of a packed sample in the quad.
+  struct sample_position {
+    /// Index of the first byte holding bits of the sample.
+    unsigned first_byte;
+    /// Offset of the most significant bit of the sample inside of the first byte.
+    unsigned bit_offset;
+  };
+
+  /// Returns the position of the given sample of the quad.
+  static constexpr sample_position locate_sample(unsigned sample)
+  {
+    unsigned prb = sample / NOF_SAMPLES_PER_PRB;
+    unsigned bit = (prb * PRB_SIZE + SAMPLES_OFFSET) * 8 + (sample % NOF_SAMPLES_PER_PRB) * BITS;
+    return {bit / 8, bit % 8};
+  }
+
+  /// Returns the mask of the bytes of the given source register that belong to the given number of PRBs.
+  static constexpr __mmask64 source_mask(unsigned source, unsigned nof_prbs)
+  {
+    unsigned nof_bytes =
+        std::min(SOURCE_SIZE, nof_prbs * PRB_SIZE - std::min(nof_prbs * PRB_SIZE, source * SOURCE_SIZE));
+    return (nof_bytes == SOURCE_SIZE) ? ~__mmask64{0} : ((__mmask64{1} << nof_bytes) - 1);
+  }
+
+  /// Returns the indices of the two source registers holding the bytes of the given register pair, the second one
+  /// equals the first if a single register is enough.
+  static constexpr std::array<unsigned, 2> pair_sources(unsigned pair)
+  {
+    unsigned first = locate_sample(pair * NOF_SAMPLES_PER_PAIR).first_byte / SOURCE_SIZE;
+    unsigned last  = (locate_sample((pair + 1) * NOF_SAMPLES_PER_PAIR - 1).first_byte + 1) / SOURCE_SIZE;
+    return (last <= first + 1) ? std::array<unsigned, 2>{first, last} : throw "Pair spans more than two sources";
+  }
+
+  /// Returns the byte permutation gathering the two bytes holding the most significant bits of each sample of the
+  /// given register pair into its 16bit word, in big-endian, from the concatenation of its two source registers.
+  static constexpr std::array<uint8_t, 64> make_gather(unsigned pair)
+  {
+    std::array<uint8_t, 64> gather = {};
+    unsigned                base   = pair_sources(pair)[0] * SOURCE_SIZE;
+    for (unsigned word = 0; word != NOF_SAMPLES_PER_PAIR; ++word) {
+      unsigned first_byte  = locate_sample(pair * NOF_SAMPLES_PER_PAIR + word).first_byte;
+      gather[word * 2 + 1] = first_byte - base;
+      gather[word * 2]     = first_byte + 1 - base;
+    }
+    return gather;
+  }
+
+  /// Returns the left shift aligning the most significant bit of each sample of the given register pair with the one
+  /// of its 16bit word.
+  static constexpr std::array<int16_t, 32> make_shifts(unsigned pair)
+  {
+    std::array<int16_t, 32> shifts = {};
+    for (unsigned word = 0; word != NOF_SAMPLES_PER_PAIR; ++word) {
+      shifts[word] = locate_sample(pair * NOF_SAMPLES_PER_PAIR + word).bit_offset;
+    }
+    return shifts;
+  }
+
+  /// Returns true if some sample of the given register pair does not start at a byte boundary.
+  static constexpr bool needs_shift(unsigned pair)
+  {
+    for (int16_t shift : make_shifts(pair)) {
+      if (shift != 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Returns true if some sample of the given register pair spans more than two bytes, so that the samples must be
+  /// gathered as 32bit elements.
+  static constexpr bool needs_dword_gather(unsigned pair)
+  {
+    for (int16_t shift : make_shifts(pair)) {
+      if (shift + BITS > 16) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Returns the byte permutation gathering the four bytes starting at the first one of each even or odd sample of
+  /// the given register pair into its 32bit element, in big-endian, from the concatenation of its two source
+  /// registers. The bytes beyond the quad are replaced by the last one, they only hold bits below the sample.
+  static constexpr std::array<uint8_t, 64> make_dword_gather(unsigned pair, unsigned parity)
+  {
+    std::array<uint8_t, 64> gather    = {};
+    std::array<unsigned, 2> sources   = pair_sources(pair);
+    unsigned                base      = sources[0] * SOURCE_SIZE;
+    unsigned                last_byte = std::min((sources[1] + 1) * SOURCE_SIZE, QUAD_SIZE) - 1;
+    for (unsigned element = 0; element != 16; ++element) {
+      unsigned first_byte = locate_sample(pair * NOF_SAMPLES_PER_PAIR + 2 * element + parity).first_byte;
+      for (unsigned byte = 0; byte != 4; ++byte) {
+        gather[element * 4 + 3 - byte] = std::min(first_byte + byte, last_byte) - base;
+      }
+    }
+    return gather;
+  }
+
+  /// Returns the left shift aligning the most significant bit of each even or odd sample of the given register pair
+  /// with the one of its 32bit element.
+  static constexpr std::array<int32_t, 16> make_dword_shifts(unsigned pair, unsigned parity)
+  {
+    std::array<int32_t, 16> shifts = {};
+    for (unsigned element = 0; element != 16; ++element) {
+      shifts[element] = locate_sample(pair * NOF_SAMPLES_PER_PAIR + 2 * element + parity).bit_offset;
+    }
+    return shifts;
+  }
+
+  /// Returns the index of the PRB of the sample held by each 32bit element of the registers of the given pair, which
+  /// is the same for the even and odd samples.
+  static constexpr std::array<int32_t, 16> make_prb_indices(unsigned pair)
+  {
+    std::array<int32_t, 16> indices = {};
+    for (unsigned element = 0; element != 16; ++element) {
+      indices[element] = (pair * NOF_SAMPLES_PER_PAIR + 2 * element) / NOF_SAMPLES_PER_PRB;
+    }
+    return indices;
+  }
+
+  /// Returns the mask of the PRBs whose compression parameter is held by the given source register.
+  static constexpr __mmask64 comp_param_mask(unsigned source)
+  {
+    __mmask64 mask = 0;
+    for (unsigned prb = 0; prb != 4; ++prb) {
+      if (prb * PRB_SIZE / SOURCE_SIZE == source) {
+        mask |= __mmask64{1} << (4 * prb);
+      }
+    }
+    return mask;
+  }
+
+  /// Returns the byte permutation gathering the compression parameter of each PRB held by the given source
+  /// registers into the first byte of the respective 32bit element, from the concatenation of both registers.
+  static constexpr std::array<uint8_t, 64> make_comp_param_gather(unsigned first_source, unsigned second_source)
+  {
+    std::array<uint8_t, 64> gather = {};
+    for (unsigned prb = 0; prb != 4; ++prb) {
+      unsigned source = prb * PRB_SIZE / SOURCE_SIZE;
+      gather[4 * prb] = (prb * PRB_SIZE) % SOURCE_SIZE + ((source == second_source) ? SOURCE_SIZE : 0);
+    }
+    return gather;
+  }
+};
+
+/// AVX512 register wrapper, as the vector types cannot be arguments of \c std::array.
+struct avx512_register {
+  __m512i value;
+};
+
+/// Source registers of a quad of PRBs, see \ref prb_quad_unpack_layout.
+template <typename LAYOUT>
+using prb_quad_sources = std::array<avx512_register, LAYOUT::NOF_SOURCES>;
+
+/// \brief Loads the packed bytes of a quad of PRBs into its source registers.
+///
+/// \tparam LAYOUT Layout of the quad, see \ref prb_quad_unpack_layout.
+/// \param[out] sources  Source registers of the quad.
+/// \param[in] in        Packed bytes of the quad.
+/// \param[in] nof_prbs  Number of PRBs of the quad, the bytes beyond them are not read.
+template <typename LAYOUT>
+inline void load_prb_quad(prb_quad_sources<LAYOUT>& sources, const uint8_t* in, unsigned nof_prbs)
+{
+  for (unsigned source = 0; source != LAYOUT::NOF_SOURCES; ++source) {
+    const uint8_t* address = in + source * LAYOUT::SOURCE_SIZE;
+    __mmask64      mask    = (nof_prbs == 4) ? LAYOUT::source_mask(source, 4) : LAYOUT::source_mask(source, nof_prbs);
+    sources[source].value =
+        (mask == ~__mmask64{0}) ? _mm512_loadu_si512(address) : _mm512_maskz_loadu_epi8(mask, address);
+  }
+}
+
+/// \brief Unpacks the samples of one register pair of a quad of PRBs into 32bit integers.
+///
+/// \tparam LAYOUT Layout of the quad, see \ref prb_quad_unpack_layout.
+/// \tparam PAIR   Index of the register pair.
+/// \param[out] even_epi32 AVX512 register storing the 16 even samples, multiplied by the inverse of
+///                        \c LAYOUT::SAMPLE_SCALE.
+/// \param[out] odd_epi32  AVX512 register storing the 16 odd samples, multiplied by the inverse of
+///                        \c LAYOUT::SAMPLE_SCALE.
+/// \param[in] sources     Source registers of the quad, see \ref load_prb_quad.
+template <typename LAYOUT, unsigned PAIR>
+inline void unpack_prb_quad_pair(__m512i& even_epi32, __m512i& odd_epi32, const prb_quad_sources<LAYOUT>& sources)
+{
+  static constexpr auto SOURCES = LAYOUT::pair_sources(PAIR);
+
+  // Gathers bytes from the two source registers of the pair.
+  auto gather = [&](const std::array<uint8_t, 64>& indices) {
+    __m512i indices_epi8 = _mm512_loadu_si512(indices.data());
+    if constexpr (SOURCES[0] == SOURCES[1]) {
+      return _mm512_permutexvar_epi8(indices_epi8, sources[SOURCES[0]].value);
+    } else {
+      return _mm512_permutex2var_epi8(sources[SOURCES[0]].value, indices_epi8, sources[SOURCES[1]].value);
+    }
+  };
+
+  if constexpr (LAYOUT::needs_dword_gather(PAIR)) {
+    // Gather the bytes of the even and odd samples into separate registers, align the most significant bit of each
+    // sample with the one of its element and sign extend.
+    static constexpr auto EVEN_GATHER = LAYOUT::make_dword_gather(PAIR, 0);
+    static constexpr auto ODD_GATHER  = LAYOUT::make_dword_gather(PAIR, 1);
+    static constexpr auto EVEN_SHIFTS = LAYOUT::make_dword_shifts(PAIR, 0);
+    static constexpr auto ODD_SHIFTS  = LAYOUT::make_dword_shifts(PAIR, 1);
+    even_epi32 = _mm512_srai_epi32(_mm512_sllv_epi32(gather(EVEN_GATHER), _mm512_loadu_si512(EVEN_SHIFTS.data())),
+                                   32 - LAYOUT::SAMPLE_BITS);
+    odd_epi32  = _mm512_srai_epi32(_mm512_sllv_epi32(gather(ODD_GATHER), _mm512_loadu_si512(ODD_SHIFTS.data())),
+                                  32 - LAYOUT::SAMPLE_BITS);
+    return;
+  }
+
+  // Gather the two bytes holding the most significant bits of each sample into its word.
+  static constexpr auto GATHER        = LAYOUT::make_gather(PAIR);
+  static constexpr auto SHIFTS        = LAYOUT::make_shifts(PAIR);
+  __m512i               samples_epi16 = gather(GATHER);
+
+  // Shift out the bits of the previous sample.
+  if constexpr (LAYOUT::needs_shift(PAIR)) {
+    samples_epi16 = _mm512_sllv_epi16(samples_epi16, _mm512_loadu_si512(SHIFTS.data()));
+  }
+
+  if constexpr (LAYOUT::SAMPLE_BITS == 16) {
+    // The samples fill their words, keep them at the top of the elements.
+    even_epi32 = _mm512_slli_epi32(samples_epi16, 16);
+    odd_epi32  = _mm512_and_si512(samples_epi16, _mm512_set1_epi32(0xffff0000));
+  } else {
+    // Sign extend the samples from the top of their words, the bits of the following sample are shifted out.
+    even_epi32 = _mm512_srai_epi32(_mm512_slli_epi32(samples_epi16, 16), 32 - LAYOUT::SAMPLE_BITS);
+    odd_epi32  = _mm512_srai_epi32(samples_epi16, 32 - LAYOUT::SAMPLE_BITS);
+  }
+}
+
+/// \brief Gathers the compression parameters of a quad of PRBs.
+///
+/// \tparam LAYOUT Layout of the quad, see \ref prb_quad_unpack_layout.
+/// \param[in] sources Source registers of the quad, see \ref load_prb_quad.
+/// \return An AVX512 register whose first four 32bit elements hold the compression parameter of the respective PRB.
+template <typename LAYOUT>
+inline __m512i gather_prb_quad_comp_params(const prb_quad_sources<LAYOUT>& sources)
+{
+  // The first two source registers are combined by a single permutation, the rest are merged one at a time.
+  static constexpr __mmask64 FIRST_MASK        = LAYOUT::comp_param_mask(0) | LAYOUT::comp_param_mask(1);
+  static constexpr auto      FIRST_GATHER      = LAYOUT::make_comp_param_gather(0, 1);
+  __m512i                    comp_params_epi32 = _mm512_maskz_permutex2var_epi8(FIRST_MASK,
+                                                             sources[0].value,
+                                                             _mm512_loadu_si512(FIRST_GATHER.data()),
+                                                             sources[std::min(1U, LAYOUT::NOF_SOURCES - 1)].value);
+  for (unsigned source = 2; source < LAYOUT::NOF_SOURCES; ++source) {
+    // The gather of each source register is a compile time constant, as the loop is unrolled.
+    if (LAYOUT::comp_param_mask(source) != 0) {
+      comp_params_epi32 =
+          _mm512_mask_permutexvar_epi8(comp_params_epi32,
+                                       LAYOUT::comp_param_mask(source),
+                                       _mm512_loadu_si512(LAYOUT::make_comp_param_gather(source, source).data()),
+                                       sources[source].value);
+    }
+  }
+  return comp_params_epi32;
 }
 
 /// \brief Unpacks packed 9bit IQ samples stored as bytes in big-endian format to an array of 16bit signed values.
