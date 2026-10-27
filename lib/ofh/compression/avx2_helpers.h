@@ -15,10 +15,12 @@
 
 #pragma once
 
+#include "packing_utils_avx2.h"
 #include "ocudu/adt/bf16.h"
-#include "ocudu/adt/span.h"
+#include "ocudu/adt/complex.h"
 #include <cstdint>
 #include <immintrin.h>
+#include <type_traits>
 
 namespace ocudu {
 namespace ofh {
@@ -163,6 +165,111 @@ inline __m256i calculate_exponents(__m256i rb0_epi16, __m256i rb01_epi16, __m256
   // is max(0, (p + 1) - (data_width - 1)). Null values and the zeroed elements end up as zero.
   const int32_t exp_offset = 127 + static_cast<int32_t>(data_width) - 2;
   return _mm256_max_epi32(_mm256_sub_epi32(float_exp_epi32, _mm256_set1_epi32(exp_offset)), _mm256_setzero_si256());
+}
+
+/// \brief Rounds 8 floats to brain float, nearest with ties to even.
+///
+/// \param[in] value_ps AVX2 register storing 8 floats.
+/// \return An AVX2 register whose 32bit elements hold the brain float in their upper 16 bits.
+inline __m256i round_to_bf16_epi32(__m256 value_ps)
+{
+  // Same as to_bf16(): add 0x7fff plus the least significant bit of the result, so that ties round to even.
+  __m256i value_epi32 = _mm256_castps_si256(value_ps);
+  __m256i lsb_epi32   = _mm256_and_si256(_mm256_srli_epi32(value_epi32, 16), _mm256_set1_epi32(1));
+  return _mm256_add_epi32(_mm256_add_epi32(value_epi32, _mm256_set1_epi32(0x7fff)), lsb_epi32);
+}
+
+/// \brief Interleaves the brain floats of the even and odd samples given by \ref round_to_bf16_epi32.
+///
+/// \param[in] even_epi32 AVX2 register storing the even samples in the upper halves of its 32bit elements.
+/// \param[in] odd_epi32  AVX2 register storing the odd samples in the upper halves of its 32bit elements.
+/// \return An AVX2 register storing the 16 interleaved brain floats.
+inline __m256i interleave_bf16(__m256i even_epi32, __m256i odd_epi32)
+{
+  return _mm256_blend_epi16(_mm256_srli_epi32(even_epi32, 16), odd_epi32, 0xaa);
+}
+
+/// \brief Decompresses a block of one or two PRBs.
+///
+/// The samples are unpacked into 32bit integers, scaled in single precision and rounded to brain float, see
+/// \ref prb_unpack_layout for the register layout.
+///
+/// \tparam BITS           Bit width of the packed samples.
+/// \tparam HAS_COMP_PARAM Whether each PRB starts with a compression parameter byte.
+/// \tparam NOF_PRBS       Number of PRBs of the block, one or two.
+/// \param[out] out       Output samples of the PRBs.
+/// \param[in] in         Packed bytes of the PRBs.
+/// \param[in] scale_0_ps AVX2 register storing the scaling factor of the first PRB in every element.
+/// \param[in] scale_1_ps AVX2 register storing the scaling factor of the second PRB in every element.
+template <unsigned BITS, bool HAS_COMP_PARAM, unsigned NOF_PRBS>
+inline void decompress_prb_block(cbf16_t* out, const uint8_t* in, __m256 scale_0_ps, __m256 scale_1_ps)
+{
+  using layout = prb_unpack_layout<BITS, HAS_COMP_PARAM, NOF_PRBS>;
+  // Number of 16bit samples stored by the first pair of registers of each PRB, as complex samples.
+  static constexpr unsigned HEAD_SIZE = layout::NOF_HEAD_SAMPLES / 2;
+
+  // Decompresses the samples of the given register pair.
+  auto decompress_pair = [&](auto pair, __m256 scale_ps) {
+    __m256i even_epi32;
+    __m256i odd_epi32;
+    unpack_prb_block_pair<layout, decltype(pair)::value>(even_epi32, odd_epi32, in);
+    return interleave_bf16(round_to_bf16_epi32(_mm256_mul_ps(_mm256_cvtepi32_ps(even_epi32), scale_ps)),
+                           round_to_bf16_epi32(_mm256_mul_ps(_mm256_cvtepi32_ps(odd_epi32), scale_ps)));
+  };
+
+  // First 16 samples of each PRB.
+  _mm256_storeu_si256(reinterpret_cast<__m256i*>(out),
+                      decompress_pair(std::integral_constant<unsigned, 0>(), scale_0_ps));
+  if constexpr (NOF_PRBS == 2) {
+    _mm256_storeu_si256(reinterpret_cast<__m256i*>(out + NOF_SUBCARRIERS_PER_RB),
+                        decompress_pair(std::integral_constant<unsigned, 1>(), scale_1_ps));
+  }
+
+  // Remaining 8 samples of each PRB, one PRB per lane.
+  __m256  tail_scale_ps = (NOF_PRBS == 2) ? _mm256_blend_ps(scale_0_ps, scale_1_ps, 0xf0) : scale_0_ps;
+  __m256i tail_epi16    = decompress_pair(std::integral_constant<unsigned, NOF_PRBS>(), tail_scale_ps);
+  _mm_storeu_si128(reinterpret_cast<__m128i*>(out + HEAD_SIZE), _mm256_castsi256_si128(tail_epi16));
+  if constexpr (NOF_PRBS == 2) {
+    _mm_storeu_si128(reinterpret_cast<__m128i*>(out + NOF_SUBCARRIERS_PER_RB + HEAD_SIZE),
+                     _mm256_extracti128_si256(tail_epi16, 1));
+  }
+}
+
+/// \brief Decompresses the given PRBs, two at a time.
+///
+/// \tparam BITS           Bit width of the packed samples.
+/// \tparam HAS_COMP_PARAM Whether each PRB starts with a compression parameter byte.
+/// \param[out] out         Output samples of the PRBs.
+/// \param[in] in           Packed bytes of the PRBs.
+/// \param[in] nof_prbs     Number of PRBs.
+/// \param[in] scale_ps     AVX2 register storing the scaling factor of the samples before the BFP exponent in every
+///                         element.
+/// \param[in] get_exponent Function returning the BFP exponent of a PRB, given a pointer to its packed bytes.
+template <unsigned BITS, bool HAS_COMP_PARAM, typename ExponentFunc>
+inline void
+decompress_prbs(cbf16_t* out, const uint8_t* in, unsigned nof_prbs, __m256 scale_ps, ExponentFunc get_exponent)
+{
+  using layout                       = prb_unpack_layout<BITS, HAS_COMP_PARAM, 1>;
+  static constexpr unsigned PRB_SIZE = layout::PRB_SIZE;
+
+  // Scaling of the unpacked samples, the exponent of each PRB is added to the exponent field of the float.
+  const __m256i scaling_epi32 = _mm256_castps_si256(_mm256_mul_ps(scale_ps, _mm256_set1_ps(layout::SAMPLE_SCALE)));
+  auto          get_scale     = [&](const uint8_t* prb) {
+    int32_t exponent = static_cast<int32_t>(get_exponent(prb));
+    return _mm256_castsi256_ps(_mm256_add_epi32(scaling_epi32, _mm256_set1_epi32(exponent << 23)));
+  };
+
+  for (unsigned prb = 0, nof_pairs = nof_prbs / 2; prb != 2 * nof_pairs; prb += 2) {
+    const uint8_t* in_pair = in + prb * PRB_SIZE;
+    decompress_prb_block<BITS, HAS_COMP_PARAM, 2>(
+        out + prb * NOF_SUBCARRIERS_PER_RB, in_pair, get_scale(in_pair), get_scale(in_pair + PRB_SIZE));
+  }
+  if (nof_prbs % 2 != 0) {
+    const uint8_t* in_last       = in + (nof_prbs - 1) * PRB_SIZE;
+    __m256         last_scale_ps = get_scale(in_last);
+    decompress_prb_block<BITS, HAS_COMP_PARAM, 1>(
+        out + (nof_prbs - 1) * NOF_SUBCARRIERS_PER_RB, in_last, last_scale_ps, last_scale_ps);
+  }
 }
 
 } // namespace mm256

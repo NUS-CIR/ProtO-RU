@@ -6,9 +6,7 @@
 #include "avx2_helpers.h"
 #include "packing_utils_avx2.h"
 #include "quantizer.h"
-#include "ocudu/ocuduvec/prod.h"
 #include "ocudu/ofh/compression/compression_properties.h"
-#include "ocudu/support/math/math_utils.h"
 
 using namespace ocudu;
 using namespace ofh;
@@ -172,42 +170,16 @@ bool iq_compression_bfp_avx2::decompress(span<cbf16_t>                iq_data,
                "Input does not contain enough bytes to decompress {} PRBs",
                nof_prbs);
 
-  const float fixp_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0f;
-  // Scaling of the decompressed samples, including the quantizer gain.
-  const float iq_scaling = scaling_table.get_decompression_iq_scaling(params.data_width) / fixp_gain;
+  // Scaling of the decompressed samples before the exponent, including the quantizer gain. The exponent of each PRB
+  // is added to the exponent field of the float, which gives the same scaling as decompress_prb_generic().
+  const float  iq_scaling   = scaling_table.get_decompression_iq_scaling(params.data_width);
+  const __m256 scale_ps     = _mm256_set1_ps(quantizer(Q_BIT_WIDTH).to_float(1) * iq_scaling);
+  auto         get_exponent = [](const uint8_t* prb) { return decode_bfp_exponent(prb[0]); };
 
-  // Determine array size so that AVX2 store operation doesn't write the data out of array bounds.
-  constexpr size_t avx2_size_iqs = 16;
-  constexpr size_t prb_size      = divide_ceil(NOF_SUBCARRIERS_PER_RB * 2, avx2_size_iqs) * avx2_size_iqs;
-
-  alignas(64) std::array<int16_t, MAX_NOF_PRBS * prb_size> unpacked_iq_data;
-  alignas(64) std::array<float, MAX_NOF_SUBCARRIERS * 2>   unpacked_iq_scaling;
-
-  unsigned idx = 0;
-  for (unsigned c_prb_idx = 0; c_prb_idx != nof_prbs; ++c_prb_idx) {
-    // Get view over compressed PRB bytes.
-    span<const uint8_t> comp_prb_buffer(&compressed_data[c_prb_idx * comp_prb_size], comp_prb_size);
-
-    uint8_t exponent = decode_bfp_exponent(comp_prb_buffer[0]);
-    float   scaler   = 1 << exponent;
-
-    // Get view over the bytes following the compression parameter.
-    comp_prb_buffer = comp_prb_buffer.last(comp_prb_buffer.size() - sizeof(exponent));
-
-    // Unpack resource block.
-    span<int16_t> unpacked_prb_span(&unpacked_iq_data[idx], prb_size);
-    mm256::unpack_prb_big_endian(unpacked_prb_span, comp_prb_buffer, params.data_width);
-
-    // Save scaling factor.
-    std::fill(&unpacked_iq_scaling[idx], &unpacked_iq_scaling[idx] + (NOF_SUBCARRIERS_PER_RB * 2), scaler * iq_scaling);
-
-    idx += (NOF_SUBCARRIERS_PER_RB * 2);
+  if (params.data_width == MAX_IQ_WIDTH) {
+    mm256::decompress_prbs<16, true>(iq_data.data(), compressed_data.data(), nof_prbs, scale_ps, get_exponent);
+  } else {
+    mm256::decompress_prbs<9, true>(iq_data.data(), compressed_data.data(), nof_prbs, scale_ps, get_exponent);
   }
-  span<int16_t> unpacked_iq_int16_span(unpacked_iq_data.data(), iq_data.size() * 2);
-  span<float>   unpacked_iq_scaling_span(unpacked_iq_scaling.data(), iq_data.size() * 2);
-
-  // Scale unpacked IQ samples using saved exponents and convert to complex samples.
-  ocuduvec::convert(iq_data, unpacked_iq_int16_span, unpacked_iq_scaling_span);
-
   return true;
 }
