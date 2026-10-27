@@ -43,19 +43,37 @@ namespace mm256 {
 ///
 /// \param[in] bf16_epi16 AVX2 register storing 16 brain floats.
 /// \param[in] scale_ps   AVX2 register storing the scaling factor applied before the conversion in every element.
+/// \param[in] clamp_epi16 AVX2 register storing \ref get_bf16_saturation_clamp of the scale in every element.
+inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps, __m256i clamp_epi16)
+{
+  // Clamp the large positive values, so that the conversion to integers below does not wrap around.
+  bf16_epi16 = _mm256_min_epi16(bf16_epi16, clamp_epi16);
+
+  // Unpack brain floats into two vectors of floats: even elements and odd ones. Same as ocudu_simd_bf16_loadu().
+  __m256 even_ps = _mm256_castsi256_ps(_mm256_slli_epi32(bf16_epi16, 16));
+  __m256 odd_ps  = _mm256_castsi256_ps(_mm256_and_si256(bf16_epi16, _mm256_set1_epi32(0xffff0000)));
+
+  // Convert to integers (rounds to nearest even in the default rounding mode) and saturate to 16 bits.
+  return _mm256_packs_epi32(_mm256_cvtps_epi32(_mm256_mul_ps(even_ps, scale_ps)),
+                            _mm256_cvtps_epi32(_mm256_mul_ps(odd_ps, scale_ps)));
+}
+
+/// \brief Quantizes 16 brain floats into 16bit integers that saturate at the given value, see the overload above.
+///
+/// It keeps the float clamps, which schedule better than the integer ones in the none compressor.
+///
+/// \param[in] bf16_epi16 AVX2 register storing 16 brain floats.
+/// \param[in] scale_ps   AVX2 register storing the scaling factor applied before the conversion in every element.
 /// \param[in] max_ps     AVX2 register storing the largest scaled value in every element, up to the 16bit maximum.
 /// Larger values saturate at it, but there is no lower limit other than the one of the 16bit range.
-inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps, __m256 max_ps = _mm256_set1_ps(INT16_MAX))
+inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps, __m256 max_ps)
 {
-  // Unpack brain floats into two vectors of floats: even elements and odd ones. Same as ocudu_simd_bf16_loadu().
   __m256 even_ps = _mm256_castsi256_ps(_mm256_slli_epi32(bf16_epi16, 16));
   __m256 odd_ps  = _mm256_castsi256_ps(_mm256_and_si256(bf16_epi16, _mm256_set1_epi32(0xffff0000)));
 
   // The conversion gives the most negative integer for the values above the 32bit range, clamp them to saturate.
   even_ps = _mm256_min_ps(_mm256_mul_ps(even_ps, scale_ps), max_ps);
   odd_ps  = _mm256_min_ps(_mm256_mul_ps(odd_ps, scale_ps), max_ps);
-
-  // Convert to integers (rounds to nearest even in the default rounding mode) and saturate to 16 bits.
   return _mm256_packs_epi32(_mm256_cvtps_epi32(even_ps), _mm256_cvtps_epi32(odd_ps));
 }
 
@@ -70,6 +88,7 @@ inline __m256i quantize_bf16_even_odd(__m256i bf16_epi16, __m256 scale_ps, __m25
 /// \param[in] nof_prb_pairs Number of pairs of PRBs to process.
 /// \param[in] prb_size      Size in bytes of one compressed PRB, including the compression parameter if present.
 /// \param[in] scale_ps      AVX2 register storing the scaling factor applied before the conversion in every element.
+/// \param[in] clamp_epi16   AVX2 register storing \ref get_bf16_saturation_clamp of the scale in every element.
 /// \param[in] comp_param    Compression parameter written at the start of each PRB, if present.
 template <bool HAS_COMP_PARAM>
 inline void compress_prb_pairs_16b(uint8_t*      out,
@@ -77,6 +96,7 @@ inline void compress_prb_pairs_16b(uint8_t*      out,
                                    unsigned      nof_prb_pairs,
                                    unsigned      prb_size,
                                    __m256        scale_ps,
+                                   __m256i       clamp_epi16,
                                    uint8_t       comp_param)
 {
   // AVX2 register size in a number of 16bit words.
@@ -91,14 +111,13 @@ inline void compress_prb_pairs_16b(uint8_t*      out,
       _mm256_setr_epi64x(0x0a0b020308090001, 0x0e0f06070c0d0405, 0x0a0b020308090001, 0x0e0f06070c0d0405);
   for (unsigned pair = 0; pair != nof_prb_pairs; ++pair) {
     // Same register layout as calculate_exponents(): RB0 only, RB0 and RB1 (one per 128bit lane), RB1 only.
-    __m256i rb0_epi16 = _mm256_shuffle_epi8(
-        quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps), bswap_mask_epi8);
-    __m256i rb01_epi16 = _mm256_shuffle_epi8(
-        quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE)), scale_ps),
-        bswap_mask_epi8);
-    __m256i rb1_epi16 = _mm256_shuffle_epi8(
-        quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE * 2)), scale_ps),
-        bswap_mask_epi8);
+    auto quantize = [&](const bf16_t* reg_in) {
+      return quantize_bf16_even_odd(
+          _mm256_loadu_si256(reinterpret_cast<const __m256i*>(reg_in)), scale_ps, clamp_epi16);
+    };
+    __m256i rb0_epi16  = _mm256_shuffle_epi8(quantize(in), bswap_mask_epi8);
+    __m256i rb01_epi16 = _mm256_shuffle_epi8(quantize(in + AVX2_REG_SIZE), bswap_mask_epi8);
+    __m256i rb1_epi16  = _mm256_shuffle_epi8(quantize(in + AVX2_REG_SIZE * 2), bswap_mask_epi8);
 
     // Write the 48 bytes of each PRB, preceded by the compression parameter if present: the first PRB takes the 8 REs
     // of rb0 and the 4 REs of the lower lane of rb01, the second PRB the 4 REs of the upper lane of rb01 and the 8 REs

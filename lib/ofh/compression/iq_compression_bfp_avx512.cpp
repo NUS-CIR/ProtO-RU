@@ -20,10 +20,15 @@ using namespace ofh;
 /// \param[in] in               Input samples of the PRBs.
 /// \param[in] nof_prbs         Number of PRBs.
 /// \param[in] scale_ps         AVX512 register storing the scaling factor applied before the conversion to fixed point.
+/// \param[in] clamp_epi16      AVX512 register storing \ref get_bf16_saturation_clamp of the scale in every element.
 /// \param[in] exponent_offset  Offset added to the transmitted exponents.
 template <unsigned BITS>
-static void
-compress_prb_quads(uint8_t* out, const bf16_t* in, unsigned nof_prbs, __m512 scale_ps, uint8_t exponent_offset)
+static void compress_prb_quads(uint8_t*      out,
+                               const bf16_t* in,
+                               unsigned      nof_prbs,
+                               __m512        scale_ps,
+                               __m512i       clamp_epi16,
+                               uint8_t       exponent_offset)
 {
   // Number of quantized samples per resource block.
   static constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
@@ -62,9 +67,9 @@ compress_prb_quads(uint8_t* out, const bf16_t* in, unsigned nof_prbs, __m512 sca
       return _mm512_maskz_loadu_epi16(mask, address);
     };
     quad_state state;
-    state.r0_epi16 = mm512::quantize_bf16_even_odd(load(0), scale_ps);
-    state.r1_epi16 = mm512::quantize_bf16_even_odd(load(1), scale_ps);
-    state.r2_epi16 = mm512::quantize_bf16_even_odd(load(2), scale_ps);
+    state.r0_epi16 = mm512::quantize_bf16_even_odd(load(0), scale_ps, clamp_epi16);
+    state.r1_epi16 = mm512::quantize_bf16_even_odd(load(1), scale_ps, clamp_epi16);
+    state.r2_epi16 = mm512::quantize_bf16_even_odd(load(2), scale_ps, clamp_epi16);
     // Samples that already use all the bits of the data width are not shifted, so the exponent is always zero.
     if constexpr (BITS != MAX_IQ_WIDTH) {
       state.exponents_epi16 = mm512::calculate_exponents(state.r0_epi16, state.r1_epi16, state.r2_epi16, BITS);
@@ -159,19 +164,21 @@ void iq_compression_bfp_avx512::compress(span<uint8_t>                buffer,
   log_quantization_rms({input_it, iq_data.size() * 2U}, params.data_width);
 
   // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
-  const float  quantizer_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0F;
-  const __m512 scale_ps = _mm512_set1_ps(quantizer_gain * scaling_table.get_compression_iq_scaling(params.data_width));
+  const float   quantizer_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0F;
+  const float   scale          = quantizer_gain * scaling_table.get_compression_iq_scaling(params.data_width);
+  const __m512  scale_ps       = _mm512_set1_ps(scale);
+  const __m512i clamp_epi16    = _mm512_set1_epi16(get_bf16_saturation_clamp(scale));
 
   // Compression algorithm implemented according to O-RAN.WG4.CUS Annex A.1.2.
   switch (params.data_width) {
     case 9:
-      compress_prb_quads<9>(buffer.data(), input_it, nof_prbs, scale_ps, exponent_offset);
+      compress_prb_quads<9>(buffer.data(), input_it, nof_prbs, scale_ps, clamp_epi16, exponent_offset);
       break;
     case 14:
-      compress_prb_quads<14>(buffer.data(), input_it, nof_prbs, scale_ps, exponent_offset);
+      compress_prb_quads<14>(buffer.data(), input_it, nof_prbs, scale_ps, clamp_epi16, exponent_offset);
       break;
     default:
-      compress_prb_quads<16>(buffer.data(), input_it, nof_prbs, scale_ps, exponent_offset);
+      compress_prb_quads<16>(buffer.data(), input_it, nof_prbs, scale_ps, clamp_epi16, exponent_offset);
       break;
   }
 }

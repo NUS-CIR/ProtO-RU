@@ -25,20 +25,24 @@ namespace mm512 {
 /// \return An AVX512 register containing 9 packed bytes in each 128bit lane.
 inline __m512i pack_avx512_register_9b_be(__m512i samples_epi16)
 {
-  // Keep the 9 data bits of each sample and shift the j-th sample of the stream left by 7 - j, so that its two bytes
-  // become the bits it contributes to the output bytes j and j + 1.
+  // Shift the j-th sample of the stream left by 7 - j, so that its two bytes become the bits it contributes to the
+  // output bytes j and j + 1. The bits above the ninth one are discarded by the selection below.
   //                                                 I0 I1 I2 I3 Q0 Q1 Q2 Q3
-  const __m512i shift_epi16 = _mm512_set4_epi32(0x00000002, 0x00040006, 0x00010003, 0x00050007);
-  __m512i shifted_epi16 = _mm512_sllv_epi16(_mm512_and_si512(samples_epi16, _mm512_set1_epi16(0x01ff)), shift_epi16);
+  const __m512i shift_epi16   = _mm512_set4_epi32(0x00000002, 0x00040006, 0x00010003, 0x00050007);
+  __m512i       shifted_epi16 = _mm512_sllv_epi16(samples_epi16, shift_epi16);
 
-  // Output byte j is the high byte of the j-th sample of the stream OR the low byte of the previous one, byte 8 is the
-  // low byte of the last sample.
+  // Output byte j takes its lowest 8 - j bits from the high byte of the j-th sample of the stream and the rest from the
+  // low byte of the previous one, byte 8 is the low byte of the last sample.
   const __m512i high_bytes_epi8 =
       _mm512_set4_epi64(0xffffffffffffffff, 0x0f070d050b030901, 0xffffffffffffffff, 0x0f070d050b030901);
   const __m512i low_bytes_epi8 =
       _mm512_set4_epi64(0xffffffffffffff0e, 0x060c040a020800ff, 0xffffffffffffff0e, 0x060c040a020800ff);
-  return _mm512_or_si512(_mm512_shuffle_epi8(shifted_epi16, high_bytes_epi8),
-                         _mm512_shuffle_epi8(shifted_epi16, low_bytes_epi8));
+  const __m512i select_low_epi8 =
+      _mm512_set4_epi64(0x00000000000000ff, 0xfefcf8f0e0c08000, 0x00000000000000ff, 0xfefcf8f0e0c08000);
+  return _mm512_ternarylogic_epi64(_mm512_shuffle_epi8(shifted_epi16, high_bytes_epi8),
+                                   _mm512_shuffle_epi8(shifted_epi16, low_bytes_epi8),
+                                   select_low_epi8,
+                                   0xd8);
 }
 
 /// \brief Packs the 16bit IQ samples of one AVX512 register using 14bit big-endian format.
@@ -59,25 +63,27 @@ inline __m512i pack_avx512_register_14b_be(__m512i samples_epi16)
 
   // Each sample of the stream starts 14 bits after the previous one, so the bits of consecutive samples are aligned to
   // the output bytes by two shifts, one per element of the RE:
-  // - shift left by 2 (first RE) or 14 (second RE) and mask, giving the I component;
-  // - shift right by 4 (first RE) or 16 (second RE) and mask, giving the Q component.
+  // - shift left by 2 (first RE) or 14 (second RE), giving the I component;
+  // - shift right by 4 (first RE) or 16 (second RE), giving the Q component.
   // | 0 0 0 0 0   0   0   0   | 0   0   0  0  0  0  0  0  |i13 i12 i11 i10 i9  i8  i7 i6 | i5 i4 i3 i2 i1 i0 0  0 |
   // | 0 0 0 0 0   0   q13 q12 | q11 q10 q9 q8 q7 q6 q5 q4 |q3  q2  q1  q0  0   0   0  0  | 0  0  0  0  0  0  0  0 |
   // | 0 0 0 0 i13 i12 i11 i10 | i9  i8  i7 i6 i5 i4 i3 i2 |i1  i0  0   0   0   0   0  0  | 0  0  0  0  0  0  0  0 |
   // | 0 0 0 0 0   0   0   0   | 0   0   0  0  0  0  0  0  |0   0   q13 q12 q11 q10 q9 q8 | q7 q6 q5 q4 q3 q2 q1 q0|
   const __m512i shl_epi32 = _mm512_set4_epi32(14, 2, 14, 2);
-  const __m512i shl_mask  = _mm512_set4_epi32(0x0fffc000, 0x0000ffff, 0x0fffc000, 0x0000ffff);
   const __m512i shr_epi32 = _mm512_set4_epi32(16, 4, 16, 4);
-  const __m512i shr_mask  = _mm512_set4_epi32(0x00003fff, 0x03fff000, 0x00003fff, 0x03fff000);
-  __m512i       i_epi32   = _mm512_and_si512(_mm512_sllv_epi32(re_epi32, shl_epi32), shl_mask);
-  __m512i       q_epi32   = _mm512_and_si512(_mm512_srlv_epi32(re_epi32, shr_epi32), shr_mask);
+  __m512i       i_epi32   = _mm512_sllv_epi32(re_epi32, shl_epi32);
+  __m512i       q_epi32   = _mm512_srlv_epi32(re_epi32, shr_epi32);
 
-  // Gather the bytes of both in big-endian order and merge them.
+  // Gather the bytes of both in big-endian order and select the bits of each from the component they belong to, which
+  // discards the bits of the other component left by the shifts.
   const __m512i i_bytes_epi8 =
       _mm512_set4_epi64(0xffff0c0d0e0fff08, 0x0904050607ff0001, 0xffff0c0d0e0fff08, 0x0904050607ff0001);
   const __m512i q_bytes_epi8 =
       _mm512_set4_epi64(0xffff0c0d0e090a0b, 0x0804050601020300, 0xffff0c0d0e090a0b, 0x0804050601020300);
-  return _mm512_or_si512(_mm512_shuffle_epi8(i_epi32, i_bytes_epi8), _mm512_shuffle_epi8(q_epi32, q_bytes_epi8));
+  const __m512i select_q_epi8 =
+      _mm512_set4_epi64(0x0000ff3f00f0ff03, 0x00ff3f00f0ff0300, 0x0000ff3f00f0ff03, 0x00ff3f00f0ff0300);
+  return _mm512_ternarylogic_epi64(
+      _mm512_shuffle_epi8(i_epi32, i_bytes_epi8), _mm512_shuffle_epi8(q_epi32, q_bytes_epi8), select_q_epi8, 0xd8);
 }
 
 /// \brief Byte layout of four packed PRBs in the output buffer.

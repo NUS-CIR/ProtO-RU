@@ -7,12 +7,33 @@
 #include "ocudu/ocuduvec/conversion.h"
 #include "ocudu/ocuduvec/simd.h"
 #include "ocudu/ofh/compression/compression_params.h"
+#include "ocudu/support/ocudu_assert.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 namespace ocudu {
 namespace ofh {
+
+/// \brief Returns the largest brain float, as 16bit integer bits, that the SIMD quantizers accept for the given scale.
+///
+/// The SIMD conversions to 32bit integers wrap around for the scaled values above the 32bit range, which must saturate
+/// to the 16bit maximum instead. Positive brain floats sort as 16bit integers, so clamping the input bits to the
+/// returned value in the integer domain saturates them: it is below \f$2^{30}\f$ divided by the scale, so the clamped
+/// values do not overflow, and far above the 16bit maximum, so they still saturate.
+///
+/// \param[in] scale Scaling factor applied to the brain floats before the conversion, must be positive.
+/// \return The clamp as the bits of a brain float.
+inline int16_t get_bf16_saturation_clamp(float scale)
+{
+  float limit = 0x1p30F / scale;
+  ocudu_assert(std::isfinite(limit) && (limit > 0.0F), "Invalid quantization scale {}", scale);
+  // Truncating the float to a brain float keeps the clamp below the limit.
+  uint32_t limit_bits = 0;
+  std::memcpy(&limit_bits, &limit, sizeof(limit_bits));
+  return static_cast<int16_t>(limit_bits >> 16);
+}
 
 /// \brief Describes quantization of floating point number in the range [-1; +1] to a fixed point number of a given bit
 /// width.

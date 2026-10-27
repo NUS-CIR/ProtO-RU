@@ -42,8 +42,10 @@ void iq_compression_bfp_avx2::compress(span<uint8_t>                buffer,
   log_quantization_rms({reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U}, params.data_width);
 
   // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
-  const float  quantizer_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0F;
-  const __m256 scale_ps = _mm256_set1_ps(quantizer_gain * scaling_table.get_compression_iq_scaling(params.data_width));
+  const float   quantizer_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0F;
+  const float   scale          = quantizer_gain * scaling_table.get_compression_iq_scaling(params.data_width);
+  const __m256  scale_ps       = _mm256_set1_ps(scale);
+  const __m256i clamp_epi16    = _mm256_set1_epi16(get_bf16_saturation_clamp(scale));
 
   // Compression algorithm implemented according to O-RAN.WG4.CUS Annex A.1.2.
   const auto* input_it = reinterpret_cast<const bf16_t*>(iq_data.data());
@@ -52,7 +54,8 @@ void iq_compression_bfp_avx2::compress(span<uint8_t>                buffer,
   unsigned nof_prb_pairs = nof_prbs / 2;
   if (data_width == MAX_IQ_WIDTH) {
     // Samples that already use all the bits of the data width are not shifted, so the exponent is always zero.
-    mm256::compress_prb_pairs_16b<true>(buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, exponent_offset);
+    mm256::compress_prb_pairs_16b<true>(
+        buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, clamp_epi16, exponent_offset);
     rb += nof_prb_pairs * 2;
     input_it += NOF_SAMPLES_PER_PRB * 2 * nof_prb_pairs;
   } else if (nof_prb_pairs != 0) {
@@ -75,13 +78,14 @@ void iq_compression_bfp_avx2::compress(span<uint8_t>                buffer,
     auto prepare_prb_pair = [&](unsigned pair) {
       const bf16_t*  in = input_it + pair * 2 * NOF_SAMPLES_PER_PRB;
       prb_pair_state state;
-      state.rb0_epi16 =
-          mm256::quantize_bf16_even_odd(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)), scale_ps);
-      state.rb01_epi16 = mm256::quantize_bf16_even_odd(
-          _mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE)), scale_ps);
-      state.rb1_epi16 = mm256::quantize_bf16_even_odd(
-          _mm256_loadu_si256(reinterpret_cast<const __m256i*>(in + AVX2_REG_SIZE * 2)), scale_ps);
-      state.exponents = mm256::calculate_exponents(state.rb0_epi16, state.rb01_epi16, state.rb1_epi16, data_width);
+      auto           quantize = [&](const bf16_t* reg_in) {
+        return mm256::quantize_bf16_even_odd(
+            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(reg_in)), scale_ps, clamp_epi16);
+      };
+      state.rb0_epi16  = quantize(in);
+      state.rb01_epi16 = quantize(in + AVX2_REG_SIZE);
+      state.rb1_epi16  = quantize(in + AVX2_REG_SIZE * 2);
+      state.exponents  = mm256::calculate_exponents(state.rb0_epi16, state.rb01_epi16, state.rb1_epi16, data_width);
       return state;
     };
 

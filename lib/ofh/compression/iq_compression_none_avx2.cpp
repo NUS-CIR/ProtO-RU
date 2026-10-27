@@ -45,9 +45,11 @@ void iq_compression_none_avx2::compress(span<uint8_t>                buffer,
   const quantizer q(data_width);
 
   // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
-  const float  full_scale = static_cast<float>((1 << (data_width - 1)) - 1);
-  const float  iq_scaling = scaling_table.get_compression_iq_scaling(data_width);
-  const __m256 scale_ps   = _mm256_set1_ps(full_scale * iq_scaling);
+  const float   full_scale  = static_cast<float>((1 << (data_width - 1)) - 1);
+  const float   iq_scaling  = scaling_table.get_compression_iq_scaling(data_width);
+  const float   scale       = full_scale * iq_scaling;
+  const __m256  scale_ps    = _mm256_set1_ps(scale);
+  const __m256i clamp_epi16 = _mm256_set1_epi16(get_bf16_saturation_clamp(scale));
 
   const auto* input_it = reinterpret_cast<const bf16_t*>(iq_data.data());
   unsigned    rb       = 0;
@@ -55,7 +57,7 @@ void iq_compression_none_avx2::compress(span<uint8_t>                buffer,
   // One AVX2 register stores 8 16-bit IQ pairs. We can process 2 PRBs at a time by using 3 AVX2 registers.
   unsigned nof_prb_pairs = nof_prbs / 2;
   if (data_width == MAX_IQ_WIDTH) {
-    mm256::compress_prb_pairs_16b<false>(buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, 0);
+    mm256::compress_prb_pairs_16b<false>(buffer.data(), input_it, nof_prb_pairs, prb_size, scale_ps, clamp_epi16, 0);
     rb += nof_prb_pairs * 2;
     input_it += NOF_SAMPLES_PER_PRB * 2 * nof_prb_pairs;
   } else {

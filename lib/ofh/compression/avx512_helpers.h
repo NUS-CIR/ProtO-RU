@@ -42,20 +42,19 @@ namespace mm512 {
 ///
 /// \param[in] bf16_epi16 AVX512 register storing 32 brain floats.
 /// \param[in] scale_ps   AVX512 register storing the scaling factor applied before the conversion in every element.
-/// \param[in] max_ps     AVX512 register storing the largest scaled value in every element, up to the 16bit maximum.
-/// Larger values saturate at it, but there is no lower limit other than the one of the 16bit range.
-inline __m512i quantize_bf16_even_odd(__m512i bf16_epi16, __m512 scale_ps, __m512 max_ps = _mm512_set1_ps(INT16_MAX))
+/// \param[in] clamp_epi16 AVX512 register storing \ref get_bf16_saturation_clamp of the scale in every element.
+inline __m512i quantize_bf16_even_odd(__m512i bf16_epi16, __m512 scale_ps, __m512i clamp_epi16)
 {
+  // Clamp the large positive values, so that the conversion to integers below does not wrap around.
+  bf16_epi16 = _mm512_min_epi16(bf16_epi16, clamp_epi16);
+
   // Unpack brain floats into two vectors of floats: even elements and odd ones.
   __m512 even_ps = _mm512_castsi512_ps(_mm512_slli_epi32(bf16_epi16, 16));
   __m512 odd_ps  = _mm512_castsi512_ps(_mm512_and_si512(bf16_epi16, _mm512_set1_epi32(0xffff0000)));
 
-  // The conversion gives the most negative integer for the values above the 32bit range, clamp them to saturate.
-  even_ps = _mm512_min_ps(_mm512_mul_ps(even_ps, scale_ps), max_ps);
-  odd_ps  = _mm512_min_ps(_mm512_mul_ps(odd_ps, scale_ps), max_ps);
-
   // Convert to integers and saturate to 16 bits, the pack works inside each 128bit lane.
-  return _mm512_packs_epi32(_mm512_cvtps_epi32(even_ps), _mm512_cvtps_epi32(odd_ps));
+  return _mm512_packs_epi32(_mm512_cvtps_epi32(_mm512_mul_ps(even_ps, scale_ps)),
+                            _mm512_cvtps_epi32(_mm512_mul_ps(odd_ps, scale_ps)));
 }
 
 /// \brief Calculates the BFP exponents of four resource blocks passed in three AVX512 registers.

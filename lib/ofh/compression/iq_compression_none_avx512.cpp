@@ -20,11 +20,17 @@ using namespace ofh;
 /// \param[in] in        Input samples of the PRBs.
 /// \param[in] nof_prbs  Number of PRBs.
 /// \param[in] scale_ps  AVX512 register storing the scaling factor applied before the conversion to fixed point.
-/// \param[in] max_ps    AVX512 register storing the largest scaled value in every element.
-/// \param[in] min_epi16 AVX512 register storing the smallest quantized value in every element.
+/// \param[in] clamp_epi16 AVX512 register storing \ref get_bf16_saturation_clamp of the scale in every element.
+/// \param[in] max_epi16   AVX512 register storing the largest quantized value in every element.
+/// \param[in] min_epi16   AVX512 register storing the smallest quantized value in every element.
 template <unsigned BITS>
-static void
-compress_prb_quads(uint8_t* out, const bf16_t* in, unsigned nof_prbs, __m512 scale_ps, __m512 max_ps, __m512i min_epi16)
+static void compress_prb_quads(uint8_t*      out,
+                               const bf16_t* in,
+                               unsigned      nof_prbs,
+                               __m512        scale_ps,
+                               __m512i       clamp_epi16,
+                               __m512i       max_epi16,
+                               __m512i       min_epi16)
 {
   // Number of quantized samples per resource block.
   static constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
@@ -58,13 +64,11 @@ compress_prb_quads(uint8_t* out, const bf16_t* in, unsigned nof_prbs, __m512 sca
       __mmask32 mask        = (nof_samples > 0) ? (~uint32_t{0} >> std::max(0, 32 - nof_samples)) : 0;
       return _mm512_maskz_loadu_epi16(mask, address);
     };
-    // The scaled samples above the full scale saturate in the float domain, and the ones below the negative full scale
-    // in the 16bit domain, as the conversion to integers gives the most negative value if it overflows. The 16bit
-    // samples use the whole range, so they are not clamped.
+    // The quantized samples saturate at the symmetric full scale, except the 16bit ones, which use the whole range.
     auto quantize = [&](unsigned reg) {
-      __m512i samples_epi16 = mm512::quantize_bf16_even_odd(load(reg), scale_ps, max_ps);
+      __m512i samples_epi16 = mm512::quantize_bf16_even_odd(load(reg), scale_ps, clamp_epi16);
       if constexpr (BITS != MAX_IQ_WIDTH) {
-        samples_epi16 = _mm512_max_epi16(samples_epi16, min_epi16);
+        samples_epi16 = _mm512_min_epi16(_mm512_max_epi16(samples_epi16, min_epi16), max_epi16);
       }
       return samples_epi16;
     };
@@ -127,20 +131,22 @@ void iq_compression_none_avx512::compress(span<uint8_t>                buffer,
   log_quantization_rms({input_it, iq_data.size() * 2U}, data_width);
 
   // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
-  const float   full_scale = static_cast<float>((1 << (data_width - 1)) - 1);
-  const __m512  scale_ps   = _mm512_set1_ps(full_scale * scaling_table.get_compression_iq_scaling(data_width));
-  const __m512  max_ps     = _mm512_set1_ps(full_scale);
-  const __m512i min_epi16  = _mm512_set1_epi16(static_cast<int16_t>(-full_scale));
+  const float   full_scale  = static_cast<float>((1 << (data_width - 1)) - 1);
+  const float   scale       = full_scale * scaling_table.get_compression_iq_scaling(data_width);
+  const __m512  scale_ps    = _mm512_set1_ps(scale);
+  const __m512i clamp_epi16 = _mm512_set1_epi16(get_bf16_saturation_clamp(scale));
+  const __m512i max_epi16   = _mm512_set1_epi16(static_cast<int16_t>(full_scale));
+  const __m512i min_epi16   = _mm512_set1_epi16(static_cast<int16_t>(-full_scale));
 
   switch (data_width) {
     case 9:
-      compress_prb_quads<9>(buffer.data(), input_it, nof_prbs, scale_ps, max_ps, min_epi16);
+      compress_prb_quads<9>(buffer.data(), input_it, nof_prbs, scale_ps, clamp_epi16, max_epi16, min_epi16);
       break;
     case 14:
-      compress_prb_quads<14>(buffer.data(), input_it, nof_prbs, scale_ps, max_ps, min_epi16);
+      compress_prb_quads<14>(buffer.data(), input_it, nof_prbs, scale_ps, clamp_epi16, max_epi16, min_epi16);
       break;
     default:
-      compress_prb_quads<16>(buffer.data(), input_it, nof_prbs, scale_ps, max_ps, min_epi16);
+      compress_prb_quads<16>(buffer.data(), input_it, nof_prbs, scale_ps, clamp_epi16, max_epi16, min_epi16);
       break;
   }
 }
