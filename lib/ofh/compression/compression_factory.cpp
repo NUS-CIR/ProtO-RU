@@ -36,9 +36,10 @@ std::unique_ptr<iq_compressor> ocudu::ofh::create_iq_compressor(compression_type
     case compression_type::none:
 #ifdef __x86_64__
     {
-      bool supports_avx2   = cpu_supports_feature(cpu_feature::avx2);
-      bool supports_avx512 = cpu_supports_feature(cpu_feature::avx512f) &&
-                             cpu_supports_feature(cpu_feature::avx512vl) && cpu_supports_feature(cpu_feature::avx512bw);
+      bool supports_avx2 = cpu_supports_feature(cpu_feature::avx2);
+      bool supports_avx512 =
+          cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
+          cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512vbmi);
       if (((impl_type == "avx512") || (impl_type == "auto")) && supports_avx512) {
         return std::make_unique<iq_compression_none_avx512>(logger, iq_scaling, fs_offset);
       }
@@ -56,11 +57,11 @@ std::unique_ptr<iq_compressor> ocudu::ofh::create_iq_compressor(compression_type
     case compression_type::BFP:
 #ifdef __x86_64__
     {
-      bool supports_avx2   = cpu_supports_feature(cpu_feature::avx2);
-      bool supports_avx512 = cpu_supports_feature(cpu_feature::avx512f) &&
-                             cpu_supports_feature(cpu_feature::avx512vl) &&
-                             cpu_supports_feature(cpu_feature::avx512bw) &&
-                             cpu_supports_feature(cpu_feature::avx512dq) && cpu_supports_feature(cpu_feature::avx512cd);
+      bool supports_avx2 = cpu_supports_feature(cpu_feature::avx2);
+      bool supports_avx512 =
+          cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
+          cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512dq) &&
+          cpu_supports_feature(cpu_feature::avx512cd) && cpu_supports_feature(cpu_feature::avx512vbmi);
       if (((impl_type == "avx512") || (impl_type == "auto")) && supports_avx512) {
         return std::make_unique<iq_compression_bfp_avx512>(logger, iq_scaling, fs_offset);
       }
