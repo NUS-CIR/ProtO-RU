@@ -2,218 +2,288 @@
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
+/// \file
+/// \brief NEON packing and unpacking of IQ samples in big-endian format.
+///
+/// A NEON register holds 8 16bit samples, which pack into exactly \c BITS bytes when each sample takes \c BITS bits.
+/// The byte shuffles, shifts and masks of the packing of every bit width are generated at compile time from the
+/// position of each sample in the packed bytes.
+
 #pragma once
 
-#include "neon_helpers.h"
 #include "ocudu/adt/span.h"
+#include "ocudu/support/compiler.h"
 #include "ocudu/support/error_handling.h"
+#include <arm_neon.h>
+#include <array>
+#include <cstdint>
 
 namespace ocudu {
 namespace ofh {
 namespace neon {
 
-/// \brief Reads eight 16bit IQ values from input NEON register and packs them to the first 72 bits of the output NEON
-/// register in big-endian format, thus occupying 9 output bytes.
+/// Byte shuffle table of a table lookup.
+using shuffle_table = std::array<uint8_t, 16>;
+
+/// Byte index that reads as zero in a table lookup.
+static constexpr uint8_t SHUFFLE_ZERO = 0xff;
+
+/// \brief Positions of the 8 samples of one NEON register inside of their packed bytes.
 ///
-/// \param[in] regs NEON register storing 16bit IQ samples of a resource block.
-/// \return NEON register storing 9 packed bytes.
-inline uint8x16_t pack_neon_register_9b_big_endian(int16x8_t reg)
-{
-  // Input IQ samples need to be shifted in order to align bits before final packing.
-  // 0:  i0 0  0  0  0  0  0  0   i8 i7 i6 i5 i4 i3 i2 i1   <- rotate right by 1 (shift left by 7, swap bytes later)
-  // 1:  0 q8 q7 q6 q5 q4 q3 q2   q1 q0  0  0  0  0  0  0   <- shift left by 6
-  // 2:  0  0 i8 i7 i6 i5 i4 i3   i2 i1 i0  0  0  0  0  0   <- shift left by 5
-  // 3:  0  0  0 q8 q7 q6 q5 q4   q3 q2 q1 q0  0  0  0  0   <- shift left by 4
-  // 4:  0  0  0  0 i8 i7 i6 i5   i4 i3 i2 i1 i0  0  0  0   <- shift left by 3
-  // 5:  0  0  0  0  0 q8 q7 q6   q5 q4 q3 q2 q1 q0  0  0   <- shift left by 2
-  // 6:  0  0  0  0  0  0 i8 i7   i6 i5 i4 i3 i2 i1 i0  0   <- shift left by 1
-  // 7:  0  0  0  0  0  0  0 q8   q7 q6 q5 q4 q3 q2 q1 q0   <- no shift
+/// The samples are packed with \c BITS bits each, most significant bit first, in the order of the lanes.
+template <unsigned BITS>
+struct packed_register_layout {
+  static_assert((BITS >= 8) && (BITS <= 16), "Unsupported bit width");
 
-  // Shift data according to the mask described above.
-  const int16x8_t shift_mask_s16 = vcombine_s16(vcreate_s16(0x0004000500060007), vcreate_s16(0x0000000100020003));
-  int16x8_t       iq_shl_s16     = vshlq_s16(reg, shift_mask_s16);
+  /// Number of packed bytes of the register.
+  static constexpr unsigned NOF_BYTES = BITS;
+  /// Number of samples of the register.
+  static constexpr unsigned NOF_SAMPLES = 8;
 
-  // Mask 16bit words to keep only 9 shifted bits.
-  const int16x8_t mask_s16 = vcombine_s16(vcreate_s16(0x1ff03fe07fc0ff80), vcreate_s16(0x01ff03fe07fc0ff8));
-  iq_shl_s16               = vandq_s16(iq_shl_s16, mask_s16);
+  /// Position of a packed sample.
+  struct sample_position {
+    /// Index of the first byte holding bits of the sample.
+    unsigned first_byte;
+    /// Number of bytes holding bits of the sample.
+    unsigned nof_bytes;
+    /// Offset of the most significant bit of the sample inside of the first byte.
+    unsigned bit_offset;
+  };
 
-  // Shuffle it and create two new vectors that can be OR'ed to produce final result. Temporal vectors look as follows:
-  // 0  0  0  0  0  0  0  0  | i0 0  0  0  0  0  0  0 | q1 q0  0  0  0  0  0  0 | i2 i1 i0  0  0  0  0  0 | ...
-  // i8 i7 i6 i5 i4 i3 i2 i1 | 0 q8 q7 q6 q5 q4 q3 q2 |  0  0 i8 i7 i6 i5 i4 i3 | 0  0  0  q8 q7 q6 q5 q4 | ...
-  int8x16_t iq_shl_s8 = vreinterpretq_s8_s16(iq_shl_s16);
-  int8x16_t tmp_iq_0_s8 =
-      vqtbl1q_s8(iq_shl_s8, vcombine_u8(vcreate_u8(0x0c0a0806040200ff), vcreate_u8(0xffffffffffffff0e)));
-  int8x16_t tmp_iq_1_s8 =
-      vqtbl1q_s8(iq_shl_s8, vcombine_u8(vcreate_u8(0x0f0d0b0907050301), vcreate_u8(0xffffffffffffffff)));
-
-  // Perform 'bitwise OR'.
-  return vorrq_u8(vreinterpretq_u8_s8(tmp_iq_0_s8), vreinterpretq_u8_s8(tmp_iq_1_s8));
-}
-
-/// \brief Packs 16bit IQ values of the PRB using given bit width and big-endian format.
-///
-/// \param[out] comp_prb_buffer Buffer dedicated for storing compressed packed bytes of the PRB.
-/// \param[in]  regs            NEON registers storing 16bit IQ samples of the PRB.
-///
-/// \note Each of the input registers stores four unique REs.
-inline void pack_prb_9b_big_endian(span<uint8_t> comp_prb_buffer, int16x8x3_t regs)
-{
-  // Number of bytes used by 1 packed PRB with IQ samples compressed to 9 bits.
-  static constexpr unsigned BYTES_PER_PRB_9BIT_COMPRESSION = 27;
-
-  static constexpr unsigned bytes_per_half_reg = 8;
-
-  ocudu_assert(comp_prb_buffer.size() == BYTES_PER_PRB_9BIT_COMPRESSION,
-               "Output buffer has incorrect size for packing compressed samples");
-
-  // Pack input registers.
-  uint8x16_t res_packed_bytes_0_u8 = pack_neon_register_9b_big_endian(regs.val[0]);
-  uint8x16_t res_packed_bytes_1_u8 = pack_neon_register_9b_big_endian(regs.val[1]);
-  uint8x16_t res_packed_bytes_2_u8 = pack_neon_register_9b_big_endian(regs.val[2]);
-
-  uint8_t* data = comp_prb_buffer.data();
-
-  // Store first 9 bytes of every register storing packed bytes.
-  vst1_u8(data, vget_low_u8(res_packed_bytes_0_u8));
-  vst1q_lane_u8(data + bytes_per_half_reg, res_packed_bytes_0_u8, bytes_per_half_reg);
-  data += bytes_per_half_reg + 1;
-
-  vst1_u8(data, vget_low_u8(res_packed_bytes_1_u8));
-  vst1q_lane_u8(data + bytes_per_half_reg, res_packed_bytes_1_u8, bytes_per_half_reg);
-  data += bytes_per_half_reg + 1;
-
-  vst1_u8(data, vget_low_u8(res_packed_bytes_2_u8));
-  vst1q_lane_u8(data + bytes_per_half_reg, res_packed_bytes_2_u8, bytes_per_half_reg);
-}
-
-/// \brief Reads eight 16bit IQ values from input NEON register and packs them to the first 112 bits of the output NEON
-/// register in big-endian format, thus occupying 14 output bytes.
-///
-/// \param[in] regs NEON register storing 16bit IQ samples of a resource block.
-/// \return NEON register storing 14 packed bytes.
-inline uint8x16_t pack_neon_register_14b_big_endian(int16x8_t reg)
-{
-  // We will use logical operations for 32bit words. I and Q components represented as 32bit words:
-  // |            byte3          |            byte2        |               byte1        |           byte0          |
-  // | s s q13 q12 q11 q10 q9 q8 | q7 q6 q5 q4 q3 q2 q1 q0 | s  s i13 i12 i11 i10 i9 i8 | i7 i6 i5 i4 i3 i2  i1 i0 |
-  // where s is a sign bit.
-  //
-  // The results of the following operations are written down below:
-  // - shift32 left first word by 2 and mask.
-  // - shift32 right first word by 4.
-  // - shift32 left second word by 14 and mask.
-  // - shift32 right second word by 16.
-  //
-  // | 0 0 0 0 0   0   0   0   | 0   0   0  0  0  0  0  0  |i13 i12 i11 i10 i9  i8  i7 i6 | i5 i4 i3 i2 i1 i0 0  0 |
-  // | 0 0 0 0 0   0   q13 q12 | q11 q10 q9 q8 q7 q6 q5 q4 |q3  q2  q1  q0  0   0   0  0  | 0  0  0  0  0  0  0  0 |
-  // | 0 0 0 0 i13 i12 i11 i10 | i9  i8  i7 i6 i5 i4 i3 i2 |i1  i0  0   0   0   0   0  0  | 0  0  0  0  0  0  0  0 |
-  // | 0 0 0 0 0   0   0   0   | 0   0   0  0  0  0  0  0  |0   0   q13 q12 q11 q10 q9 q8 | q7 q6 q5 q4 q3 q2 q1 q0|
-
-  int32x4_t reg_s32 = vreinterpretq_s32_s16(reg);
-  // Shift data according to the scheme described above.
-  const int32x4_t lshift_mask_s32 = vcombine_s32(vcreate_s32(0x0000000e00000002), vcreate_s32(0x0000000e00000002));
-  const int32x4_t rshift_mask_s32 =
-      vnegq_s32(vcombine_s32(vcreate_s32(0x0000001000000004), vcreate_s32(0x0000001000000004)));
-
-  int32x4_t iq_shl_s32 = vshlq_s32(reg_s32, lshift_mask_s32);
-  int32x4_t iq_shr_s32 = vshlq_s32(reg_s32, rshift_mask_s32);
-
-  // Mask 32bit words to keep only the 14 bits we are interested in.
-  const int32x4_t shl_mask_s32 = vcombine_s32(vcreate_s32(0x0fffc0000000ffff), vcreate_s32(0x0fffc0000000ffff));
-  const int32x4_t shr_mask_s32 = vcombine_s32(vcreate_s32(0x00003fff03fff000), vcreate_s32(0x00003fff03fff000));
-  iq_shl_s32                   = vandq_s32(iq_shl_s32, shl_mask_s32);
-  iq_shr_s32                   = vandq_s32(iq_shr_s32, shr_mask_s32);
-
-  // Create new vectors by shuffling left and right shifted values. Two resulting vectors can be ORed and the result
-  // will be stored in a big-endian format.
-  int8x16_t iq_shl_s8 = vreinterpretq_s8_s32(iq_shl_s32);
-  int8x16_t iq_shr_s8 = vreinterpretq_s8_s32(iq_shr_s32);
-  int8x16_t tmp_iq_0_s8 =
-      vqtbl1q_s8(iq_shl_s8, vcombine_u8(vcreate_u8(0x0904050607ff0001), vcreate_u8(0xffff0c0d0e0fff08)));
-  int8x16_t tmp_iq_1_s8 =
-      vqtbl1q_s8(iq_shr_s8, vcombine_u8(vcreate_u8(0x0804050601020300), vcreate_u8(0xffff0c0d0e090a0b)));
-
-  // Perform 'bitwise OR'.
-  return vorrq_u8(vreinterpretq_u8_s8(tmp_iq_0_s8), vreinterpretq_u8_s8(tmp_iq_1_s8));
-}
-
-/// \brief Packs 16bit IQ values of the PRB using 14 bit big-endian format.
-///
-/// \param[out] comp_prb_buffer Buffer dedicated for storing compressed packed bytes of the PRB.
-/// \param[in]  regs            NEON registers storing 16bit IQ samples of the PRB.
-///
-/// \note Each of the input registers stores four unique REs.
-inline void pack_prb_14b_big_endian(span<uint8_t> comp_prb_buffer, int16x8x3_t regs)
-{
-  // Number of bytes used by compressed IQ samples in a single NEON register.
-  static constexpr unsigned BYTES_PER_COMPRESSED_REG = 14;
-  // Number of bytes used by 1 packed PRB with IQ samples compressed to 14 bits.
-  static constexpr unsigned BYTES_PER_PRB_14BIT_COMPRESSION = 42;
-
-  ocudu_assert(comp_prb_buffer.size() == BYTES_PER_PRB_14BIT_COMPRESSION,
-               "Output buffer has incorrect size for packing compressed samples");
-
-  // Pack input registers.
-  uint8x16_t res_packed_bytes_0_u8 = pack_neon_register_14b_big_endian(regs.val[0]);
-  uint8x16_t res_packed_bytes_1_u8 = pack_neon_register_14b_big_endian(regs.val[1]);
-  uint8x16_t res_packed_bytes_2_u8 = pack_neon_register_14b_big_endian(regs.val[2]);
-
-  uint8_t* data = comp_prb_buffer.data();
-  // Temporal storage used by vst1q_u8 intrinsics.
-  uint8_t temp_storage[48];
-  vst1q_u8(temp_storage, res_packed_bytes_0_u8);
-  vst1q_u8(temp_storage + BYTES_PER_COMPRESSED_REG, res_packed_bytes_1_u8);
-  vst1q_u8(temp_storage + 2 * BYTES_PER_COMPRESSED_REG, res_packed_bytes_2_u8);
-
-  // Store the result in the output memory.
-  std::memcpy(data, temp_storage, BYTES_PER_PRB_14BIT_COMPRESSION);
-}
-
-/// \brief Packs 16bit IQ values of the PRB using given bit width and big-endian format.
-///
-/// \param[out] comp_prb_buffer Buffer dedicated for storing compressed packed bytes of the PRB.
-/// \param[in]  regs            NEON registers storing 16bit IQ samples of the PRB.
-///
-/// \note Each of the input registers stores four unique REs.
-inline void pack_prb_16b_big_endian(span<uint8_t> comp_prb_buffer, int16x8x3_t regs)
-{
-  // Number of bytes used by 1 packed PRB with IQ samples compressed to 16 bits.
-  static constexpr unsigned BYTES_PER_PRB_16BIT_COMPRESSION = 48;
-  static constexpr unsigned NEON_REG_SIZE_BYTES             = 16;
-
-  ocudu_assert(comp_prb_buffer.size() == BYTES_PER_PRB_16BIT_COMPRESSION,
-               "Output buffer has incorrect size for packing compressed samples");
-
-  static const uint8x16_t shuffle_mask_u8 = vcombine_u8(vcreate_u8(0x0607040502030001), vcreate_u8(0x0e0f0c0d0a0b0809));
-
-  int8x16x3_t regs_shuffled_s16;
-  regs_shuffled_s16.val[0] = vqtbl1q_s8(vreinterpretq_s8_s16(regs.val[0]), shuffle_mask_u8);
-  regs_shuffled_s16.val[1] = vqtbl1q_s8(vreinterpretq_s8_s16(regs.val[1]), shuffle_mask_u8);
-  regs_shuffled_s16.val[2] = vqtbl1q_s8(vreinterpretq_s8_s16(regs.val[2]), shuffle_mask_u8);
-
-  int8_t* data = reinterpret_cast<int8_t*>(comp_prb_buffer.data());
-  vst1q_s8(data, regs_shuffled_s16.val[0]);
-  vst1q_s8(data + NEON_REG_SIZE_BYTES, regs_shuffled_s16.val[1]);
-  vst1q_s8(data + NEON_REG_SIZE_BYTES * 2, regs_shuffled_s16.val[2]);
-}
-
-/// \brief Packs 16bit IQ values of a resource block using the specified width and big-endian format.
-///
-/// \param[out] comp_prb_buffer Buffer dedicated for storing compressed packed bytes of the PRB.
-/// \param[in]  reg             Vector of three NEON registers storing 16bit IQ pairs of the PRB.
-/// \param[in] iq_width         Bit width of the resulting packed IQ samples.
-inline void pack_prb_big_endian(span<uint8_t> comp_prb_buffer, int16x8x3_t regs, unsigned iq_width)
-{
-  if (iq_width == 9) {
-    return pack_prb_9b_big_endian(comp_prb_buffer, regs);
+  /// Returns the position of the given sample.
+  static constexpr sample_position locate(unsigned sample)
+  {
+    unsigned bit = sample * BITS;
+    return {bit / 8, (bit % 8 + BITS + 7) / 8, bit % 8};
   }
-  if (iq_width == 14) {
-    return pack_prb_14b_big_endian(comp_prb_buffer, regs);
+
+  /// Returns true if some sample does not start at a byte boundary.
+  static constexpr bool has_bit_offsets()
+  {
+    for (unsigned sample = 0; sample != NOF_SAMPLES; ++sample) {
+      if (locate(sample).bit_offset != 0) {
+        return true;
+      }
+    }
+    return false;
   }
-  if (iq_width == 16) {
-    return pack_prb_16b_big_endian(comp_prb_buffer, regs);
+
+  /// \brief Whether the samples are packed from 16bit lanes.
+  ///
+  /// A sample and the bits that precede it in its first byte fit in 16 bits up to 9 bits, and the 16bit samples are
+  /// byte aligned. The other widths spread the samples over 32bit lanes.
+  static constexpr bool PACK_16BIT_LANES = (BITS <= 9) || (BITS == 16);
+};
+
+/// \brief Makes the shuffle tables packing a register of 16bit lanes.
+///
+/// Each lane holds its sample shifted to the position it takes in the two bytes it spans. The first table gathers the
+/// most significant byte of each lane into the first byte of its sample, the second one the least significant byte
+/// into the next byte. The second table is empty if the samples are byte aligned.
+template <unsigned BITS>
+constexpr std::array<shuffle_table, 2> make_pack_tables_16b()
+{
+  using layout = packed_register_layout<BITS>;
+
+  std::array<shuffle_table, 2> tables = {};
+  for (shuffle_table& table : tables) {
+    for (uint8_t& index : table) {
+      index = SHUFFLE_ZERO;
+    }
   }
-  report_fatal_error("Unsupported bit width");
+  for (unsigned sample = 0; sample != layout::NOF_SAMPLES; ++sample) {
+    typename layout::sample_position position = layout::locate(sample);
+    tables[0][position.first_byte]            = 2 * sample + 1;
+    if (position.nof_bytes == 2) {
+      tables[1][position.first_byte + 1] = 2 * sample;
+    }
+  }
+  return tables;
+}
+
+/// Returns true if the two tables never write the same byte, so that they merge into a single one.
+constexpr bool are_disjoint(const std::array<shuffle_table, 2>& tables)
+{
+  for (unsigned byte = 0; byte != 16; ++byte) {
+    if ((tables[0][byte] != SHUFFLE_ZERO) && (tables[1][byte] != SHUFFLE_ZERO)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/// Merges two disjoint tables.
+constexpr shuffle_table merge_tables(const std::array<shuffle_table, 2>& tables)
+{
+  shuffle_table merged = tables[0];
+  for (unsigned byte = 0; byte != 16; ++byte) {
+    if (tables[1][byte] != SHUFFLE_ZERO) {
+      merged[byte] = tables[1][byte];
+    }
+  }
+  return merged;
+}
+
+/// Makes the left shifts aligning each 16bit lane with the position of its sample, see \ref make_pack_tables_16b.
+template <unsigned BITS>
+constexpr std::array<int16_t, 8> make_pack_shifts_16b()
+{
+  using layout = packed_register_layout<BITS>;
+
+  std::array<int16_t, 8> shifts = {};
+  for (unsigned sample = 0; sample != layout::NOF_SAMPLES; ++sample) {
+    shifts[sample] = static_cast<int16_t>(16 - BITS - layout::locate(sample).bit_offset);
+  }
+  return shifts;
+}
+
+/// Makes the masks keeping the \c BITS bits of each shifted 16bit lane.
+template <unsigned BITS>
+constexpr std::array<int16_t, 8> make_pack_masks_16b()
+{
+  std::array<int16_t, 8> shifts = make_pack_shifts_16b<BITS>();
+  std::array<int16_t, 8> masks  = {};
+  for (unsigned lane = 0; lane != 8; ++lane) {
+    masks[lane] = static_cast<int16_t>(static_cast<uint16_t>(((1U << BITS) - 1U) << shifts[lane]));
+  }
+  return masks;
+}
+
+/// \brief Makes the shuffle tables packing a register whose samples are spread over two registers of 32bit lanes.
+///
+/// The first register holds the first four samples and the second one the others, each one shifted to the position
+/// it takes in the three bytes it spans, which are the three least significant bytes of its lane. A packed byte takes
+/// bits from up to two samples, the first table gathers the first contribution and the second one the other.
+template <unsigned BITS>
+constexpr std::array<shuffle_table, 2> make_pack_tables_32b()
+{
+  using layout = packed_register_layout<BITS>;
+
+  std::array<shuffle_table, 2> tables = {};
+  for (shuffle_table& table : tables) {
+    for (uint8_t& index : table) {
+      index = SHUFFLE_ZERO;
+    }
+  }
+  for (unsigned sample = 0; sample != layout::NOF_SAMPLES; ++sample) {
+    typename layout::sample_position position = layout::locate(sample);
+    for (unsigned byte = 0; byte != position.nof_bytes; ++byte) {
+      // Most significant byte of the sample first, at the top of the three bytes of its lane.
+      uint8_t  source                                         = 4 * sample + (2 - byte);
+      unsigned dest                                           = position.first_byte + byte;
+      tables[(tables[0][dest] == SHUFFLE_ZERO) ? 0 : 1][dest] = source;
+    }
+  }
+  return tables;
+}
+
+/// Makes the powers of two moving each sample to the position it takes in its 32bit lane, see \ref
+/// make_pack_tables_32b.
+template <unsigned BITS>
+constexpr std::array<int16_t, 8> make_pack_multipliers_32b()
+{
+  using layout = packed_register_layout<BITS>;
+
+  std::array<int16_t, 8> multipliers = {};
+  for (unsigned sample = 0; sample != layout::NOF_SAMPLES; ++sample) {
+    multipliers[sample] = static_cast<int16_t>(1 << (24 - BITS - layout::locate(sample).bit_offset));
+  }
+  return multipliers;
+}
+
+/// \brief Returns the per lane shift counts that the exponent is subtracted from before \ref pack_register.
+///
+/// They are the left shifts of the 16bit lanes, or zero when the samples are packed from 32bit lanes, so that in both
+/// cases the register is shifted by the counts minus the exponent.
+template <unsigned BITS>
+OCUDU_FORCE_INLINE int16x8_t get_pack_shift_counts()
+{
+  if constexpr (packed_register_layout<BITS>::PACK_16BIT_LANES) {
+    static constexpr std::array<int16_t, 8> SHIFTS = make_pack_shifts_16b<BITS>();
+    return vld1q_s16(SHIFTS.data());
+  }
+  return vdupq_n_s16(0);
+}
+
+/// \brief Packs the 8 samples of a register with \c BITS bits each, most significant bit first.
+///
+/// \tparam BITS         Bit width of the packed samples.
+/// \tparam HAS_EXPONENT Whether the samples are shifted right by a BFP exponent before packing.
+/// \param[in] samples_s16 NEON register storing the samples.
+/// \param[in] shift_s16   NEON register storing \ref get_pack_shift_counts minus the exponent in every lane, unused if
+///                        there is no exponent.
+/// \return A NEON register holding the \c BITS packed bytes in its first bytes, the rest are zero.
+template <unsigned BITS, bool HAS_EXPONENT>
+OCUDU_FORCE_INLINE uint8x16_t pack_register(int16x8_t samples_s16, int16x8_t shift_s16)
+{
+  using layout = packed_register_layout<BITS>;
+
+  if constexpr (layout::PACK_16BIT_LANES) {
+    static constexpr std::array<shuffle_table, 2> TABLES = make_pack_tables_16b<BITS>();
+    static constexpr bool                         SINGLE = are_disjoint(TABLES);
+    static constexpr shuffle_table                MERGED = merge_tables(TABLES);
+    static constexpr std::array<int16_t, 8>       SHIFTS = make_pack_shifts_16b<BITS>();
+    static constexpr std::array<int16_t, 8>       MASKS  = make_pack_masks_16b<BITS>();
+
+    // Shift each sample to its position. A shift right by the exponent drops the low bits, and a shift left keeps the
+    // sign extension and, with an exponent, the low bits above or below the sample: the mask clears them.
+    if constexpr (HAS_EXPONENT) {
+      samples_s16 = vshlq_s16(samples_s16, shift_s16);
+    } else if constexpr (BITS != 16) {
+      samples_s16 = vshlq_s16(samples_s16, vld1q_s16(SHIFTS.data()));
+    }
+    if constexpr (HAS_EXPONENT || layout::has_bit_offsets()) {
+      samples_s16 = vandq_s16(samples_s16, vld1q_s16(MASKS.data()));
+    }
+
+    uint8x16_t bytes_u8 = vreinterpretq_u8_s16(samples_s16);
+    if constexpr (SINGLE) {
+      return vqtbl1q_u8(bytes_u8, vld1q_u8(MERGED.data()));
+    } else {
+      return vorrq_u8(vqtbl1q_u8(bytes_u8, vld1q_u8(TABLES[0].data())),
+                      vqtbl1q_u8(bytes_u8, vld1q_u8(TABLES[1].data())));
+    }
+  } else {
+    static constexpr std::array<shuffle_table, 2> TABLES      = make_pack_tables_32b<BITS>();
+    static constexpr std::array<int16_t, 8>       MULTIPLIERS = make_pack_multipliers_32b<BITS>();
+
+    // Shift right by the exponent and keep the data bits, the widening multiplication then moves them into place.
+    if constexpr (HAS_EXPONENT) {
+      samples_s16 = vshlq_s16(samples_s16, shift_s16);
+    }
+    samples_s16 = vandq_s16(samples_s16, vdupq_n_s16(static_cast<int16_t>((1U << BITS) - 1U)));
+
+    int16x8_t    multipliers_s16 = vld1q_s16(MULTIPLIERS.data());
+    uint8x16x2_t bytes_u8x2;
+    bytes_u8x2.val[0] = vreinterpretq_u8_s32(vmull_s16(vget_low_s16(samples_s16), vget_low_s16(multipliers_s16)));
+    bytes_u8x2.val[1] = vreinterpretq_u8_s32(vmull_high_s16(samples_s16, multipliers_s16));
+    return vorrq_u8(vqtbl2q_u8(bytes_u8x2, vld1q_u8(TABLES[0].data())),
+                    vqtbl2q_u8(bytes_u8x2, vld1q_u8(TABLES[1].data())));
+  }
+}
+
+/// Stores the first \c NOF_BYTES bytes of a register, from 8 to 16.
+template <unsigned NOF_BYTES>
+OCUDU_FORCE_INLINE void store_bytes(uint8_t* out, uint8x16_t bytes_u8)
+{
+  static_assert((NOF_BYTES >= 8) && (NOF_BYTES <= 16), "Unsupported number of bytes");
+
+  if constexpr (NOF_BYTES == 16) {
+    vst1q_u8(out, bytes_u8);
+    return;
+  }
+  vst1_u8(out, vget_low_u8(bytes_u8));
+  if constexpr ((NOF_BYTES & 4) != 0) {
+    vst1q_lane_u32(reinterpret_cast<uint32_t*>(out + 8), vreinterpretq_u32_u8(bytes_u8), 2);
+  }
+  if constexpr ((NOF_BYTES & 2) != 0) {
+    static constexpr unsigned OFFSET = 8 + (NOF_BYTES & 4);
+    vst1q_lane_u16(reinterpret_cast<uint16_t*>(out + OFFSET), vreinterpretq_u16_u8(bytes_u8), OFFSET / 2);
+  }
+  if constexpr ((NOF_BYTES & 1) != 0) {
+    static constexpr unsigned OFFSET = 8 + (NOF_BYTES & 6);
+    vst1q_lane_u8(out + OFFSET, bytes_u8, OFFSET);
+  }
 }
 
 /// \brief Unpacks packed 9bit IQ samples stored as bytes in big-endian format to an array of 16bit signed values.
@@ -374,11 +444,20 @@ inline void unpack_prb_big_endian(span<int16_t> unpacked_iq_data, span<const uin
   report_fatal_error("Unsupported bit width");
 }
 
-/// \brief Checks whether the requested bit width is supported by the NEON implementation.
+/// \brief Checks whether the requested bit width is supported by the NEON packing.
 /// \param[in] iq_width Requested bit width.
 ///
-/// \return True in case packing/unpacking with the requested bit width is supported.
+/// \return True in case packing with the requested bit width is supported.
 inline bool iq_width_packing_supported(unsigned iq_width)
+{
+  return (iq_width >= 8) && (iq_width <= 16);
+}
+
+/// \brief Checks whether the requested bit width is supported by the NEON unpacking.
+/// \param[in] iq_width Requested bit width.
+///
+/// \return True in case unpacking with the requested bit width is supported.
+inline bool iq_width_unpacking_supported(unsigned iq_width)
 {
   return ((iq_width == 9) || (iq_width == 14) || (iq_width == 16));
 }

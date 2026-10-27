@@ -12,49 +12,6 @@
 using namespace ocudu;
 using namespace ofh;
 
-#define shift_right_x3vector(src, dst, exponent)                                                                       \
-  (dst).val[0] = vshrq_n_s16((src).val[0], (exponent));                                                                \
-  (dst).val[1] = vshrq_n_s16((src).val[1], (exponent));                                                                \
-  (dst).val[2] = vshrq_n_s16((src).val[2], (exponent));
-
-/// Workaround for \c vshrq_n_s16 NEON intrinsic which only accepts an immediate value known at compile time. Note that
-/// we are checking values up to 8 because minimum output bit width used in BFP compression is 8 bits.
-static inline void shift_right_x3vector_s16(int16x8x3_t src, int16x8x3_t& dst, uint8_t exponent)
-{
-  switch (exponent) {
-    case 1:
-      shift_right_x3vector(src, dst, 1);
-      break;
-    case 2:
-      shift_right_x3vector(src, dst, 2);
-      break;
-    case 3:
-      shift_right_x3vector(src, dst, 3);
-      break;
-    case 4:
-      shift_right_x3vector(src, dst, 4);
-      break;
-    case 5:
-      shift_right_x3vector(src, dst, 5);
-      break;
-    case 6:
-      shift_right_x3vector(src, dst, 6);
-      break;
-    case 7:
-      shift_right_x3vector(src, dst, 7);
-      break;
-    case 8:
-      shift_right_x3vector(src, dst, 8);
-      break;
-    default:
-      // Copy source to destination when exponent is 0 or incorrect value is passed.
-      dst.val[0] = src.val[0];
-      dst.val[1] = src.val[1];
-      dst.val[2] = src.val[2];
-      break;
-  }
-}
-
 void iq_compression_bfp_neon::compress(span<uint8_t>                buffer,
                                        span<const cbf16_t>          iq_data,
                                        const ru_compression_params& params)
@@ -73,140 +30,17 @@ void iq_compression_bfp_neon::compress(span<uint8_t>                buffer,
 
   ocudu_assert(buffer.size() >= prb_size * nof_prbs, "Output buffer doesn't have enough space to decompress PRBs");
 
-  // Auxiliary arrays used for float to fixed point conversion of the input data.
-  std::array<int16_t, NOF_SAMPLES_PER_PRB * MAX_NOF_PRBS> input_quantized;
-
-  span<const bf16_t> float_samples_span(reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U);
-  span<int16_t>      input_quantized_span(input_quantized.data(), float_samples_span.size());
-
-  // Performs conversion of input brain float values to signed 16-bit integers.
-  quantize_input(input_quantized_span, float_samples_span, params.data_width);
+  span<const bf16_t> float_samples(reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U);
+  log_quantization_rms(float_samples, params.data_width);
 
   // Offset added to the transmitted exponents.
   uint8_t exponent_offset = scaling_table.get_compression_exponent_offset(params.data_width);
 
-  // Compression algorithm implemented according to Annex A.1.2 in O-RAN.WG4.CUS.
-  unsigned sample_idx = 0;
-  unsigned rb         = 0;
+  // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
+  const float quantizer_gain = (1 << (Q_BIT_WIDTH - 1)) - 1.0F;
+  const float scale          = quantizer_gain * scaling_table.get_compression_iq_scaling(params.data_width);
 
-  // One NEON register can store 8 16-bit samples. A PRB is comprised of 24 16-bit IQ samples, thus we need three NEON
-  // registers to process one PRB.
-  //
-  // The loop below processes four resource blocks at a time.
-  for (size_t rb_index_end = (nof_prbs / 4) * 4; rb != rb_index_end; rb += 4) {
-    // Load samples.
-    int16x8x3_t vec_s16x3_0 = vld1q_s16_x3(&input_quantized[sample_idx]);
-    int16x8x3_t vec_s16x3_1 = vld1q_s16_x3(&input_quantized[sample_idx + NOF_SAMPLES_PER_PRB]);
-    int16x8x3_t vec_s16x3_2 = vld1q_s16_x3(&input_quantized[sample_idx + NOF_SAMPLES_PER_PRB * 2]);
-    int16x8x3_t vec_s16x3_3 = vld1q_s16_x3(&input_quantized[sample_idx + NOF_SAMPLES_PER_PRB * 3]);
-
-    uint8_t exponent_0 = 0;
-    uint8_t exponent_1 = 0;
-    uint8_t exponent_2 = 0;
-    uint8_t exponent_3 = 0;
-    // Determine exponents.
-    if (OCUDU_LIKELY(params.data_width != MAX_IQ_WIDTH)) {
-      exponent_0 = neon::determine_bfp_exponent(vec_s16x3_0, params.data_width);
-      exponent_1 = neon::determine_bfp_exponent(vec_s16x3_1, params.data_width);
-      exponent_2 = neon::determine_bfp_exponent(vec_s16x3_2, params.data_width);
-      exponent_3 = neon::determine_bfp_exponent(vec_s16x3_3, params.data_width);
-    }
-
-    // Shift original IQ samples right.
-    int16x8x3_t shifted_data_0, shifted_data_1, shifted_data_2, shifted_data_3;
-    shift_right_x3vector_s16(vec_s16x3_0, shifted_data_0, exponent_0);
-    shift_right_x3vector_s16(vec_s16x3_1, shifted_data_1, exponent_1);
-    shift_right_x3vector_s16(vec_s16x3_2, shifted_data_2, exponent_2);
-    shift_right_x3vector_s16(vec_s16x3_3, shifted_data_3, exponent_3);
-
-    // Pack compressed samples of the PRBs using utility function and save the exponent.
-    span<uint8_t> output_span(&buffer[rb * prb_size], prb_size);
-    uint8_t       comp_param_0 = exponent_0 + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param_0, sizeof(uint8_t));
-    neon::pack_prb_big_endian(
-        output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data_0, params.data_width);
-
-    output_span          = span<uint8_t>(&buffer[(rb + 1) * prb_size], prb_size);
-    uint8_t comp_param_1 = exponent_1 + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param_1, sizeof(uint8_t));
-    neon::pack_prb_big_endian(
-        output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data_1, params.data_width);
-
-    output_span          = span<uint8_t>(&buffer[(rb + 2) * prb_size], prb_size);
-    uint8_t comp_param_2 = exponent_2 + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param_2, sizeof(uint8_t));
-    neon::pack_prb_big_endian(
-        output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data_2, params.data_width);
-
-    output_span          = span<uint8_t>(&buffer[(rb + 3) * prb_size], prb_size);
-    uint8_t comp_param_3 = exponent_3 + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param_3, sizeof(uint8_t));
-    neon::pack_prb_big_endian(
-        output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data_3, params.data_width);
-
-    sample_idx += (4 * NOF_SAMPLES_PER_PRB);
-  }
-
-  // The loop below processes two resource blocks at a time.
-  for (size_t rb_index_end = (nof_prbs / 2) * 2; rb != rb_index_end; rb += 2) {
-    // Load samples.
-    int16x8x3_t vec_s16x3_0 = vld1q_s16_x3(&input_quantized[sample_idx]);
-    int16x8x3_t vec_s16x3_1 = vld1q_s16_x3(&input_quantized[sample_idx + NOF_SAMPLES_PER_PRB]);
-
-    // Determine exponents.
-    uint8_t exponent_0 = 0;
-    uint8_t exponent_1 = 0;
-    if (OCUDU_LIKELY(params.data_width != MAX_IQ_WIDTH)) {
-      exponent_0 = neon::determine_bfp_exponent(vec_s16x3_0, params.data_width);
-      exponent_1 = neon::determine_bfp_exponent(vec_s16x3_1, params.data_width);
-    }
-
-    // Shift original IQ samples right.
-    int16x8x3_t shifted_data_0, shifted_data_1;
-    shift_right_x3vector_s16(vec_s16x3_0, shifted_data_0, exponent_0);
-    shift_right_x3vector_s16(vec_s16x3_1, shifted_data_1, exponent_1);
-
-    // Save exponent of the first compressed PRB and pack its compressed IQ samples using utility function.
-    span<uint8_t> output_span(&buffer[rb * prb_size], prb_size);
-    uint8_t       comp_param_0 = exponent_0 + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param_0, sizeof(uint8_t));
-    neon::pack_prb_big_endian(
-        output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data_0, params.data_width);
-
-    // Save exponent of the first compressed PRB and pack its compressed IQ samples using utility function.
-    output_span          = span<uint8_t>(&buffer[(rb + 1) * prb_size], prb_size);
-    uint8_t comp_param_1 = exponent_1 + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param_1, sizeof(uint8_t));
-    neon::pack_prb_big_endian(
-        output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data_1, params.data_width);
-
-    sample_idx += (2 * NOF_SAMPLES_PER_PRB);
-  }
-
-  // Process the last resource block.
-  if (rb != nof_prbs) {
-    // Load samples.
-    int16x8x3_t vec_s16x3 = vld1q_s16_x3(&input_quantized[sample_idx]);
-
-    // Determine exponent.
-    uint8_t exponent = 0;
-    if (OCUDU_LIKELY(params.data_width != MAX_IQ_WIDTH)) {
-      exponent = neon::determine_bfp_exponent(vec_s16x3, params.data_width);
-    }
-
-    // Shift original IQ samples right.
-    int16x8x3_t shifted_data;
-    shift_right_x3vector_s16(vec_s16x3, shifted_data, exponent);
-
-    // Save exponent of the compressed PRB and pack its compressed IQ samples using utility function.
-    span<uint8_t> output_span(&buffer[rb * prb_size], prb_size);
-    uint8_t       comp_param = exponent + exponent_offset;
-    std::memcpy(output_span.data(), &comp_param, sizeof(uint8_t));
-    neon::pack_prb_big_endian(output_span.last(output_span.size() - sizeof(uint8_t)), shifted_data, params.data_width);
-
-    sample_idx += NOF_SAMPLES_PER_PRB;
-    ++rb;
-  }
+  neon::compress_prbs<true>(buffer.data(), float_samples.data(), nof_prbs, params.data_width, scale, exponent_offset);
 }
 
 bool iq_compression_bfp_neon::decompress(span<cbf16_t>                iq_data,
@@ -214,7 +48,7 @@ bool iq_compression_bfp_neon::decompress(span<cbf16_t>                iq_data,
                                          const ru_compression_params& params)
 {
   // Use generic implementation if NEON utils don't support requested bit width.
-  if (!neon::iq_width_packing_supported(params.data_width)) {
+  if (!neon::iq_width_unpacking_supported(params.data_width)) {
     return iq_compression_bfp_impl::decompress(iq_data, compressed_data, params);
   }
 
