@@ -14,6 +14,7 @@
 #include "ocudu/fapi_adaptor/phy/p5/phy_fapi_p5_sector_adaptor.h"
 #include "ocudu/fapi_adaptor/phy/p7/phy_fapi_p7_sector_adaptor.h"
 #include "ocudu/mac/mac_clock_controller.h"
+#include "ocudu/support/ocudu_assert.h"
 
 using namespace ocudu;
 
@@ -21,6 +22,8 @@ o_du_unit ocudu::create_o_du_split6(const split6_o_du_unit_config&              
                                     const o_du_unit_dependencies&                   du_dependencies,
                                     std::unique_ptr<fapi_adaptor::phy_fapi_adaptor> fapi_adaptor)
 {
+  ocudu_assert(du_dependencies.workers != nullptr, "Invalid workers");
+
   o_du_unit odu_unit;
   odu_unit.e2_metric_connectors = std::make_unique<
       e2_metric_connector_manager<e2_du_metrics_connector, e2_du_metrics_notifier, e2_du_metrics_interface>>(

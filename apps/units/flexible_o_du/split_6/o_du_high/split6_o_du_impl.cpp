@@ -6,7 +6,9 @@
 #include "split6_o_du_impl.h"
 #include "ocudu/fapi_adaptor/mac/mac_fapi_fastpath_adaptor.h"
 #include "ocudu/fapi_adaptor/mac/mac_fapi_sector_fastpath_adaptor.h"
+#include "ocudu/fapi_adaptor/mac/p5/mac_fapi_p5_sector_fastpath_adaptor.h"
 #include "ocudu/fapi_adaptor/mac/p7/mac_fapi_p7_sector_fastpath_adaptor.h"
+#include "ocudu/fapi_adaptor/phy/p5/phy_fapi_p5_sector_adaptor.h"
 #include "ocudu/fapi_adaptor/phy/p7/phy_fapi_p7_sector_adaptor.h"
 #include "ocudu/support/ocudu_assert.h"
 
@@ -23,7 +25,10 @@ split6_o_du_impl::split6_o_du_impl(unsigned                                     
   slot_adaptors.reserve(nof_cells);
 
   for (unsigned i = 0; i != nof_cells; ++i) {
-    auto& p7_mac_sector_adaptor = odu_hi->get_mac_fapi_fastpath_adaptor().get_sector_adaptor(i).get_p7_sector_adaptor();
+    auto& mac_sector_adaptor    = odu_hi->get_mac_fapi_fastpath_adaptor().get_sector_adaptor(i);
+    auto& p5_mac_sector_adaptor = mac_sector_adaptor.get_p5_sector_fastpath_adaptor();
+    auto& p7_mac_sector_adaptor = mac_sector_adaptor.get_p7_sector_adaptor();
+    auto& p5_phy_sector_adaptor = adaptor->get_sector_adaptor(i).get_p5_sector_adaptor();
     auto& p7_phy_sector_adaptor = adaptor->get_sector_adaptor(i).get_p7_sector_adaptor();
 
     auto& slot_extender_adaptor = slot_adaptors.emplace_back(p7_mac_sector_adaptor.get_p7_slot_indication_notifier());
@@ -31,17 +36,19 @@ split6_o_du_impl::split6_o_du_impl(unsigned                                     
     p7_phy_sector_adaptor.set_error_indication_notifier(p7_mac_sector_adaptor.get_error_indication_notifier());
     p7_phy_sector_adaptor.set_p7_slot_indication_notifier(slot_extender_adaptor);
 
-    // TODO: connect P5
+    p5_phy_sector_adaptor.set_p5_responses_notifier(p5_mac_sector_adaptor.get_p5_responses_notifier());
+    p5_phy_sector_adaptor.set_error_indication_notifier(p5_mac_sector_adaptor.get_error_indication_notifier());
   }
 }
 
 void split6_o_du_impl::start()
 {
-  odu_hi->get_operation_controller().start();
-
+  // Start the PHY adaptor before DU-high can activate cells after F1 setup.
   for (unsigned i = 0; i != nof_cells; ++i) {
     adaptor->get_sector_adaptor(i).start();
   }
+
+  odu_hi->get_operation_controller().start();
 }
 
 void split6_o_du_impl::stop()
