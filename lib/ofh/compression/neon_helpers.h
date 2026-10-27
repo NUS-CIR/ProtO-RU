@@ -7,12 +7,14 @@
 ///
 /// A PRB holds 24 samples, which fill three NEON registers of 8 16bit samples. The compressors quantize the brain
 /// floats on the fly, find the BFP exponents of four PRBs at a time in vector lanes and pack each register with the
-/// tables of \ref packed_register_layout.
+/// tables of \ref packed_register_layout. The decompressors unpack each register to 16bit lanes, scale them in single
+/// precision and round to brain float in registers.
 ///
-/// The conversion of the scaled floats to integers goes through the mantissa of a float near \f$2^{23}\f$ rather than
-/// the conversion instructions, which have a lower throughput than the arithmetic ones on many Arm cores: a float
-/// rounds to the nearest integer (ties to even) by adding \f$1.5 \cdot 2^{23}\f$, and the result is held by the
-/// mantissa bits.
+/// The conversions between integers and floats go through the mantissa of a float near \f$2^{23}\f$ rather than the
+/// conversion instructions, which have a lower throughput than the arithmetic ones on many Arm cores: a float in
+/// \f$[2^{23}, 2^{24})\f$ holds an integer in its mantissa bits, so an integer with 16 bits becomes a float by placing
+/// the float exponent above it, and a float rounds to the nearest integer (ties to even) by adding
+/// \f$1.5 \cdot 2^{23}\f$.
 
 #pragma once
 
@@ -35,6 +37,10 @@ static constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
 /// Number of NEON registers of samples per PRB.
 static constexpr unsigned NOF_REGS_PER_PRB = NOF_SAMPLES_PER_PRB / 8;
 
+/// Float whose mantissa bits hold the 16bit integer added to it, as \f$2^{23} + 2^{15}\f$.
+static constexpr float INT16_MANTISSA_BIAS = 0x1.01p23F;
+/// Upper 16 bits of \ref INT16_MANTISSA_BIAS, placed above a 16bit integer with its sign bit flipped.
+static constexpr uint16_t INT16_MANTISSA_BIAS_HIGH = 0x4b00;
 /// Float that rounds the integers added to it to the nearest one (ties to even), as \f$1.5 \cdot 2^{23}\f$.
 static constexpr float ROUNDING_BIAS = 0x1.8p23F;
 
@@ -108,6 +114,39 @@ quantize_bf16(int16x8_t* out, const bf16_t* in, float32x4_t scale_f32, float32x4
     out[reg] = vreinterpretq_s16_u16(
         vuzp1q_u16(vreinterpretq_u16_f32(values[reg].first), vreinterpretq_u16_f32(values[reg].last)));
   });
+}
+
+/// \brief Converts 8 16bit integers to floats, scaled by the given factor.
+///
+/// \param[in] values_s16 NEON register storing the integers.
+/// \param[in] scale_f32  NEON register storing the scaling factor in every element.
+/// \return The scaled values.
+OCUDU_FORCE_INLINE float32x8 int16_to_float(int16x8_t values_s16, float32x4_t scale_f32)
+{
+  // Flipping the sign bit adds 2^15 to the values, which are then placed in the mantissa of a float above 2^23. The
+  // subtraction of the bias is exact and the scaling rounds like a conversion followed by a multiplication.
+  uint16x8_t  bias_high_u16 = vdupq_n_u16(INT16_MANTISSA_BIAS_HIGH);
+  float32x4_t bias_f32      = vdupq_n_f32(INT16_MANTISSA_BIAS);
+  uint16x8_t  offset_u16    = veorq_u16(vreinterpretq_u16_s16(values_s16), vdupq_n_u16(0x8000));
+  return {vmulq_f32(vsubq_f32(vreinterpretq_f32_u16(vzip1q_u16(offset_u16, bias_high_u16)), bias_f32), scale_f32),
+          vmulq_f32(vsubq_f32(vreinterpretq_f32_u16(vzip2q_u16(offset_u16, bias_high_u16)), bias_f32), scale_f32)};
+}
+
+/// \brief Rounds 8 floats to brain float, nearest with ties to even.
+///
+/// \param[in] values Floats to round.
+/// \return A NEON register storing the 8 brain floats.
+OCUDU_FORCE_INLINE uint16x8_t round_to_bf16(float32x8 values)
+{
+  // Same as to_bf16(): add 0x7fff plus the least significant bit of the result, so that ties round to even. The bit
+  // test gives all ones where the bit is set, so subtracting it adds one. The narrowing addition keeps the upper half.
+  uint32x4_t lsb_u32  = vdupq_n_u32(0x10000);
+  uint32x4_t bias_u32 = vdupq_n_u32(0x7fff);
+  auto       round    = [&](float32x4_t value_f32) {
+    uint32x4_t value_u32 = vreinterpretq_u32_f32(value_f32);
+    return vsubq_u32(value_u32, vtstq_u32(value_u32, lsb_u32));
+  };
+  return vaddhn_high_u32(vaddhn_u32(round(values.first), bias_u32), round(values.last), bias_u32);
 }
 
 /// \brief Calculates the BFP exponents of up to four PRBs.
@@ -279,6 +318,119 @@ inline void compress_prbs(uint8_t*      out,
       return compress_prbs<15, IS_BFP>(out, in, nof_prbs, scale, exponent_offset);
     case 16:
       return compress_prbs<16, IS_BFP>(out, in, nof_prbs, scale, exponent_offset);
+    default:
+      break;
+  }
+}
+
+/// \brief Decompresses a batch of one or two PRBs.
+///
+/// The registers of the PRBs are processed stage by stage, so that their dependency chains interleave.
+///
+/// \tparam BITS     Bit width of the packed samples.
+/// \tparam IS_BFP   Whether the PRBs start with the BFP compression parameter.
+/// \tparam NOF_PRBS Number of PRBs of the batch.
+/// \param[out] out       Output samples of the PRBs.
+/// \param[in] in         Packed bytes of the PRBs.
+/// \param[in] scale_u32  Bits of the float scaling factor of the unpacked lanes, before the BFP exponent.
+template <unsigned BITS, bool IS_BFP, unsigned NOF_PRBS>
+OCUDU_FORCE_INLINE void decompress_prb_batch(cbf16_t* out, const uint8_t* in, uint32x4_t scale_u32)
+{
+  // Size in bytes of one compressed PRB.
+  static constexpr unsigned PRB_SIZE = NOF_REGS_PER_PRB * BITS + (IS_BFP ? 1 : 0);
+  // Offset of the samples inside a PRB.
+  static constexpr unsigned SAMPLES_OFFSET = IS_BFP ? 1 : 0;
+  // The last register of a PRB is loaded from the end of the PRB, so that the load does not exceed it.
+  static constexpr unsigned LAST_LOAD_OFFSET = PRB_SIZE - 16;
+  static constexpr unsigned LAST_REG_OFFSET  = SAMPLES_OFFSET + 2 * BITS - LAST_LOAD_OFFSET;
+  // Number of registers of the batch.
+  static constexpr unsigned NOF_REGS = NOF_PRBS * NOF_REGS_PER_PRB;
+
+  // The exponent of each PRB is added to the exponent field of the float scaling.
+  float32x4_t scale_f32[NOF_PRBS];
+  for_each_index<NOF_PRBS>([&](auto prb) {
+    scale_f32[prb] = vreinterpretq_f32_u32(scale_u32);
+    if constexpr (IS_BFP) {
+      uint32_t exponent = in[prb * PRB_SIZE] & 0x0fU;
+      scale_f32[prb]    = vreinterpretq_f32_u32(vaddq_u32(scale_u32, vdupq_n_u32(exponent << 23)));
+    }
+  });
+
+  int16x8_t samples_s16[NOF_REGS];
+  for_each_index<NOF_REGS>([&](auto reg) {
+    static constexpr unsigned PRB     = decltype(reg)::value / NOF_REGS_PER_PRB;
+    static constexpr unsigned PRB_REG = decltype(reg)::value % NOF_REGS_PER_PRB;
+    static constexpr bool     IS_LAST = (PRB_REG == NOF_REGS_PER_PRB - 1);
+    static constexpr unsigned LOAD_POS =
+        PRB * PRB_SIZE + (IS_LAST ? LAST_LOAD_OFFSET : (SAMPLES_OFFSET + PRB_REG * BITS));
+
+    samples_s16[reg] = unpack_register<BITS, IS_LAST ? LAST_REG_OFFSET : 0>(vld1q_u8(in + LOAD_POS));
+  });
+
+  if constexpr (packed_register_layout<BITS>::UNPACK_HAS_TAIL_BITS) {
+    // Drop the bits of the next sample.
+    for_each_index<NOF_REGS>([&](auto reg) {
+      samples_s16[reg] = vandq_s16(samples_s16[reg], vdupq_n_s16(static_cast<int16_t>(0xffffU << (16 - BITS))));
+    });
+  }
+
+  float32x8 values[NOF_REGS];
+  for_each_index<NOF_REGS>(
+      [&](auto reg) { values[reg] = int16_to_float(samples_s16[reg], scale_f32[reg / NOF_REGS_PER_PRB]); });
+  for_each_index<NOF_REGS>(
+      [&](auto reg) { vst1q_u16(reinterpret_cast<uint16_t*>(out + reg * 4), round_to_bf16(values[reg])); });
+}
+
+/// \brief Decompresses the given PRBs, two at a time.
+///
+/// \tparam BITS   Bit width of the packed samples.
+/// \tparam IS_BFP Whether the PRBs start with the BFP compression parameter.
+/// \param[out] out     Output samples of the PRBs.
+/// \param[in] in       Packed bytes of the PRBs.
+/// \param[in] nof_prbs Number of PRBs.
+/// \param[in] scale    Scaling factor of the samples, before the BFP exponent.
+template <unsigned BITS, bool IS_BFP>
+inline void decompress_prbs(cbf16_t* out, const uint8_t* in, unsigned nof_prbs, float scale)
+{
+  // Size in bytes of one compressed PRB.
+  static constexpr unsigned PRB_SIZE = NOF_REGS_PER_PRB * BITS + (IS_BFP ? 1 : 0);
+  // The unpacked lanes hold the samples multiplied by this power of two.
+  static constexpr float LANE_SCALE = static_cast<float>(1 << (16 - BITS));
+
+  const uint32x4_t scale_u32 = vreinterpretq_u32_f32(vdupq_n_f32(scale / LANE_SCALE));
+
+  unsigned prb = 0;
+  for (unsigned prb_end = (nof_prbs / 2) * 2; prb != prb_end; prb += 2) {
+    decompress_prb_batch<BITS, IS_BFP, 2>(out + prb * NOF_SUBCARRIERS_PER_RB, in + prb * PRB_SIZE, scale_u32);
+  }
+  if (prb != nof_prbs) {
+    decompress_prb_batch<BITS, IS_BFP, 1>(out + prb * NOF_SUBCARRIERS_PER_RB, in + prb * PRB_SIZE, scale_u32);
+  }
+}
+
+/// Decompresses the given PRBs with the given bit width, see \ref decompress_prbs.
+template <bool IS_BFP>
+inline void decompress_prbs(cbf16_t* out, const uint8_t* in, unsigned nof_prbs, unsigned data_width, float scale)
+{
+  switch (data_width) {
+    case 8:
+      return decompress_prbs<8, IS_BFP>(out, in, nof_prbs, scale);
+    case 9:
+      return decompress_prbs<9, IS_BFP>(out, in, nof_prbs, scale);
+    case 10:
+      return decompress_prbs<10, IS_BFP>(out, in, nof_prbs, scale);
+    case 11:
+      return decompress_prbs<11, IS_BFP>(out, in, nof_prbs, scale);
+    case 12:
+      return decompress_prbs<12, IS_BFP>(out, in, nof_prbs, scale);
+    case 13:
+      return decompress_prbs<13, IS_BFP>(out, in, nof_prbs, scale);
+    case 14:
+      return decompress_prbs<14, IS_BFP>(out, in, nof_prbs, scale);
+    case 15:
+      return decompress_prbs<15, IS_BFP>(out, in, nof_prbs, scale);
+    case 16:
+      return decompress_prbs<16, IS_BFP>(out, in, nof_prbs, scale);
     default:
       break;
   }

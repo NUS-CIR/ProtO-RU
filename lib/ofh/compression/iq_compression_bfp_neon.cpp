@@ -7,7 +7,6 @@
 #include "packing_utils_neon.h"
 #include "quantizer.h"
 #include "ocudu/ofh/compression/compression_properties.h"
-#include "ocudu/support/math/math_utils.h"
 
 using namespace ocudu;
 using namespace ofh;
@@ -48,7 +47,7 @@ bool iq_compression_bfp_neon::decompress(span<cbf16_t>                iq_data,
                                          const ru_compression_params& params)
 {
   // Use generic implementation if NEON utils don't support requested bit width.
-  if (!neon::iq_width_unpacking_supported(params.data_width)) {
+  if (!neon::iq_width_packing_supported(params.data_width)) {
     return iq_compression_bfp_impl::decompress(iq_data, compressed_data, params);
   }
 
@@ -62,37 +61,9 @@ bool iq_compression_bfp_neon::decompress(span<cbf16_t>                iq_data,
                "Input does not contain enough bytes to decompress {} PRBs",
                nof_prbs);
 
-  quantizer q_out(Q_BIT_WIDTH);
+  // Scaling of the decompressed samples before the exponent, including the quantizer gain.
+  float scale = quantizer(Q_BIT_WIDTH).to_float(1) * scaling_table.get_decompression_iq_scaling(params.data_width);
 
-  // Scaling of the decompressed samples.
-  float iq_scaling = scaling_table.get_decompression_iq_scaling(params.data_width);
-
-  unsigned out_idx = 0;
-  for (unsigned c_prb_idx = 0; c_prb_idx != nof_prbs; ++c_prb_idx) {
-    // Get view over compressed PRB bytes.
-    span<const uint8_t> comp_prb_buffer(&compressed_data[c_prb_idx * comp_prb_size], comp_prb_size);
-
-    uint8_t exponent = decode_bfp_exponent(comp_prb_buffer[0]);
-    float   scaler   = 1 << exponent;
-
-    // Get view over the bytes following the compression parameter.
-    comp_prb_buffer = comp_prb_buffer.last(comp_prb_buffer.size() - sizeof(exponent));
-
-    // Determine array size so that NEON store operation doesn't write the data out of array bounds.
-    constexpr size_t neon_size_iqs = 8;
-    constexpr size_t arr_size      = divide_ceil(NOF_SAMPLES_PER_PRB, neon_size_iqs) * neon_size_iqs;
-    alignas(64) std::array<int16_t, arr_size> unpacked_iq_data;
-
-    // Unpack resource block.
-    neon::unpack_prb_big_endian(unpacked_iq_data, comp_prb_buffer, params.data_width);
-
-    span<cbf16_t>       output_span = iq_data.subspan(out_idx, NOF_SUBCARRIERS_PER_RB);
-    span<const int16_t> unpacked_span(unpacked_iq_data.data(), NOF_SUBCARRIERS_PER_RB * 2);
-
-    // Convert to complex samples.
-    q_out.to_brain_float(output_span, unpacked_span, scaler * iq_scaling);
-    out_idx += NOF_SUBCARRIERS_PER_RB;
-  }
-
+  neon::decompress_prbs<true>(iq_data.data(), compressed_data.data(), nof_prbs, params.data_width, scale);
   return true;
 }

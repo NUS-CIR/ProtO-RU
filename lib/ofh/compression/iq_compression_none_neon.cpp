@@ -44,7 +44,7 @@ bool iq_compression_none_neon::decompress(span<cbf16_t>                iq_data,
                                           const ru_compression_params& params)
 {
   // Use generic implementation if NEON utils don't support requested bit width.
-  if (!neon::iq_width_unpacking_supported(params.data_width)) {
+  if (!neon::iq_width_packing_supported(params.data_width)) {
     return iq_compression_none_impl::decompress(iq_data, compressed_data, params);
   }
 
@@ -58,24 +58,10 @@ bool iq_compression_none_neon::decompress(span<cbf16_t>                iq_data,
                "Input does not contain enough bytes to decompress {} PRBs",
                nof_prbs);
 
-  quantizer q_out(params.data_width);
+  // Scaling of the decompressed samples, including the quantizer gain.
+  float scale =
+      quantizer(params.data_width).to_float(1) * scaling_table.get_decompression_iq_scaling(params.data_width);
 
-  std::array<int16_t, MAX_NOF_SUBCARRIERS * 2> unpacked_iq_data;
-
-  unsigned idx = 0;
-  for (unsigned rb = 0; rb != nof_prbs; ++rb) {
-    span<const uint8_t> comp_prb_buffer(&compressed_data[rb * comp_prb_size], comp_prb_size);
-
-    // Unpack resource block.
-    span<int16_t> unpacked_prb_span(&unpacked_iq_data[idx], NOF_SUBCARRIERS_PER_RB * 2);
-    neon::unpack_prb_big_endian(unpacked_prb_span, comp_prb_buffer, params.data_width);
-
-    idx += (NOF_SUBCARRIERS_PER_RB * 2);
-  }
-
-  span<int16_t> unpacked_iq_int16_span(unpacked_iq_data.data(), iq_data.size() * 2);
-  // Convert to complex brain float samples.
-  q_out.to_brain_float(iq_data, unpacked_iq_int16_span, scaling_table.get_decompression_iq_scaling(params.data_width));
-
+  neon::decompress_prbs<false>(iq_data.data(), compressed_data.data(), nof_prbs, params.data_width, scale);
   return true;
 }
