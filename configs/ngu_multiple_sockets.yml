@@ -2,18 +2,36 @@
 # SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
+# Each PDU session uses one NG-U socket for its whole lifetime, in both directions: the CU-UP reports the socket's
+# address to the core as the DL tunnel endpoint and sends the UL GTP-U PDUs of the session from it.
+#
+# A socket with an S-NSSAI (sst and, optionally, sd) is dedicated to that slice and serves only its PDU sessions. A
+# socket without an S-NSSAI is a default socket and serves the PDU sessions of every slice that has no dedicated
+# socket. The S-NSSAI must match exactly: a socket with sst 1 and no sd does not serve the PDU sessions of sst 1, sd 2.
+# PDU sessions of one slice take turns on its sockets. The setup of a PDU session fails when its slice has no dedicated
+# socket and no default socket exists.
+#
+# Binding the sockets of each slice to their own network interface or VLAN keeps the N3 traffic of each slice apart,
+# so that it can be routed and protected (e.g. with IPsec) per slice.
+#
+# GTP-U path management (echo responses) and error indications are sent from the first socket.
 
 cu_up:
   ngu:
     socket:
-      - bind_addr: 127.0.3.1 # Address that the NG-U socket will bind to.
+      - # Default socket. Serves every slice without a dedicated socket.
+        bind_addr: 127.0.3.1 # Address that the NG-U socket will bind to.
         udp:
           max_rx_msgs: 256 # Maximum packets read from the socket in a single syscall.
           pool_threshold: 0.9 # Pool occupancy threshold, after which packets are dropped.
           # dscp: 3             # Differentiated Services Code Point.
 
-      - bind_addr: 127.0.3.2 # Address that the NG-U socket will bind to.
+      - # Socket dedicated to the slice with SST 1 and SD 2.
+        sst: 1 # Slice/Service type.
+        sd: 2 # Slice differentiator. Without it, the socket serves the slice of this SST that has no SD.
+        bind_addr: 127.0.3.2 # Address that the NG-U socket will bind to.
+        # bind_interface: eth1.102 # Network device to bind to, e.g. the VLAN of the slice.
         udp:
-          max_rx_msgs: 256 # maximum packets read from the socket in a single syscall.
+          max_rx_msgs: 256 # Maximum packets read from the socket in a single syscall.
           pool_threshold: 0.9 # Pool occupancy threshold, after which packets are dropped.
           # dscp: 4             # Differentiated Services Code Point.

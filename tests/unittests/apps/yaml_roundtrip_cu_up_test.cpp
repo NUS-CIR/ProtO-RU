@@ -67,7 +67,9 @@ TEST_P(cu_up_example_config_test, roundtrip)
   assert_roundtrip(read_file(CONFIGS + "/" + name), &load_and_emit, name);
 }
 
-INSTANTIATE_TEST_SUITE_P(, cu_up_example_config_test, ::testing::Values("cu_up.yml", "cu_up_f1u_multiple_sockets.yml"));
+INSTANTIATE_TEST_SUITE_P(,
+                         cu_up_example_config_test,
+                         ::testing::Values("cu_up.yml", "cu_up_f1u_multiple_sockets.yml", "ngu_multiple_sockets.yml"));
 
 TEST(cu_up_default_config_test, roundtrip)
 {
