@@ -7,6 +7,7 @@
 
 #include "cu_up_test_helpers.h"
 #include "lib/cu_up/ngu_session_manager_impl.h"
+#include "ocudu/support/ocudu_assert.h"
 #include <gtest/gtest.h>
 
 namespace ocudu::ocuup {
@@ -19,15 +20,9 @@ class ngu_session_manager_test : public ::testing::Test
     ocudulog::fetch_basic_logger("TEST").set_level(ocudulog::basic_levels::debug);
     ocudulog::init();
 
-    unsigned nof_gws = 2;
-    for (unsigned i = 0; i < nof_gws; i++) {
-      auto        ngu_gw = std::make_unique<dummy_gtpu_gateway>();
-      std::string addr   = fmt::format("127.0.0.{}", 1 + i);
-      ngu_gw->set_bind_address(addr);
-      ngu_gws.push_back(std::move(ngu_gw));
-    }
+    add_gateways(2);
 
-    // todo init ngu session manager
+    // All gateways are default gateways.
     ngu_session_mngr = std::make_unique<ngu_session_manager_impl>(ngu_gws);
   }
 
@@ -41,6 +36,21 @@ class ngu_session_manager_test : public ::testing::Test
   }
 
 protected:
+  /// Appends gateways bound to 127.0.0.N, where N continues from the last gateway.
+  void add_gateways(unsigned nof_gws)
+  {
+    ocudu_assert(ngu_gws.size() + nof_gws <= 255,
+                 "Cannot have more than 255 gateways bound to 127.0.0.N. nof_gws={} new_gws={}",
+                 ngu_gws.size(),
+                 nof_gws);
+    for (unsigned i = 0; i != nof_gws; ++i) {
+      auto        ngu_gw = std::make_unique<dummy_gtpu_gateway>();
+      std::string addr   = fmt::format("127.0.0.{}", 1 + ngu_gws.size());
+      ngu_gw->set_bind_address(addr);
+      ngu_gws.push_back(std::move(ngu_gw));
+    }
+  }
+
   std::unique_ptr<ngu_session_manager>               ngu_session_mngr;
   std::vector<std::unique_ptr<gtpu_tnl_pdu_session>> ngu_gws;
 };

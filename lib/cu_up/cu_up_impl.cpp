@@ -17,11 +17,15 @@
 using namespace ocudu;
 using namespace ocuup;
 
-/// Asserts that the CU-CP dependencies are valid.
-static void assert_cu_up_dependencies_valid(const cu_up_dependencies& dependencies)
+/// Asserts that the CU-UP dependencies are valid for the given configuration.
+static void assert_cu_up_dependencies_valid(const cu_up_config& config, const cu_up_dependencies& dependencies)
 {
   ocudu_assert(!dependencies.e1_conn_clients.empty(), "Invalid E1 connection client(s)");
   ocudu_assert(!dependencies.ngu_gws.empty(), "Invalid NG-U gateway list");
+  ocudu_assert(config.ngu_cfg.gw_snssais.size() <= dependencies.ngu_gws.size(),
+               "More NG-U gateway S-NSSAIs ({}) than NG-U gateways ({})",
+               config.ngu_cfg.gw_snssais.size(),
+               dependencies.ngu_gws.size());
 
   for (auto* e1 : dependencies.e1_conn_clients) {
     ocudu_assert(e1, "Invalid E1 gateway");
@@ -44,7 +48,7 @@ cu_up::cu_up(const cu_up_config& config_, cu_up_dependencies dependencies) :
   logger(dependencies.logger),
   main_ctrl_loop(128)
 {
-  assert_cu_up_dependencies_valid(dependencies);
+  assert_cu_up_dependencies_valid(cfg, dependencies);
 
   // > Create and connect upper layers.
 
@@ -103,7 +107,7 @@ cu_up::cu_up(const cu_up_config& config_, cu_up_dependencies dependencies) :
     }
     ngu_sessions.push_back(std::move(ngu_session));
   }
-  ngu_session_mngr = std::make_unique<ngu_session_manager_impl>(ngu_sessions);
+  ngu_session_mngr = std::make_unique<ngu_session_manager_impl>(ngu_sessions, cfg.ngu_cfg.gw_snssais);
 
   // Connect GTPU GW adapter to NG-U session in order to send UL PDUs.
   // We use the first UDP GW for UL.

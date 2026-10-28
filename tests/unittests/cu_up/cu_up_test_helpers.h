@@ -322,8 +322,11 @@ public:
     ngu_gws[1].set_bind_address("127.0.0.3");
   }
 
-  // Hands out the gateways in round-robin order, like ngu_session_manager_impl does.
-  gtpu_tnl_pdu_session& get_next_ngu_gateway() override { return ngu_gws[next_gw++ % ngu_gws.size()]; }
+  // Hands out the gateways in round-robin order, like ngu_session_manager_impl does with default gateways.
+  gtpu_tnl_pdu_session* get_next_ngu_gateway(const s_nssai_t& snssai) override
+  {
+    return &ngu_gws[next_gw++ % ngu_gws.size()];
+  }
 
 private:
   std::array<dummy_gtpu_gateway, 2> ngu_gws;

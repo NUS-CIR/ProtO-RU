@@ -16,8 +16,11 @@
 #include "ocudu/gtpu/gtpu_teid_pool.h"
 #include "ocudu/pcap/dlt_pcap.h"
 #include "ocudu/ran/gnb_cu_up_id.h"
+#include "ocudu/ran/s_nssai.h"
 #include "ocudu/support/timers.h"
 #include <map>
+#include <optional>
+#include <vector>
 
 namespace ocudu {
 
@@ -52,6 +55,12 @@ struct ngu_interface_config {
   uint32_t gtpu_batch_size;
   /// Warn whenever a PDU is dropped.
   bool warn_on_drop;
+  /// \brief S-NSSAI each NG-U gateway is dedicated to, in the order of \c cu_up_dependencies::ngu_gws.
+  ///
+  /// A gateway dedicated to an S-NSSAI serves only the PDU sessions of that S-NSSAI. A gateway without an entry, or
+  /// with an empty one, is a default gateway and serves the PDU sessions of every S-NSSAI that has no dedicated
+  /// gateway. Holds at most one entry per NG-U gateway.
+  std::vector<std::optional<s_nssai_t>> gw_snssais;
 };
 
 struct xnu_interface_config {

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cu_up_test_helpers.h"
+#include "lib/cu_up/ngu_session_manager_impl.h"
 #include "lib/cu_up/pdu_session_manager_impl.h"
 #include "ocudu/support/executors/manual_task_worker.h"
 #include <gtest/gtest.h>
@@ -32,10 +33,21 @@ protected:
     ngu_allocator      = std::make_unique<dummy_gtpu_teid_pool>();
     xnu_allocator      = std::make_unique<dummy_gtpu_teid_pool>();
     f1u_allocator      = std::make_unique<dummy_gtpu_teid_pool>();
-    ngu_session_mngr   = std::make_unique<dummy_ngu_session_manager>();
     xnu_session_mngr   = with_xnu_socket ? std::make_unique<dummy_xnu_session_manager>() : nullptr;
     cu_up_mngr_pdcp_if = std::make_unique<dummy_cu_up_manager_pdcp_interface>();
     e1ap               = std::make_unique<dummy_e1ap>(cu_up_e1_index_t{0});
+
+    if (ngu_gw_snssais.empty()) {
+      ngu_session_mngr = std::make_unique<dummy_ngu_session_manager>();
+    } else {
+      // One gateway per S-NSSAI entry, bound to 127.0.1.1, 127.0.1.2, ... in order.
+      for (unsigned i = 0, e = ngu_gw_snssais.size(); i != e; ++i) {
+        auto gw = std::make_unique<dummy_gtpu_gateway>();
+        gw->set_bind_address(fmt::format("127.0.1.{}", i + 1));
+        ngu_gws.push_back(std::move(gw));
+      }
+      ngu_session_mngr = std::make_unique<ngu_session_manager_impl>(ngu_gws, ngu_gw_snssais);
+    }
 
     // create DUT object
     ue_inactivity_timer = timers_factory.create_timer();
@@ -79,6 +91,11 @@ protected:
     ocudulog::flush();
   }
 
+  /// S-NSSAI of each NG-U gateway. When not empty, the fixture uses the real NG-U session manager.
+  std::vector<std::optional<s_nssai_t>> ngu_gw_snssais;
+  /// NG-U gateways of the real NG-U session manager.
+  std::vector<std::unique_ptr<gtpu_tnl_pdu_session>> ngu_gws;
+
   timer_manager                                               timers_manager;
   manual_task_worker                                          worker{64};
   timer_factory                                               timers_factory{timers_manager, worker};
@@ -108,6 +125,21 @@ class pdu_session_manager_test : public pdu_session_manager_test_base, public ::
 {
 protected:
   void SetUp() override { init(); }
+  void TearDown() override { finish(); }
+};
+
+/// Fixture class for PDU session manager tests with NG-U sockets dedicated to slices.
+class pdu_session_manager_slice_socket_test : public pdu_session_manager_test_base, public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    // 127.0.1.1 and 127.0.1.2 serve SST 1 with SD 0x1, 127.0.1.3 serves SST 2 without SD.
+    ngu_gw_snssais = {s_nssai_t{slice_service_type{1}, slice_differentiator::create(1).value()},
+                      s_nssai_t{slice_service_type{1}, slice_differentiator::create(1).value()},
+                      s_nssai_t{slice_service_type{2}}};
+    init();
+  }
   void TearDown() override { finish(); }
 };
 

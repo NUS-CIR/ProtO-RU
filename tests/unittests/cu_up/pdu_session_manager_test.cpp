@@ -587,6 +587,64 @@ TEST_F(pdu_session_manager_test, when_ng_ul_up_tnl_info_absent_in_modify_item_th
   EXPECT_EQ(pdu_session_mng->get_nof_pdu_sessions(), 1);
 }
 
+/// NG-U socket selection by S-NSSAI.
+
+TEST_F(pdu_session_manager_slice_socket_test, when_slice_has_dedicated_sockets_then_sessions_take_turns_on_them)
+{
+  const s_nssai_t                  slice{slice_service_type{1}, slice_differentiator::create(1).value()};
+  const std::array<std::string, 3> expected_addrs = {"127.0.1.1", "127.0.1.2", "127.0.1.1"};
+
+  for (unsigned i = 0; i != expected_addrs.size(); ++i) {
+    e1ap_pdu_session_res_to_setup_item item = generate_pdu_session_res_to_setup_item(
+        uint_to_pdu_session_id(i + 1), uint_to_drb_id(i + 1), uint_to_qos_flow_id(8), uint_to_five_qi(9));
+    item.snssai = slice;
+
+    pdu_session_setup_result result = pdu_session_mng->setup_pdu_session(item, direct_forwarding_path);
+
+    ASSERT_TRUE(result.success);
+    EXPECT_EQ(result.gtp_tunnel.tp_address.to_string(), expected_addrs[i]);
+  }
+  EXPECT_EQ(pdu_session_mng->get_nof_pdu_sessions(), 3);
+}
+
+TEST_F(pdu_session_manager_slice_socket_test, when_slice_without_sd_has_a_dedicated_socket_then_session_uses_it)
+{
+  e1ap_pdu_session_res_to_setup_item item = generate_pdu_session_res_to_setup_item(
+      uint_to_pdu_session_id(1), uint_to_drb_id(1), uint_to_qos_flow_id(8), uint_to_five_qi(9));
+  item.snssai = s_nssai_t{slice_service_type{2}};
+
+  pdu_session_setup_result result = pdu_session_mng->setup_pdu_session(item, direct_forwarding_path);
+
+  ASSERT_TRUE(result.success);
+  EXPECT_EQ(result.gtp_tunnel.tp_address.to_string(), "127.0.1.3");
+}
+
+TEST_F(pdu_session_manager_slice_socket_test, when_no_socket_serves_the_slice_then_session_setup_fails)
+{
+  e1ap_pdu_session_res_to_setup_item item = generate_pdu_session_res_to_setup_item(
+      uint_to_pdu_session_id(1), uint_to_drb_id(1), uint_to_qos_flow_id(8), uint_to_five_qi(9));
+  item.snssai = s_nssai_t{slice_service_type{3}};
+
+  pdu_session_setup_result result = pdu_session_mng->setup_pdu_session(item, direct_forwarding_path);
+
+  EXPECT_FALSE(result.success);
+  EXPECT_EQ(result.cause, e1ap_cause_t{e1ap_cause_radio_network_t::res_not_available_for_the_slice});
+  EXPECT_EQ(pdu_session_mng->get_nof_pdu_sessions(), 0);
+}
+
+TEST_F(pdu_session_manager_slice_socket_test, when_only_the_sst_matches_a_dedicated_socket_then_session_setup_fails)
+{
+  // SST 1 without SD is a different S-NSSAI than SST 1 with SD 0x1.
+  e1ap_pdu_session_res_to_setup_item item = generate_pdu_session_res_to_setup_item(
+      uint_to_pdu_session_id(1), uint_to_drb_id(1), uint_to_qos_flow_id(8), uint_to_five_qi(9));
+  item.snssai = s_nssai_t{slice_service_type{1}};
+
+  pdu_session_setup_result result = pdu_session_mng->setup_pdu_session(item, direct_forwarding_path);
+
+  EXPECT_FALSE(result.success);
+  EXPECT_EQ(pdu_session_mng->get_nof_pdu_sessions(), 0);
+}
+
 int main(int argc, char** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

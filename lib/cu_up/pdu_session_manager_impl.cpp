@@ -78,6 +78,17 @@ pdu_session_setup_result pdu_session_manager_impl::setup_pdu_session(const e1ap_
     return pdu_session_result;
   }
 
+  // Select the NG-U (N3) gateway of the PDU session from its S-NSSAI.
+  gtpu_tnl_pdu_session* ngu_gw = ngu_session_mngr.get_next_ngu_gateway(session.snssai);
+  if (ngu_gw == nullptr) {
+    logger.log_warning("Failed to create PDU session. Cause: no NG-U socket serves the slice. {} sst={} sd={:#x}",
+                       session.pdu_session_id,
+                       session.snssai.sst.value(),
+                       session.snssai.sd.value());
+    pdu_session_result.cause = e1ap_cause_radio_network_t::res_not_available_for_the_slice;
+    return pdu_session_result;
+  }
+
   // Allocate local TEID
   expected<gtpu_teid_t> local_teid = ngu_teid_allocator.request_teid();
   if (not local_teid.has_value()) {
@@ -120,10 +131,8 @@ pdu_session_setup_result pdu_session_manager_impl::setup_pdu_session(const e1ap_
                    ul_tunnel_info.tp_address);
 
   // Advertise either local or external IP address of NG-U (N3) interface
-  // TODO select correct GW based on slice or UE info.
-  std::string           ngu_addr;
-  gtpu_tnl_pdu_session& ngu_gw = ngu_session_mngr.get_next_ngu_gateway();
-  if (not ngu_gw.get_bind_address(ngu_addr)) {
+  std::string ngu_addr;
+  if (not ngu_gw->get_bind_address(ngu_addr)) {
     report_error("Could not get NG-U bind address to report to core.");
   }
   pdu_session_result.gtp_tunnel =
@@ -157,7 +166,7 @@ pdu_session_setup_result pdu_session_manager_impl::setup_pdu_session(const e1ap_
   // Connect adapters
   new_session->sdap_to_gtpu_adapter.connect_gtpu(*new_session->gtpu->get_tx_lower_layer_interface());
   new_session->gtpu_to_sdap_adapter.connect_sdap(new_session->sdap->get_sdap_tx_sdu_handler());
-  new_session->gtpu_to_udp_adapter.connect_network_gateway(ngu_gw);
+  new_session->gtpu_to_udp_adapter.connect_network_gateway(*ngu_gw);
 
   // Register tunnel at demux
   expected<std::unique_ptr<gtpu_demux_dispatch_queue>> expected_dispatch_queue =
