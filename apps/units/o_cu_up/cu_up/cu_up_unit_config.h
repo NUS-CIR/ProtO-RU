@@ -40,10 +40,15 @@ struct cu_up_unit_trace_config {
 };
 
 struct cu_up_unit_ngu_socket_config {
-  std::string   bind_addr      = "127.0.0.1";
-  std::string   bind_interface = "auto";
-  std::string   ext_addr       = "auto";
-  udp_appconfig udp_config     = {};
+  std::string bind_addr      = "127.0.0.1";
+  std::string bind_interface = "auto";
+  std::string ext_addr       = "auto";
+  /// SST of the S-NSSAI the socket is dedicated to. Without it, the socket serves every S-NSSAI that has no dedicated
+  /// socket.
+  std::optional<uint8_t> sst;
+  /// SD of the S-NSSAI the socket is dedicated to. Without it, the socket serves the S-NSSAI that has no SD.
+  std::optional<uint32_t> sd;
+  udp_appconfig           udp_config = {};
 };
 
 /// GPTU parameters.

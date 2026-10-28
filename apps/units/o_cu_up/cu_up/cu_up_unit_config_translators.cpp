@@ -10,6 +10,30 @@
 
 using namespace ocudu;
 
+/// Returns the S-NSSAI each NG-U gateway is dedicated to, in the order the gateways are created.
+static std::vector<std::optional<s_nssai_t>> generate_ngu_gw_snssais(const cu_up_unit_ngu_config& config)
+{
+  // Without a core, the CU-UP runs a single gateway that serves every S-NSSAI.
+  if (config.no_core) {
+    return {};
+  }
+
+  std::vector<std::optional<s_nssai_t>> gw_snssais;
+  gw_snssais.reserve(config.ngu_socket_cfg.size());
+  for (const cu_up_unit_ngu_socket_config& sock : config.ngu_socket_cfg) {
+    if (not sock.sst.has_value()) {
+      gw_snssais.emplace_back(std::nullopt);
+      continue;
+    }
+    s_nssai_t snssai{slice_service_type{*sock.sst}};
+    if (sock.sd.has_value()) {
+      snssai.sd = slice_differentiator::create(*sock.sd).value();
+    }
+    gw_snssais.emplace_back(snssai);
+  }
+  return gw_snssais;
+}
+
 ocuup::cu_up_config ocudu::generate_cu_up_config(const cu_up_unit_config& config)
 {
   // JSON metrics are not supported at E1AP for now, so only enable if log metrics are enabled.
@@ -27,7 +51,8 @@ ocuup::cu_up_config ocudu::generate_cu_up_config(const cu_up_unit_config& config
               .gtpu_ignore_ue_ambr           = config.ngu_cfg.gtpu_cfg.ignore_ue_ambr,
               .gtpu_queue_size               = config.ngu_cfg.gtpu_cfg.gtpu_queue_size,
               .gtpu_batch_size               = config.ngu_cfg.gtpu_cfg.gtpu_batch_size,
-              .warn_on_drop                  = config.warn_on_drop},
+              .warn_on_drop                  = config.warn_on_drop,
+              .gw_snssais                    = generate_ngu_gw_snssais(config.ngu_cfg)},
       .xnu_cfg =
           ocuup::xnu_interface_config{
               .gtpu_reordering_timer     = std::chrono::milliseconds{config.xnu_cfg.gtpu_cfg.gtpu_reordering_timer_ms},

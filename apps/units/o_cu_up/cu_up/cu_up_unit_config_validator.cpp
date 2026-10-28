@@ -8,6 +8,7 @@
 #include "cu_up_unit_config.h"
 #include "ocudu/adt/span.h"
 #include "ocudu/ran/plmn_identity.h"
+#include <algorithm>
 
 using namespace ocudu;
 
@@ -39,6 +40,20 @@ static bool validate_cu_up_test_mode_appconfig(const cu_up_unit_test_mode_config
     return false;
   }
   return true;
+}
+
+/// Validates the given NG-U socket configuration. Returns true on success, otherwise false.
+static bool validate_ngu_sockets_appconfig(span<const cu_up_unit_ngu_socket_config> config)
+{
+  return std::all_of(config.begin(), config.end(), [](const cu_up_unit_ngu_socket_config& sock) {
+    if (sock.sd.has_value() and not sock.sst.has_value()) {
+      fmt::println("NG-U socket has an SD, but no SST. Configure the SST of the S-NSSAI too. bind_addr={} sd={:#x}",
+                   sock.bind_addr,
+                   *sock.sd);
+      return false;
+    }
+    return true;
+  });
 }
 
 static bool validate_plmn_list(span<const std::string> plmns)
@@ -79,6 +94,10 @@ bool ocudu::validate_cu_up_unit_config(const cu_up_unit_config& config, bool tra
   }
 
   if (!validate_xnu_sockets_appconfig(config.xnu_cfg.sockets_cfg)) {
+    return false;
+  }
+
+  if (!validate_ngu_sockets_appconfig(config.ngu_cfg.ngu_socket_cfg)) {
     return false;
   }
 

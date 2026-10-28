@@ -28,6 +28,12 @@ static void fill_cu_up_ngu_socket_entry(YAML::Node& node, const cu_up_unit_ngu_s
   node["bind_addr"]      = config.bind_addr;
   node["bind_interface"] = config.bind_interface;
   node["ext_addr"]       = config.ext_addr;
+  if (config.sst.has_value()) {
+    node["sst"] = static_cast<unsigned>(*config.sst);
+  }
+  if (config.sd.has_value()) {
+    node["sd"] = *config.sd;
+  }
   fill_udp_config_in_yaml_schema(node["udp"], config.udp_config);
 }
 
