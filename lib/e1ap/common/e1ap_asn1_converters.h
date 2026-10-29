@@ -972,7 +972,8 @@ inline e1ap_cause_t asn1_to_cause(asn1::e1ap::cause_c e1ap_cause)
       cause = static_cast<cause_misc_t>(e1ap_cause.misc().value);
       break;
     default:
-      report_fatal_error("Cannot convert E1AP ASN.1 cause {} to common type", fmt::underlying(e1ap_cause.type().value));
+      // The ASN.1 defines no Cause extension. Use the unspecified cause for an unknown extension.
+      cause = cause_misc_t::unspecified;
   }
 
   return cause;

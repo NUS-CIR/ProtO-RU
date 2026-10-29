@@ -354,6 +354,16 @@ TEST_F(asn1_cause_conversion_test, when_e1ap_cause_received_then_conversion_to_c
   ASSERT_EQ(std::get<cause_misc_t>(cause), cause_misc_t::unspecified);
 }
 
+TEST_F(asn1_cause_conversion_test, when_e1ap_cause_with_choice_extension_received_then_cause_is_unspecified)
+{
+  asn1::e1ap::cause_c asn1_cause;
+  asn1_cause.set_choice_ext();
+
+  e1ap_cause_t e1ap_cause = asn1_to_cause(asn1_cause);
+  ASSERT_TRUE(std::holds_alternative<cause_misc_t>(e1ap_cause));
+  ASSERT_EQ(std::get<cause_misc_t>(e1ap_cause), cause_misc_t::unspecified);
+}
+
 // test conversion to e1ap asn1
 TEST_F(asn1_cause_conversion_test, when_common_cause_received_then_conversion_to_e1ap_cause_successful)
 {
