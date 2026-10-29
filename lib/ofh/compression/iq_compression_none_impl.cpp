@@ -90,7 +90,7 @@ bool iq_compression_none_impl::decompress(span<cbf16_t>                output,
   return true;
 }
 
-void iq_compression_none_impl::log_quantization_rms(span<const bf16_t> in, unsigned data_width)
+void iq_compression_none_impl::log_quantized_input_rms(span<const bf16_t> in, unsigned data_width)
 {
   if (OCUDU_LIKELY(!logger.debug.enabled())) {
     return;

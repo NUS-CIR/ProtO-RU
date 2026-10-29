@@ -22,3 +22,6 @@
 
 /// Ensures a function is always inlinable.
 #define OCUDU_FORCE_INLINE __attribute__((always_inline)) inline
+
+/// Inlines every call inside a function, including the calls of the inlined callees, regardless of the size limits.
+#define OCUDU_FLATTEN __attribute__((flatten))

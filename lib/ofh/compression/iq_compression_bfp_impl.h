@@ -102,21 +102,21 @@ protected:
   /// \param[in] data_width BFP compression bit width, used to select the IQ scaling.
   void quantize_input(span<int16_t> out, span<const bf16_t> in, unsigned data_width) const;
 
-  /// \brief Logs the RMS of the quantized samples if debug logging is enabled.
+  /// \brief Prints to the log the root mean square (RMS) value of the given samples once quantized.
   ///
-  /// It is meant for implementations that quantize the samples on the fly, as it quantizes them again to compute the
-  /// statistics.
+  /// The samples are only quantized if the debug level of the logger is enabled, so that the implementations that
+  /// quantize the samples on the fly do not need to store the quantized values.
   ///
-  /// \param[in] in         Span of input float samples.
+  /// \param[in] in         Brain float samples to quantize.
   /// \param[in] data_width BFP compression bit width, used to select the IQ scaling.
-  void log_quantization_rms(span<const bf16_t> in, unsigned data_width) const;
+  void log_quantized_input_rms(span<const bf16_t> in, unsigned data_width) const;
 
   /// IQ data scaling for every IQ bit width.
   const iq_scaling_table scaling_table;
 
 private:
-  /// Logs the RMS of the given quantized samples if debug logging is enabled.
-  void log_quantized_rms(span<const int16_t> quantized) const;
+  /// Prints to the log the root mean square (RMS) value of the given quantized samples.
+  void log_post_quantization_rms(span<const int16_t> samples) const;
 
   ocudulog::basic_logger& logger;
 };

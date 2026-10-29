@@ -30,7 +30,7 @@ void iq_compression_bfp_neon::compress(span<uint8_t>                buffer,
   ocudu_assert(buffer.size() >= prb_size * nof_prbs, "Output buffer doesn't have enough space to decompress PRBs");
 
   span<const bf16_t> float_samples(reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U);
-  log_quantization_rms(float_samples, params.data_width);
+  log_quantized_input_rms(float_samples, params.data_width);
 
   // Offset added to the transmitted exponents.
   uint8_t exponent_offset = scaling_table.get_compression_exponent_offset(params.data_width);

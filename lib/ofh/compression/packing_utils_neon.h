@@ -24,7 +24,7 @@ namespace neon {
 using shuffle_table = std::array<uint8_t, 16>;
 
 /// Byte index that reads as zero in a table lookup.
-static constexpr uint8_t SHUFFLE_ZERO = 0xff;
+constexpr uint8_t SHUFFLE_ZERO = 0xff;
 
 /// \brief Positions of the 8 samples of one NEON register inside of their packed bytes.
 ///
@@ -214,8 +214,8 @@ OCUDU_FORCE_INLINE int16x8_t get_pack_shift_counts()
 
 /// \brief Packs the 8 samples of a register with \c BITS bits each, most significant bit first.
 ///
-/// \tparam BITS         Bit width of the packed samples.
-/// \tparam HAS_EXPONENT Whether the samples are shifted right by a BFP exponent before packing.
+/// \tparam BITS           Bit width of the packed samples.
+/// \tparam HAS_EXPONENT   Whether the samples are shifted right by a BFP exponent before packing.
 /// \param[in] samples_s16 NEON register storing the samples.
 /// \param[in] shift_s16   NEON register storing \ref get_pack_shift_counts minus the exponent in every lane, unused if
 ///                        there is no exponent.
@@ -345,8 +345,8 @@ constexpr std::array<Int, NOF_LANES> make_unpack_shifts()
 /// Each lane holds its sample multiplied by two to the power of \c 16 - \c BITS. If \c BITS is not a multiple of 8,
 /// the bits below the sample belong to the next sample, see \c packed_register_layout::UNPACK_HAS_TAIL_BITS.
 ///
-/// \tparam BITS   Bit width of the packed samples.
-/// \tparam OFFSET Offset of the first packed byte of the register inside of the given bytes.
+/// \tparam BITS        Bit width of the packed samples.
+/// \tparam OFFSET      Offset of the first packed byte of the register inside of the given bytes.
 /// \param[in] bytes_u8 NEON register storing 16 bytes that include the \c BITS packed bytes of the register.
 /// \return A NEON register storing the samples.
 template <unsigned BITS, unsigned OFFSET>

@@ -30,7 +30,7 @@ void iq_compression_none_neon::compress(span<uint8_t>                buffer,
   ocudu_assert(buffer.size() >= prb_size * nof_prbs, "Output buffer doesn't have enough space to decompress PRBs");
 
   span<const bf16_t> float_samples(reinterpret_cast<const bf16_t*>(iq_data.data()), iq_data.size() * 2U);
-  log_quantization_rms(float_samples, params.data_width);
+  log_quantized_input_rms(float_samples, params.data_width);
 
   // Scaling applied to the input floats before the conversion to fixed point, including the quantizer gain.
   const float full_scale = static_cast<float>((1 << (params.data_width - 1)) - 1);

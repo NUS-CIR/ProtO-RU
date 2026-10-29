@@ -2,8 +2,12 @@
 // SPDX-FileCopyrightText: Copyright (C) 2026 OCUDU contributors
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
+/// \file
+/// \brief AVX2 packing and unpacking of IQ samples in big-endian format.
+
 #pragma once
 
+#include "ocudu/ran/resource_block.h"
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -15,24 +19,34 @@ namespace mm256 {
 
 /// \brief Packs the 16bit IQ samples of one AVX2 register using 9bit big-endian format.
 ///
-/// Each 128bit lane of the input holds the four I samples followed by the four Q samples of four REs (the layout of
-/// \ref quantize_bf16_even_odd). The output is the bit stream I0 Q0 I1 Q1 I2 Q2 I3 Q3, 9 bits per sample and most
-/// significant bit first, stored in the first 9 bytes of the respective lane of the output register. The remaining 7
-/// bytes of each lane are zero.
+/// Each 128bit lane of the input holds the four I samples followed by the four Q samples of four REs, the layout
+/// given by \ref quantize_bf16_even_odd. The lane is packed into the bit stream I0 Q0 I1 Q1 I2 Q2 I3 Q3, 9 bits per
+/// sample and most significant bit first, stored in the first 9 bytes of the respective lane of the output register.
+/// The remaining 7 bytes of each lane are zero.
 ///
 /// \param[in] samples_epi16 AVX2 register storing 16bit IQ samples, only the lower 9 bits of each are packed.
 /// \return An AVX2 register containing 9 packed bytes in each 128bit lane.
 inline __m256i pack_avx2_register_9b_be(__m256i samples_epi16)
 {
-  // Keep the 9 data bits of each sample and shift the j-th sample of the stream left by 7 - j, so that its two bytes
-  // become the bits it contributes to the output bytes j and j + 1. AVX2 has no 16bit variable shift, but a
-  // multiplication by a power of two is equivalent as the shifted values fit in 16 bits.
-  //                        I0   I1  I2  I3  Q0  Q1  Q2  Q3
+  // The j-th sample of the stream starts at the bit j of the output byte j (counted from the most significant one),
+  // so it is shifted left by 7 - j to place its bits where they land in the two bytes it spans:
+  //   stream  element  shift  16bit lane after the shift (bits 15 to 0)
+  //   I0      0        7      i8 i7 i6 i5 i4 i3 i2 i1 | i0  0  0  0  0  0  0  0
+  //   Q0      4        6       0 q8 q7 q6 q5 q4 q3 q2 | q1 q0  0  0  0  0  0  0
+  //   I1      1        5       0  0 i8 i7 i6 i5 i4 i3 | i2 i1 i0  0  0  0  0  0
+  //   Q1      5        4       0  0  0 q8 q7 q6 q5 q4 | q3 q2 q1 q0  0  0  0  0
+  //   I2      2        3       0  0  0  0 i8 i7 i6 i5 | i4 i3 i2 i1 i0  0  0  0
+  //   Q2      6        2       0  0  0  0  0 q8 q7 q6 | q5 q4 q3 q2 q1 q0  0  0
+  //   I3      3        1       0  0  0  0  0  0 i8 i7 | i6 i5 i4 i3 i2 i1 i0  0
+  //   Q3      7        0       0  0  0  0  0  0  0 q8 | q7 q6 q5 q4 q3 q2 q1 q0
+  // AVX2 has no 16bit variable shift, but a multiplication by a power of two is equivalent once the padding bits of
+  // the samples are masked out.
   const __m256i shift_epi16 = _mm256_setr_epi16(128, 32, 8, 2, 64, 16, 4, 1, 128, 32, 8, 2, 64, 16, 4, 1);
   __m256i shifted_epi16 = _mm256_mullo_epi16(_mm256_and_si256(samples_epi16, _mm256_set1_epi16(0x01ff)), shift_epi16);
 
-  // Output byte j is the high byte of the j-th sample of the stream OR the low byte of the previous one, byte 8 is the
-  // low byte of the last sample.
+  // The output byte j is the high byte of the j-th sample of the stream OR the low byte of the previous one, and the
+  // byte 8 is the low byte of the last sample. The bits of the two bytes do not overlap, so two byte shuffles gather
+  // them and an OR merges them.
   const __m256i high_bytes_epi8 =
       _mm256_setr_epi64x(0x0f070d050b030901, 0xffffffffffffffff, 0x0f070d050b030901, 0xffffffffffffffff);
   const __m256i low_bytes_epi8 =
@@ -51,11 +65,11 @@ inline void store_9_bytes(uint8_t* dest, __m128i reg)
 
 /// \brief Packs the 16bit IQ samples of two RBs using 9bit big-endian format.
 ///
-/// The three input registers hold the samples of the first RB, the samples of the first and second RBs (one per 128bit
-/// lane) and the samples of the second RB, with the layout of \ref quantize_bf16_even_odd in each lane.
+/// The three input registers hold the samples of the two RBs with the register layout described in avx2_helpers.h,
+/// each 128bit lane with the layout of \ref quantize_bf16_even_odd.
 ///
-/// \param[out] prb0 Output bytes of the first PRB, 27 bytes.
-/// \param[out] prb1 Output bytes of the second PRB, 27 bytes.
+/// \param[out] prb0      Output bytes of the first PRB, 27 bytes.
+/// \param[out] prb1      Output bytes of the second PRB, 27 bytes.
 /// \param[in] rb0_epi16  AVX2 register storing the first 16 samples of the first RB.
 /// \param[in] rb01_epi16 AVX2 register storing the last 8 samples of the first RB and the first 8 of the second RB.
 /// \param[in] rb1_epi16  AVX2 register storing the last 16 samples of the second RB.
@@ -69,8 +83,9 @@ avx2_pack_prbs_9b_big_endian(uint8_t* prb0, uint8_t* prb1, __m256i rb0_epi16, __
   __m256i rb01_packed_epi8 = pack_avx2_register_9b_be(rb01_epi16);
   __m256i rb1_packed_epi8  = pack_avx2_register_9b_be(rb1_epi16);
 
-  // The first two lanes of each PRB are stored with full 16 byte writes, as the following write overwrites their 7
-  // padding bytes and stays inside of the PRB. The last lane only writes its 9 bytes.
+  // The 9 bytes of each lane are stored one after the other. The first two lanes of a PRB are stored with full 16
+  // byte writes, as the following write overwrites their 7 padding bytes and stays inside of the PRB. The last lane
+  // only writes its 9 bytes.
   _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0), _mm256_castsi256_si128(rb0_packed_epi8));
   _mm_storeu_si128(reinterpret_cast<__m128i*>(prb0 + BYTES_PER_LANE), _mm256_extracti128_si256(rb0_packed_epi8, 1));
   store_9_bytes(prb0 + 2 * BYTES_PER_LANE, _mm256_castsi256_si128(rb01_packed_epi8));
@@ -80,13 +95,27 @@ avx2_pack_prbs_9b_big_endian(uint8_t* prb0, uint8_t* prb1, __m256i rb0_epi16, __
   store_9_bytes(prb1 + 2 * BYTES_PER_LANE, _mm256_extracti128_si256(rb1_packed_epi8, 1));
 }
 
-/// \brief Layout of a block of one or two PRBs unpacked into 32bit elements, see \ref unpack_prb_block_pair.
+/// \brief Layout of a block of one or two packed PRBs unpacked into 32bit elements.
 ///
-/// The samples of the block are spread over pairs of AVX2 registers of eight 32bit elements, each one holding a
-/// sample. The two registers of a pair hold the even and odd samples of the same 16bit output register: the first
-/// pair holds the first 16 samples of the first PRB, the next pair the ones of the second PRB (if present) and the
-/// last pair the remaining 8 samples of each PRB, one PRB per 128bit lane. The 16 samples of a pair are gathered as
-/// 16bit words from 16 bytes loaded for each lane.
+/// The decompressor unpacks a block of PRBs into pairs of AVX2 registers of eight 32bit elements, each one holding a
+/// sample. The two registers of a pair hold the even and the odd samples (that is, the I and the Q components) of 16
+/// consecutive samples:
+/// | register pair | lane 0                | lane 1                |
+/// | ------------- | --------------------- | --------------------- |
+/// | 0             | PRB0 samples 0 to 7   | PRB0 samples 8 to 15  |
+/// | 1             | PRB1 samples 0 to 7   | PRB1 samples 8 to 15  |
+/// | last          | PRB0 samples 16 to 23 | PRB1 samples 16 to 23 |
+/// The pair 1 is absent when the block has a single PRB, and the second lane of the last pair repeats the first PRB.
+///
+/// Each lane of a pair gathers its eight samples from 16 bytes loaded from the block: a byte shuffle moves the two
+/// bytes holding the most significant bits of each sample into its 16bit word, in big-endian, and a multiplication
+/// by a power of two aligns the most significant bit of the sample with the one of the word. The sample is then sign
+/// extended from the top of the word, which drops the bits of the following sample. This class computes the position
+/// of every sample in the block and generates the shuffles and multipliers at compile time.
+///
+/// As an example, with 9bit samples preceded by a compression parameter the PRB takes 28 bytes and the sample \c s
+/// of the PRB \c p starts at the bit <tt>(28 p + 1) 8 + 9 s</tt>, so the lane 0 of the pair 0 loads the bytes 1 to
+/// 16 and gathers the bytes {1, 2}, {2, 3}, {3, 4}, ... {8, 9} with the multipliers 1, 2, 4, ... 128.
 ///
 /// \tparam BITS           Bit width of the packed samples.
 /// \tparam HAS_COMP_PARAM Whether each PRB starts with a compression parameter byte.
@@ -100,17 +129,19 @@ struct prb_unpack_layout {
   static constexpr unsigned SAMPLE_BITS = BITS;
   /// Scaling of the unpacked samples: the 16bit ones are left at the top of their 32bit elements.
   static constexpr float SAMPLE_SCALE = (BITS == 16) ? 0x1p-16F : 1.0F;
+  /// Number of samples of a PRB.
+  static constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
   /// Size in bytes of one packed PRB, including the compression parameter if present.
   static constexpr unsigned PRB_SIZE = 3 * BITS + (HAS_COMP_PARAM ? 1 : 0);
   /// Size in bytes of the block.
   static constexpr unsigned BLOCK_SIZE = NOF_PRBS * PRB_SIZE;
   /// Number of register pairs of the block.
   static constexpr unsigned NOF_PAIRS = NOF_PRBS + 1;
-  /// Number of samples held by the first pair of registers of each PRB.
+  /// Number of samples of each PRB held by the first pairs of registers.
   static constexpr unsigned NOF_HEAD_SAMPLES = 16;
   /// Byte offset of the samples inside of a PRB.
   static constexpr unsigned SAMPLES_OFFSET = HAS_COMP_PARAM ? 1 : 0;
-  /// Size in bytes of a 128bit load.
+  /// Size in bytes of a lane load.
   static constexpr unsigned LANE_SIZE = 16;
 
   /// Position of a packed sample in the block.
@@ -139,25 +170,39 @@ struct prb_unpack_layout {
     return locate_sample(std::min(lane, NOF_PRBS - 1), NOF_HEAD_SAMPLES + word);
   }
 
-  /// Returns the offset of the 16 bytes loaded for the given lane of the given register pair, inside of the block.
-  static constexpr unsigned lane_load_offset(unsigned pair, unsigned lane)
+  /// \brief Returns the offset in the block of the 16 bytes loaded for the given lane of the given register pair.
+  ///
+  /// The bytes start at the first sample of the lane, unless that would read beyond the block, in which case they end
+  /// at the last byte of the block.
+  static constexpr unsigned get_lane_load_offset(unsigned pair, unsigned lane)
   {
-    unsigned        offset = std::min(locate_word(pair, lane, 0).first_byte, BLOCK_SIZE - LANE_SIZE);
-    sample_position last   = locate_word(pair, lane, 7);
-    return (last.first_byte + last.nof_bytes <= offset + LANE_SIZE) ? offset : throw "Samples exceed the loaded bytes";
+    return std::min(locate_word(pair, lane, 0).first_byte, BLOCK_SIZE - LANE_SIZE);
   }
 
-  /// Returns the byte shuffle gathering the two bytes holding the most significant bits of each sample into its
-  /// 16bit word, in big-endian.
+  /// Returns true if the loaded bytes of every lane of the given register pair cover all its samples.
+  static constexpr bool are_lane_loads_sufficient(unsigned pair)
+  {
+    for (unsigned lane = 0; lane != 2; ++lane) {
+      sample_position last = locate_word(pair, lane, 7);
+      if (last.first_byte + last.nof_bytes > get_lane_load_offset(pair, lane) + LANE_SIZE) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// \brief Returns the byte shuffle gathering the two bytes holding the most significant bits of each sample of the
+  /// given register pair into its 16bit word, in big-endian.
+  ///
+  /// The samples held by a single byte take a zero as least significant byte.
   static constexpr std::array<uint8_t, 32> make_shuffle(unsigned pair)
   {
     std::array<uint8_t, 32> shuffle = {};
     for (unsigned lane = 0; lane != 2; ++lane) {
-      unsigned load_offset = lane_load_offset(pair, lane);
+      unsigned load_offset = get_lane_load_offset(pair, lane);
       for (unsigned word = 0; word != 8; ++word) {
         sample_position position = locate_word(pair, lane, word);
         for (unsigned byte = 0; byte != 2; ++byte) {
-          // Samples held by a single byte take a zero as the least significant one.
           shuffle[lane * LANE_SIZE + word * 2 + 1 - byte] =
               (byte < position.nof_bytes) ? (position.first_byte + byte - load_offset) : 0x80;
         }
@@ -166,7 +211,8 @@ struct prb_unpack_layout {
     return shuffle;
   }
 
-  /// Returns the power of two aligning the most significant bit of each sample with the one of its 16bit word.
+  /// Returns the powers of two aligning the most significant bit of each sample of the given register pair with the
+  /// one of its 16bit word.
   static constexpr std::array<int16_t, 16> make_multipliers(unsigned pair)
   {
     std::array<int16_t, 16> multipliers = {};
@@ -192,8 +238,8 @@ struct prb_unpack_layout {
 
 /// \brief Unpacks the samples of one register pair of a block of PRBs into 32bit integers.
 ///
-/// \tparam LAYOUT Layout of the block, see \ref prb_unpack_layout.
-/// \tparam PAIR   Index of the register pair.
+/// \tparam LAYOUT         Layout of the block, see \ref prb_unpack_layout.
+/// \tparam PAIR           Index of the register pair.
 /// \param[out] even_epi32 AVX2 register storing the eight even samples, multiplied by the inverse of
 ///                        \c LAYOUT::SAMPLE_SCALE.
 /// \param[out] odd_epi32  AVX2 register storing the eight odd samples, multiplied by the inverse of
@@ -202,8 +248,9 @@ struct prb_unpack_layout {
 template <typename LAYOUT, unsigned PAIR>
 inline void unpack_prb_block_pair(__m256i& even_epi32, __m256i& odd_epi32, const uint8_t* in)
 {
-  static constexpr unsigned LOAD_OFFSET_0 = LAYOUT::lane_load_offset(PAIR, 0);
-  static constexpr unsigned LOAD_OFFSET_1 = LAYOUT::lane_load_offset(PAIR, 1);
+  static_assert(LAYOUT::are_lane_loads_sufficient(PAIR), "The samples exceed the loaded bytes");
+  static constexpr unsigned LOAD_OFFSET_0 = LAYOUT::get_lane_load_offset(PAIR, 0);
+  static constexpr unsigned LOAD_OFFSET_1 = LAYOUT::get_lane_load_offset(PAIR, 1);
   static constexpr auto     SHUFFLE       = LAYOUT::make_shuffle(PAIR);
   static constexpr auto     MULTIPLIERS   = LAYOUT::make_multipliers(PAIR);
 

@@ -21,10 +21,10 @@ void iq_compression_bfp_impl::quantize_input(span<int16_t> out, span<const bf16_
   // Convert input to int16_t representation.
   q.to_fixed_point(out, in, scaling_table.get_compression_iq_scaling(data_width));
 
-  log_quantized_rms(out);
+  log_post_quantization_rms(out);
 }
 
-void iq_compression_bfp_impl::log_quantization_rms(span<const bf16_t> in, unsigned data_width) const
+void iq_compression_bfp_impl::log_quantized_input_rms(span<const bf16_t> in, unsigned data_width) const
 {
   if (OCUDU_LIKELY(!logger.debug.enabled())) {
     return;
@@ -35,18 +35,18 @@ void iq_compression_bfp_impl::log_quantization_rms(span<const bf16_t> in, unsign
   std::array<int16_t, NOF_SAMPLES_PER_PRB * MAX_NOF_PRBS> quantized;
   span<int16_t>                                           quantized_span(quantized.data(), in.size());
   quantizer(Q_BIT_WIDTH).to_fixed_point(quantized_span, in, scaling_table.get_compression_iq_scaling(data_width));
-  log_quantized_rms(quantized_span);
+  log_post_quantization_rms(quantized_span);
 }
 
-void iq_compression_bfp_impl::log_quantized_rms(span<const int16_t> quantized) const
+void iq_compression_bfp_impl::log_post_quantization_rms(span<const int16_t> samples) const
 {
-  if (OCUDU_LIKELY(!logger.debug.enabled() || quantized.empty())) {
+  if (OCUDU_LIKELY(!logger.debug.enabled() || samples.empty())) {
     return;
   }
 
   // Calculate and print RMS of quantized samples.
-  float sum_squares = ocuduvec::dot_prod(quantized, quantized, 0.0F);
-  float rms         = std::sqrt(sum_squares / quantized.size());
+  float sum_squares = ocuduvec::dot_prod(samples, samples, 0.0F);
+  float rms         = std::sqrt(sum_squares / samples.size());
   if (std::isnormal(rms)) {
     logger.debug("Quantized IQ samples RMS value of '{}'", rms);
   }

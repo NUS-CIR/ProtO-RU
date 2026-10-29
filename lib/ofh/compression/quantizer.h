@@ -16,15 +16,22 @@
 namespace ocudu {
 namespace ofh {
 
-/// \brief Returns the largest brain float, as 16bit integer bits, that the SIMD quantizers accept for the given scale.
+/// \brief Returns the largest brain float that the SIMD quantizers accept for the given scale, as the bits of bf16.
 ///
-/// The SIMD conversions to 32bit integers wrap around for the scaled values above the 32bit range, which must saturate
-/// to the 16bit maximum instead. Positive brain floats sort as 16bit integers, so clamping the input bits to the
-/// returned value in the integer domain saturates them: it is below \f$2^{30}\f$ divided by the scale, so the clamped
-/// values do not overflow, and far above the 16bit maximum, so they still saturate.
+/// The SIMD quantizers scale the input and convert it to 32bit integers before saturating it to 16 bits. The
+/// conversion does not saturate by itself: any value outside the 32bit range becomes INT32_MIN. A large positive
+/// input would therefore end up as the most negative sample instead of the most positive one.
+///
+/// Clamping the input to the value returned here before scaling avoids it. The scaled value then stays below
+/// \f$2^{30}\f$, which the conversion handles, and it is still far above the 16bit maximum, so the final saturation
+/// clips it as expected. The clamp does not change the result for any input that fits in 16 bits after scaling.
+///
+/// Positive brain floats order like 16bit integers, so the clamp is applied directly on the raw bits with a single
+/// integer minimum, before the widening to floats. Only the upper bound is needed: large negative values convert to
+/// INT32_MIN, which saturates to the correct 16bit minimum.
 ///
 /// \param[in] scale Scaling factor applied to the brain floats before the conversion, must be positive.
-/// \return The clamp as the bits of a brain float.
+/// \return The limit \f$2^{30} / scale\f$, truncated to a brain float, as a 16bit integer.
 inline int16_t get_bf16_saturation_clamp(float scale)
 {
   float limit = 0x1p30F / scale;

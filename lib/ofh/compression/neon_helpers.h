@@ -19,6 +19,7 @@
 #pragma once
 
 #include "packing_utils_neon.h"
+#include "simd_loop_utils.h"
 #include "ocudu/adt/bf16.h"
 #include "ocudu/adt/complex.h"
 #include "ocudu/ran/resource_block.h"
@@ -26,37 +27,22 @@
 #include <algorithm>
 #include <arm_neon.h>
 #include <cstdint>
-#include <utility>
 
 namespace ocudu {
 namespace ofh {
 namespace neon {
 
 /// Number of 16bit samples per PRB.
-static constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
+constexpr unsigned NOF_SAMPLES_PER_PRB = 2 * NOF_SUBCARRIERS_PER_RB;
 /// Number of NEON registers of samples per PRB.
-static constexpr unsigned NOF_REGS_PER_PRB = NOF_SAMPLES_PER_PRB / 8;
+constexpr unsigned NOF_REGS_PER_PRB = NOF_SAMPLES_PER_PRB / 8;
 
 /// Float whose mantissa bits hold the 16bit integer added to it, as \f$2^{23} + 2^{15}\f$.
-static constexpr float INT16_MANTISSA_BIAS = 0x1.01p23F;
+constexpr float INT16_MANTISSA_BIAS = 0x1.01p23F;
 /// Upper 16 bits of \ref INT16_MANTISSA_BIAS, placed above a 16bit integer with its sign bit flipped.
-static constexpr uint16_t INT16_MANTISSA_BIAS_HIGH = 0x4b00;
+constexpr uint16_t INT16_MANTISSA_BIAS_HIGH = 0x4b00;
 /// Float that rounds the integers added to it to the nearest one (ties to even), as \f$1.5 \cdot 2^{23}\f$.
-static constexpr float ROUNDING_BIAS = 0x1.8p23F;
-
-/// Calls the given function with \c std::integral_constant arguments from 0 to \c N - 1.
-template <unsigned N, typename Func, unsigned... Is>
-OCUDU_FORCE_INLINE void for_each_index(Func&& func, std::integer_sequence<unsigned, Is...> /* unused */)
-{
-  (func(std::integral_constant<unsigned, Is>()), ...);
-}
-
-/// Calls the given function with \c std::integral_constant arguments from 0 to \c N - 1.
-template <unsigned N, typename Func>
-OCUDU_FORCE_INLINE void for_each_index(Func&& func)
-{
-  for_each_index<N>(std::forward<Func>(func), std::make_integer_sequence<unsigned, N>());
-}
+constexpr float ROUNDING_BIAS = 0x1.8p23F;
 
 /// Pair of NEON registers storing 8 floats.
 struct float32x8 {
@@ -70,7 +56,7 @@ struct float32x8 {
 /// way as \c quantizer::to_fixed_point. The registers are processed stage by stage, so that the dependency chains of
 /// the registers interleave.
 ///
-/// \tparam NOF_REGS Number of registers.
+/// \tparam NOF_REGS     Number of registers.
 /// \param[out] out      Registers storing the quantized values in the order of the input.
 /// \param[in] in        Input brain floats, 8 per register.
 /// \param[in] scale_f32 NEON register storing the scaling factor applied before the conversion in every element.
@@ -157,7 +143,7 @@ OCUDU_FORCE_INLINE uint16x8_t round_to_bf16(float32x8 values)
 /// example, -256 fits in 9 bits while 256 does not), see O-RAN.WG4.CUS Annex A.1.2. The PRB needs the maximum of them,
 /// that is the samples share the minimum count of leading sign bits.
 ///
-/// \tparam NOF_PRBS Number of PRBs, from one to four.
+/// \tparam NOF_PRBS      Number of PRBs, from one to four.
 /// \param[in] samples    Registers storing the 16bit samples of the PRBs, three per PRB.
 /// \param[in] data_width BFP compression bit width.
 /// \return A NEON register whose lane \c i stores the exponent of the PRB \c i, for \c i below \c NOF_PRBS.
@@ -187,9 +173,10 @@ OCUDU_FORCE_INLINE int16x8_t calculate_exponents(const int16x8_t* samples, unsig
 
 /// \brief Compresses a batch of up to four PRBs.
 ///
-/// \tparam BITS     Bit width of the packed samples.
-/// \tparam IS_BFP   Whether the PRBs start with the BFP compression parameter and are shifted by their exponent.
-/// \tparam NOF_PRBS Number of PRBs of the batch, from one to four.
+/// \tparam BITS               Bit width of the packed samples.
+/// \tparam IS_BFP             Whether the PRBs start with the BFP compression parameter and are shifted by their
+///                            exponent.
+/// \tparam NOF_PRBS           Number of PRBs of the batch, from one to four.
 /// \param[out] out            Output bytes of the PRBs.
 /// \param[in] in              Input samples of the PRBs.
 /// \param[in] scale_f32       NEON register storing the scaling factor applied before the conversion in every element.
@@ -265,15 +252,17 @@ compress_prb_batch(uint8_t* out, const bf16_t* in, float32x4_t scale_f32, uint8_
 
 /// \brief Compresses the given PRBs, four at a time.
 ///
-/// \tparam BITS   Bit width of the packed samples.
-/// \tparam IS_BFP Whether the PRBs start with the BFP compression parameter and are shifted by their exponent.
+/// \tparam BITS               Bit width of the packed samples.
+/// \tparam IS_BFP             Whether the PRBs start with the BFP compression parameter and are shifted by their
+///                            exponent.
 /// \param[out] out            Output bytes of the PRBs.
 /// \param[in] in              Input samples of the PRBs.
 /// \param[in] nof_prbs        Number of PRBs.
 /// \param[in] scale           Scaling factor applied to the samples before the conversion to integers.
 /// \param[in] exponent_offset Offset added to the BFP exponents.
 template <unsigned BITS, bool IS_BFP>
-inline void compress_prbs(uint8_t* out, const bf16_t* in, unsigned nof_prbs, float scale, uint8_t exponent_offset)
+OCUDU_FLATTEN inline void
+compress_prbs(uint8_t* out, const bf16_t* in, unsigned nof_prbs, float scale, uint8_t exponent_offset)
 {
   static constexpr unsigned PRB_SIZE = NOF_REGS_PER_PRB * BITS + (IS_BFP ? 1 : 0);
 
@@ -327,12 +316,12 @@ inline void compress_prbs(uint8_t*      out,
 ///
 /// The registers of the PRBs are processed stage by stage, so that their dependency chains interleave.
 ///
-/// \tparam BITS     Bit width of the packed samples.
-/// \tparam IS_BFP   Whether the PRBs start with the BFP compression parameter.
-/// \tparam NOF_PRBS Number of PRBs of the batch.
-/// \param[out] out       Output samples of the PRBs.
-/// \param[in] in         Packed bytes of the PRBs.
-/// \param[in] scale_u32  Bits of the float scaling factor of the unpacked lanes, before the BFP exponent.
+/// \tparam BITS         Bit width of the packed samples.
+/// \tparam IS_BFP       Whether the PRBs start with the BFP compression parameter.
+/// \tparam NOF_PRBS     Number of PRBs of the batch.
+/// \param[out] out      Output samples of the PRBs.
+/// \param[in] in        Packed bytes of the PRBs.
+/// \param[in] scale_u32 Bits of the float scaling factor of the unpacked lanes, before the BFP exponent.
 template <unsigned BITS, bool IS_BFP, unsigned NOF_PRBS>
 OCUDU_FORCE_INLINE void decompress_prb_batch(cbf16_t* out, const uint8_t* in, uint32x4_t scale_u32)
 {
@@ -383,14 +372,14 @@ OCUDU_FORCE_INLINE void decompress_prb_batch(cbf16_t* out, const uint8_t* in, ui
 
 /// \brief Decompresses the given PRBs, two at a time.
 ///
-/// \tparam BITS   Bit width of the packed samples.
-/// \tparam IS_BFP Whether the PRBs start with the BFP compression parameter.
+/// \tparam BITS        Bit width of the packed samples.
+/// \tparam IS_BFP      Whether the PRBs start with the BFP compression parameter.
 /// \param[out] out     Output samples of the PRBs.
 /// \param[in] in       Packed bytes of the PRBs.
 /// \param[in] nof_prbs Number of PRBs.
 /// \param[in] scale    Scaling factor of the samples, before the BFP exponent.
 template <unsigned BITS, bool IS_BFP>
-inline void decompress_prbs(cbf16_t* out, const uint8_t* in, unsigned nof_prbs, float scale)
+OCUDU_FLATTEN inline void decompress_prbs(cbf16_t* out, const uint8_t* in, unsigned nof_prbs, float scale)
 {
   // Size in bytes of one compressed PRB.
   static constexpr unsigned PRB_SIZE = NOF_REGS_PER_PRB * BITS + (IS_BFP ? 1 : 0);

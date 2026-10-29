@@ -19,13 +19,15 @@ if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
             iq_compression_bfp_avx2.cpp
             iq_compression_bfp_avx512.cpp
             iq_compression_none_avx512.cpp
-            iq_compression_none_avx2.cpp)
+            iq_compression_none_avx2.cpp
+            avx512_bf16_helpers.cpp)
     set_source_files_properties(iq_compression_bfp_avx2.cpp PROPERTIES COMPILE_OPTIONS "-mavx2;")
     set_source_files_properties(iq_compression_none_avx2.cpp PROPERTIES COMPILE_OPTIONS "-mavx2;")
     # The compression factory checks the same AVX512 instruction sets at run time before selecting these sources.
     set(AVX512_COMPILE_OPTIONS "-mavx512f;-mavx512bw;-mavx512vl;-mavx512cd;-mavx512dq;-mavx512vbmi")
     set_source_files_properties(iq_compression_bfp_avx512.cpp PROPERTIES COMPILE_OPTIONS "${AVX512_COMPILE_OPTIONS}")
     set_source_files_properties(iq_compression_none_avx512.cpp PROPERTIES COMPILE_OPTIONS "${AVX512_COMPILE_OPTIONS}")
+    set_source_files_properties(avx512_bf16_helpers.cpp PROPERTIES COMPILE_OPTIONS "${AVX512_COMPILE_OPTIONS};-mavx512bf16")
 endif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
 
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")

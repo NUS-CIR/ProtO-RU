@@ -46,7 +46,7 @@ protected:
   ///
   /// \param[in] in         Brain float samples to quantize.
   /// \param[in] data_width Bit width of the quantized samples.
-  void log_quantization_rms(span<const bf16_t> in, unsigned data_width);
+  void log_quantized_input_rms(span<const bf16_t> in, unsigned data_width);
 
   ocudulog::basic_logger& logger;
   /// IQ data scaling for every IQ bit width.
