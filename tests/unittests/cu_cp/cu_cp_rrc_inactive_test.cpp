@@ -17,6 +17,7 @@
 #include "tests/unittests/ngap/ngap_test_messages.h"
 #include "tests/unittests/xnap/xnap_test_messages.h"
 #include "ocudu/adt/format.h"
+#include "ocudu/asn1/f1ap/f1ap_pdu_contents.h"
 #include "ocudu/asn1/ngap/ngap_ies.h"
 #include "ocudu/asn1/ngap/ngap_pdu_contents.h"
 #include "ocudu/asn1/rrc_nr/dl_ccch_msg.h"
@@ -553,6 +554,18 @@ public:
     return true;
   }
 
+  /// Get the cells in the Paging Cell List of the last F1AP Paging.
+  std::vector<nr_cell_global_id_t> get_paged_cells() const
+  {
+    std::vector<nr_cell_global_id_t> cells;
+    for (const auto& item : f1ap_pdu.pdu.init_msg().value.paging()->paging_cell_list) {
+      const asn1::f1ap::nr_cgi_s& nr_cgi = item.value().paging_cell_item().nr_cgi;
+      cells.emplace_back(plmn_identity::from_bytes(nr_cgi.plmn_id.to_bytes()).value(),
+                         nr_cell_identity::create(nr_cgi.nr_cell_id.to_number()).value());
+    }
+    return cells;
+  }
+
   [[nodiscard]] bool timeout_ran_paging_and_await_ngap_ue_context_release_request()
   {
     // Fail RAN paging (UE doesn't respond) and wait for NGAP UE Context Release Request.
@@ -627,6 +640,10 @@ public:
 
   unsigned du_idx    = 0;
   unsigned cu_up_idx = 0;
+
+  /// NR CGI of the cell that the DU at du_idx serves.
+  const nr_cell_global_id_t du_cell_cgi{test_helpers::served_cell_item_info{}.plmn_id,
+                                        test_helpers::served_cell_item_info{}.nci};
 
   gnb_du_ue_f1ap_id_t    du_ue_id      = gnb_du_ue_f1ap_id_t::min;
   rnti_t                 crnti         = to_rnti(0x4601);
@@ -1405,6 +1422,37 @@ TEST_F(cu_cp_rrc_inactive_test, when_dl_data_notification_for_inactive_ue_is_rec
   // Inject E1AP DL Data Notification and await F1AP Paging.
   ASSERT_TRUE(
       send_e1ap_dl_data_notification_and_await_f1ap_paging(du_idx, ue_ctx->cu_cp_e1ap_id.value(), cu_up_e1ap_id));
+
+  // The RNA holds the one cell of the DU, so the F1AP Paging pages this cell.
+  EXPECT_EQ(get_paged_cells(), std::vector<nr_cell_global_id_t>{du_cell_cgi});
+}
+
+TEST_F(cu_cp_rrc_inactive_test, when_dl_data_notification_for_inactive_ue_is_received_then_only_rna_cells_are_paged)
+{
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BAS-16-1-a");
+
+  // Connect a second DU. Its cell is in the same tracking area, but not in the RNA of the UE.
+  const test_helpers::served_cell_item_info cell_du2{.nci = nr_cell_identity::create(gnb_id_t{411, 22}, 1U).value(),
+                                                     .pci = 1};
+  std::optional<unsigned>                   ret = connect_new_du();
+  ASSERT_TRUE(ret.has_value());
+  unsigned du_idx2 = ret.value();
+  ASSERT_TRUE(this->run_f1_setup(du_idx2, int_to_gnb_du_id(0x12), {cell_du2}));
+
+  // Connect UE with RRC Inactive support on the first DU.
+  connect_ue_with_rrc_inactive_support();
+
+  // Inject Inactivity Notification and handle it. The RNA holds the cells of the first DU.
+  ASSERT_TRUE(trigger_rrc_inactive(du_ue_id));
+
+  // Inject E1AP DL Data Notification and await F1AP Paging at the first DU.
+  ASSERT_TRUE(
+      send_e1ap_dl_data_notification_and_await_f1ap_paging(du_idx, ue_ctx->cu_cp_e1ap_id.value(), cu_up_e1ap_id));
+  EXPECT_EQ(get_paged_cells(), std::vector<nr_cell_global_id_t>{du_cell_cgi});
+
+  // The second DU serves no cell of the RNA, so it gets no F1AP Paging.
+  ASSERT_FALSE(this->wait_for_f1ap_tx_pdu(du_idx2, f1ap_pdu, std::chrono::milliseconds{100}))
+      << "Received F1AP Paging at the DU outside the RNA";
 }
 
 TEST_F(

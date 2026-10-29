@@ -49,9 +49,15 @@ static bool is_cell_in_tai_list(span<const cu_cp_tai_list_for_paging_item> tai_l
       cell.tac_list.begin(), cell.tac_list.end(), [&tai_list](tac_t tac) { return is_tac_in_list(tai_list, tac); });
 }
 
+/// True for a RAN paging. A RAN paging identifies the UE by its I-RNTI.
+static bool is_ran_paging(const cu_cp_paging_message& msg)
+{
+  return std::holds_alternative<full_i_rnti_t>(msg.ue_paging_id);
+}
+
 /// \brief Replace each recommended cell with the served cells of this DU that are paged under it.
 ///
-/// Drops the ones this DU does not serve, and the ones outside every tracking area being paged.
+/// Drops the ones this DU does not serve. A CN paging also drops the ones outside every tracking area being paged.
 static void resolve_recommended_cells(cu_cp_paging_message& msg, const du_configuration_context& du_cfg)
 {
   auto& recommended_cells = msg.assist_data_for_paging.value()
@@ -66,7 +72,7 @@ static void resolve_recommended_cells(cu_cp_paging_message& msg, const du_config
   std::vector<cu_cp_recommended_cell_item> paged_cells;
   for (const cu_cp_recommended_cell_item& recommended_cell : recommended_cells) {
     for (const du_cell_configuration* cell : du_cfg.find_cells_by_reported_cgi(recommended_cell.ngran_cgi)) {
-      if (!is_cell_in_tai_list(msg.tai_list_for_paging, *cell)) {
+      if (!is_ran_paging(msg) && !is_cell_in_tai_list(msg.tai_list_for_paging, *cell)) {
         continue;
       }
       if (std::any_of(paged_cells.begin(), paged_cells.end(), [cell](const cu_cp_recommended_cell_item& paged) {
@@ -108,30 +114,31 @@ bool paging_message_handler::handle_du_paging_message(cu_cp_du_index_t          
   // Resolve the recommended cells to the cells of this DU that are paged under them, dropping the rest.
   resolve_recommended_cells(msg_filtered, *du_cfg);
 
-  for (const du_cell_configuration& cell : du_cfg->served_cells) {
-    // Skip a cell already recommended: resolve_recommended_cells() left the list holding Uu Cell IDs alone.
-    if (std::any_of(recommended_cells.begin(), recommended_cells.end(), [&cell](const auto& c) {
-          return c.ngran_cgi == cell.cgi;
-        })) {
-      continue;
-    }
+  // A RAN paging pages only the recommended cells, which are the cells of the RNA (TS 38.300 section 9.2.2.3).
+  // TODO: Support RANAC based paging.
+  if (!is_ran_paging(msg_filtered)) {
+    // A CN paging also pages the served cells in the paged tracking areas that are not recommended.
+    for (const du_cell_configuration& cell : du_cfg->served_cells) {
+      // Skip a cell already recommended: resolve_recommended_cells() left the list holding Uu Cell IDs alone.
+      if (std::any_of(recommended_cells.begin(), recommended_cells.end(), [&cell](const auto& c) {
+            return c.ngran_cgi == cell.cgi;
+          })) {
+        continue;
+      }
 
-    // If tai_list_for_paging is empty, this is a RAN paging.
-    // TODO: Support RANAC based paging.
-    if (!msg_filtered.tai_list_for_paging.empty()) {
       if (!is_cell_in_tai_list(msg_filtered.tai_list_for_paging, cell)) {
         continue;
       }
-    }
 
-    // Setup recommended cell item to add in case it doesn't exist
-    cu_cp_recommended_cell_item cell_item;
-    cell_item.ngran_cgi = cell.cgi;
-    recommended_cells.push_back(cell_item);
+      // Setup recommended cell item to add in case it doesn't exist
+      cu_cp_recommended_cell_item cell_item;
+      cell_item.ngran_cgi = cell.cgi;
+      recommended_cells.push_back(cell_item);
+    }
   }
 
   if (recommended_cells.empty()) {
-    logger.info("du={}: No cells with matching TAC available at this DU", du_index);
+    logger.info("du={}: No cells to page at this DU", du_index);
     return false;
   }
 
