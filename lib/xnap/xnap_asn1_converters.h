@@ -70,7 +70,8 @@ inline xnap_cause_t asn1_to_cause(const asn1::xnap::cause_c& asn1_cause)
       cause = static_cast<xnap_cause_misc_t>(asn1_cause.misc().value);
       break;
     default:
-      report_fatal_error("Cannot convert XNAP ASN.1 cause {} to common type", fmt::underlying(asn1_cause.type().value));
+      // The ASN.1 defines no Cause extension. Use the unspecified cause for an unknown extension.
+      cause = xnap_cause_misc_t::unspecified;
   }
 
   return cause;

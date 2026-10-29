@@ -94,3 +94,13 @@ TEST(xnap_asn1_converters_test, guami_with_invalid_plmn_bytes_is_rejected)
 
   EXPECT_FALSE(asn1_to_guami(asn1_guami).has_value());
 }
+
+TEST(xnap_asn1_converters_test, cause_with_choice_extension_is_converted_to_unspecified_cause)
+{
+  asn1::xnap::cause_c asn1_cause;
+  asn1_cause.set_choice_ext();
+
+  xnap_cause_t cause = asn1_to_cause(asn1_cause);
+  ASSERT_TRUE(std::holds_alternative<xnap_cause_misc_t>(cause));
+  EXPECT_EQ(std::get<xnap_cause_misc_t>(cause), xnap_cause_misc_t::unspecified);
+}
