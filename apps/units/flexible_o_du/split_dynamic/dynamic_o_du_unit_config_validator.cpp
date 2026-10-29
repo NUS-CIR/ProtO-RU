@@ -10,6 +10,7 @@
 #include "apps/units/flexible_o_du/split_8/helpers/ru_sdr_config_validator.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/ran/prach/prach_configuration.h"
+#include <algorithm>
 
 using namespace ocudu;
 
@@ -101,6 +102,15 @@ static bool validate_fapi_dummy_config(const du_high_unit_config& du_hi_cfg)
 
   if (du_hi_cfg.test_mode_cfg.test_ue.auto_ack_indication_delay.has_value()) {
     fmt::print("The FAPI dummy is not compatible with the test mode auto ACK indication delay\n");
+    return false;
+  }
+
+  // A single clock drives the slots of all the cells.
+  const subcarrier_spacing scs = du_hi_cfg.cells_cfg.front().cell.common_scs;
+  if (std::any_of(du_hi_cfg.cells_cfg.begin(), du_hi_cfg.cells_cfg.end(), [scs](const auto& cell) {
+        return cell.cell.common_scs != scs;
+      })) {
+    fmt::print("The FAPI dummy requires all the cells to have the same subcarrier spacing\n");
     return false;
   }
 

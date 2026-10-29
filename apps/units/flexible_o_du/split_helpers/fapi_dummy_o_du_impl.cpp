@@ -17,12 +17,12 @@ using namespace ocudu;
 fapi_dummy_o_du_impl::fapi_dummy_o_du_impl(unsigned                                        nof_cells_,
                                            std::unique_ptr<fapi_adaptor::phy_fapi_adaptor> fapi_dummy_,
                                            std::unique_ptr<odu::o_du_high>                 odu_hi_) :
-  nof_cells(nof_cells_), odu_hi(std::move(odu_hi_)), fapi_dummy(std::move(fapi_dummy_))
+  odu_hi(std::move(odu_hi_)), fapi_dummy(std::move(fapi_dummy_))
 {
   ocudu_assert(odu_hi, "Invalid O-DU high");
   ocudu_assert(fapi_dummy, "Invalid FAPI dummy");
 
-  for (unsigned i = 0; i != nof_cells; ++i) {
+  for (unsigned i = 0; i != nof_cells_; ++i) {
     auto& mac_sector = odu_hi->get_mac_fapi_fastpath_adaptor().get_sector_adaptor(i);
     auto& phy_sector = fapi_dummy->get_sector_adaptor(i);
 

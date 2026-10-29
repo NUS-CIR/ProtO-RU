@@ -88,6 +88,7 @@ struct worker_manager {
   cu_cp_pcap_executor_mapper& get_cu_cp_pcap_executors() { return *pcap_exec_mapper; }
   cu_up_pcap_executor_mapper& get_cu_up_pcap_executors() { return *pcap_exec_mapper; }
 
+  /// Returns the executor that runs the FAPI dummy clock loop.
   task_executor& get_fapi_dummy_clock_executor() const
   {
     ocudu_assert(fapi_dummy_clock_exec, "FAPI dummy clock executor is not available.");

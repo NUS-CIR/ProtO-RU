@@ -710,14 +710,17 @@ void worker_manager::create_fapi_dummy_executors(const worker_manager_config::fa
 {
   using namespace execution_config_helper;
 
+  // The clock uses the Radio Unit affinity of the first cell.
+  const os_sched_affinity_bitmask clock_mask =
+      affinity_mng.front().calcute_affinity_mask(sched_affinity_mask_types::ru);
+
   // The clock loop occupies its worker until the FAPI dummy is destroyed.
   create_prio_worker("fapi_dummy",
                      "fapi_dummy_exec",
                      4,
                      concurrent_queue_policy::locking_mpsc,
                      std::nullopt,
-                     // Use the RU affinity of the first cell for the clock.
-                     affinity_mng.front().calcute_affinity_mask(sched_affinity_mask_types::ru),
+                     clock_mask,
                      os_thread_realtime_priority::max());
   fapi_dummy_clock_exec = exec_mng.executors().at("fapi_dummy_exec");
 

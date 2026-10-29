@@ -12,12 +12,11 @@ namespace ocudu {
 /// FAPI dummy application unit configuration.
 struct fapi_dummy_unit_config {
   /// Slot clock mode.
-  fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode clock_mode =
-      fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime;
+  fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode clock_mode = fapi_adaptor::phy_dummy_fapi_adaptor_config{}.clock_mode;
   /// Number of slots between an uplink slot and the notification of its indications.
-  unsigned ul_indication_delay_slots = 4;
+  unsigned ul_indication_delay_slots = fapi_adaptor::phy_dummy_fapi_adaptor_config{}.ul_indication_delay_slots;
   /// Number of slots a SLOT.indication is notified in advance of the transmission time.
-  unsigned max_processing_delay_slots = 6;
+  unsigned max_processing_delay_slots = fapi_adaptor::phy_dummy_fapi_adaptor_config{}.max_processing_delay_slots;
 };
 
 } // namespace ocudu

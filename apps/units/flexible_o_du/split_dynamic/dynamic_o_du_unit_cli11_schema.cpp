@@ -28,7 +28,8 @@ static void configure_cli11_fapi_dummy_args(CLI::App& app, fapi_dummy_unit_confi
       {"realtime", fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime},
       {"free_running", fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::free_running}};
   add_option(app, "--clock", config.clock_mode, "Slot clock mode. Values: realtime or free_running")
-      ->transform(CLI::CheckedTransformer(clock_modes));
+      ->transform(CLI::CheckedTransformer(clock_modes))
+      ->default_str("realtime");
   add_option(app,
              "--ul_indication_delay_slots",
              config.ul_indication_delay_slots,

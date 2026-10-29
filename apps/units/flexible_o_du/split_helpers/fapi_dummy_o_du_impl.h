@@ -31,7 +31,6 @@ public:
   void stop() override;
 
 private:
-  const unsigned                                  nof_cells;
   std::unique_ptr<odu::o_du_high>                 odu_hi;
   std::unique_ptr<fapi_adaptor::phy_fapi_adaptor> fapi_dummy;
 };
