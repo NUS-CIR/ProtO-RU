@@ -679,6 +679,40 @@ TEST(serving_cell_config_converter_test, test_pucch_res_repetition_factor_update
   ASSERT_EQ((*pucch_cfg.res_to_add_mod_list_ext_v1610)[0].pucch_repeat_nrof_slots_r17.to_number(), 2);
 }
 
+TEST(serving_cell_config_converter_test, test_pucch_res_repetition_factor_release_conversion)
+{
+  auto  src_cfg = make_initial_du_ue_resource_config();
+  auto& src_pucch_cfg =
+      src_cfg.cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg.ul_config.value().init_ul_bwp.pucch_cfg.value();
+  ASSERT_FALSE(src_pucch_cfg.pucch_res_list.empty());
+  src_pucch_cfg.pucch_res_list.front().rep_factor = pucch_repetition_factor::n2;
+
+  // Disable the repetition of the only repeated PUCCH resource.
+  odu::du_ue_resource_config dest_cfg{src_cfg};
+  auto&                      dest_pucch_cfg =
+      dest_cfg.cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg.ul_config.value().init_ul_bwp.pucch_cfg.value();
+  pucch_resource& res = dest_pucch_cfg.pucch_res_list.front();
+  res.rep_factor      = pucch_repetition_factor::n1;
+
+  asn1::rrc_nr::cell_group_cfg_s rrc_cell_grp_cfg;
+  odu::calculate_cell_group_config_diff(rrc_cell_grp_cfg, src_cfg, dest_cfg);
+
+  byte_buffer   packed;
+  asn1::bit_ref bref{packed};
+  ASSERT_EQ(rrc_cell_grp_cfg.pack(bref), asn1::OCUDUASN_SUCCESS);
+  asn1::rrc_nr::cell_group_cfg_s unpacked;
+  asn1::cbit_ref                 cbref{packed};
+  ASSERT_EQ(unpacked.unpack(cbref), asn1::OCUDUASN_SUCCESS);
+
+  // resourceToAddModListExt-v1610 is Need N, so it must be present for pucch-RepetitionNrofSlots-r17 to be released.
+  const auto& pucch_cfg = unpacked.sp_cell_cfg.sp_cell_cfg_ded.ul_cfg.init_ul_bwp.pucch_cfg.setup();
+  ASSERT_EQ(pucch_cfg.res_to_add_mod_list.size(), 1);
+  ASSERT_EQ(pucch_cfg.res_to_add_mod_list[0].pucch_res_id, res.res_id.ded().ue_res_id);
+  ASSERT_TRUE(pucch_cfg.res_to_add_mod_list_ext_v1610.is_present());
+  ASSERT_EQ(pucch_cfg.res_to_add_mod_list_ext_v1610->size(), 1);
+  ASSERT_FALSE((*pucch_cfg.res_to_add_mod_list_ext_v1610)[0].pucch_repeat_nrof_slots_r17_present);
+}
+
 TEST(serving_cell_config_converter_test, test_ue_pucch_cfg_release_conversion)
 {
   auto                       src_cfg = make_initial_du_ue_resource_config();

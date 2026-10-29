@@ -1728,11 +1728,19 @@ calculate_pucch_config_diff(asn1::rrc_nr::pucch_cfg_s& out, const pucch_config& 
       [](const pucch_resource& res) { return res.res_id.ded().ue_res_id; });
 
   // PUCCH Resource extension (\c pucch-RepetitionNrofSlots-r17): mirror res_to_add_mod_list in size and order.
-  // Only emit the ext list if at least one resource has a non-default repetition factor.
-  const bool any_repetition = std::any_of(dest.pucch_res_list.begin(), dest.pucch_res_list.end(), [](const auto& r) {
-    return r.rep_factor != pucch_repetition_factor::n1;
-  });
-  if (any_repetition and out.res_to_add_mod_list.size() > 0) {
+  // Emit the ext list if a signalled resource has or had a non-default repetition factor. The list is Need N, so
+  // omitting it would leave a previously configured repetition unreleased in the UE.
+  const auto has_repetition = [](const auto& res_list, unsigned ue_res_id) {
+    return std::any_of(res_list.begin(), res_list.end(), [ue_res_id](const pucch_resource& r) {
+      return r.res_id.ded().ue_res_id == ue_res_id and r.rep_factor != pucch_repetition_factor::n1;
+    });
+  };
+  const bool any_repetition =
+      std::any_of(out.res_to_add_mod_list.begin(), out.res_to_add_mod_list.end(), [&](const auto& asn1_res) {
+        return has_repetition(dest.pucch_res_list, asn1_res.pucch_res_id) or
+               has_repetition(src.pucch_res_list, asn1_res.pucch_res_id);
+      });
+  if (any_repetition) {
     // resourceToAddModListExt-v1610 is in an extension addition group of PUCCH-Config (TS 38.331).
     out.ext = true;
     out.res_to_add_mod_list_ext_v1610.set_present();
