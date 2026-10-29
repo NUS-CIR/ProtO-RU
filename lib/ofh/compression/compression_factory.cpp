@@ -26,6 +26,17 @@
 using namespace ocudu;
 using namespace ofh;
 
+#ifdef __x86_64__
+/// Checks whether the CPU supports the instruction sets that the AVX512 implementations are compiled with, see the
+/// compile options in CMakeLists.txt.
+static bool cpu_supports_avx512_compression()
+{
+  return cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512bw) &&
+         cpu_supports_feature(cpu_feature::avx512vl) && cpu_supports_feature(cpu_feature::avx512cd) &&
+         cpu_supports_feature(cpu_feature::avx512dq) && cpu_supports_feature(cpu_feature::avx512vbmi);
+}
+#endif // __x86_64__
+
 std::unique_ptr<iq_compressor> ocudu::ofh::create_iq_compressor(compression_type        type,
                                                                 ocudulog::basic_logger& logger,
                                                                 float                   iq_scaling,
@@ -36,10 +47,8 @@ std::unique_ptr<iq_compressor> ocudu::ofh::create_iq_compressor(compression_type
     case compression_type::none:
 #ifdef __x86_64__
     {
-      bool supports_avx2 = cpu_supports_feature(cpu_feature::avx2);
-      bool supports_avx512 =
-          cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
-          cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512vbmi);
+      bool supports_avx2   = cpu_supports_feature(cpu_feature::avx2);
+      bool supports_avx512 = cpu_supports_avx512_compression();
       if (((impl_type == "avx512") || (impl_type == "auto")) && supports_avx512) {
         return std::make_unique<iq_compression_none_avx512>(logger, iq_scaling, fs_offset);
       }
@@ -57,11 +66,8 @@ std::unique_ptr<iq_compressor> ocudu::ofh::create_iq_compressor(compression_type
     case compression_type::BFP:
 #ifdef __x86_64__
     {
-      bool supports_avx2 = cpu_supports_feature(cpu_feature::avx2);
-      bool supports_avx512 =
-          cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
-          cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512dq) &&
-          cpu_supports_feature(cpu_feature::avx512cd) && cpu_supports_feature(cpu_feature::avx512vbmi);
+      bool supports_avx2   = cpu_supports_feature(cpu_feature::avx2);
+      bool supports_avx512 = cpu_supports_avx512_compression();
       if (((impl_type == "avx512") || (impl_type == "auto")) && supports_avx512) {
         return std::make_unique<iq_compression_bfp_avx512>(logger, iq_scaling, fs_offset);
       }
@@ -100,10 +106,8 @@ std::unique_ptr<iq_decompressor> ocudu::ofh::create_iq_decompressor(compression_
     case compression_type::none:
 #ifdef __x86_64__
     {
-      bool supports_avx2 = cpu_supports_feature(cpu_feature::avx2);
-      bool supports_avx512 =
-          cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
-          cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512vbmi);
+      bool supports_avx2   = cpu_supports_feature(cpu_feature::avx2);
+      bool supports_avx512 = cpu_supports_avx512_compression();
       if (((impl_type == "avx512") || (impl_type == "auto")) && supports_avx512) {
         return std::make_unique<iq_compression_none_avx512>(logger, 1.0F, fs_offset);
       }
@@ -121,10 +125,8 @@ std::unique_ptr<iq_decompressor> ocudu::ofh::create_iq_decompressor(compression_
     case compression_type::BFP:
 #ifdef __x86_64__
     {
-      bool supports_avx2 = cpu_supports_feature(cpu_feature::avx2);
-      bool supports_avx512 =
-          cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
-          cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512vbmi);
+      bool supports_avx2   = cpu_supports_feature(cpu_feature::avx2);
+      bool supports_avx512 = cpu_supports_avx512_compression();
       if (((impl_type == "avx512") || (impl_type == "auto")) && supports_avx512) {
         return std::make_unique<iq_compression_bfp_avx512>(logger, 1.0F, fs_offset);
       }

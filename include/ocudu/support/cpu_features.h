@@ -173,6 +173,9 @@ constexpr auto cpu_features_included = to_array<cpu_feature>({
 #ifdef __AVX512VBMI__
     cpu_feature::avx512vbmi,
 #endif // __AVX512VBMI__
+#ifdef __AVX512BF16__
+    cpu_feature::avx512bf16,
+#endif // __AVX512BF16__
 #ifdef __FMA__
     cpu_feature::fma,
 #endif // __FMA__

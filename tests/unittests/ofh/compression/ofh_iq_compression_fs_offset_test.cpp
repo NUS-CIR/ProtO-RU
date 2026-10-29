@@ -32,7 +32,8 @@ static std::vector<std::string> testable_impls()
     impls.push_back("avx2");
   }
   if (cpu_supports_feature(cpu_feature::avx512f) && cpu_supports_feature(cpu_feature::avx512vl) &&
-      cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512vbmi)) {
+      cpu_supports_feature(cpu_feature::avx512bw) && cpu_supports_feature(cpu_feature::avx512dq) &&
+      cpu_supports_feature(cpu_feature::avx512cd) && cpu_supports_feature(cpu_feature::avx512vbmi)) {
     impls.push_back("avx512");
   }
 #endif // __x86_64__
