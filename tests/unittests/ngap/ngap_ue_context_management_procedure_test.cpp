@@ -421,6 +421,26 @@ TEST_F(
   ASSERT_TRUE(was_ue_removed());
 }
 
+/// Test UE context release with a Cause that holds a choice extension.
+TEST_F(ngap_ue_context_management_procedure_test,
+       when_ue_context_release_command_with_cause_choice_extension_received_then_ue_is_released)
+{
+  // Test preamble.
+  cu_cp_ue_index_t ue_index = create_ue();
+  auto&            ue       = test_ues.at(ue_index);
+
+  ASSERT_TRUE(was_ue_added());
+
+  // Inject UE Context Release Command with a Cause choice extension.
+  ngap_message ue_context_release_cmd =
+      generate_valid_ue_context_release_command_with_ue_ngap_id_pair(amf_ue_id_t(1), ue.ran_ue_id.value());
+  ue_context_release_cmd.pdu.init_msg().value.ue_context_release_cmd()->cause.set_choice_exts();
+  ngap->handle_message(ue_context_release_cmd);
+
+  ASSERT_TRUE(was_ue_context_release_complete_sent());
+  ASSERT_TRUE(was_ue_removed());
+}
+
 /// Test successful UE context release
 TEST_F(ngap_ue_context_management_procedure_test,
        when_ue_context_release_command_with_amf_ue_ngap_id_received_then_ue_is_released_and_release_complete_is_sent)
