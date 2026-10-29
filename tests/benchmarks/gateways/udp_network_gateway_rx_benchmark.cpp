@@ -25,7 +25,7 @@ struct bench_params {
 
 static void usage(const char* prog, const bench_params& params)
 {
-  fmt::print("Usage: {} [-n <nof PDUs>] [-l <PDU len>] [-u <t us>]\n", prog);
+  fmt::print("Usage: {} [-b <bind addr>] [-n <nof PDUs>] [-m <rx mmsg>] [-u <t us>]\n", prog);
   fmt::print("\t-b Bind address for socket [Default {}]\n", params.bind_addr);
   fmt::print("\t-n Number of PDUs [Default {}]\n", params.nof_pdus);
   fmt::print("\t-u Notify large PDU inter arrival time longer than t microseconds [Default {}]\n",
@@ -74,6 +74,12 @@ int main(int argc, char** argv)
 
   bench_params params{};
   parse_args(argc, argv, params);
+  if (params.nof_pdus == 0) {
+    report_error("Number of PDUs must be greater than zero");
+  }
+  if (params.rx_mmsg == 0) {
+    report_error("RX max mmsg must be greater than zero");
+  }
 
   udp_network_gateway_config gw_cfg;
   gw_cfg.bind_address      = params.bind_addr;
@@ -88,7 +94,9 @@ int main(int argc, char** argv)
   manual_task_worker   io_tx_executor{128};
 
   gw = create_udp_network_gateway({gw_cfg, gw_dn, io_tx_executor, io_rx_executor});
-  gw->create_and_bind();
+  if (!gw->create_and_bind()) {
+    report_error("Failed to bind UDP network gateway. bind_port={}", gw_cfg.bind_port);
+  }
 
   std::unique_ptr<io_broker> epoll_broker;
 
@@ -114,6 +122,7 @@ int main(int argc, char** argv)
   uint64_t rx_duration_us = gw_dn.get_t_rx().count();
   uint64_t rx_bytes       = gw_dn.get_rx_bytes();
   uint64_t rx_bits        = rx_bytes * 8;
+  uint64_t nof_rx_pdus    = gw_dn.get_n_pdus();
 
   fmt::print("Test duration: {} us\n\n", duration.count());
   fmt::print("Rx time: {} us\n\n", rx_duration_us);
@@ -121,11 +130,17 @@ int main(int argc, char** argv)
   fmt::print("Rx Bytes: {} GB\n", rx_bytes * 1e-9);
   fmt::print("Rx bits: {} b\n\n", rx_bits);
 
-  fmt::print("Rx data rate: {:.2f} Mbit/s\n", (long double)(rx_bits / rx_duration_us));
-  fmt::print("Rx PDU rate: {:.2f} PDU/s\n\n", (long double)gw_dn.get_n_pdus() / (rx_duration_us * 1e-6));
+  fmt::print(rx_duration_us > 0 ? "Rx data rate: {:.2f} Mbit/s\n" : "Rx data rate: N/A\n",
+             rx_duration_us > 0 ? (long double)rx_bits / rx_duration_us : 0);
+  fmt::print(rx_duration_us > 0 ? "Rx PDU rate: {:.2f} PDU/s\n\n" : "Rx PDU rate: N/A\n\n",
+             rx_duration_us > 0 ? nof_rx_pdus / (rx_duration_us * 1e-6) : 0);
 
-  fmt::print("PDU inter arrival time (min/avg/max) [us]: {}/{}/{}\n",
-             gw_dn.get_t_min().count(),
-             gw_dn.get_t_sum().count() / gw_dn.get_n_pdus(),
-             gw_dn.get_t_max().count());
+  if (nof_rx_pdus > 1) {
+    fmt::print("PDU inter arrival time (min/avg/max) [us]: {}/{:.2f}/{}\n",
+               gw_dn.get_t_min().count(),
+               (double)gw_dn.get_t_sum().count() / (nof_rx_pdus - 1),
+               gw_dn.get_t_max().count());
+  } else {
+    fmt::print("PDU inter arrival time (min/avg/max) [us]: N/A\n");
+  }
 }

@@ -9,17 +9,18 @@
 #include "ocudu/support/executors/manual_task_worker.h"
 #include <arpa/inet.h>
 #include <getopt.h>
+#include <limits>
 
 using namespace ocudu;
 
 struct bench_params {
-  uint64_t pdu_len  = 1400;
+  unsigned pdu_len  = 1400;
   uint64_t nof_pdus = 100000;
 };
 
 static void usage(const char* prog, const bench_params& params)
 {
-  fmt::print("Usage: {} [-n <nof PDUs>] [-l <PDU len>] [-u <t us>]\n", prog);
+  fmt::print("Usage: {} [-n <nof PDUs>] [-l <PDU len>]\n", prog);
   fmt::print("\t-l PDU len [Default {}]\n", params.pdu_len);
   fmt::print("\t-n Number of PDUs [Default {}]\n", params.nof_pdus);
   fmt::print("\t-h Show this message\n");
@@ -55,6 +56,15 @@ int main(int argc, char** argv)
 
   bench_params params{};
   parse_args(argc, argv, params);
+  if (params.nof_pdus == 0) {
+    report_error("Number of PDUs must be greater than zero");
+  }
+  if (params.pdu_len == 0 || params.pdu_len > 9100) {
+    report_error("PDU length must be in the range [1, 9100]");
+  }
+  if (params.nof_pdus > std::numeric_limits<uint64_t>::max() / (params.pdu_len * 8ULL)) {
+    report_error("Benchmark workload overflows the bit counter");
+  }
 
   udp_network_gateway_config gw1_cfg;
   gw1_cfg.bind_address      = "127.0.0.1";
@@ -71,7 +81,9 @@ int main(int argc, char** argv)
 
   gw1 = create_udp_network_gateway({gw1_cfg, gw1_dn, io_tx_executor, io_rx_executor});
 
-  gw1->create_and_bind();
+  if (!gw1->create_and_bind()) {
+    report_error("Failed to bind UDP network gateway. bind_port={}", gw1_cfg.bind_port);
+  }
 
   sockaddr_storage gw2_addr = to_sockaddr_storage("127.0.0.1", 56702);
 
@@ -79,16 +91,16 @@ int main(int argc, char** argv)
 
   auto t_start = std::chrono::steady_clock::now();
 
-  for (unsigned n = 0; n < params.nof_pdus; n++) {
+  for (uint64_t n = 0; n < params.nof_pdus; n++) {
     gw1->handle_pdu(pdu.copy(), gw2_addr);
   }
   auto t_end    = std::chrono::steady_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_start);
+  auto duration = std::chrono::duration<double, std::micro>(t_end - t_start);
   fmt::print("Tx done\n\n");
 
   std::this_thread::sleep_for(std::chrono::milliseconds(750));
 
-  uint64_t tx_duration_us = duration.count();
+  double   tx_duration_us = duration.count();
   uint64_t tx_bytes       = params.pdu_len * params.nof_pdus;
   uint64_t tx_bits        = tx_bytes * 8;
 
@@ -96,6 +108,8 @@ int main(int argc, char** argv)
   fmt::print("Tx PDUs total: {:>7}\n", params.nof_pdus);
   fmt::print("Tx Bytes: {:.3f} GB\n\n", tx_bytes * 1e-9);
 
-  fmt::print("Tx data rate: {:.2f} Mbit/s\n", (long double)(tx_bits) / tx_duration_us);
-  fmt::print("Tx PDU rate: {:.2f} PDU/s\n", (long double)params.nof_pdus / (duration.count() * 1e-6));
+  fmt::print(tx_duration_us > 0 ? "Tx data rate: {:.2f} Mbit/s\n" : "Tx data rate: N/A\n",
+             tx_duration_us > 0 ? (long double)tx_bits / tx_duration_us : 0);
+  fmt::print(tx_duration_us > 0 ? "Tx PDU rate: {:.2f} PDU/s\n" : "Tx PDU rate: N/A\n",
+             tx_duration_us > 0 ? params.nof_pdus / (tx_duration_us * 1e-6) : 0);
 }
