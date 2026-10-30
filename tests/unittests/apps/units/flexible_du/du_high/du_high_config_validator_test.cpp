@@ -6,6 +6,8 @@
 #include "apps/units/flexible_o_du/o_du_high/du_high/du_high_config_cli11_schema.h"
 #include "apps/units/flexible_o_du/o_du_high/du_high/du_high_config_validator.h"
 #include "tests/ocudu_test_requirements.h"
+#include "ocudu/ran/band_helper.h"
+#include "ocudu/ran/configured_grant/cg_configuration.h"
 #include "ocudu/ran/ntn.h"
 #include "ocudu/ran/pusch/pusch_constants.h"
 #include <gtest/gtest.h>
@@ -262,3 +264,84 @@ TEST_F(du_high_cg_type2_config_test, fallback_dci_formats_are_rejected)
   cell().pdcch_cfg.dedicated.dci_format_0_1_and_1_1 = false;
   ASSERT_FALSE(validate());
 }
+
+// The scheduler checks the CG configuration of each UE when the reconfiguration that adds its CG is applied. A cell
+// configuration that every UE CG would fail is rejected at startup instead.
+class du_high_cg_config_test : public ::testing::TestWithParam<bool>
+{
+protected:
+  du_high_cg_config_test() : app("du_high config validator test")
+  {
+    configure_cli11_with_du_high_config_schema(app, parsed_cfg);
+    app.parse("");
+    autoderive_du_high_parameters_after_parsing(parsed_cfg.config);
+    cell().cg_cfg.periodicity_slots = 40;
+    cell().cg_cfg.type2             = GetParam();
+  }
+
+  du_high_unit_base_cell_config& cell() { return parsed_cfg.config.cells_cfg.front().cell; }
+
+  bool validate() const { return validate_du_high_config(parsed_cfg.config); }
+
+  CLI::App              app;
+  du_high_parsed_config parsed_cfg;
+};
+
+TEST_P(du_high_cg_config_test, default_cg_config_is_valid)
+{
+  ASSERT_TRUE(validate());
+}
+
+TEST_P(du_high_cg_config_test, fewer_cg_harq_processes_than_the_configured_grant_timer_are_rejected)
+{
+  cell().cg_cfg.nof_harq_processes = cg_configuration::configured_grant_timer;
+  ASSERT_TRUE(validate());
+
+  cell().cg_cfg.nof_harq_processes = cg_configuration::configured_grant_timer - 1;
+  ASSERT_FALSE(validate());
+}
+
+TEST_P(du_high_cg_config_test, pusch_transform_precoding_is_rejected)
+{
+  cell().pusch_cfg.enable_transform_precoding = true;
+  ASSERT_FALSE(validate());
+}
+
+TEST_P(du_high_cg_config_test, cg_period_without_dynamic_ul_slots_in_the_tdd_period_is_rejected)
+{
+  // Move the cell to a TDD band and derive again the band-dependent parameters, e.g., the TDD pattern.
+  cell().dl_f_ref_arfcn = 520002;
+  cell().band.reset();
+  cell().prach_cfg.prach_config_index.reset();
+  autoderive_du_high_parameters_after_parsing(parsed_cfg.config);
+  ASSERT_TRUE(cell().band.has_value());
+  ASSERT_EQ(band_helper::get_duplex_mode(cell().band.value()), duplex_mode::TDD);
+  ASSERT_TRUE(cell().tdd_ul_dl_cfg.has_value());
+  tdd_ul_dl_pattern_unit_config& pattern = cell().tdd_ul_dl_cfg->pattern1;
+  ASSERT_FALSE(cell().tdd_ul_dl_cfg->pattern2.has_value());
+
+  // CG period longer than the TDD period.
+  cell().cg_cfg.periodicity_slots = 2 * pattern.dl_ul_period_slots;
+  ASSERT_TRUE(validate());
+
+  // CG period equal to the TDD period, with more than one full UL slot left for the dynamic PUSCHs.
+  pattern.nof_ul_slots            = 2;
+  cell().cg_cfg.periodicity_slots = pattern.dl_ul_period_slots;
+  ASSERT_TRUE(validate());
+
+  // CG period equal to the TDD period, with a single full UL slot.
+  pattern.nof_ul_slots = 1;
+  ASSERT_FALSE(validate());
+
+  // CG period shorter than the TDD period.
+  pattern.nof_ul_slots            = 2;
+  cell().cg_cfg.periodicity_slots = pattern.dl_ul_period_slots / 2;
+  ASSERT_FALSE(validate());
+}
+
+INSTANTIATE_TEST_SUITE_P(cg_type,
+                         du_high_cg_config_test,
+                         ::testing::Bool(),
+                         [](const ::testing::TestParamInfo<bool>& param_info) {
+                           return param_info.param ? "type2" : "type1";
+                         });

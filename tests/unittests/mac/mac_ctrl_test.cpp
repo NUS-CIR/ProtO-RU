@@ -254,3 +254,34 @@ TEST_F(mac_controller_test, ue_procedures)
   ASSERT_TRUE(mac_ctrl.find_ue(ue_create_msg.ue_index) == nullptr);
   ASSERT_TRUE(mac_ctrl.find_by_rnti(ue_create_msg.crnti) == nullptr);
 }
+
+TEST_F(mac_controller_test, when_cg_is_kept_in_reconfiguration_then_cs_rnti_is_kept)
+{
+  // Step 1: Create a UE directly via mac_ctrl_configurator::add_ue (bypasses async procedure).
+  auto&  ctrl_cfg = static_cast<mac_ctrl_configurator&>(mac_ctrl);
+  rnti_t ue_crnti = ctrl_cfg.add_ue(to_du_ue_index(0), to_du_cell_index(0), rnti_t::INVALID_RNTI);
+  ASSERT_NE(ue_crnti, rnti_t::INVALID_RNTI);
+
+  // Step 2: Reconfigure UE with configured grant (cs_rnti_requested = true) → allocates CS-RNTI.
+  mac_ue_reconfiguration_request reconfig_cg{};
+  reconfig_cg.ue_index          = to_du_ue_index(0);
+  reconfig_cg.pcell_index       = to_du_cell_index(0);
+  reconfig_cg.crnti             = ue_crnti;
+  reconfig_cg.cs_rnti_requested = true;
+
+  async_task<mac_ue_reconfiguration_response>         t_cg = mac_ctrl.handle_ue_reconfiguration_request(reconfig_cg);
+  lazy_task_launcher<mac_ue_reconfiguration_response> launcher_cg(t_cg);
+  ASSERT_TRUE(t_cg.ready());
+  ASSERT_TRUE(t_cg.get().result);
+  ASSERT_TRUE(t_cg.get().cs_rnti_allocated.has_value());
+  rnti_t saved_cs_rnti = t_cg.get().cs_rnti_allocated.value();
+
+  // Step 3: Reconfigure UE again, keeping the configured grant (e.g., a new DRB) → the same CS-RNTI is kept and
+  // reported back, so that the DU does not release it.
+  async_task<mac_ue_reconfiguration_response>         t_kept = mac_ctrl.handle_ue_reconfiguration_request(reconfig_cg);
+  lazy_task_launcher<mac_ue_reconfiguration_response> launcher_kept(t_kept);
+  ASSERT_TRUE(t_kept.ready());
+  ASSERT_TRUE(t_kept.get().result);
+  ASSERT_EQ(t_kept.get().cs_rnti_allocated, saved_cs_rnti);
+  ASSERT_EQ(mac_ctrl.find_ue(to_du_ue_index(0))->cs_rnti, saved_cs_rnti);
+}

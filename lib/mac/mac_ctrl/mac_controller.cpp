@@ -136,6 +136,9 @@ mac_controller::handle_ue_reconfiguration_request(const mac_ue_reconfiguration_r
                      new_cs_rnti);
       }
     }
+  } else if (has_cg_in_request and had_cs_rnti) {
+    // CG kept: report the CS-RNTI the UE already holds, so that the DU keeps it in the UE configuration.
+    cs_rnti = ue_ctx->cs_rnti;
   } else if (not has_cg_in_request and had_cs_rnti) {
     // CG deactivation: free the CS-RNTI.
     logger.debug("{}: Deallocating CS-RNTI={} (configured grant deactivated)",

@@ -111,11 +111,11 @@ async_task<bool> ocudu_scheduler_adapter::handle_ue_reconfiguration_request(cons
     // Reconfigure UE in the scheduler.
     sched_impl->handle_ue_reconfiguration_request(make_scheduler_ue_reconfiguration_request(msg));
 
-    // Await Scheduler notification.
-    CORO_AWAIT(sched_cfg_notif_map[msg.ue_index].ue_config_ready);
+    // Await Scheduler notification, which reports whether the scheduler accepted the new configuration.
+    CORO_AWAIT_VALUE(bool res, sched_cfg_notif_map[msg.ue_index].ue_config_ready);
     sched_cfg_notif_map[msg.ue_index].ue_config_ready.reset();
 
-    CORO_RETURN(true);
+    CORO_RETURN(res);
   });
 }
 

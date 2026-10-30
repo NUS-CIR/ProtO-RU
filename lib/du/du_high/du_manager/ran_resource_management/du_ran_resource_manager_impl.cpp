@@ -417,6 +417,10 @@ du_ran_resource_manager_impl::update_context(du_ue_index_t                      
       }
       // NOTE: no-op for case with CG config not requested.
     }
+    // The UE keeps its CG config, so it keeps needing its CS-RNTI; otherwise the MAC would release it.
+    else if (has_drbs and cg_was_active) {
+      resp.cs_rnti_requested = true;
+    }
     // Remove old CG config when DRBs are removed.
     else if (not has_drbs and cg_was_active) {
       cg_res_mng->reset_ue_cg_config(ue_mcg.cell_group.cells.at(SERVING_PCELL_IDX));

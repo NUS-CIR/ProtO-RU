@@ -1237,3 +1237,66 @@ TEST(du_ran_resource_manager_cg_type_test, cells_agreeing_on_the_cg_type_are_acc
     EXPECT_NE(make_res_mng(cells), nullptr);
   }
 }
+
+namespace {
+
+/// Builds a request to set up a DRB that uses a GBR 5QI, with the given DRB ID.
+f1ap_ue_context_update_request make_drb_setup_req(du_ue_index_t ue_index, drb_id_t drb_id)
+{
+  f1ap_ue_context_update_request req;
+  req.ue_index = ue_index;
+
+  f1ap_drb_to_setup& drb = req.drbs_to_setup.emplace_back();
+  drb.drb_id             = drb_id;
+  // The default QoS configuration of 5QI 1, a GBR 5QI, uses the UM bidirectional RLC mode.
+  drb.mode        = rlc_mode::um_bidir;
+  drb.pdcp_sn_len = pdcp_sn_size::size12bits;
+  drb.uluptnl_info_list.push_back(
+      up_transport_layer_info{transport_layer_address::create_from_string("127.0.0.1"), int_to_gtpu_teid(1)});
+  drb.qos_info.drb_qos.qos_desc = non_dyn_5qi_descriptor{uint_to_five_qi(1), {}, {}, {}};
+  drb.qos_info.drb_qos.gbr_qos_info.emplace(gbr_qos_flow_information{1000000, 1000000, 1000000, 1000000});
+  return req;
+}
+
+} // namespace
+
+/// A UE keeps its Configured Grant across the UE Context Modifications that leave it with DRBs (e.g., a second PDU
+/// session), so each of them must keep requesting the CS-RNTI; otherwise the MAC releases it while the UE keeps the CG.
+TEST(du_ran_resource_manager_cg_cs_rnti_test, cs_rnti_is_requested_as_long_as_the_ue_keeps_the_cg)
+{
+  for (const cg_builder_params::cg_type cg_type :
+       {cg_builder_params::cg_type::type1, cg_builder_params::cg_type::type2}) {
+    std::vector<du_cell_config> cells(1, config_helpers::make_default_du_cell_config());
+    cells[0].ran.init_bwp.cg_cfg                          = cg_builder_params{.type = cg_type};
+    std::unique_ptr<du_ran_resource_manager_impl> res_mng = make_res_mng(cells);
+
+    const du_ue_index_t ue_idx = to_du_ue_index(0);
+    auto                result = res_mng->create_ue_resource_configurator(ue_idx, to_du_cell_index(0), true);
+    ASSERT_TRUE(result.has_value());
+    ue_ran_resource_configurator ue_res = std::move(result.value());
+
+    // First DRB: the CG is allocated and the CS-RNTI is requested.
+    auto resp = ue_res.update(to_du_cell_index(0), make_drb_setup_req(ue_idx, drb_id_t::drb1));
+    ASSERT_FALSE(resp.failed());
+    ASSERT_TRUE(resp.failed_drbs.empty());
+    ASSERT_TRUE(ue_res->cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
+    EXPECT_TRUE(resp.cs_rnti_requested);
+
+    // Second DRB: the UE keeps its CG, so the CS-RNTI is still requested.
+    resp = ue_res.update(to_du_cell_index(0), make_drb_setup_req(ue_idx, drb_id_t::drb2));
+    ASSERT_FALSE(resp.failed());
+    ASSERT_TRUE(resp.failed_drbs.empty());
+    ASSERT_TRUE(ue_res->cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
+    EXPECT_TRUE(resp.cs_rnti_requested) << "the CS-RNTI would be released while the UE keeps its CG";
+
+    // All DRBs removed: the CG is released, and so is the CS-RNTI.
+    f1ap_ue_context_update_request rem_req;
+    rem_req.ue_index    = ue_idx;
+    rem_req.drbs_to_rem = {drb_id_t::drb1, drb_id_t::drb2};
+    resp                = ue_res.update(to_du_cell_index(0), rem_req);
+    ASSERT_FALSE(resp.failed());
+    ASSERT_FALSE(
+        ue_res->cell_group.cells.at(SERVING_PCELL_IDX).serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
+    EXPECT_FALSE(resp.cs_rnti_requested);
+  }
+}

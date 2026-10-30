@@ -6,6 +6,7 @@
 #include "du_high_config_validator.h"
 #include "ocudu/adt/format.h"
 #include "ocudu/ran/antenna_topology.h"
+#include "ocudu/ran/configured_grant/cg_configuration.h"
 #include "ocudu/ran/duplex_mode.h"
 #include "ocudu/ran/frame_types.h"
 #include "ocudu/ran/nr_cell_identity.h"
@@ -1936,8 +1937,11 @@ static bool validate_ntn_tn_cell_config(const du_high_unit_cell_ntn_config& ntn,
   return validate_ntn_neighbor_cells(ntn);
 }
 
-static bool validate_cell_cg_config(const du_high_configured_grants& cg_cfg, unsigned nof_crbs, unsigned max_nof_harqs)
+static bool validate_cell_cg_config(const du_high_unit_base_cell_config& config, unsigned nof_crbs, bool is_tdd)
 {
+  const du_high_configured_grants& cg_cfg        = config.cg_cfg;
+  const unsigned                   max_nof_harqs = config.pusch_cfg.nof_harqs;
+
   if (cg_cfg.max_nof_cell_cg_rbs > nof_crbs) {
     fmt::print("Max number of RBs {} for configured grant exceeds the number of BWP RBs {}.\n",
                cg_cfg.max_nof_cell_cg_rbs,
@@ -1951,6 +1955,43 @@ static bool validate_cell_cg_config(const du_high_configured_grants& cg_cfg, uns
                cg_cfg.nof_harq_processes,
                max_nof_harqs);
     return false;
+  }
+
+  // The CG HARQ timeout is configured_grant_timer CG periods, so it only expires before the next CG occasion of the
+  // same HARQ process if there are at least that many CG HARQ processes.
+  if (cg_cfg.nof_harq_processes < cg_configuration::configured_grant_timer) {
+    fmt::print("The number of UE HARQ processes {} reserved for configured grant (CG) must be at least {}, the "
+               "configured grant timer, so that the CG HARQ timeout expires before the HARQ process is used again.\n",
+               cg_cfg.nof_harq_processes,
+               cg_configuration::configured_grant_timer);
+    return false;
+  }
+
+  // [Implementation-defined] The CG PUSCH waveform follows msg3-transformPrecoder, which is set from the PUSCH
+  // transform precoding, and the CG scheduler only supports CP-OFDM.
+  if (config.pusch_cfg.enable_transform_precoding) {
+    fmt::print("Configured grants are not supported with PUSCH transform precoding enabled.\n");
+    return false;
+  }
+
+  // The scheduler needs some full UL slots without a CG occasion to allocate the dynamic PUSCHs, which the RRC
+  // reconfiguration that sets up the CG requires.
+  if (is_tdd and config.tdd_ul_dl_cfg.has_value()) {
+    const du_high_unit_tdd_ul_dl_config& tdd = config.tdd_ul_dl_cfg.value();
+    const unsigned                       period_slots =
+        tdd.pattern1.dl_ul_period_slots + (tdd.pattern2.has_value() ? tdd.pattern2->dl_ul_period_slots : 0U);
+    const unsigned full_ul_slots =
+        tdd.pattern1.nof_ul_slots + (tdd.pattern2.has_value() ? tdd.pattern2->nof_ul_slots : 0U);
+    const unsigned cg_period = cg_cfg.periodicity_slots.value();
+    if (cg_period < period_slots or (cg_period == period_slots and full_ul_slots <= 1U)) {
+      fmt::print("Configured grant periodicity of {} slots is not compatible with the TDD period of {} slots and {} "
+                 "full UL slots. It must be longer than the TDD period, or equal to it with more than one full UL "
+                 "slot.\n",
+                 cg_period,
+                 period_slots,
+                 full_ul_slots);
+      return false;
+    }
   }
 
   return true;
@@ -2173,7 +2214,7 @@ static bool validate_base_cell_unit_config(const du_high_unit_base_cell_config& 
   }
 
   if (config.cg_cfg.periodicity_slots.has_value() and
-      !validate_cell_cg_config(config.cg_cfg, nof_crbs, config.pusch_cfg.nof_harqs)) {
+      !validate_cell_cg_config(config, nof_crbs, band_helper::get_duplex_mode(band) == duplex_mode::TDD)) {
     return false;
   }
 

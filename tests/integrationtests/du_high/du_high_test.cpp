@@ -790,3 +790,50 @@ TEST_F(du_high_cg_tester, when_all_drbs_removed_then_cs_rnti_is_deallocated)
         << "CS-RNTI should be released when all DRBs are removed";
   }
 }
+
+// A CG configuration that the scheduler rejects for the UE, which the app config validator would have refused at
+// startup: fewer CG HARQ processes than the configured grant timer.
+class du_high_invalid_cg_tester : public du_high_env_simulator, public testing::Test
+{
+protected:
+  du_high_invalid_cg_tester() :
+    du_high_env_simulator([]() {
+      du_high_configuration du_cfg            = create_du_high_configuration();
+      du_cfg.ran.cells[0].ran.init_bwp.cg_cfg = cg_builder_params{.nof_harq_processes = 2};
+      return du_cfg;
+    }())
+  {
+  }
+};
+
+TEST_F(du_high_invalid_cg_tester, when_scheduler_rejects_the_cg_config_then_ue_context_setup_fails)
+{
+  // Create UE.
+  rnti_t rnti = to_rnti(0x4601);
+  ASSERT_TRUE(add_ue(rnti));
+  ASSERT_TRUE(run_rrc_setup(rnti));
+
+  auto& u = ues[rnti];
+
+  // DU receives UE Context Setup Request with a DRB, which gives the UE its CG.
+  cu_notifier.f1ap_ul_msgs.clear();
+  f1ap_message msg = test_helpers::generate_ue_context_setup_request(
+      *u.cu_ue_id,
+      u.du_ue_id,
+      u.srbs[LCID_SRB1].next_pdcp_sn++,
+      {drb_id_t::drb1},
+      {plmn_identity::test_value(), nr_cell_identity::create(0).value()});
+  asn1::f1ap::ue_context_setup_request_s& cmd      = msg.pdu.init_msg().value.ue_context_setup_request();
+  auto&                                   drb_item = cmd->drbs_to_be_setup_list[0].value().drbs_to_be_setup_item();
+  auto&                                   drb_info = drb_item.qos_info.choice_ext().value().drb_info();
+  drb_info.drb_qos.qos_characteristics.non_dyn_5qi().five_qi = 7U;
+  drb_item.rlc_mode.value                                    = asn1::f1ap::rlc_mode_opts::rlc_um_bidirectional;
+  this->du_hi->get_f1ap_pdu_handler().handle_message(msg);
+
+  // The scheduler rejects the UE reconfiguration, so the DU must report a failure rather than a DRB it never schedules.
+  ASSERT_TRUE(run_until([this]() { return not cu_notifier.f1ap_ul_msgs.empty(); }));
+  const f1ap_message& resp = cu_notifier.f1ap_ul_msgs.rbegin()->second;
+  ASSERT_EQ(resp.pdu.type().value, asn1::f1ap::f1ap_pdu_c::types_opts::unsuccessful_outcome);
+  ASSERT_EQ(resp.pdu.unsuccessful_outcome().value.type().value,
+            asn1::f1ap::f1ap_elem_procs_o::unsuccessful_outcome_c::types_opts::ue_context_setup_fail);
+}
