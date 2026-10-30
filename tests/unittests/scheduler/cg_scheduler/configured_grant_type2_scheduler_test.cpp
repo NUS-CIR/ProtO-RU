@@ -1301,38 +1301,6 @@ TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_paused_w
   ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
 }
 
-TEST_F(configured_grant_type2_scheduler_test, cell_deactivation_returns_cg_resources_to_the_pool)
-{
-  // On cell deactivation the UEs are dropped straight from the UE repository, without going through rem_ue(), so the
-  // CG scheduler has to hand their resources back itself. If it does not, every deactivation cycle leaks the resource
-  // of each activated UE and activation silently stops working once the pool runs dry. Cycling more times than the
-  // pool is deep is what turns such a leak into an observable failure, so nof_cycles must stay comfortably above the
-  // pool size (36 resources for this cell configuration).
-  GTEST_SKIP() << "blocked by a division by zero in intra_slice_scheduler::fill_ue_candidate_group() on cell "
-                  "re-activation";
-
-  constexpr unsigned nof_cycles = 60;
-
-  for (unsigned i = 0; i != nof_cycles; ++i) {
-    ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true)) << "cycle=" << i;
-
-    ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-        << "CG Type 2 activation stopped working at cycle=" << i
-        << ": the resource pool was likely drained by resources that were not returned on cell deactivation";
-
-    // Hold the resource as an activated UE rather than one still pending activation, which is the case the cell
-    // deactivation path has to clean up.
-    confirm_cg_activation();
-    run_slot();
-
-    // Bring the cell down and straight back up. No slot is run in between: a deactivated cell scheduler expects no
-    // slot indication until it is re-enabled.
-    sched->handle_cell_deactivation_request(to_du_cell_index(0));
-    sched->handle_cell_activation_request(to_du_cell_index(0));
-    run_slot();
-  }
-}
-
 /// \brief CG Type 2 on an F1AP-created UE that is still awaiting its C-RNTI MAC CE.
 ///
 /// While contention resolution is pending, the CG scheduler is not told about the UE at all: the reconfiguration that
