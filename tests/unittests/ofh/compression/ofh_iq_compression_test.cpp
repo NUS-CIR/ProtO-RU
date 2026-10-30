@@ -312,6 +312,10 @@ protected:
   const ru_compression_params& params         = std::get<1>(GetParam());
 };
 
+/// Fixture for the edge cases that only apply to BFP.
+class ofh_iq_compression_bfp_edge_case_fixture : public ofh_iq_compression_edge_case_fixture
+{};
+
 } // namespace
 
 /// Returns a resource block where all the I and Q components take the given value.
@@ -429,12 +433,8 @@ TEST_P(ofh_iq_compression_edge_case_fixture, compression_matches_reference)
   }
 }
 
-TEST_P(ofh_iq_compression_edge_case_fixture, exponent_sweep_takes_every_exponent)
+TEST_P(ofh_iq_compression_bfp_edge_case_fixture, exponent_sweep_takes_every_exponent)
 {
-  if (params.type != compression_type::BFP) {
-    GTEST_SKIP() << "Only applicable to BFP";
-  }
-
   std::vector<uint8_t> compressed =
       compress(generate_exponent_sweep(params.data_width), params, 1.0F, std::nullopt, implementation);
 
@@ -447,12 +447,8 @@ TEST_P(ofh_iq_compression_edge_case_fixture, exponent_sweep_takes_every_exponent
   }
 }
 
-TEST_P(ofh_iq_compression_edge_case_fixture, negative_saturation_keeps_exponent_within_four_bits)
+TEST_P(ofh_iq_compression_bfp_edge_case_fixture, negative_saturation_keeps_exponent_within_four_bits)
 {
-  if (params.type != compression_type::BFP) {
-    GTEST_SKIP() << "Only applicable to BFP";
-  }
-
   // All values saturate at -32768 in 16 bits. Its magnitude must not raise the exponent above the one of the positive
   // full scale, or the FS_Offset exponent offset would overflow the four bits of the exponent.
   std::vector<cbf16_t> iq_data = generate_constant_prb(-1.5F);
@@ -518,11 +514,11 @@ TEST_P(ofh_iq_compression_edge_case_fixture, out_of_range_input_saturates_at_ful
   ASSERT_TRUE(result.has_value()) << result.error();
 }
 
-/// Generates the compression parameters of the edge cases.
-static std::vector<ru_compression_params> generate_edge_case_params()
+/// Generates the compression parameters of the edge cases for the given compression types.
+static std::vector<ru_compression_params> generate_edge_case_params(std::initializer_list<compression_type> types)
 {
   std::vector<ru_compression_params> params;
-  for (compression_type type : {compression_type::none, compression_type::BFP}) {
+  for (compression_type type : types) {
     for (unsigned data_width = 8; data_width <= MAX_IQ_WIDTH; ++data_width) {
       params.push_back({type, data_width});
     }
@@ -530,10 +526,19 @@ static std::vector<ru_compression_params> generate_edge_case_params()
   return params;
 }
 
-INSTANTIATE_TEST_SUITE_P(ofh_iq_compression_edge_cases,
-                         ofh_iq_compression_edge_case_fixture,
+INSTANTIATE_TEST_SUITE_P(
+    ofh_iq_compression_edge_cases,
+    ofh_iq_compression_edge_case_fixture,
+    ::testing::Combine(::testing::ValuesIn(get_testable_implementations()),
+                       ::testing::ValuesIn(generate_edge_case_params({compression_type::none, compression_type::BFP}))),
+    [](const auto& param_info) {
+      return get_case_name(std::get<0>(param_info.param), {std::get<1>(param_info.param), std::nullopt});
+    });
+
+INSTANTIATE_TEST_SUITE_P(ofh_iq_compression_bfp_edge_cases,
+                         ofh_iq_compression_bfp_edge_case_fixture,
                          ::testing::Combine(::testing::ValuesIn(get_testable_implementations()),
-                                            ::testing::ValuesIn(generate_edge_case_params())),
+                                            ::testing::ValuesIn(generate_edge_case_params({compression_type::BFP}))),
                          [](const auto& param_info) {
                            return get_case_name(std::get<0>(param_info.param),
                                                 {std::get<1>(param_info.param), std::nullopt});

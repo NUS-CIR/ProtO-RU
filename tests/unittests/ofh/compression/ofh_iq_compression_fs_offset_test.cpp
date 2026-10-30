@@ -99,6 +99,10 @@ protected:
   }
 };
 
+// Fixture for the tests that only apply to BFP.
+class ofh_iq_compression_fs_offset_bfp_fixture : public ofh_iq_compression_fs_offset_fixture
+{};
+
 // Configuring the FS_Offset of the OCUDU IQ full scale must not change the compressed or decompressed data.
 TEST_P(ofh_iq_compression_fs_offset_fixture, native_fs_offset_is_transparent)
 {
@@ -112,12 +116,9 @@ TEST_P(ofh_iq_compression_fs_offset_fixture, native_fs_offset_is_transparent)
 }
 
 // For BFP, a full scale above the OCUDU one is applied through the exponent, leaving the mantissas untouched.
-TEST_P(ofh_iq_compression_fs_offset_fixture, bfp_exponent_offset)
+TEST_P(ofh_iq_compression_fs_offset_bfp_fixture, bfp_exponent_offset)
 {
   const ru_compression_params& params = std::get<1>(GetParam());
-  if (params.type != compression_type::BFP) {
-    GTEST_SKIP() << "Only applicable to BFP";
-  }
 
   unsigned             prb_size  = get_compressed_prb_size(params).value();
   std::vector<cbf16_t> iq        = generate_iq(0.5F);
@@ -197,4 +198,14 @@ INSTANTIATE_TEST_SUITE_P(ofh_iq_compression_fs_offset,
                                                               ru_compression_params{compression_type::BFP, 16},
                                                               ru_compression_params{compression_type::none, 9},
                                                               ru_compression_params{compression_type::none, 16})),
+                         get_test_name);
+
+INSTANTIATE_TEST_SUITE_P(ofh_iq_compression_fs_offset_bfp,
+                         ofh_iq_compression_fs_offset_bfp_fixture,
+                         ::testing::Combine(::testing::ValuesIn(testable_impls()),
+                                            ::testing::Values(ru_compression_params{compression_type::BFP, 8},
+                                                              ru_compression_params{compression_type::BFP, 9},
+                                                              ru_compression_params{compression_type::BFP, 12},
+                                                              ru_compression_params{compression_type::BFP, 14},
+                                                              ru_compression_params{compression_type::BFP, 16})),
                          get_test_name);
