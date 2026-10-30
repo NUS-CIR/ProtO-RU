@@ -519,10 +519,11 @@ unsigned intra_slice_scheduler::schedule_dl_newtx_candidates(dl_ran_slice_candid
     }
 
     // Create DL grant builder.
-    const ue_newtx_dl_grant_request request{.user          = *ue_candidate.ue,
-                                            .pdsch_slot    = pdsch_slot,
-                                            .pending_bytes = ue_candidate.pending_bytes,
-                                            .restrictions  = ue_candidate.dl_restrictions};
+    const ue_newtx_dl_grant_request request{.user                 = *ue_candidate.ue,
+                                            .pdsch_slot           = pdsch_slot,
+                                            .pending_bytes        = ue_candidate.pending_bytes,
+                                            .interleaving_enabled = enable_pdsch_interleaving,
+                                            .restrictions         = ue_candidate.dl_restrictions};
     auto                            result = ue_alloc.allocate_dl_grant(request);
 
     if (result.has_value()) {
