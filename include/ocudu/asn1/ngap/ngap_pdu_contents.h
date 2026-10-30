@@ -6239,7 +6239,6 @@ using private_msg_ies_container = private_ie_container_empty_l;
 
 // PrivateMessage ::= SEQUENCE
 struct private_msg_s {
-  bool                      ext = false;
   private_msg_ies_container private_ies;
   // ...
 

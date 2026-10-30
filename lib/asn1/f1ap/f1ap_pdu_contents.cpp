@@ -772,7 +772,8 @@ OCUDUASN_CODE aperiodic_srs_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE aperiodic_srs_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(srs_res_trigger_present, 1));
   bool ie_exts_present;
   HANDLE_CODE(bref.unpack(ie_exts_present, 1));
@@ -36263,7 +36264,8 @@ OCUDUASN_CODE semipersistent_srs_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE semipersistent_srs_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(srs_spatial_relation_present, 1));
   HANDLE_CODE(bref.unpack(ie_exts_present, 1));
 
@@ -42971,7 +42973,8 @@ OCUDUASN_CODE private_msg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE private_msg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(private_ies.unpack(bref));
 
   if (ext) {

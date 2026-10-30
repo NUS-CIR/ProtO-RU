@@ -43,7 +43,6 @@ struct sl_bwp_disc_pool_cfg_common_r17_s {
   using sl_disc_tx_pool_sel_r17_l_ = dyn_array<sl_res_pool_cfg_r16_s>;
 
   // member variables
-  bool                       ext = false;
   sl_disc_rx_pool_r17_l_     sl_disc_rx_pool_r17;
   sl_disc_tx_pool_sel_r17_l_ sl_disc_tx_pool_sel_r17;
   // ...
@@ -56,7 +55,6 @@ struct sl_bwp_disc_pool_cfg_common_r17_s {
 
 // SL-BWP-ConfigCommon-r16 ::= SEQUENCE
 struct sl_bwp_cfg_common_r16_s {
-  bool                         ext                                = false;
   bool                         sl_bwp_generic_r16_present         = false;
   bool                         sl_bwp_pool_cfg_common_r16_present = false;
   sl_bwp_generic_r16_s         sl_bwp_generic_r16;
@@ -80,7 +78,6 @@ struct sl_bwp_prs_pool_cfg_common_r18_s {
   using sl_prs_tx_pool_sel_normal_r18_l_ = dyn_array<sl_prs_res_pool_cfg_r18_s>;
 
   // member variables
-  bool                             ext                                    = false;
   bool                             sl_prs_tx_pool_exceptional_r18_present = false;
   sl_prs_rx_pool_r18_l_            sl_prs_rx_pool_r18;
   sl_prs_tx_pool_sel_normal_r18_l_ sl_prs_tx_pool_sel_normal_r18;
@@ -95,7 +92,6 @@ struct sl_bwp_prs_pool_cfg_common_r18_s {
 
 // SL-PosBWP-ConfigCommon-r18 ::= SEQUENCE
 struct sl_pos_bwp_cfg_common_r18_s {
-  bool                             ext                                    = false;
   bool                             sl_bwp_generic_r18_present             = false;
   bool                             sl_bwp_prs_pool_cfg_common_r18_present = false;
   sl_bwp_generic_r16_s             sl_bwp_generic_r18;
@@ -183,7 +179,6 @@ struct sl_freq_cfg_common_r16_s {
   using sl_pos_bwp_list_r18_l_ = dyn_array<sl_pos_bwp_cfg_common_r18_s>;
 
   // member variables
-  bool                                ext                              = false;
   bool                                sl_absolute_freq_ssb_r16_present = false;
   bool                                freq_shift7p5khz_sl_r16_present  = false;
   bool                                sl_sync_prio_r16_present         = false;
@@ -218,7 +213,6 @@ using sl_eutra_anchor_carrier_freq_list_r16_l = bounded_array<uint32_t, 8>;
 
 // SL-MeasConfigCommon-r16 ::= SEQUENCE
 struct sl_meas_cfg_common_r16_s {
-  bool                     ext                             = false;
   bool                     sl_quant_cfg_common_r16_present = false;
   sl_meas_obj_list_r16_l   sl_meas_obj_list_common_r16;
   sl_report_cfg_list_r16_l sl_report_cfg_list_common_r16;
@@ -267,7 +261,6 @@ struct sl_precfg_disc_cfg_v1840_s {
 
 // SL-PreconfigGeneral-r16 ::= SEQUENCE
 struct sl_precfg_general_r16_s {
-  bool                   ext                       = false;
   bool                   sl_tdd_cfg_r16_present    = false;
   bool                   reserved_bits_r16_present = false;
   tdd_ul_dl_cfg_common_s sl_tdd_cfg_r16;
@@ -345,7 +338,6 @@ struct sidelink_precfg_nr_r16_s {
   using sl_pos_precfg_freq_info_list_ext_v1880_l_ = dyn_array<sl_freq_cfg_common_ext_v16k0_s>;
 
   // member variables
-  bool                                    ext                                    = false;
   bool                                    sl_meas_pre_cfg_r16_present            = false;
   bool                                    sl_offset_dfn_r16_present              = false;
   bool                                    t400_r16_present                       = false;
@@ -411,7 +403,6 @@ struct sidelink_precfg_nr_v16k0_s {
 
 // SL-PreconfigurationNR-r16 ::= SEQUENCE
 struct sl_precfg_nr_r16_s {
-  bool                     ext = false;
   sidelink_precfg_nr_r16_s sidelink_precfg_nr_r16;
   // ...
   // group 0

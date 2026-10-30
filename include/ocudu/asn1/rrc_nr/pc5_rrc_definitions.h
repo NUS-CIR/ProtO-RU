@@ -201,7 +201,6 @@ struct band_sidelink_pc5_r16_s {
   using sl_pwr_class_unlicensed_r18_e_ = enumerated<sl_pwr_class_unlicensed_r18_opts>;
 
   // member variables
-  bool                ext                                          = false;
   bool                sl_reception_r16_present                     = false;
   bool                sl_tx_256_qam_r16_present                    = false;
   bool                low_se_64_qam_mcs_table_sidelink_r16_present = false;
@@ -239,7 +238,6 @@ struct band_sidelink_pc5_r16_s {
 
 // MAC-ParametersSidelink-r17 ::= SEQUENCE
 struct mac_params_sidelink_r17_s {
-  bool ext                         = false;
   bool drx_on_sidelink_r17_present = false;
   // ...
 
@@ -265,7 +263,6 @@ struct mib_sidelink_s {
 
 // SL-MeasQuantityResult-r16 ::= SEQUENCE
 struct sl_meas_quant_result_r16_s {
-  bool    ext                 = false;
   bool    sl_rsrp_r16_present = false;
   uint8_t sl_rsrp_r16         = 0;
   // ...
@@ -281,7 +278,6 @@ struct sl_meas_quant_result_r16_s {
 
 // SL-MeasResult-r16 ::= SEQUENCE
 struct sl_meas_result_r16_s {
-  bool                       ext                        = false;
   bool                       sl_result_dmrs_r16_present = false;
   sl_meas_quant_result_r16_s sl_result_dmrs_r16;
   // ...
@@ -296,7 +292,6 @@ struct sl_meas_result_r16_s {
 
 // SL-MeasResults-r16 ::= SEQUENCE
 struct sl_meas_results_r16_s {
-  bool                 ext            = false;
   uint8_t              sl_meas_id_r16 = 1;
   sl_meas_result_r16_s sl_meas_result_r16;
   // ...
@@ -457,7 +452,6 @@ struct notif_msg_sidelink_r17_s {
 
 // PDCP-ParametersSidelink-r16 ::= SEQUENCE
 struct pdcp_params_sidelink_r16_s {
-  bool ext                                        = false;
   bool out_of_order_delivery_sidelink_r16_present = false;
   // ...
   // group 0
@@ -619,7 +613,6 @@ struct sl_sdap_cfg_pc5_r16_s {
   using sl_sdap_hdr_r16_e_ = enumerated<sl_sdap_hdr_r16_opts>;
 
   // member variables
-  bool                                       ext = false;
   sl_mapped_qos_flows_to_add_list_r16_l_     sl_mapped_qos_flows_to_add_list_r16;
   sl_mapped_qos_flows_to_release_list_r16_l_ sl_mapped_qos_flows_to_release_list_r16;
   sl_sdap_hdr_r16_e_                         sl_sdap_hdr_r16;
@@ -643,7 +636,6 @@ struct sl_pdcp_cfg_pc5_r16_s {
   using sl_pdcp_sn_size_r16_e_ = enumerated<sl_pdcp_sn_size_r16_opts>;
 
   // member variables
-  bool                   ext                                  = false;
   bool                   sl_pdcp_sn_size_r16_present          = false;
   bool                   sl_out_of_order_delivery_r16_present = false;
   sl_pdcp_sn_size_r16_e_ sl_pdcp_sn_size_r16;
@@ -658,19 +650,16 @@ struct sl_pdcp_cfg_pc5_r16_s {
 // SL-RLC-ConfigPC5-r16 ::= CHOICE
 struct sl_rlc_cfg_pc5_r16_c {
   struct sl_am_rlc_r16_s_ {
-    bool              ext                            = false;
     bool              sl_sn_field_len_am_r16_present = false;
     sn_field_len_am_e sl_sn_field_len_am_r16;
     // ...
   };
   struct sl_um_bi_dir_rlc_r16_s_ {
-    bool              ext                            = false;
     bool              sl_sn_field_len_um_r16_present = false;
     sn_field_len_um_e sl_sn_field_len_um_r16;
     // ...
   };
   struct sl_um_uni_dir_rlc_r16_s_ {
-    bool              ext                            = false;
     bool              sl_sn_field_len_um_r16_present = false;
     sn_field_len_um_e sl_sn_field_len_um_r16;
     // ...
@@ -736,7 +725,6 @@ private:
 
 // SL-LogicalChannelConfigPC5-r16 ::= SEQUENCE
 struct sl_lc_ch_cfg_pc5_r16_s {
-  bool    ext             = false;
   uint8_t sl_lc_ch_id_r16 = 1;
   // ...
   // group 0
@@ -751,7 +739,6 @@ struct sl_lc_ch_cfg_pc5_r16_s {
 
 // SLRB-Config-r16 ::= SEQUENCE
 struct slrb_cfg_r16_s {
-  bool                   ext                              = false;
   bool                   sl_sdap_cfg_pc5_r16_present      = false;
   bool                   sl_pdcp_cfg_pc5_r16_present      = false;
   bool                   sl_rlc_cfg_pc5_r16_present       = false;
@@ -821,7 +808,6 @@ struct sl_csi_rs_cfg_r16_s {
   };
 
   // member variables
-  bool                        ext                                = false;
   bool                        sl_csi_rs_freq_alloc_r16_present   = false;
   bool                        sl_csi_rs_first_symbol_r16_present = false;
   sl_csi_rs_freq_alloc_r16_c_ sl_csi_rs_freq_alloc_r16;
@@ -836,7 +822,6 @@ struct sl_csi_rs_cfg_r16_s {
 
 // SL-RLC-ChannelConfigPC5-r17 ::= SEQUENCE
 struct sl_rlc_ch_cfg_pc5_r17_s {
-  bool                   ext                              = false;
   bool                   sl_rlc_cfg_pc5_r17_present       = false;
   bool                   sl_mac_lc_ch_cfg_pc5_r17_present = false;
   uint16_t               sl_rlc_ch_id_pc5_r17             = 1;
@@ -879,13 +864,11 @@ struct sl_carrier_cfg_r18_s {
 // SL-RLC-BearerConfig-r18 ::= CHOICE
 struct sl_rlc_bearer_cfg_r18_c {
   struct srb_s_ {
-    bool     ext                       = false;
     uint8_t  sl_srb_id_with_dupl       = 1;
     uint16_t sl_rlc_bearer_cfg_idx_r18 = 1;
     // ...
   };
   struct drb_s_ {
-    bool                   ext                              = false;
     bool                   sl_rlc_cfg_pc5_r18_present       = false;
     bool                   sl_mac_lc_ch_cfg_pc5_r18_present = false;
     uint16_t               slrb_pc5_cfg_idx_r18             = 1;
@@ -944,7 +927,6 @@ private:
 
 // SL-SRAP-ConfigPC5-r18 ::= SEQUENCE
 struct sl_srap_cfg_pc5_r18_s {
-  bool                ext                                    = false;
   bool                sl_peer_remote_ue_l2_id_r18_present    = false;
   bool                sl_peer_remote_ue_local_id_r18_present = false;
   bool                sl_remote_ue_l2_id_r18_present         = false;
@@ -2146,7 +2128,6 @@ struct sl_meas_result_relay_r17_s {
   using sl_meas_quant_r18_e_ = enumerated<sl_meas_quant_r18_opts>;
 
   // member variables
-  bool                       ext = false;
   cell_access_related_info_s cell_id_r17;
   fixed_bitstring<24>        sl_relay_ue_id_r17;
   sl_meas_result_r16_s       sl_meas_result_r17;

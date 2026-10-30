@@ -72,8 +72,6 @@ TEST_F(asn1_rrc_nr_test, when_eutra_nr_capabilities_correct_then_packing_success
 
   mrdc_cap.rf_params_mrdc.supported_band_combination_list.push_back(band_combination);
 
-  mrdc_cap.rf_params_mrdc.ext = true;
-
   // RF Params MRDC applied_freq_band_list_filt
   freq_band_info_c band_info_eutra;
   band_info_eutra.set_band_info_eutra();
@@ -628,7 +626,6 @@ TEST_F(asn1_rrc_nr_test, mandatory_ext_group_member_with_first_enum_value)
   rlf.t310.value = rlf_timers_and_consts_s::t310_opts::ms1000;
   rlf.n310.value = rlf_timers_and_consts_s::n310_opts::n2;
   rlf.n311.value = rlf_timers_and_consts_s::n311_opts::n3;
-  rlf.ext        = true;
   rlf.t311.set_present();
   rlf.t311->value = rlf_timers_and_consts_s::t311_opts::ms1000;
 

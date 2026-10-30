@@ -50,12 +50,10 @@ struct sdt_cfg_r17_s {
 struct srs_pos_res_set_linked_for_agg_bw_r18_s {
   struct srs_linked_cfg_r18_c_ {
     struct rrc_connected_state_r18_s_ {
-      bool                          ext = false;
       serving_cell_and_bwp_id_r17_s serving_cell_and_bwp_id_r18;
       // ...
     };
     struct rrc_inactive_state_r18_s_ {
-      bool                   ext = false;
       scs_specific_carrier_s scs_specific_carrier_r18;
       uint32_t               freq_info_r18 = 0;
       // ...
@@ -109,7 +107,6 @@ struct srs_pos_res_set_linked_for_agg_bw_r18_s {
   };
 
   // member variables
-  bool                  ext                        = false;
   uint8_t               srs_pos_res_set_linked_r18 = 0;
   srs_linked_cfg_r18_c_ srs_linked_cfg_r18;
   // ...
@@ -298,7 +295,6 @@ struct success_pscell_cfg_r18_s {
   using thres_percentage_t312_scg_r18_e_ = enumerated<thres_percentage_t312_scg_r18_opts>;
 
   // member variables
-  bool                             ext                                   = false;
   bool                             thres_percentage_t304_scg_r18_present = false;
   bool                             thres_percentage_t310_scg_r18_present = false;
   bool                             thres_percentage_t312_scg_r18_present = false;
@@ -588,7 +584,6 @@ struct cond_trigger_cfg_r16_s {
   };
 
   // member variables
-  bool             ext = false;
   cond_event_id_c_ cond_event_id;
   nr_rs_type_e     rs_type_r16;
   // ...
@@ -647,7 +642,6 @@ struct gap_cfg_s {
   using mgl_r16_e_ = enumerated<mgl_r16_opts>;
 
   // member variables
-  bool    ext        = false;
   uint8_t gap_offset = 0;
   mgl_e_  mgl;
   mgrp_e_ mgrp;
@@ -871,7 +865,6 @@ struct mu_si_m_gap_cfg_r17_s {
   using musim_gap_to_add_mod_list_ext_v1820_l_ = dyn_array<mu_si_m_gap_ext_v1820_s>;
 
   // member variables
-  bool                             ext                             = false;
   bool                             musim_aperiodic_gap_r17_present = false;
   musim_gap_to_release_list_r17_l_ musim_gap_to_release_list_r17;
   musim_gap_to_add_mod_list_r17_l_ musim_gap_to_add_mod_list_r17;
@@ -1013,7 +1006,6 @@ struct periodical_report_cfg_s {
   using report_amount_e_ = enumerated<report_amount_opts>;
 
   // member variables
-  bool                ext                                 = false;
   bool                report_quant_rs_idxes_present       = false;
   bool                max_nrof_rs_idxes_to_report_present = false;
   nr_rs_type_e        rs_type;
@@ -1518,7 +1510,6 @@ struct event_trigger_cfg_s {
   using report_on_best_cell_change_r18_e_ = enumerated<report_on_best_cell_change_r18_opts>;
 
   // member variables
-  bool                ext                                 = false;
   bool                report_quant_rs_idxes_present       = false;
   bool                max_nrof_rs_idxes_to_report_present = false;
   bool                report_add_neigh_meas_present       = false;
@@ -1561,7 +1552,6 @@ struct event_trigger_cfg_s {
 
 // ReportCGI ::= SEQUENCE
 struct report_cgi_s {
-  bool     ext                          = false;
   uint16_t cell_for_which_to_report_cgi = 0;
   // ...
   // group 0
@@ -1578,7 +1568,6 @@ struct report_sftd_nr_s {
   using cells_for_which_to_report_sftd_l_ = bounded_array<uint16_t, 3>;
 
   // member variables
-  bool ext              = false;
   bool report_sftd_meas = false;
   bool report_rsrp      = false;
   // ...
@@ -1613,7 +1602,6 @@ struct cli_periodical_report_cfg_r16_s {
   using report_amount_r16_e_ = enumerated<report_amount_r16_opts>;
 
   // member variables
-  bool                        ext = false;
   report_interv_e             report_interv_r16;
   report_amount_r16_e_        report_amount_r16;
   meas_report_quant_cli_r16_e report_quant_cli_r16;
@@ -1716,7 +1704,6 @@ struct cli_event_trigger_cfg_r16_s {
   using report_amount_r16_e_ = enumerated<report_amount_r16_opts>;
 
   // member variables
-  bool                 ext = false;
   event_id_r16_c_      event_id_r16;
   report_interv_e      report_interv_r16;
   report_amount_r16_e_ report_amount_r16;
@@ -1769,7 +1756,6 @@ struct rx_tx_periodical_r17_s {
   using report_amount_r17_e_ = enumerated<report_amount_r17_opts>;
 
   // member variables
-  bool                      ext                             = false;
   bool                      rx_tx_report_interv_r17_present = false;
   rx_tx_report_interv_r17_e rx_tx_report_interv_r17;
   report_amount_r17_e_      report_amount_r17;
@@ -2184,7 +2170,6 @@ struct csi_rs_res_mob_s {
   };
 
   // member variables
-  bool                 ext                    = false;
   bool                 associated_ssb_present = false;
   uint8_t              csi_rs_idx             = 0;
   slot_cfg_c_          slot_cfg;
@@ -2251,7 +2236,6 @@ struct aerial_cfg_r18_s {
   };
 
   // member variables
-  bool                           ext                                 = false;
   bool                           flight_path_upd_thr_cfg_r18_present = false;
   flight_path_upd_thr_cfg_r18_s_ flight_path_upd_thr_cfg_r18;
   // ...
@@ -2372,7 +2356,6 @@ private:
 
 // AvailableRAN-VisibleMetrics-r18 ::= SEQUENCE
 struct available_ran_visible_metrics_r18_s {
-  bool ext                                         = false;
   bool app_layer_buffer_level_list_r18_present     = false;
   bool playout_delay_for_media_startup_r18_present = false;
   // ...
@@ -2399,7 +2382,6 @@ struct app_layer_idle_inactive_cfg_r18_s {
   using qoe_meas_type_r18_e_ = enumerated<qoe_meas_type_r18_opts>;
 
   // member variables
-  bool                                ext                                       = false;
   bool                                service_type_r18_present                  = false;
   bool                                app_layer_meas_prio_r18_present           = false;
   bool                                qoe_ref_r18_present                       = false;
@@ -2443,7 +2425,6 @@ struct ran_visible_params_r17_s {
   using ran_visible_report_srb_r18_e_ = enumerated<ran_visible_report_srb_r18_opts>;
 
   // member variables
-  bool                           ext                                                = false;
   bool                           ran_visible_periodicity_r17_present                = false;
   bool                           nof_buffer_level_entries_r17_present               = false;
   bool                           report_playout_delay_for_media_startup_r17_present = false;
@@ -2479,7 +2460,6 @@ struct meas_cfg_app_layer_r17_s {
   using report_srb_r18_e_ = enumerated<report_srb_r18_opts>;
 
   // member variables
-  bool                                      ext                                  = false;
   bool                                      service_type_r17_present             = false;
   bool                                      pause_report_r17_present             = false;
   bool                                      tx_of_session_start_stop_r17_present = false;
@@ -2510,7 +2490,6 @@ struct app_layer_meas_cfg_r17_s {
   using meas_cfg_app_layer_to_release_list_r17_l_ = bounded_array<uint8_t, 16>;
 
   // member variables
-  bool                                      ext                              = false;
   bool                                      rrc_seg_allowed_srb4_r17_present = false;
   meas_cfg_app_layer_to_add_mod_list_r17_l_ meas_cfg_app_layer_to_add_mod_list_r17;
   meas_cfg_app_layer_to_release_list_r17_l_ meas_cfg_app_layer_to_release_list_r17;
@@ -2829,7 +2808,6 @@ struct bap_cfg_r16_s {
   using flow_ctrl_feedback_type_r16_e_ = enumerated<flow_ctrl_feedback_type_r16_opts>;
 
   // member variables
-  bool                           ext                                   = false;
   bool                           bap_address_r16_present               = false;
   bool                           default_ul_bap_routing_id_r16_present = false;
   bool                           default_ul_bh_rlc_ch_r16_present      = false;
@@ -2887,7 +2865,6 @@ struct bfd_relaxation_report_cfg_r17_s {
 
 // SRS-ResourceConfigCLI-r16 ::= SEQUENCE
 struct srs_res_cfg_cli_r16_s {
-  bool                 ext                           = false;
   bool                 ref_serv_cell_idx_r16_present = false;
   srs_res_s            srs_res_r16;
   subcarrier_spacing_e srs_scs_r16;
@@ -3013,7 +2990,6 @@ private:
 
 // RSSI-ResourceConfigCLI-r16 ::= SEQUENCE
 struct rssi_res_cfg_cli_r16_s {
-  bool                              ext                           = false;
   bool                              ref_serv_cell_idx_r16_present = false;
   uint8_t                           rssi_res_id_r16               = 0;
   subcarrier_spacing_e              rssi_scs_r16;
@@ -3052,7 +3028,6 @@ struct csi_rs_res_cfg_mob_s {
   using csi_rs_cell_list_mob_l_ = dyn_array<csi_rs_cell_mob_s>;
 
   // member variables
-  bool                    ext = false;
   subcarrier_spacing_e    subcarrier_spacing;
   csi_rs_cell_list_mob_l_ csi_rs_cell_list_mob;
   // ...
@@ -3124,7 +3099,6 @@ struct ltm_qcl_info_r18_s {
   using qcl_type_r18_e_ = enumerated<qcl_type_r18_opts>;
 
   // member variables
-  bool            ext = false;
   ref_sig_r18_c_  ref_sig_r18;
   qcl_type_r18_e_ qcl_type_r18;
   // ...
@@ -3147,7 +3121,6 @@ struct candidate_tci_state_r18_s {
   using tag_id_ptr_r18_e_ = enumerated<tag_id_ptr_r18_opts>;
 
   // member variables
-  bool               ext                            = false;
   bool               qcl_type2_r18_present          = false;
   bool               pathloss_ref_rs_id_r18_present = false;
   bool               tag_id_ptr_r18_present         = false;
@@ -3226,7 +3199,6 @@ struct candidate_tci_ul_state_r18_s {
   using tag_id_ptr_r18_e_ = enumerated<tag_id_ptr_r18_opts>;
 
   // member variables
-  bool              ext                            = false;
   bool              pathloss_ref_rs_id_r18_present = false;
   bool              tag_id_ptr_r18_present         = false;
   bool              ul_pwr_ctrl_r18_present        = false;
@@ -3245,7 +3217,6 @@ struct candidate_tci_ul_state_r18_s {
 
 // CarrierInfoNR ::= SEQUENCE
 struct carrier_info_nr_s {
-  bool                 ext          = false;
   bool                 smtc_present = false;
   uint32_t             carrier_freq = 0;
   subcarrier_spacing_e ssb_subcarrier_spacing;
@@ -3346,7 +3317,6 @@ struct cell_resel_priorities_s {
   using t320_e_ = enumerated<t320_opts>;
 
   // member variables
-  bool                   ext          = false;
   bool                   t320_present = false;
   freq_prio_list_eutra_l freq_prio_list_eutra;
   freq_prio_list_nr_l    freq_prio_list_nr;
@@ -3527,7 +3497,6 @@ struct clock_quality_metrics_r18_s {
   using parent_time_source_r18_e_ = enumerated<parent_time_source_r18_opts>;
 
   // member variables
-  bool                         ext                               = false;
   bool                         synchronisation_state_r18_present = false;
   bool                         tracebility_to_utc_r18_present    = false;
   bool                         tracebility_to_gnss_r18_present   = false;
@@ -3553,7 +3522,6 @@ struct cond_execution_cond_to_add_mod_r18_s {
   using subsequent_cond_execution_cond_r18_l_ = bounded_array<uint8_t, 2>;
 
   // member variables
-  bool                                  ext                          = false;
   uint8_t                               subsequent_cond_recfg_id_r18 = 1;
   subsequent_cond_execution_cond_r18_l_ subsequent_cond_execution_cond_r18;
   dyn_octstring                         subsequent_cond_execution_cond_scg_r18;
@@ -3573,7 +3541,6 @@ using cond_execution_cond_to_release_list_r18_l = bounded_array<uint8_t, 8>;
 
 // SubsequentCondReconfig-r18 ::= SEQUENCE
 struct subsequent_cond_recfg_r18_s {
-  bool                                      ext = false;
   cond_execution_cond_to_release_list_r18_l cond_execution_cond_to_release_list_r18;
   cond_execution_cond_to_add_mod_list_r18_l cond_execution_cond_to_add_mod_list_r18;
   // ...
@@ -3590,7 +3557,6 @@ struct cond_recfg_to_add_mod_r16_s {
   using cond_execution_cond_pscell_r18_l_ = bounded_array<uint8_t, 2>;
 
   // member variables
-  bool                       ext               = false;
   uint8_t                    cond_recfg_id_r16 = 1;
   cond_execution_cond_r16_l_ cond_execution_cond_r16;
   dyn_octstring              cond_rrc_recfg_r16;
@@ -3647,7 +3613,6 @@ struct sk_counter_configuration_r18_s {
 
 // ConditionalReconfiguration-r16 ::= SEQUENCE
 struct conditional_recfg_r16_s {
-  bool                             ext                            = false;
   bool                             attempt_cond_recfg_r16_present = false;
   cond_recfg_to_rem_list_r16_l     cond_recfg_to_rem_list_r16;
   cond_recfg_to_add_mod_list_r16_l cond_recfg_to_add_mod_list_r16;
@@ -3820,7 +3785,6 @@ using ssb_to_measure_altitude_based_list_r18_l = dyn_array<ssb_to_measure_altitu
 
 // SSB-ConfigMobility ::= SEQUENCE
 struct ssb_cfg_mob_s {
-  bool                              ext                    = false;
   bool                              ssb_to_measure_present = false;
   bool                              ss_rssi_meas_present   = false;
   setup_release_c<ssb_to_measure_c> ssb_to_measure;
@@ -4099,7 +4063,6 @@ struct rmtc_cfg_r16_s {
   };
 
   // member variables
-  bool                    ext                        = false;
   bool                    rmtc_sf_offset_r16_present = false;
   rmtc_periodicity_r16_e_ rmtc_periodicity_r16;
   uint16_t                rmtc_sf_offset_r16 = 0;
@@ -4157,7 +4120,6 @@ struct meas_obj_nr_s {
   using meas_cycle_pscell_r17_e_ = enumerated<meas_cycle_pscell_r17_opts>;
 
   // member variables
-  bool                              ext                                        = false;
   bool                              ssb_freq_present                           = false;
   bool                              ssb_subcarrier_spacing_present             = false;
   bool                              smtc1_present                              = false;
@@ -4252,7 +4214,6 @@ struct meas_obj_eutra_s {
   using excluded_cells_to_add_mod_list_eutran_l_ = dyn_array<eutra_excluded_cell_s>;
 
   // member variables
-  bool                                     ext                          = false;
   bool                                     eutra_q_offset_range_present = false;
   uint32_t                                 carrier_freq                 = 0;
   eutra_allowed_meas_bw_e                  allowed_meas_bw;
@@ -4325,7 +4286,6 @@ using utra_fdd_cell_idx_list_r16_l = bounded_array<uint8_t, 32>;
 
 // MeasObjectUTRA-FDD-r16 ::= SEQUENCE
 struct meas_obj_utra_fdd_r16_s {
-  bool                                 ext                                 = false;
   bool                                 utra_fdd_q_offset_range_r16_present = false;
   uint16_t                             carrier_freq_r16                    = 0;
   utra_fdd_q_offset_range_r16_e        utra_fdd_q_offset_range_r16;
@@ -4355,7 +4315,6 @@ struct meas_obj_nr_sl_r16_s {
 
 // MeasObjectCLI-r16 ::= SEQUENCE
 struct meas_obj_cli_r16_s {
-  bool              ext = false;
   cli_res_cfg_r16_s cli_res_cfg_r16;
   // ...
 
@@ -4391,7 +4350,6 @@ struct meas_obj_rx_tx_diff_r17_s {
   };
 
   // member variables
-  bool          ext                = false;
   bool          dl_ref_r17_present = false;
   dl_ref_r17_c_ dl_ref_r17;
   // ...
@@ -4589,7 +4547,6 @@ struct periodical_report_cfg_inter_rat_s {
   using report_amount_e_ = enumerated<report_amount_opts>;
 
   // member variables
-  bool                ext = false;
   report_interv_e     report_interv;
   report_amount_e_    report_amount;
   meas_report_quant_s report_quant;
@@ -4728,7 +4685,6 @@ private:
 struct event_trigger_cfg_inter_rat_s {
   struct event_id_c_ {
     struct event_b1_s_ {
-      bool                       ext = false;
       meas_trigger_quant_eutra_c b1_thres_eutra;
       bool                       report_on_leave = false;
       uint8_t                    hysteresis      = 0;
@@ -4736,7 +4692,6 @@ struct event_trigger_cfg_inter_rat_s {
       // ...
     };
     struct event_b2_s_ {
-      bool                       ext = false;
       meas_trigger_quant_c       b2_thres1;
       meas_trigger_quant_eutra_c b2_thres2_eutra;
       bool                       report_on_leave = false;
@@ -4745,7 +4700,6 @@ struct event_trigger_cfg_inter_rat_s {
       // ...
     };
     struct event_b1_utra_fdd_r16_s_ {
-      bool                              ext = false;
       meas_trigger_quant_utra_fdd_r16_c b1_thres_utra_fdd_r16;
       bool                              report_on_leave_r16 = false;
       uint8_t                           hysteresis_r16      = 0;
@@ -4753,7 +4707,6 @@ struct event_trigger_cfg_inter_rat_s {
       // ...
     };
     struct event_b2_utra_fdd_r16_s_ {
-      bool                              ext = false;
       meas_trigger_quant_c              b2_thres1_r16;
       meas_trigger_quant_utra_fdd_r16_c b2_thres2_utra_fdd_r16;
       bool                              report_on_leave_r16 = false;
@@ -4762,7 +4715,6 @@ struct event_trigger_cfg_inter_rat_s {
       // ...
     };
     struct event_y1_relay_r17_s_ {
-      bool                        ext = false;
       meas_trigger_quant_c        y1_thres1_r17;
       sl_meas_trigger_quant_r16_c y1_thres2_relay_r17;
       bool                        report_on_leave_r17 = false;
@@ -4771,7 +4723,6 @@ struct event_trigger_cfg_inter_rat_s {
       // ...
     };
     struct event_y2_relay_r17_s_ {
-      bool                        ext = false;
       sl_meas_trigger_quant_r16_c y2_thres_relay_r17;
       bool                        report_on_leave_r17 = false;
       uint8_t                     hysteresis_r17      = 0;
@@ -4786,7 +4737,6 @@ struct event_trigger_cfg_inter_rat_s {
       };
 
       // member variables
-      bool                        ext = false;
       z1_thres1_relay_r18_s_      z1_thres1_relay_r18;
       sl_meas_trigger_quant_r16_c z1_thres2_relay_r18;
       bool                        report_on_leave_r18 = false;
@@ -4924,7 +4874,6 @@ struct event_trigger_cfg_inter_rat_s {
   using cell_individual_offset_list_r18_l_ = dyn_array<cell_individual_offset_list_eutra_r18_s>;
 
   // member variables
-  bool                ext = false;
   event_id_c_         event_id;
   nr_rs_type_e        rs_type;
   report_interv_e     report_interv;
@@ -4952,7 +4901,6 @@ struct event_trigger_cfg_inter_rat_s {
 
 // ReportCGI-EUTRA ::= SEQUENCE
 struct report_cgi_eutra_s {
-  bool     ext                          = false;
   uint16_t cell_for_which_to_report_cgi = 0;
   // ...
   // group 0
@@ -4966,7 +4914,6 @@ struct report_cgi_eutra_s {
 
 // ReportSFTD-EUTRA ::= SEQUENCE
 struct report_sftd_eutra_s {
-  bool ext              = false;
   bool report_sftd_meas = false;
   bool report_rsrp      = false;
   // ...
@@ -5065,7 +5012,6 @@ struct report_cfg_inter_rat_s {
 
 // MeasReportQuantity-r16 ::= SEQUENCE
 struct meas_report_quant_r16_s {
-  bool ext     = false;
   bool cbr_r16 = false;
   // ...
 
@@ -5087,7 +5033,6 @@ struct periodical_report_cfg_nr_sl_r16_s {
   using report_amount_r16_e_ = enumerated<report_amount_r16_opts>;
 
   // member variables
-  bool                    ext = false;
   report_interv_e         report_interv_r16;
   report_amount_r16_e_    report_amount_r16;
   meas_report_quant_r16_s report_quant_r16;
@@ -5171,7 +5116,6 @@ struct event_trigger_cfg_nr_sl_r16_s {
   using report_amount_r16_e_ = enumerated<report_amount_r16_opts>;
 
   // member variables
-  bool                    ext = false;
   event_id_r16_c_         event_id_r16;
   report_interv_e         report_interv_r16;
   report_amount_r16_e_    report_amount_r16;
@@ -5406,7 +5350,6 @@ struct quant_cfg_s {
   using quant_cfg_nr_list_l_ = dyn_array<quant_cfg_nr_s>;
 
   // member variables
-  bool                 ext = false;
   quant_cfg_nr_list_l_ quant_cfg_nr_list;
   // ...
   // group 0
@@ -5478,7 +5421,6 @@ struct gap_cfg_r17_s {
   using ref_serv_cell_ind_r17_e_ = enumerated<ref_serv_cell_ind_r17_opts>;
 
   // member variables
-  bool                      ext                                    = false;
   bool                      ref_serv_cell_ind_r17_present          = false;
   bool                      ref_fr2_serv_cell_async_ca_r17_present = false;
   bool                      pre_cfg_ind_r17_present                = false;
@@ -5542,7 +5484,6 @@ struct pos_gap_cfg_r17_s {
   using gap_type_r17_e_ = enumerated<gap_type_r17_opts>;
 
   // member variables
-  bool            ext                         = false;
   uint8_t         meas_pos_pre_cfg_gap_id_r17 = 1;
   uint8_t         gap_offset_r17              = 0;
   mgl_r17_e_      mgl_r17;
@@ -5569,7 +5510,6 @@ struct meas_gap_cfg_s {
   using gap_to_release_list_r17_l_ = bounded_array<uint8_t, 8>;
 
   // member variables
-  bool                       ext             = false;
   bool                       gap_fr2_present = false;
   setup_release_c<gap_cfg_s> gap_fr2;
   // ...
@@ -5590,7 +5530,6 @@ struct meas_gap_cfg_s {
 
 // MeasGapSharingConfig ::= SEQUENCE
 struct meas_gap_sharing_cfg_s {
-  bool                                       ext                     = false;
   bool                                       gap_sharing_fr2_present = false;
   setup_release_c<meas_gap_sharing_scheme_e> gap_sharing_fr2;
   // ...
@@ -5667,7 +5606,6 @@ struct meas_win_cfg_r18_s {
   using win_dur_r18_e_ = enumerated<win_dur_r18_opts>;
 
   // member variables
-  bool                          ext = false;
   win_offset_periodicity_r18_c_ win_offset_periodicity_r18;
   win_dur_r18_e_                win_dur_r18;
   // ...
@@ -5730,7 +5668,6 @@ struct meas_cfg_s {
   };
 
   // member variables
-  bool                         ext                          = false;
   bool                         s_measure_cfg_present        = false;
   bool                         quant_cfg_present            = false;
   bool                         meas_gap_cfg_present         = false;
@@ -5759,7 +5696,6 @@ struct meas_cfg_s {
 
 // MasterKeyUpdate ::= SEQUENCE
 struct master_key_upd_s {
-  bool          ext                     = false;
   bool          key_set_change_ind      = false;
   uint8_t       next_hop_chaining_count = 0;
   dyn_octstring nas_container;
@@ -5872,7 +5808,6 @@ struct overheat_assist_cfg_s {
 
 // OtherConfig-v1540 ::= SEQUENCE
 struct other_cfg_v1540_s {
-  bool                                   ext                         = false;
   bool                                   overheat_assist_cfg_present = false;
   setup_release_c<overheat_assist_cfg_s> overheat_assist_cfg;
   // ...
@@ -5946,7 +5881,6 @@ struct mrdc_secondary_cell_group_cfg_s {
 
 // IDC-AssistanceConfig-r16 ::= SEQUENCE
 struct idc_assist_cfg_r16_s {
-  bool                                 ext = false;
   candidate_serving_freq_list_nr_r16_l candidate_serving_freq_list_nr_r16;
   // ...
 
@@ -6186,7 +6120,6 @@ using iab_ip_usage_r16_e = enumerated<iab_ip_usage_r16_opts>;
 
 // IAB-IP-AddressConfiguration-r16 ::= SEQUENCE
 struct iab_ip_address_cfg_r16_s {
-  bool                 ext                                  = false;
   bool                 iab_ip_address_r16_present           = false;
   bool                 iab_ip_usage_r16_present             = false;
   bool                 iab_donor_du_bap_address_r16_present = false;
@@ -6208,7 +6141,6 @@ struct iab_ip_address_cfg_list_r16_s {
   using iab_ip_address_to_release_list_r16_l_ = bounded_array<uint8_t, 32>;
 
   // member variables
-  bool                                  ext = false;
   iab_ip_address_to_add_mod_list_r16_l_ iab_ip_address_to_add_mod_list_r16;
   iab_ip_address_to_release_list_r16_l_ iab_ip_address_to_release_list_r16;
   // ...
@@ -6396,7 +6328,6 @@ struct success_ho_cfg_r17_s {
   using thres_percentage_t312_r17_e_ = enumerated<thres_percentage_t312_r17_opts>;
 
   // member variables
-  bool                         ext                                 = false;
   bool                         thres_percentage_t304_r17_present   = false;
   bool                         thres_percentage_t310_r17_present   = false;
   bool                         thres_percentage_t312_r17_present   = false;
@@ -6602,7 +6533,6 @@ struct other_cfg_v1700_s {
 
 // SL-RemoteUE-ToAddMod-r17 ::= SEQUENCE
 struct sl_remote_ue_to_add_mod_r17_s {
-  bool                ext                           = false;
   bool                sl_srap_cfg_relay_r17_present = false;
   fixed_bitstring<24> sl_l2_id_remote_r17;
   sl_srap_cfg_r17_s   sl_srap_cfg_relay_r17;
@@ -6616,7 +6546,6 @@ struct sl_remote_ue_to_add_mod_r17_s {
 
 // SL-SourceRemoteUE-Config-r18 ::= SEQUENCE
 struct sl_source_remote_ue_cfg_r18_s {
-  bool                   ext = false;
   fixed_bitstring<24>    sl_source_ue_id_r18;
   sl_srap_cfg_u2_u_r18_s sl_srap_cfg_u2_u_r18;
   // ...
@@ -6633,7 +6562,6 @@ struct sl_u2_u_remote_ue_cfg_r18_s {
   using sl_source_remote_ue_to_release_list_r18_l_ = bounded_array<fixed_bitstring<24>, 32>;
 
   // member variables
-  bool                                       ext = false;
   fixed_bitstring<24>                        sl_l2_id_remote_ue_r18;
   sl_source_remote_ue_to_add_mod_list_r18_l_ sl_source_remote_ue_to_add_mod_list_r18;
   sl_source_remote_ue_to_release_list_r18_l_ sl_source_remote_ue_to_release_list_r18;
@@ -6653,7 +6581,6 @@ struct sl_l2_relay_ue_cfg_r17_s {
   using sl_u2_u_remote_ue_to_release_list_r18_l_ = bounded_array<fixed_bitstring<24>, 32>;
 
   // member variables
-  bool                                ext = false;
   sl_remote_ue_to_add_mod_list_r17_l_ sl_remote_ue_to_add_mod_list_r17;
   sl_remote_ue_to_release_list_r17_l_ sl_remote_ue_to_release_list_r17;
   // ...
@@ -6783,7 +6710,6 @@ struct sl_indirect_path_add_change_r18_s {
   using t421_r18_e_ = enumerated<t421_r18_opts>;
 
   // member variables
-  bool                ext              = false;
   bool                t421_r18_present = false;
   fixed_bitstring<24> sl_indirect_path_relay_ue_id_r18;
   fixed_bitstring<36> sl_indirect_path_cell_id_r18;
@@ -6815,7 +6741,6 @@ struct n3_c_relay_ue_info_r18_s {
 
 // N3C-IndirectPathAddChange-r18 ::= SEQUENCE
 struct n3_c_indirect_path_add_change_r18_s {
-  bool                     ext = false;
   n3_c_relay_ue_info_r18_s n3c_relay_identif_r18;
   // ...
 
@@ -6827,7 +6752,6 @@ struct n3_c_indirect_path_add_change_r18_s {
 
 // N3C-MappingConfig-r18 ::= SEQUENCE
 struct n3_c_map_cfg_r18_s {
-  bool                     ext = false;
   sl_remote_ue_rb_id_r17_c n3c_remote_ue_rb_id_r18;
   uint8_t                  n3c_rlc_ch_uu_r18 = 1;
   // ...
@@ -6844,7 +6768,6 @@ struct n3_c_indirect_path_cfg_relay_r18_s {
   using n3c_map_to_add_mod_list_r18_l_ = dyn_array<n3_c_map_cfg_r18_s>;
 
   // member variables
-  bool                           ext = false;
   n3c_map_to_release_list_r18_l_ n3c_map_to_release_list_r18;
   n3c_map_to_add_mod_list_r18_l_ n3c_map_to_add_mod_list_r18;
   // ...
@@ -6857,7 +6780,6 @@ struct n3_c_indirect_path_cfg_relay_r18_s {
 
 // IDC-FDM-AssistanceConfig-r18 ::= SEQUENCE
 struct idc_fdm_assist_cfg_r18_s {
-  bool                                       ext = false;
   candidate_serving_freq_range_list_nr_r18_l candidate_serving_freq_range_list_nr_r18;
   // ...
 
@@ -7105,7 +7027,6 @@ struct ltm_ssb_cfg_r18_s {
   };
 
   // member variables
-  bool                          ext                                = false;
   bool                          ssb_periodicity_r18_present        = false;
   bool                          ssb_positions_in_burst_r18_present = false;
   bool                          ss_pbch_block_pwr_r18_present      = false;
@@ -7142,7 +7063,6 @@ struct ltm_tci_info_r18_s {
   using unified_tci_state_type_r18_e_ = enumerated<unified_tci_state_type_r18_opts>;
 
   // member variables
-  bool                                             ext                                = false;
   bool                                             unified_tci_state_type_r18_present = false;
   ltm_dl_or_joint_tci_state_to_add_mod_list_r18_l_ ltm_dl_or_joint_tci_state_to_add_mod_list_r18;
   ltm_dl_or_joint_tci_state_to_release_list_r18_l_ ltm_dl_or_joint_tci_state_to_release_list_r18;
@@ -7165,7 +7085,6 @@ struct ltm_tci_info_r18_s {
 
 // LTM-Candidate-r18 ::= SEQUENCE
 struct ltm_candidate_r18_s {
-  bool               ext                               = false;
   bool               ltm_candidate_pci_r18_present     = false;
   bool               ltm_ssb_cfg_r18_present           = false;
   bool               ltm_cfg_complete_r18_present      = false;
@@ -7195,7 +7114,6 @@ struct ltm_csi_ssb_res_set_r18_s {
   using ltm_candidate_id_list_r18_l_ = dyn_array<uint8_t>;
 
   // member variables
-  bool                         ext = false;
   ltm_csi_ssb_res_list_r18_l_  ltm_csi_ssb_res_list_r18;
   ltm_candidate_id_list_r18_l_ ltm_candidate_id_list_r18;
   // ...
@@ -7208,7 +7126,6 @@ struct ltm_csi_ssb_res_set_r18_s {
 
 // LTM-CSI-ResourceConfig-r18 ::= SEQUENCE
 struct ltm_csi_res_cfg_r18_s {
-  bool                      ext                    = false;
   uint8_t                   ltm_csi_res_cfg_id_r18 = 0;
   ltm_csi_ssb_res_set_r18_s ltm_csi_ssb_res_set_r18;
   // ...
@@ -7227,7 +7144,6 @@ struct ltm_cfg_r18_s {
   using ltm_csi_res_cfg_to_release_list_r18_l_ = dyn_array<uint8_t>;
 
   // member variables
-  bool                                   ext                                            = false;
   bool                                   ltm_ref_cfg_r18_present                        = false;
   bool                                   ltm_serving_cell_no_reset_id_r18_present       = false;
   bool                                   attempt_ltm_switch_r18_present                 = false;
@@ -7860,7 +7776,6 @@ struct multicast_cfg_inactive_r18_s {
 
 // SuspendConfig ::= SEQUENCE
 struct suspend_cfg_s {
-  bool                        ext                         = false;
   bool                        ran_notif_area_info_present = false;
   bool                        t380_present                = false;
   fixed_bitstring<40>         full_i_rnti;
@@ -7923,7 +7838,6 @@ struct meas_idle_cfg_ded_r16_s {
   using meas_resel_carrier_list_nr_r18_l_ = dyn_array<meas_resel_carrier_nr_r18_s>;
 
   // member variables
-  bool                                ext = false;
   meas_idle_carrier_list_nr_r16_l_    meas_idle_carrier_list_nr_r16;
   meas_idle_carrier_list_eutra_r16_l_ meas_idle_carrier_list_eutra_r16;
   meas_idle_dur_r16_e_                meas_idle_dur_r16;
@@ -8153,7 +8067,6 @@ struct rrc_reest_s {
 
 // SecurityConfigSMC ::= SEQUENCE
 struct security_cfg_smc_s {
-  bool                     ext = false;
   security_algorithm_cfg_s security_algorithm_cfg;
   // ...
 
@@ -8223,7 +8136,6 @@ struct security_mode_cmd_s {
 
 // RxTxTimeDiff-r17 ::= SEQUENCE
 struct rx_tx_time_diff_r17_s {
-  bool     ext                   = false;
   bool     result_k5_r17_present = false;
   uint16_t result_k5_r17         = 0;
   // ...
@@ -8403,7 +8315,6 @@ struct dl_info_transfer_s {
 
 // UE-CapabilityRAT-Request ::= SEQUENCE
 struct ue_cap_rat_request_s {
-  bool          ext = false;
   rat_type_e    rat_type;
   dyn_octstring cap_request_filt;
   // ...
@@ -8866,7 +8777,6 @@ using logging_interv_r16_e = enumerated<logging_interv_r16_opts>;
 
 // LoggedPeriodicalReportConfig-r16 ::= SEQUENCE
 struct logged_periodical_report_cfg_r16_s {
-  bool                 ext = false;
   logging_interv_r16_e logging_interv_r16;
   // ...
 
@@ -8920,7 +8830,6 @@ private:
 
 // LoggedEventTriggerConfig-r16 ::= SEQUENCE
 struct logged_event_trigger_cfg_r16_s {
-  bool                 ext = false;
   event_type_r16_c     event_type_r16;
   logging_interv_r16_e logging_interv_r16;
   // ...

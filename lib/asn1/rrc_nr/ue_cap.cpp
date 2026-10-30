@@ -367,7 +367,8 @@ OCUDUASN_CODE aerial_params_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE aerial_params_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(aerial_ue_cap_r18_present, 1));
   HANDLE_CODE(bref.unpack(altitude_meas_r18_present, 1));
   HANDLE_CODE(bref.unpack(altitude_based_ssb_to_measure_r18_present, 1));
@@ -467,7 +468,7 @@ OCUDUASN_CODE app_layer_meas_params_r17_s::pack(bit_ref& bref) const
   group_flags[0] |= qoe_add_memory_meas_report_r18_present;
   group_flags[0] |= qoe_prio_based_discarding_r18_present;
   group_flags[0] |= srb5_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(qoe_streaming_meas_report_r17_present, 1));
   HANDLE_CODE(bref.pack(qoe_mt_si_meas_report_r17_present, 1));
   HANDLE_CODE(bref.pack(qoe_vr_meas_report_r17_present, 1));
@@ -475,7 +476,7 @@ OCUDUASN_CODE app_layer_meas_params_r17_s::pack(bit_ref& bref) const
   HANDLE_CODE(bref.pack(ran_visible_qo_e_vr_meas_report_r17_present, 1));
   HANDLE_CODE(bref.pack(ul_meas_report_app_layer_seg_r17_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -495,7 +496,8 @@ OCUDUASN_CODE app_layer_meas_params_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE app_layer_meas_params_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(qoe_streaming_meas_report_r17_present, 1));
   HANDLE_CODE(bref.unpack(qoe_mt_si_meas_report_r17_present, 1));
   HANDLE_CODE(bref.unpack(qoe_vr_meas_report_r17_present, 1));
@@ -542,22 +544,20 @@ void app_layer_meas_params_r17_s::to_json(json_writer& j) const
   if (ul_meas_report_app_layer_seg_r17_present) {
     j.write_str("ul-MeasurementReportAppLayer-Seg-r17", "supported");
   }
-  if (ext) {
-    if (qoe_idle_inactive_meas_report_r18_present) {
-      j.write_str("qoe-IdleInactiveMeasReport-r18", "supported");
-    }
-    if (qoe_nrdc_meas_report_r18_present) {
-      j.write_str("qoe-NRDC-MeasReport-r18", "supported");
-    }
-    if (qoe_add_memory_meas_report_r18_present) {
-      j.write_str("qoe-AdditionalMemoryMeasReport-r18", qoe_add_memory_meas_report_r18.to_string());
-    }
-    if (qoe_prio_based_discarding_r18_present) {
-      j.write_str("qoe-PriorityBasedDiscarding-r18", "supported");
-    }
-    if (srb5_r18_present) {
-      j.write_str("srb5-r18", "supported");
-    }
+  if (qoe_idle_inactive_meas_report_r18_present) {
+    j.write_str("qoe-IdleInactiveMeasReport-r18", "supported");
+  }
+  if (qoe_nrdc_meas_report_r18_present) {
+    j.write_str("qoe-NRDC-MeasReport-r18", "supported");
+  }
+  if (qoe_add_memory_meas_report_r18_present) {
+    j.write_str("qoe-AdditionalMemoryMeasReport-r18", qoe_add_memory_meas_report_r18.to_string());
+  }
+  if (qoe_prio_based_discarding_r18_present) {
+    j.write_str("qoe-PriorityBasedDiscarding-r18", "supported");
+  }
+  if (srb5_r18_present) {
+    j.write_str("srb5-r18", "supported");
   }
   j.end_obj();
 }
@@ -881,7 +881,8 @@ OCUDUASN_CODE ca_params_eutra_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ca_params_eutra_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(multiple_timing_advance_present, 1));
   HANDLE_CODE(bref.unpack(simul_rx_tx_present, 1));
   HANDLE_CODE(bref.unpack(supported_naics_2_crs_ap_present, 1));
@@ -947,7 +948,8 @@ OCUDUASN_CODE ca_params_nr_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ca_params_nr_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(dummy_present, 1));
   HANDLE_CODE(bref.unpack(parallel_tx_srs_pucch_pusch_present, 1));
   HANDLE_CODE(bref.unpack(parallel_tx_prach_srs_pucch_pusch_present, 1));
@@ -1015,7 +1017,7 @@ OCUDUASN_CODE mrdc_params_s::pack(bit_ref& bref) const
   group_flags[0] |= dual_pa_architecture_present;
   group_flags[0] |= intra_band_endc_support_present;
   group_flags[0] |= ul_timing_align_eutra_nr_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(single_ul_tx_present, 1));
   HANDLE_CODE(bref.pack(dyn_pwr_sharing_endc_present, 1));
   HANDLE_CODE(bref.pack(tdm_pattern_present, 1));
@@ -1031,7 +1033,7 @@ OCUDUASN_CODE mrdc_params_s::pack(bit_ref& bref) const
     HANDLE_CODE(ul_switching_time_eutra_nr.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1049,7 +1051,8 @@ OCUDUASN_CODE mrdc_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mrdc_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(single_ul_tx_present, 1));
   HANDLE_CODE(bref.unpack(dyn_pwr_sharing_endc_present, 1));
   HANDLE_CODE(bref.unpack(tdm_pattern_present, 1));
@@ -1105,16 +1108,14 @@ void mrdc_params_s::to_json(json_writer& j) const
   if (async_intra_band_endc_present) {
     j.write_str("asyncIntraBandENDC", "supported");
   }
-  if (ext) {
-    if (dual_pa_architecture_present) {
-      j.write_str("dualPA-Architecture", "supported");
-    }
-    if (intra_band_endc_support_present) {
-      j.write_str("intraBandENDC-Support", intra_band_endc_support.to_string());
-    }
-    if (ul_timing_align_eutra_nr_present) {
-      j.write_str("ul-TimingAlignmentEUTRA-NR", "required");
-    }
+  if (dual_pa_architecture_present) {
+    j.write_str("dualPA-Architecture", "supported");
+  }
+  if (intra_band_endc_support_present) {
+    j.write_str("intraBandENDC-Support", intra_band_endc_support.to_string());
+  }
+  if (ul_timing_align_eutra_nr_present) {
+    j.write_str("ul-TimingAlignmentEUTRA-NR", "required");
   }
   j.end_obj();
 }
@@ -3438,7 +3439,7 @@ OCUDUASN_CODE band_combination_ul_tx_switch_r16_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ul_tx_switching_pusch_trans_coherence_r16_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(band_combination_v1540_present, 1));
   HANDLE_CODE(bref.pack(band_combination_v1560_present, 1));
   HANDLE_CODE(bref.pack(band_combination_v1570_present, 1));
@@ -3472,7 +3473,7 @@ OCUDUASN_CODE band_combination_ul_tx_switch_r16_s::pack(bit_ref& bref) const
     HANDLE_CODE(ul_tx_switching_option_support_r16.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -3488,7 +3489,8 @@ OCUDUASN_CODE band_combination_ul_tx_switch_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE band_combination_ul_tx_switch_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(band_combination_v1540_present, 1));
   HANDLE_CODE(bref.unpack(band_combination_v1560_present, 1));
   HANDLE_CODE(bref.unpack(band_combination_v1570_present, 1));
@@ -3576,10 +3578,8 @@ void band_combination_ul_tx_switch_r16_s::to_json(json_writer& j) const
   if (ul_tx_switching_pwr_boosting_r16_present) {
     j.write_str("uplinkTxSwitching-PowerBoosting-r16", "supported");
   }
-  if (ext) {
-    if (ul_tx_switching_pusch_trans_coherence_r16_present) {
-      j.write_str("uplinkTxSwitching-PUSCH-TransCoherence-r16", ul_tx_switching_pusch_trans_coherence_r16.to_string());
-    }
+  if (ul_tx_switching_pusch_trans_coherence_r16_present) {
+    j.write_str("uplinkTxSwitching-PUSCH-TransCoherence-r16", ul_tx_switching_pusch_trans_coherence_r16.to_string());
   }
   j.end_obj();
 }
@@ -15886,7 +15886,7 @@ OCUDUASN_CODE mimo_params_per_band_s::pack(bit_ref& bref) const
   group_flags[9] |= pucch_repeat_dyn_ind_sfn_r18_present;
   group_flags[9] |= group_beam_report_s_tx2_p_r18.is_present();
   group_flags[10] |= simul_cfg_dmrs_dci_1_3_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(tci_state_pdsch_present, 1));
   HANDLE_CODE(bref.pack(add_active_tci_state_pdcch_present, 1));
   HANDLE_CODE(bref.pack(pusch_trans_coherence_present, 1));
@@ -16035,7 +16035,7 @@ OCUDUASN_CODE mimo_params_per_band_s::pack(bit_ref& bref) const
     HANDLE_CODE(dummy4.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -16763,7 +16763,8 @@ OCUDUASN_CODE mimo_params_per_band_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mimo_params_per_band_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(tci_state_pdsch_present, 1));
   HANDLE_CODE(bref.unpack(add_active_tci_state_pdcch_present, 1));
   HANDLE_CODE(bref.unpack(pusch_trans_coherence_present, 1));
@@ -17795,901 +17796,895 @@ void mimo_params_per_band_s::to_json(json_writer& j) const
   if (aperiodic_trs_present) {
     j.write_str("aperiodicTRS", "supported");
   }
-  if (ext) {
-    if (dummy6_present) {
-      j.write_str("dummy6", "true");
+  if (dummy6_present) {
+    j.write_str("dummy6", "true");
+  }
+  if (beam_management_ssb_csi_rs.is_present()) {
+    j.write_fieldname("beamManagementSSB-CSI-RS");
+    beam_management_ssb_csi_rs->to_json(j);
+  }
+  if (beam_switch_timing.is_present()) {
+    j.write_fieldname("beamSwitchTiming");
+    j.start_obj();
+    if (beam_switch_timing->scs_60k_hz_present) {
+      j.write_str("scs-60kHz", beam_switch_timing->scs_60k_hz.to_string());
     }
-    if (beam_management_ssb_csi_rs.is_present()) {
-      j.write_fieldname("beamManagementSSB-CSI-RS");
-      beam_management_ssb_csi_rs->to_json(j);
+    if (beam_switch_timing->scs_120k_hz_present) {
+      j.write_str("scs-120kHz", beam_switch_timing->scs_120k_hz.to_string());
     }
-    if (beam_switch_timing.is_present()) {
-      j.write_fieldname("beamSwitchTiming");
+    j.end_obj();
+  }
+  if (codebook_params.is_present()) {
+    j.write_fieldname("codebookParameters");
+    codebook_params->to_json(j);
+  }
+  if (csi_rs_im_reception_for_feedback.is_present()) {
+    j.write_fieldname("csi-RS-IM-ReceptionForFeedback");
+    csi_rs_im_reception_for_feedback->to_json(j);
+  }
+  if (csi_rs_proc_framework_for_srs.is_present()) {
+    j.write_fieldname("csi-RS-ProcFrameworkForSRS");
+    csi_rs_proc_framework_for_srs->to_json(j);
+  }
+  if (csi_report_framework.is_present()) {
+    j.write_fieldname("csi-ReportFramework");
+    csi_report_framework->to_json(j);
+  }
+  if (csi_rs_for_tracking.is_present()) {
+    j.write_fieldname("csi-RS-ForTracking");
+    csi_rs_for_tracking->to_json(j);
+  }
+  if (srs_assoc_csi_rs.is_present()) {
+    j.start_array("srs-AssocCSI-RS");
+    for (const auto& e1 : *srs_assoc_csi_rs) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (spatial_relations.is_present()) {
+    j.write_fieldname("spatialRelations");
+    spatial_relations->to_json(j);
+  }
+  if (default_qcl_two_tci_r16_present) {
+    j.write_str("defaultQCL-TwoTCI-r16", "supported");
+  }
+  if (codebook_params_per_band_r16.is_present()) {
+    j.write_fieldname("codebookParametersPerBand-r16");
+    codebook_params_per_band_r16->to_json(j);
+  }
+  if (simul_spatial_relation_upd_pucch_res_group_r16_present) {
+    j.write_str("simul-SpatialRelationUpdatePUCCHResGroup-r16", "supported");
+  }
+  if (max_num_scell_bfr_r16_present) {
+    j.write_str("maxNumberSCellBFR-r16", max_num_scell_bfr_r16.to_string());
+  }
+  if (simul_reception_diff_type_d_r16_present) {
+    j.write_str("simultaneousReceptionDiffTypeD-r16", "supported");
+  }
+  if (ssb_csirs_sinr_meas_r16.is_present()) {
+    j.write_fieldname("ssb-csirs-SINR-measurement-r16");
+    j.start_obj();
+    j.write_str("maxNumberSSB-CSIRS-OneTx-CMR-r16",
+                ssb_csirs_sinr_meas_r16->max_num_ssb_csi_rs_one_tx_cmr_r16.to_string());
+    j.write_str("maxNumberCSI-IM-NZP-IMR-res-r16", ssb_csirs_sinr_meas_r16->max_num_csi_im_nzp_imr_res_r16.to_string());
+    j.write_str("maxNumberCSIRS-2Tx-res-r16", ssb_csirs_sinr_meas_r16->max_num_csi_rs_2_tx_res_r16.to_string());
+    j.write_str("maxNumberSSB-CSIRS-res-r16", ssb_csirs_sinr_meas_r16->max_num_ssb_csi_rs_res_r16.to_string());
+    j.write_str("maxNumberCSI-IM-NZP-IMR-res-mem-r16",
+                ssb_csirs_sinr_meas_r16->max_num_csi_im_nzp_imr_res_mem_r16.to_string());
+    j.write_str("supportedCSI-RS-Density-CMR-r16",
+                ssb_csirs_sinr_meas_r16->supported_csi_rs_density_cmr_r16.to_string());
+    j.write_str("maxNumberAperiodicCSI-RS-Res-r16",
+                ssb_csirs_sinr_meas_r16->max_num_aperiodic_csi_rs_res_r16.to_string());
+    if (ssb_csirs_sinr_meas_r16->supported_sinr_meas_r16_present) {
+      j.write_str("supportedSINR-meas-r16", ssb_csirs_sinr_meas_r16->supported_sinr_meas_r16.to_string());
+    }
+    j.end_obj();
+  }
+  if (non_group_sinr_report_r16_present) {
+    j.write_str("nonGroupSINR-reporting-r16", non_group_sinr_report_r16.to_string());
+  }
+  if (group_sinr_report_r16_present) {
+    j.write_str("groupSINR-reporting-r16", "supported");
+  }
+  if (multi_dci_multi_trp_params_r16.is_present()) {
+    j.write_fieldname("multiDCI-multiTRP-Parameters-r16");
+    j.start_obj();
+    if (multi_dci_multi_trp_params_r16->overlap_pdsc_hs_fully_freq_time_r16_present) {
+      j.write_int("overlapPDSCHsFullyFreqTime-r16",
+                  multi_dci_multi_trp_params_r16->overlap_pdsc_hs_fully_freq_time_r16);
+    }
+    if (multi_dci_multi_trp_params_r16->overlap_pdsc_hs_in_time_partially_freq_r16_present) {
+      j.write_str("overlapPDSCHsInTimePartiallyFreq-r16", "supported");
+    }
+    if (multi_dci_multi_trp_params_r16->out_of_order_operation_dl_r16_present) {
+      j.write_fieldname("outOfOrderOperationDL-r16");
       j.start_obj();
-      if (beam_switch_timing->scs_60k_hz_present) {
-        j.write_str("scs-60kHz", beam_switch_timing->scs_60k_hz.to_string());
+      if (multi_dci_multi_trp_params_r16->out_of_order_operation_dl_r16.support_pdcch_to_pdsch_r16_present) {
+        j.write_str("supportPDCCH-ToPDSCH-r16", "supported");
       }
-      if (beam_switch_timing->scs_120k_hz_present) {
-        j.write_str("scs-120kHz", beam_switch_timing->scs_120k_hz.to_string());
+      if (multi_dci_multi_trp_params_r16->out_of_order_operation_dl_r16.support_pdsch_to_harq_ack_r16_present) {
+        j.write_str("supportPDSCH-ToHARQ-ACK-r16", "supported");
       }
       j.end_obj();
     }
-    if (codebook_params.is_present()) {
-      j.write_fieldname("codebookParameters");
-      codebook_params->to_json(j);
+    if (multi_dci_multi_trp_params_r16->out_of_order_operation_ul_r16_present) {
+      j.write_str("outOfOrderOperationUL-r16", "supported");
     }
-    if (csi_rs_im_reception_for_feedback.is_present()) {
-      j.write_fieldname("csi-RS-IM-ReceptionForFeedback");
-      csi_rs_im_reception_for_feedback->to_json(j);
+    if (multi_dci_multi_trp_params_r16->separate_crs_rate_matching_r16_present) {
+      j.write_str("separateCRS-RateMatching-r16", "supported");
     }
-    if (csi_rs_proc_framework_for_srs.is_present()) {
-      j.write_fieldname("csi-RS-ProcFrameworkForSRS");
-      csi_rs_proc_framework_for_srs->to_json(j);
+    if (multi_dci_multi_trp_params_r16->default_qcl_per_coreset_pool_idx_r16_present) {
+      j.write_str("defaultQCL-PerCORESETPoolIndex-r16", "supported");
     }
-    if (csi_report_framework.is_present()) {
-      j.write_fieldname("csi-ReportFramework");
-      csi_report_framework->to_json(j);
-    }
-    if (csi_rs_for_tracking.is_present()) {
-      j.write_fieldname("csi-RS-ForTracking");
-      csi_rs_for_tracking->to_json(j);
-    }
-    if (srs_assoc_csi_rs.is_present()) {
-      j.start_array("srs-AssocCSI-RS");
-      for (const auto& e1 : *srs_assoc_csi_rs) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (spatial_relations.is_present()) {
-      j.write_fieldname("spatialRelations");
-      spatial_relations->to_json(j);
-    }
-    if (default_qcl_two_tci_r16_present) {
-      j.write_str("defaultQCL-TwoTCI-r16", "supported");
-    }
-    if (codebook_params_per_band_r16.is_present()) {
-      j.write_fieldname("codebookParametersPerBand-r16");
-      codebook_params_per_band_r16->to_json(j);
-    }
-    if (simul_spatial_relation_upd_pucch_res_group_r16_present) {
-      j.write_str("simul-SpatialRelationUpdatePUCCHResGroup-r16", "supported");
-    }
-    if (max_num_scell_bfr_r16_present) {
-      j.write_str("maxNumberSCellBFR-r16", max_num_scell_bfr_r16.to_string());
-    }
-    if (simul_reception_diff_type_d_r16_present) {
-      j.write_str("simultaneousReceptionDiffTypeD-r16", "supported");
-    }
-    if (ssb_csirs_sinr_meas_r16.is_present()) {
-      j.write_fieldname("ssb-csirs-SINR-measurement-r16");
+    if (multi_dci_multi_trp_params_r16->max_num_activ_tci_states_r16_present) {
+      j.write_fieldname("maxNumberActivatedTCI-States-r16");
       j.start_obj();
-      j.write_str("maxNumberSSB-CSIRS-OneTx-CMR-r16",
-                  ssb_csirs_sinr_meas_r16->max_num_ssb_csi_rs_one_tx_cmr_r16.to_string());
-      j.write_str("maxNumberCSI-IM-NZP-IMR-res-r16",
-                  ssb_csirs_sinr_meas_r16->max_num_csi_im_nzp_imr_res_r16.to_string());
-      j.write_str("maxNumberCSIRS-2Tx-res-r16", ssb_csirs_sinr_meas_r16->max_num_csi_rs_2_tx_res_r16.to_string());
-      j.write_str("maxNumberSSB-CSIRS-res-r16", ssb_csirs_sinr_meas_r16->max_num_ssb_csi_rs_res_r16.to_string());
-      j.write_str("maxNumberCSI-IM-NZP-IMR-res-mem-r16",
-                  ssb_csirs_sinr_meas_r16->max_num_csi_im_nzp_imr_res_mem_r16.to_string());
-      j.write_str("supportedCSI-RS-Density-CMR-r16",
-                  ssb_csirs_sinr_meas_r16->supported_csi_rs_density_cmr_r16.to_string());
-      j.write_str("maxNumberAperiodicCSI-RS-Res-r16",
-                  ssb_csirs_sinr_meas_r16->max_num_aperiodic_csi_rs_res_r16.to_string());
-      if (ssb_csirs_sinr_meas_r16->supported_sinr_meas_r16_present) {
-        j.write_str("supportedSINR-meas-r16", ssb_csirs_sinr_meas_r16->supported_sinr_meas_r16.to_string());
-      }
+      j.write_str(
+          "maxNumberPerCORESET-Pool-r16",
+          multi_dci_multi_trp_params_r16->max_num_activ_tci_states_r16.max_num_per_coreset_pool_r16.to_string());
+      j.write_str("maxTotalNumberAcrossCORESET-Pool-r16",
+                  multi_dci_multi_trp_params_r16->max_num_activ_tci_states_r16.max_total_num_across_coreset_pool_r16
+                      .to_string());
       j.end_obj();
     }
-    if (non_group_sinr_report_r16_present) {
-      j.write_str("nonGroupSINR-reporting-r16", non_group_sinr_report_r16.to_string());
+    j.end_obj();
+  }
+  if (single_dci_sdm_scheme_params_r16.is_present()) {
+    j.write_fieldname("singleDCI-SDM-scheme-Parameters-r16");
+    j.start_obj();
+    if (single_dci_sdm_scheme_params_r16->support_new_dmrs_port_r16_present) {
+      j.write_str("supportNewDMRS-Port-r16", single_dci_sdm_scheme_params_r16->support_new_dmrs_port_r16.to_string());
     }
-    if (group_sinr_report_r16_present) {
-      j.write_str("groupSINR-reporting-r16", "supported");
+    if (single_dci_sdm_scheme_params_r16->support_two_port_dl_ptrs_r16_present) {
+      j.write_str("supportTwoPortDL-PTRS-r16", "supported");
     }
-    if (multi_dci_multi_trp_params_r16.is_present()) {
-      j.write_fieldname("multiDCI-multiTRP-Parameters-r16");
-      j.start_obj();
-      if (multi_dci_multi_trp_params_r16->overlap_pdsc_hs_fully_freq_time_r16_present) {
-        j.write_int("overlapPDSCHsFullyFreqTime-r16",
-                    multi_dci_multi_trp_params_r16->overlap_pdsc_hs_fully_freq_time_r16);
-      }
-      if (multi_dci_multi_trp_params_r16->overlap_pdsc_hs_in_time_partially_freq_r16_present) {
-        j.write_str("overlapPDSCHsInTimePartiallyFreq-r16", "supported");
-      }
-      if (multi_dci_multi_trp_params_r16->out_of_order_operation_dl_r16_present) {
-        j.write_fieldname("outOfOrderOperationDL-r16");
-        j.start_obj();
-        if (multi_dci_multi_trp_params_r16->out_of_order_operation_dl_r16.support_pdcch_to_pdsch_r16_present) {
-          j.write_str("supportPDCCH-ToPDSCH-r16", "supported");
-        }
-        if (multi_dci_multi_trp_params_r16->out_of_order_operation_dl_r16.support_pdsch_to_harq_ack_r16_present) {
-          j.write_str("supportPDSCH-ToHARQ-ACK-r16", "supported");
-        }
-        j.end_obj();
-      }
-      if (multi_dci_multi_trp_params_r16->out_of_order_operation_ul_r16_present) {
-        j.write_str("outOfOrderOperationUL-r16", "supported");
-      }
-      if (multi_dci_multi_trp_params_r16->separate_crs_rate_matching_r16_present) {
-        j.write_str("separateCRS-RateMatching-r16", "supported");
-      }
-      if (multi_dci_multi_trp_params_r16->default_qcl_per_coreset_pool_idx_r16_present) {
-        j.write_str("defaultQCL-PerCORESETPoolIndex-r16", "supported");
-      }
-      if (multi_dci_multi_trp_params_r16->max_num_activ_tci_states_r16_present) {
-        j.write_fieldname("maxNumberActivatedTCI-States-r16");
-        j.start_obj();
-        j.write_str(
-            "maxNumberPerCORESET-Pool-r16",
-            multi_dci_multi_trp_params_r16->max_num_activ_tci_states_r16.max_num_per_coreset_pool_r16.to_string());
-        j.write_str("maxTotalNumberAcrossCORESET-Pool-r16",
-                    multi_dci_multi_trp_params_r16->max_num_activ_tci_states_r16.max_total_num_across_coreset_pool_r16
-                        .to_string());
-        j.end_obj();
-      }
-      j.end_obj();
+    j.end_obj();
+  }
+  if (support_fdm_scheme_a_r16_present) {
+    j.write_str("supportFDM-SchemeA-r16", "supported");
+  }
+  if (support_code_word_soft_combining_r16_present) {
+    j.write_str("supportCodeWordSoftCombining-r16", "supported");
+  }
+  if (support_tdm_scheme_a_r16_present) {
+    j.write_str("supportTDM-SchemeA-r16", support_tdm_scheme_a_r16.to_string());
+  }
+  if (support_inter_slot_tdm_r16.is_present()) {
+    j.write_fieldname("supportInter-slotTDM-r16");
+    j.start_obj();
+    j.write_str("supportRepNumPDSCH-TDRA-r16", support_inter_slot_tdm_r16->support_rep_num_pdsch_tdra_r16.to_string());
+    j.write_str("maxTBS-Size-r16", support_inter_slot_tdm_r16->max_tbs_size_r16.to_string());
+    j.write_int("maxNumberTCI-states-r16", support_inter_slot_tdm_r16->max_num_tci_states_r16);
+    j.end_obj();
+  }
+  if (low_papr_dmrs_pdsch_r16_present) {
+    j.write_str("lowPAPR-DMRS-PDSCH-r16", "supported");
+  }
+  if (low_papr_dmrs_pusc_hwithout_precoding_r16_present) {
+    j.write_str("lowPAPR-DMRS-PUSCHwithoutPrecoding-r16", "supported");
+  }
+  if (low_papr_dmrs_pucch_r16_present) {
+    j.write_str("lowPAPR-DMRS-PUCCH-r16", "supported");
+  }
+  if (low_papr_dmrs_pusc_hwith_precoding_r16_present) {
+    j.write_str("lowPAPR-DMRS-PUSCHwithPrecoding-r16", "supported");
+  }
+  if (csi_report_framework_ext_r16.is_present()) {
+    j.write_fieldname("csi-ReportFrameworkExt-r16");
+    csi_report_framework_ext_r16->to_json(j);
+  }
+  if (codebook_params_addition_r16.is_present()) {
+    j.write_fieldname("codebookParametersAddition-r16");
+    codebook_params_addition_r16->to_json(j);
+  }
+  if (codebook_combo_params_addition_r16.is_present()) {
+    j.write_fieldname("codebookComboParametersAddition-r16");
+    codebook_combo_params_addition_r16->to_json(j);
+  }
+  if (beam_correspondence_ssb_based_r16_present) {
+    j.write_str("beamCorrespondenceSSB-based-r16", "supported");
+  }
+  if (beam_correspondence_csi_rs_based_r16_present) {
+    j.write_str("beamCorrespondenceCSI-RS-based-r16", "supported");
+  }
+  if (beam_switch_timing_r16.is_present()) {
+    j.write_fieldname("beamSwitchTiming-r16");
+    j.start_obj();
+    if (beam_switch_timing_r16->scs_60k_hz_r16_present) {
+      j.write_str("scs-60kHz-r16", beam_switch_timing_r16->scs_60k_hz_r16.to_string());
     }
-    if (single_dci_sdm_scheme_params_r16.is_present()) {
-      j.write_fieldname("singleDCI-SDM-scheme-Parameters-r16");
-      j.start_obj();
-      if (single_dci_sdm_scheme_params_r16->support_new_dmrs_port_r16_present) {
-        j.write_str("supportNewDMRS-Port-r16", single_dci_sdm_scheme_params_r16->support_new_dmrs_port_r16.to_string());
-      }
-      if (single_dci_sdm_scheme_params_r16->support_two_port_dl_ptrs_r16_present) {
-        j.write_str("supportTwoPortDL-PTRS-r16", "supported");
-      }
-      j.end_obj();
+    if (beam_switch_timing_r16->scs_120k_hz_r16_present) {
+      j.write_str("scs-120kHz-r16", beam_switch_timing_r16->scs_120k_hz_r16.to_string());
     }
-    if (support_fdm_scheme_a_r16_present) {
-      j.write_str("supportFDM-SchemeA-r16", "supported");
+    j.end_obj();
+  }
+  if (semi_persistent_l1_sinr_report_pucch_r16.is_present()) {
+    j.write_fieldname("semi-PersistentL1-SINR-Report-PUCCH-r16");
+    j.start_obj();
+    if (semi_persistent_l1_sinr_report_pucch_r16->support_report_format1_2_ofdm_syms_r16_present) {
+      j.write_str("supportReportFormat1-2OFDM-syms-r16", "supported");
     }
-    if (support_code_word_soft_combining_r16_present) {
-      j.write_str("supportCodeWordSoftCombining-r16", "supported");
+    if (semi_persistent_l1_sinr_report_pucch_r16->support_report_format4_14_ofdm_syms_r16_present) {
+      j.write_str("supportReportFormat4-14OFDM-syms-r16", "supported");
     }
-    if (support_tdm_scheme_a_r16_present) {
-      j.write_str("supportTDM-SchemeA-r16", support_tdm_scheme_a_r16.to_string());
-    }
-    if (support_inter_slot_tdm_r16.is_present()) {
-      j.write_fieldname("supportInter-slotTDM-r16");
-      j.start_obj();
-      j.write_str("supportRepNumPDSCH-TDRA-r16",
-                  support_inter_slot_tdm_r16->support_rep_num_pdsch_tdra_r16.to_string());
-      j.write_str("maxTBS-Size-r16", support_inter_slot_tdm_r16->max_tbs_size_r16.to_string());
-      j.write_int("maxNumberTCI-states-r16", support_inter_slot_tdm_r16->max_num_tci_states_r16);
-      j.end_obj();
-    }
-    if (low_papr_dmrs_pdsch_r16_present) {
-      j.write_str("lowPAPR-DMRS-PDSCH-r16", "supported");
-    }
-    if (low_papr_dmrs_pusc_hwithout_precoding_r16_present) {
-      j.write_str("lowPAPR-DMRS-PUSCHwithoutPrecoding-r16", "supported");
-    }
-    if (low_papr_dmrs_pucch_r16_present) {
-      j.write_str("lowPAPR-DMRS-PUCCH-r16", "supported");
-    }
-    if (low_papr_dmrs_pusc_hwith_precoding_r16_present) {
-      j.write_str("lowPAPR-DMRS-PUSCHwithPrecoding-r16", "supported");
-    }
-    if (csi_report_framework_ext_r16.is_present()) {
-      j.write_fieldname("csi-ReportFrameworkExt-r16");
-      csi_report_framework_ext_r16->to_json(j);
-    }
-    if (codebook_params_addition_r16.is_present()) {
-      j.write_fieldname("codebookParametersAddition-r16");
-      codebook_params_addition_r16->to_json(j);
-    }
-    if (codebook_combo_params_addition_r16.is_present()) {
-      j.write_fieldname("codebookComboParametersAddition-r16");
-      codebook_combo_params_addition_r16->to_json(j);
-    }
-    if (beam_correspondence_ssb_based_r16_present) {
-      j.write_str("beamCorrespondenceSSB-based-r16", "supported");
-    }
-    if (beam_correspondence_csi_rs_based_r16_present) {
-      j.write_str("beamCorrespondenceCSI-RS-based-r16", "supported");
-    }
-    if (beam_switch_timing_r16.is_present()) {
-      j.write_fieldname("beamSwitchTiming-r16");
-      j.start_obj();
-      if (beam_switch_timing_r16->scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", beam_switch_timing_r16->scs_60k_hz_r16.to_string());
-      }
-      if (beam_switch_timing_r16->scs_120k_hz_r16_present) {
-        j.write_str("scs-120kHz-r16", beam_switch_timing_r16->scs_120k_hz_r16.to_string());
-      }
-      j.end_obj();
-    }
-    if (semi_persistent_l1_sinr_report_pucch_r16.is_present()) {
-      j.write_fieldname("semi-PersistentL1-SINR-Report-PUCCH-r16");
-      j.start_obj();
-      if (semi_persistent_l1_sinr_report_pucch_r16->support_report_format1_2_ofdm_syms_r16_present) {
-        j.write_str("supportReportFormat1-2OFDM-syms-r16", "supported");
-      }
-      if (semi_persistent_l1_sinr_report_pucch_r16->support_report_format4_14_ofdm_syms_r16_present) {
-        j.write_str("supportReportFormat4-14OFDM-syms-r16", "supported");
-      }
-      j.end_obj();
-    }
-    if (semi_persistent_l1_sinr_report_pusch_r16_present) {
-      j.write_str("semi-PersistentL1-SINR-Report-PUSCH-r16", "supported");
-    }
-    if (spatial_relations_v1640.is_present()) {
-      j.write_fieldname("spatialRelations-v1640");
-      j.start_obj();
-      j.write_str("maxNumberConfiguredSpatialRelations-v1640",
-                  spatial_relations_v1640->max_num_cfg_spatial_relations_v1640.to_string());
-      j.end_obj();
-    }
-    if (support64_candidate_beam_rs_bfr_r16_present) {
-      j.write_str("support64CandidateBeamRS-BFR-r16", "supported");
-    }
-    if (max_mimo_layers_for_multi_dci_m_trp_r16_present) {
-      j.write_str("maxMIMO-LayersForMulti-DCI-mTRP-r16", "supported");
-    }
-    if (supported_sinr_meas_v1670_present) {
-      j.write_str("supportedSINR-meas-v1670", supported_sinr_meas_v1670.to_string());
-    }
-    if (srs_increased_repeat_r17_present) {
-      j.write_str("srs-increasedRepetition-r17", "supported");
-    }
-    if (srs_partial_freq_sr17_present) {
-      j.write_str("srs-partialFrequencySounding-r17", "supported");
-    }
-    if (srs_start_rb_location_hop_partial_r17_present) {
-      j.write_str("srs-startRB-locationHoppingPartial-r17", "supported");
-    }
-    if (srs_comb_eight_r17_present) {
-      j.write_str("srs-combEight-r17", "supported");
-    }
-    if (codebook_paramsfetype2_r17.is_present()) {
-      j.write_fieldname("codebookParametersfetype2-r17");
-      codebook_paramsfetype2_r17->to_json(j);
-    }
-    if (mtrp_pusch_two_csi_rs_r17_present) {
-      j.write_str("mTRP-PUSCH-twoCSI-RS-r17", "supported");
-    }
-    if (mtrp_pucch_inter_slot_r17_present) {
-      j.write_str("mTRP-PUCCH-InterSlot-r17", mtrp_pucch_inter_slot_r17.to_string());
-    }
-    if (mtrp_pucch_cyclic_map_r17_present) {
-      j.write_str("mTRP-PUCCH-CyclicMapping-r17", "supported");
-    }
-    if (mtrp_pucch_second_tpc_r17_present) {
-      j.write_str("mTRP-PUCCH-SecondTPC-r17", "supported");
-    }
-    if (mtrp_bfr_two_bfd_rs_set_r17.is_present()) {
-      j.write_fieldname("mTRP-BFR-twoBFD-RS-Set-r17");
-      j.start_obj();
-      j.write_str("maxBFD-RS-resourcesPerSetPerBWP-r17",
-                  mtrp_bfr_two_bfd_rs_set_r17->max_bfd_rs_res_per_set_per_bwp_r17.to_string());
-      j.write_int("maxBFR-r17", mtrp_bfr_two_bfd_rs_set_r17->max_bfr_r17);
-      j.write_str("maxBFD-RS-resourcesAcrossSetsPerBWP-r17",
-                  mtrp_bfr_two_bfd_rs_set_r17->max_bfd_rs_res_across_sets_per_bwp_r17.to_string());
-      j.end_obj();
-    }
-    if (mtrp_bfr_pucch_sr_per_cg_r17_present) {
-      j.write_str("mTRP-BFR-PUCCH-SR-perCG-r17", mtrp_bfr_pucch_sr_per_cg_r17.to_string());
-    }
-    if (mtrp_bfr_assoc_pucch_sr_r17_present) {
-      j.write_str("mTRP-BFR-association-PUCCH-SR-r17", "supported");
-    }
-    if (sfn_simul_two_tci_across_multi_cc_r17_present) {
-      j.write_str("sfn-SimulTwoTCI-AcrossMultiCC-r17", "supported");
-    }
-    if (sfn_default_dl_beam_setup_r17_present) {
-      j.write_str("sfn-DefaultDL-BeamSetup-r17", "supported");
-    }
-    if (sfn_default_ul_beam_setup_r17_present) {
-      j.write_str("sfn-DefaultUL-BeamSetup-r17", "supported");
-    }
-    if (srs_trigger_offset_r17_present) {
-      j.write_str("srs-TriggeringOffset-r17", srs_trigger_offset_r17.to_string());
-    }
-    if (srs_trigger_dci_r17_present) {
-      j.write_str("srs-TriggeringDCI-r17", "supported");
-    }
-    if (codebook_combo_param_mixed_type_r17.is_present()) {
-      j.write_fieldname("codebookComboParameterMixedType-r17");
-      codebook_combo_param_mixed_type_r17->to_json(j);
-    }
-    if (unified_joint_tci_r17.is_present()) {
-      j.write_fieldname("unifiedJointTCI-r17");
-      j.start_obj();
-      j.write_str("maxConfiguredJointTCI-r17", unified_joint_tci_r17->max_cfg_joint_tci_r17.to_string());
-      j.write_str("maxActivatedTCIAcrossCC-r17", unified_joint_tci_r17->max_activ_tci_across_cc_r17.to_string());
-      j.end_obj();
-    }
-    if (unified_joint_tci_multi_mac_ce_r17.is_present()) {
-      j.write_fieldname("unifiedJointTCI-multiMAC-CE-r17");
-      j.start_obj();
-      if (unified_joint_tci_multi_mac_ce_r17->min_beam_application_time_r17_present) {
-        j.write_str("minBeamApplicationTime-r17",
-                    unified_joint_tci_multi_mac_ce_r17->min_beam_application_time_r17.to_string());
-      }
-      j.write_str("maxNumMAC-CE-PerCC", unified_joint_tci_multi_mac_ce_r17->max_num_mac_ce_per_cc.to_string());
-      j.end_obj();
-    }
-    if (unified_joint_tci_per_bwp_ca_r17_present) {
-      j.write_str("unifiedJointTCI-perBWP-CA-r17", "supported");
-    }
-    if (unified_joint_tci_list_sharing_ca_r17_present) {
-      j.write_str("unifiedJointTCI-ListSharingCA-r17", unified_joint_tci_list_sharing_ca_r17.to_string());
-    }
-    if (unified_joint_tci_common_multi_cc_r17_present) {
-      j.write_str("unifiedJointTCI-commonMultiCC-r17", "supported");
-    }
-    if (unified_joint_tci_beam_align_dl_rs_r17_present) {
-      j.write_str("unifiedJointTCI-BeamAlignDLRS-r17", "supported");
-    }
-    if (unified_joint_tci_pc_assoc_r17_present) {
-      j.write_str("unifiedJointTCI-PC-association-r17", "supported");
-    }
-    if (unified_joint_tci_legacy_r17_present) {
-      j.write_str("unifiedJointTCI-Legacy-r17", "supported");
-    }
-    if (unified_joint_tci_legacy_srs_r17_present) {
-      j.write_str("unifiedJointTCI-Legacy-SRS-r17", "supported");
-    }
-    if (unified_joint_tci_legacy_coreset0_r17_present) {
-      j.write_str("unifiedJointTCI-Legacy-CORESET0-r17", "supported");
-    }
-    if (unified_joint_tci_scell_bfr_r17_present) {
-      j.write_str("unifiedJointTCI-SCellBFR-r17", "supported");
-    }
-    if (unified_joint_tci_inter_cell_r17.is_present()) {
-      j.write_fieldname("unifiedJointTCI-InterCell-r17");
-      j.start_obj();
-      j.write_str("additionalMAC-CE-PerCC-r17", unified_joint_tci_inter_cell_r17->add_mac_ce_per_cc_r17.to_string());
-      j.write_str("additionalMAC-CE-AcrossCC-r17",
-                  unified_joint_tci_inter_cell_r17->add_mac_ce_across_cc_r17.to_string());
-      j.end_obj();
-    }
-    if (unified_separate_tci_r17.is_present()) {
-      j.write_fieldname("unifiedSeparateTCI-r17");
-      j.start_obj();
-      j.write_str("maxConfiguredDL-TCI-r17", unified_separate_tci_r17->max_cfg_dl_tci_r17.to_string());
-      j.write_str("maxConfiguredUL-TCI-r17", unified_separate_tci_r17->max_cfg_ul_tci_r17.to_string());
-      j.write_str("maxActivatedDL-TCIAcrossCC-r17",
-                  unified_separate_tci_r17->max_activ_dl_tci_across_cc_r17.to_string());
-      j.write_str("maxActivatedUL-TCIAcrossCC-r17",
-                  unified_separate_tci_r17->max_activ_ul_tci_across_cc_r17.to_string());
-      j.end_obj();
-    }
-    if (unified_separate_tci_multi_mac_ce_r17.is_present()) {
-      j.write_fieldname("unifiedSeparateTCI-multiMAC-CE-r17");
-      j.start_obj();
+    j.end_obj();
+  }
+  if (semi_persistent_l1_sinr_report_pusch_r16_present) {
+    j.write_str("semi-PersistentL1-SINR-Report-PUSCH-r16", "supported");
+  }
+  if (spatial_relations_v1640.is_present()) {
+    j.write_fieldname("spatialRelations-v1640");
+    j.start_obj();
+    j.write_str("maxNumberConfiguredSpatialRelations-v1640",
+                spatial_relations_v1640->max_num_cfg_spatial_relations_v1640.to_string());
+    j.end_obj();
+  }
+  if (support64_candidate_beam_rs_bfr_r16_present) {
+    j.write_str("support64CandidateBeamRS-BFR-r16", "supported");
+  }
+  if (max_mimo_layers_for_multi_dci_m_trp_r16_present) {
+    j.write_str("maxMIMO-LayersForMulti-DCI-mTRP-r16", "supported");
+  }
+  if (supported_sinr_meas_v1670_present) {
+    j.write_str("supportedSINR-meas-v1670", supported_sinr_meas_v1670.to_string());
+  }
+  if (srs_increased_repeat_r17_present) {
+    j.write_str("srs-increasedRepetition-r17", "supported");
+  }
+  if (srs_partial_freq_sr17_present) {
+    j.write_str("srs-partialFrequencySounding-r17", "supported");
+  }
+  if (srs_start_rb_location_hop_partial_r17_present) {
+    j.write_str("srs-startRB-locationHoppingPartial-r17", "supported");
+  }
+  if (srs_comb_eight_r17_present) {
+    j.write_str("srs-combEight-r17", "supported");
+  }
+  if (codebook_paramsfetype2_r17.is_present()) {
+    j.write_fieldname("codebookParametersfetype2-r17");
+    codebook_paramsfetype2_r17->to_json(j);
+  }
+  if (mtrp_pusch_two_csi_rs_r17_present) {
+    j.write_str("mTRP-PUSCH-twoCSI-RS-r17", "supported");
+  }
+  if (mtrp_pucch_inter_slot_r17_present) {
+    j.write_str("mTRP-PUCCH-InterSlot-r17", mtrp_pucch_inter_slot_r17.to_string());
+  }
+  if (mtrp_pucch_cyclic_map_r17_present) {
+    j.write_str("mTRP-PUCCH-CyclicMapping-r17", "supported");
+  }
+  if (mtrp_pucch_second_tpc_r17_present) {
+    j.write_str("mTRP-PUCCH-SecondTPC-r17", "supported");
+  }
+  if (mtrp_bfr_two_bfd_rs_set_r17.is_present()) {
+    j.write_fieldname("mTRP-BFR-twoBFD-RS-Set-r17");
+    j.start_obj();
+    j.write_str("maxBFD-RS-resourcesPerSetPerBWP-r17",
+                mtrp_bfr_two_bfd_rs_set_r17->max_bfd_rs_res_per_set_per_bwp_r17.to_string());
+    j.write_int("maxBFR-r17", mtrp_bfr_two_bfd_rs_set_r17->max_bfr_r17);
+    j.write_str("maxBFD-RS-resourcesAcrossSetsPerBWP-r17",
+                mtrp_bfr_two_bfd_rs_set_r17->max_bfd_rs_res_across_sets_per_bwp_r17.to_string());
+    j.end_obj();
+  }
+  if (mtrp_bfr_pucch_sr_per_cg_r17_present) {
+    j.write_str("mTRP-BFR-PUCCH-SR-perCG-r17", mtrp_bfr_pucch_sr_per_cg_r17.to_string());
+  }
+  if (mtrp_bfr_assoc_pucch_sr_r17_present) {
+    j.write_str("mTRP-BFR-association-PUCCH-SR-r17", "supported");
+  }
+  if (sfn_simul_two_tci_across_multi_cc_r17_present) {
+    j.write_str("sfn-SimulTwoTCI-AcrossMultiCC-r17", "supported");
+  }
+  if (sfn_default_dl_beam_setup_r17_present) {
+    j.write_str("sfn-DefaultDL-BeamSetup-r17", "supported");
+  }
+  if (sfn_default_ul_beam_setup_r17_present) {
+    j.write_str("sfn-DefaultUL-BeamSetup-r17", "supported");
+  }
+  if (srs_trigger_offset_r17_present) {
+    j.write_str("srs-TriggeringOffset-r17", srs_trigger_offset_r17.to_string());
+  }
+  if (srs_trigger_dci_r17_present) {
+    j.write_str("srs-TriggeringDCI-r17", "supported");
+  }
+  if (codebook_combo_param_mixed_type_r17.is_present()) {
+    j.write_fieldname("codebookComboParameterMixedType-r17");
+    codebook_combo_param_mixed_type_r17->to_json(j);
+  }
+  if (unified_joint_tci_r17.is_present()) {
+    j.write_fieldname("unifiedJointTCI-r17");
+    j.start_obj();
+    j.write_str("maxConfiguredJointTCI-r17", unified_joint_tci_r17->max_cfg_joint_tci_r17.to_string());
+    j.write_str("maxActivatedTCIAcrossCC-r17", unified_joint_tci_r17->max_activ_tci_across_cc_r17.to_string());
+    j.end_obj();
+  }
+  if (unified_joint_tci_multi_mac_ce_r17.is_present()) {
+    j.write_fieldname("unifiedJointTCI-multiMAC-CE-r17");
+    j.start_obj();
+    if (unified_joint_tci_multi_mac_ce_r17->min_beam_application_time_r17_present) {
       j.write_str("minBeamApplicationTime-r17",
-                  unified_separate_tci_multi_mac_ce_r17->min_beam_application_time_r17.to_string());
-      j.write_int("maxActivatedDL-TCIPerCC-r17", unified_separate_tci_multi_mac_ce_r17->max_activ_dl_tci_per_cc_r17);
-      j.write_int("maxActivatedUL-TCIPerCC-r17", unified_separate_tci_multi_mac_ce_r17->max_activ_ul_tci_per_cc_r17);
-      j.end_obj();
-    }
-    if (unified_separate_tci_per_bwp_ca_r17_present) {
-      j.write_str("unifiedSeparateTCI-perBWP-CA-r17", "supported");
-    }
-    if (unified_separate_tci_list_sharing_ca_r17.is_present()) {
-      j.write_fieldname("unifiedSeparateTCI-ListSharingCA-r17");
-      j.start_obj();
-      if (unified_separate_tci_list_sharing_ca_r17->max_num_list_dl_tci_r17_present) {
-        j.write_str("maxNumListDL-TCI-r17",
-                    unified_separate_tci_list_sharing_ca_r17->max_num_list_dl_tci_r17.to_string());
-      }
-      if (unified_separate_tci_list_sharing_ca_r17->max_num_list_ul_tci_r17_present) {
-        j.write_str("maxNumListUL-TCI-r17",
-                    unified_separate_tci_list_sharing_ca_r17->max_num_list_ul_tci_r17.to_string());
-      }
-      j.end_obj();
-    }
-    if (unified_separate_tci_common_multi_cc_r17_present) {
-      j.write_str("unifiedSeparateTCI-commonMultiCC-r17", "supported");
-    }
-    if (unified_separate_tci_inter_cell_r17.is_present()) {
-      j.write_fieldname("unifiedSeparateTCI-InterCell-r17");
-      j.start_obj();
-      j.write_str("k-DL-PerCC-r17", unified_separate_tci_inter_cell_r17->k_dl_per_cc_r17.to_string());
-      j.write_str("k-UL-PerCC-r17", unified_separate_tci_inter_cell_r17->k_ul_per_cc_r17.to_string());
-      j.write_str("k-DL-AcrossCC-r17", unified_separate_tci_inter_cell_r17->k_dl_across_cc_r17.to_string());
-      j.write_str("k-UL-AcrossCC-r17", unified_separate_tci_inter_cell_r17->k_ul_across_cc_r17.to_string());
-      j.end_obj();
-    }
-    if (unified_joint_tci_m_trp_inter_cell_bm_r17.is_present()) {
-      j.write_fieldname("unifiedJointTCI-mTRP-InterCell-BM-r17");
-      j.start_obj();
-      j.write_int("maxNumAdditionalPCI-L1-RSRP-r17",
-                  unified_joint_tci_m_trp_inter_cell_bm_r17->max_num_add_pci_l1_rsrp_r17);
-      j.write_str("maxNumSSB-ResourceL1-RSRP-AcrossCC-r17",
-                  unified_joint_tci_m_trp_inter_cell_bm_r17->max_num_ssb_res_l1_rsrp_across_cc_r17.to_string());
-      j.end_obj();
-    }
-    if (mpe_mitigation_r17.is_present()) {
-      j.write_fieldname("mpe-Mitigation-r17");
-      j.start_obj();
-      j.write_int("maxNumP-MPR-RI-pairs-r17", mpe_mitigation_r17->max_num_p_mpr_ri_pairs_r17);
-      j.write_str("maxNumConfRS-r17", mpe_mitigation_r17->max_num_conf_rs_r17.to_string());
-      j.end_obj();
-    }
-    if (srs_port_report_r17.is_present()) {
-      j.write_fieldname("srs-PortReport-r17");
-      j.start_obj();
-      if (srs_port_report_r17->cap_val1_r17_present) {
-        j.write_str("capVal1-r17", srs_port_report_r17->cap_val1_r17.to_string());
-      }
-      if (srs_port_report_r17->cap_val2_r17_present) {
-        j.write_str("capVal2-r17", srs_port_report_r17->cap_val2_r17.to_string());
-      }
-      if (srs_port_report_r17->cap_val3_r17_present) {
-        j.write_str("capVal3-r17", srs_port_report_r17->cap_val3_r17.to_string());
-      }
-      if (srs_port_report_r17->cap_val4_r17_present) {
-        j.write_str("capVal4-r17", srs_port_report_r17->cap_val4_r17.to_string());
-      }
-      j.end_obj();
-    }
-    if (mtrp_pdcch_individual_r17_present) {
-      j.write_str("mTRP-PDCCH-individual-r17", "supported");
-    }
-    if (mtrp_pdcch_any_span_3_symbols_r17_present) {
-      j.write_str("mTRP-PDCCH-anySpan-3Symbols-r17", "supported");
-    }
-    if (mtrp_pdcch_two_qcl_type_d_r17_present) {
-      j.write_str("mTRP-PDCCH-TwoQCL-TypeD-r17", "supported");
-    }
-    if (mtrp_pusch_csi_rs_r17.is_present()) {
-      j.write_fieldname("mTRP-PUSCH-CSI-RS-r17");
-      j.start_obj();
-      j.write_int("maxNumPeriodicSRS-r17", mtrp_pusch_csi_rs_r17->max_num_periodic_srs_r17);
-      j.write_int("maxNumAperiodicSRS-r17", mtrp_pusch_csi_rs_r17->max_num_aperiodic_srs_r17);
-      j.write_int("maxNumSP-SRS-r17", mtrp_pusch_csi_rs_r17->max_num_sp_srs_r17);
-      j.write_int("numSRS-ResourcePerCC-r17", mtrp_pusch_csi_rs_r17->num_srs_res_per_cc_r17);
-      j.write_int("numSRS-ResourceNonCodebook-r17", mtrp_pusch_csi_rs_r17->num_srs_res_non_codebook_r17);
-      j.end_obj();
-    }
-    if (mtrp_pusch_cyclic_map_r17_present) {
-      j.write_str("mTRP-PUSCH-cyclicMapping-r17", mtrp_pusch_cyclic_map_r17.to_string());
-    }
-    if (mtrp_pusch_second_tpc_r17_present) {
-      j.write_str("mTRP-PUSCH-secondTPC-r17", "supported");
-    }
-    if (mtrp_pusch_two_phr_report_r17_present) {
-      j.write_str("mTRP-PUSCH-twoPHR-Reporting-r17", "supported");
-    }
-    if (mtrp_pusch_a_csi_r17_present) {
-      j.write_str("mTRP-PUSCH-A-CSI-r17", "supported");
-    }
-    if (mtrp_pusch_sp_csi_r17_present) {
-      j.write_str("mTRP-PUSCH-SP-CSI-r17", "supported");
-    }
-    if (mtrp_pusch_cg_r17_present) {
-      j.write_str("mTRP-PUSCH-CG-r17", "supported");
-    }
-    if (mtrp_pucch_mac_ce_r17_present) {
-      j.write_str("mTRP-PUCCH-MAC-CE-r17", "supported");
-    }
-    if (mtrp_pucch_max_num_pc_fr1_r17_present) {
-      j.write_int("mTRP-PUCCH-maxNum-PC-FR1-r17", mtrp_pucch_max_num_pc_fr1_r17);
-    }
-    if (mtrp_inter_cell_r17.is_present()) {
-      j.write_fieldname("mTRP-inter-Cell-r17");
-      j.start_obj();
-      j.write_int("maxNumAdditionalPCI-Case1-r17", mtrp_inter_cell_r17->max_num_add_pci_case1_r17);
-      j.write_int("maxNumAdditionalPCI-Case2-r17", mtrp_inter_cell_r17->max_num_add_pci_case2_r17);
-      j.end_obj();
-    }
-    if (mtrp_group_based_l1_rsrp_r17.is_present()) {
-      j.write_fieldname("mTRP-GroupBasedL1-RSRP-r17");
-      j.start_obj();
-      j.write_int("maxNumBeamGroups-r17", mtrp_group_based_l1_rsrp_r17->max_num_beam_groups_r17);
-      j.write_str("maxNumRS-WithinSlot-r17", mtrp_group_based_l1_rsrp_r17->max_num_rs_within_slot_r17.to_string());
-      j.write_str("maxNumRS-AcrossSlot-r17", mtrp_group_based_l1_rsrp_r17->max_num_rs_across_slot_r17.to_string());
-      j.end_obj();
-    }
-    if (mtrp_bfd_rs_mac_ce_r17_present) {
-      j.write_str("mTRP-BFD-RS-MAC-CE-r17", mtrp_bfd_rs_mac_ce_r17.to_string());
-    }
-    if (mtrp_csi_enhancement_per_band_r17.is_present()) {
-      j.write_fieldname("mTRP-CSI-EnhancementPerBand-r17");
-      j.start_obj();
-      j.write_int("maxNumNZP-CSI-RS-r17", mtrp_csi_enhancement_per_band_r17->max_num_nzp_csi_rs_r17);
-      j.write_str("cSI-Report-mode-r17", mtrp_csi_enhancement_per_band_r17->csi_report_mode_r17.to_string());
-      j.start_array("supportedComboAcrossCCs-r17");
-      for (const auto& e1 : mtrp_csi_enhancement_per_band_r17->supported_combo_across_ccs_r17) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      j.write_str("codebookModeNCJT-r17", mtrp_csi_enhancement_per_band_r17->codebook_mode_ncjt_r17.to_string());
-      j.end_obj();
-    }
-    if (codebook_combo_param_multi_trp_r17.is_present()) {
-      j.write_fieldname("codebookComboParameterMultiTRP-r17");
-      codebook_combo_param_multi_trp_r17->to_json(j);
-    }
-    if (mtrp_csi_add_csi_r17_present) {
-      j.write_str("mTRP-CSI-additionalCSI-r17", mtrp_csi_add_csi_r17.to_string());
-    }
-    if (mtrp_csi_n_max2_r17_present) {
-      j.write_str("mTRP-CSI-N-Max2-r17", "supported");
-    }
-    if (mtrp_csi_cmr_r17_present) {
-      j.write_str("mTRP-CSI-CMR-r17", "supported");
-    }
-    if (srs_partial_freq_nohop_sr17_present) {
-      j.write_str("srs-partialFreqSounding-r17", "supported");
-    }
-    if (beam_switch_timing_v1710.is_present()) {
-      j.write_fieldname("beamSwitchTiming-v1710");
-      j.start_obj();
-      if (beam_switch_timing_v1710->scs_480k_hz_present) {
-        j.write_str("scs-480kHz", beam_switch_timing_v1710->scs_480k_hz.to_string());
-      }
-      if (beam_switch_timing_v1710->scs_960k_hz_present) {
-        j.write_str("scs-960kHz", beam_switch_timing_v1710->scs_960k_hz.to_string());
-      }
-      j.end_obj();
-    }
-    if (beam_switch_timing_r17.is_present()) {
-      j.write_fieldname("beamSwitchTiming-r17");
-      j.start_obj();
-      if (beam_switch_timing_r17->scs_480k_hz_r17_present) {
-        j.write_str("scs-480kHz-r17", beam_switch_timing_r17->scs_480k_hz_r17.to_string());
-      }
-      if (beam_switch_timing_r17->scs_960k_hz_r17_present) {
-        j.write_str("scs-960kHz-r17", beam_switch_timing_r17->scs_960k_hz_r17.to_string());
-      }
-      j.end_obj();
-    }
-    if (beam_report_timing_v1710.is_present()) {
-      j.write_fieldname("beamReportTiming-v1710");
-      j.start_obj();
-      if (beam_report_timing_v1710->scs_480k_hz_r17_present) {
-        j.write_str("scs-480kHz-r17", beam_report_timing_v1710->scs_480k_hz_r17.to_string());
-      }
-      if (beam_report_timing_v1710->scs_960k_hz_r17_present) {
-        j.write_str("scs-960kHz-r17", beam_report_timing_v1710->scs_960k_hz_r17.to_string());
-      }
-      j.end_obj();
-    }
-    if (max_num_rx_tx_beam_switch_dl_v1710.is_present()) {
-      j.write_fieldname("maxNumberRxTxBeamSwitchDL-v1710");
-      j.start_obj();
-      if (max_num_rx_tx_beam_switch_dl_v1710->scs_480k_hz_r17_present) {
-        j.write_str("scs-480kHz-r17", max_num_rx_tx_beam_switch_dl_v1710->scs_480k_hz_r17.to_string());
-      }
-      if (max_num_rx_tx_beam_switch_dl_v1710->scs_960k_hz_r17_present) {
-        j.write_str("scs-960kHz-r17", max_num_rx_tx_beam_switch_dl_v1710->scs_960k_hz_r17.to_string());
-      }
-      j.end_obj();
-    }
-    if (srs_port_report_sp_ap_r17_present) {
-      j.write_str("srs-PortReportSP-AP-r17", "supported");
-    }
-    if (max_num_rx_beam_v1720_present) {
-      j.write_int("maxNumberRxBeam-v1720", max_num_rx_beam_v1720);
-    }
-    if (sfn_implicit_rs_two_tci_r17_present) {
-      j.write_str("sfn-ImplicitRS-twoTCI-r17", "supported");
-    }
-    if (sfn_qcl_type_d_collision_two_tci_r17_present) {
-      j.write_str("sfn-QCL-TypeD-Collision-twoTCI-r17", "supported");
-    }
-    if (mtrp_csi_num_cp_u_r17_present) {
-      j.write_str("mTRP-CSI-numCPU-r17", mtrp_csi_num_cp_u_r17.to_string());
-    }
-    if (support_rep_num_pdsch_tdra_dci_1_2_r17_present) {
-      j.write_str("supportRepNumPDSCH-TDRA-DCI-1-2-r17", support_rep_num_pdsch_tdra_dci_1_2_r17.to_string());
-    }
-    if (codebook_paramsetype2_doppler_csi_r18.is_present()) {
-      j.write_fieldname("codebookParametersetype2DopplerCSI-r18");
-      codebook_paramsetype2_doppler_csi_r18->to_json(j);
-    }
-    if (codebook_paramsfetype2_doppler_csi_r18.is_present()) {
-      j.write_fieldname("codebookParametersfetype2DopplerCSI-r18");
-      codebook_paramsfetype2_doppler_csi_r18->to_json(j);
-    }
-    if (codebook_paramsetype2_cjt_r18.is_present()) {
-      j.write_fieldname("codebookParametersetype2CJT-r18");
-      codebook_paramsetype2_cjt_r18->to_json(j);
-    }
-    if (codebook_paramsfetype2_cjt_r18.is_present()) {
-      j.write_fieldname("codebookParametersfetype2CJT-r18");
-      codebook_paramsfetype2_cjt_r18->to_json(j);
-    }
-    if (codebook_combo_params_cjt_r18.is_present()) {
-      j.write_fieldname("codebookComboParametersCJT-r18");
-      codebook_combo_params_cjt_r18->to_json(j);
-    }
-    if (codebook_params_harq_ack_pusch_r18.is_present()) {
-      j.write_fieldname("codebookParametersHARQ-ACK-PUSCH-r18");
-      codebook_params_harq_ack_pusch_r18->to_json(j);
-    }
-    if (tci_joint_tci_upd_single_active_tci_per_cc_r18.is_present()) {
-      j.write_fieldname("tci-JointTCI-UpdateSingleActiveTCI-PerCC-r18");
-      j.start_obj();
-      j.write_str("maxNumberConfigJointTCIPerCC-PerBWP-r18",
-                  tci_joint_tci_upd_single_active_tci_per_cc_r18->max_num_cfg_joint_tci_per_cc_per_bwp_r18.to_string());
-      j.write_str("maxNumberActiveJointTCI-AcrossCC-r18",
-                  tci_joint_tci_upd_single_active_tci_per_cc_r18->max_num_active_joint_tci_across_cc_r18.to_string());
-      j.end_obj();
-    }
-    if (tci_joint_tci_upd_multi_active_tci_per_cc_r18.is_present()) {
-      j.write_fieldname("tci-JointTCI-UpdateMultiActiveTCI-PerCC-r18");
-      j.start_obj();
-      j.write_str("tci-StateInd-r18", tci_joint_tci_upd_multi_active_tci_per_cc_r18->tci_state_ind_r18.to_string());
-      j.write_int("maxNumberActiveJointTCI-PerCC-r18",
-                  tci_joint_tci_upd_multi_active_tci_per_cc_r18->max_num_active_joint_tci_per_cc_r18);
-      j.end_obj();
-    }
-    if (tci_sel_dci_r18_present) {
-      j.write_str("tci-SelectionDCI-r18", "supported");
-    }
-    if (tci_separate_tci_upd_single_active_tci_per_cc_r18.is_present()) {
-      j.write_fieldname("tci-SeparateTCI-UpdateSingleActiveTCI-PerCC-r18");
-      j.start_obj();
-      j.write_str("maxNumConfigDL-TCI-PerCC-PerBWP-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_cfg_dl_tci_per_cc_per_bwp_r18.to_string());
-      j.write_str("maxNumConfigUL-TCI-PerCC-PerBWP-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_cfg_ul_tci_per_cc_per_bwp_r18.to_string());
-      j.write_str("maxNumActiveDL-TCI-AcrossCC-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_active_dl_tci_across_cc_r18.to_string());
-      j.write_str("maxNumActiveUL-TCI-AcrossCC-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_active_ul_tci_across_cc_r18.to_string());
-      j.end_obj();
-    }
-    if (tci_separate_tci_upd_multi_active_tci_per_cc_r18.is_present()) {
-      j.write_fieldname("tci-SeparateTCI-UpdateMultiActiveTCI-PerCC-r18");
-      j.start_obj();
-      j.write_str("maxNumActiveDL-TCI-AcrossCC-r18",
-                  tci_separate_tci_upd_multi_active_tci_per_cc_r18->max_num_active_dl_tci_across_cc_r18.to_string());
-      j.write_str("maxNumActiveUL-TCI-AcrossCC-r18",
-                  tci_separate_tci_upd_multi_active_tci_per_cc_r18->max_num_active_ul_tci_across_cc_r18.to_string());
-      j.end_obj();
-    }
-    if (tci_sel_aperiodic_csi_rs_r18_present) {
-      j.write_str("tci-SelectionAperiodicCSI-RS-r18", tci_sel_aperiodic_csi_rs_r18.to_string());
-    }
-    if (tci_sel_aperiodic_csi_rs_m_dci_r18_present) {
-      j.write_str("tci-SelectionAperiodicCSI-RS-M-DCI-r18", tci_sel_aperiodic_csi_rs_m_dci_r18.to_string());
-    }
-    if (two_tci_state_pdsch_cjt_tx_scheme_r18_present) {
-      j.write_str("twoTCI-StatePDSCH-CJT-TxScheme-r18", two_tci_state_pdsch_cjt_tx_scheme_r18.to_string());
-    }
-    if (tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18.is_present()) {
-      j.write_fieldname("tci-JointTCI-UpdateSingleActiveTCI-PerCC-PerCORESET-r18");
-      j.start_obj();
-      j.write_str("mTRP-Operation-r18",
-                  tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18->mtrp_operation_r18.to_string());
-      j.write_str("maxNumberConfigJointTCIPerCC-PerBWP-r18",
-                  tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_cfg_joint_tci_per_cc_per_bwp_r18
-                      .to_string());
-      j.write_str("maxNumberActiveJointTCIAcrossCC-PerCORESET-r18",
-                  tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18
-                      ->max_num_active_joint_tci_across_cc_per_coreset_r18.to_string());
-      j.end_obj();
-    }
-    if (tci_joint_tci_upd_multi_active_tci_per_cc_per_coreset_r18_present) {
-      j.write_int("tci-JointTCI-UpdateMultiActiveTCI-PerCC-PerCORESET-r18",
-                  tci_joint_tci_upd_multi_active_tci_per_cc_per_coreset_r18);
-    }
-    if (tci_trp_bfr_r18_present) {
-      j.write_str("tci-TRP-BFR-r18", "supported");
-    }
-    if (tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18.is_present()) {
-      j.write_fieldname("tci-SeparateTCI-UpdateSingleActiveTCI-PerCC-PerCORESET-r18");
-      j.start_obj();
-      j.write_str("mTRP-Operation-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->mtrp_operation_r18.to_string());
-      j.write_str("maxNumConfigDL-TCI-PerCC-PerBWP-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_cfg_dl_tci_per_cc_per_bwp_r18
-                      .to_string());
-      j.write_str("maxNumConfigUL-TCI-PerCC-PerBWP-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_cfg_ul_tci_per_cc_per_bwp_r18
-                      .to_string());
-      j.write_str("maxNumActiveDL-TCI-AcrossCC-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_active_dl_tci_across_cc_r18
-                      .to_string());
-      j.write_str("maxNumActiveUL-TCI-AcrossCC-r18",
-                  tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_active_ul_tci_across_cc_r18
-                      .to_string());
-      j.end_obj();
-    }
-    if (tci_separate_tci_upd_multi_active_tci_per_cc_per_coreset_r18.is_present()) {
-      j.write_fieldname("tci-SeparateTCI-UpdateMultiActiveTCI-PerCC-PerCORESET-r18");
-      j.start_obj();
-      j.write_int("maxNumConfigDL-TCI-PerCC-PerBWP-r18",
-                  tci_separate_tci_upd_multi_active_tci_per_cc_per_coreset_r18->max_num_cfg_dl_tci_per_cc_per_bwp_r18);
-      j.write_int("maxNumConfigUL-TCI-PerCC-PerBWP-r18",
-                  tci_separate_tci_upd_multi_active_tci_per_cc_per_coreset_r18->max_num_cfg_ul_tci_per_cc_per_bwp_r18);
-      j.end_obj();
-    }
-    if (common_tci_single_dci_r18_present) {
-      j.write_int("commonTCI-SingleDCI-r18", common_tci_single_dci_r18);
-    }
-    if (common_tci_multi_dci_r18_present) {
-      j.write_int("commonTCI-MultiDCI-r18", common_tci_multi_dci_r18);
-    }
-    if (two_phr_report_r18_present) {
-      j.write_str("twoPHR-Reporting-r18", "supported");
-    }
-    if (sp_cell_tag_ind_r18_present) {
-      j.write_str("spCell-TAG-Ind-r18", "supported");
-    }
-    if (inter_cell_cross_trp_pdcch_order_cfra_r18_present) {
-      j.write_str("interCellCrossTRP-PDCCH-OrderCFRA-r18", "supported");
-    }
-    if (intra_cell_cross_trp_pdcch_order_cfra_r18_present) {
-      j.write_str("intraCellCrossTRP-PDCCH-OrderCFRA-r18", "supported");
-    }
-    if (overlap_ul_trans_reduction_r18_present) {
-      j.write_str("overlapUL-TransReduction-r18", "supported");
-    }
-    if (max_periodicity_cmr_r18_present) {
-      j.write_str("maxPeriodicityCMR-r18", max_periodicity_cmr_r18.to_string());
-    }
-    if (tdcp_report_r18.is_present()) {
-      j.write_fieldname("tdcp-Report-r18");
-      j.start_obj();
-      j.write_int("valueX-r18", tdcp_report_r18->value_x_r18);
-      j.write_int("maxNumberActiveResource-r18", tdcp_report_r18->max_num_active_res_r18);
-      j.end_obj();
-    }
-    if (tdcp_res_r18.is_present()) {
-      j.write_fieldname("tdcp-Resource-r18");
-      j.start_obj();
-      j.write_str("maxNumberConfigPerCC-r18", tdcp_res_r18->max_num_cfg_per_cc_r18.to_string());
-      j.write_int("maxNumberConfigAcrossCC-r18", tdcp_res_r18->max_num_cfg_across_cc_r18);
-      j.write_str("maxNumberSimultaneousPerCC-r18", tdcp_res_r18->max_num_simul_per_cc_r18.to_string());
-      j.end_obj();
-    }
-    if (timeline_relax_cjt_csi_r18_present) {
-      j.write_str("timelineRelax-CJT-CSI-r18", timeline_relax_cjt_csi_r18.to_string());
-    }
-    if (joint_cfg_dmrs_port_dyn_switching_r18_present) {
-      j.write_str("jointConfigDMRSPortDynamicSwitching-r18", "supported");
-    }
-    if (srs_comb_offset_hop_r18_present) {
-      j.write_str("srs-combOffsetHopping-r18", "supported");
-    }
-    if (srs_comb_offset_in_time_r18_present) {
-      j.write_str("srs-combOffsetInTime-r18", srs_comb_offset_in_time_r18.to_string());
-    }
-    if (srs_comb_offset_combined_group_seq_r18_present) {
-      j.write_str("srs-combOffsetCombinedGroupSequence-r18", "supported");
-    }
-    if (srs_comb_offset_hop_within_subset_r18_present) {
-      j.write_str("srs-combOffsetHoppingWithinSubset-r18", "supported");
-    }
-    if (srs_cyclic_shift_hop_r18_present) {
-      j.write_str("srs-cyclicShiftHopping-r18", "supported");
-    }
-    if (srs_cyclic_shift_hop_small_granularity_r18_present) {
-      j.write_str("srs-cyclicShiftHoppingSmallGranularity-r18", "supported");
-    }
-    if (srs_cyclic_shift_combined_group_seq_r18_present) {
-      j.write_str("srs-cyclicShiftCombinedGroupSequence-r18", "supported");
-    }
-    if (cyclic_shift_hop_within_subset_r18_present) {
-      j.write_str("cyclicShiftHoppingWithinSubset-r18", "supported");
-    }
-    if (srs_cyclic_shift_combined_comb_offset_r18_present) {
-      j.write_str("srs-cyclicShiftCombinedCombOffset-r18", "supported");
-    }
-    if (pusch_cb_2_ptrs_single_dci_s_tx2_p_sdm_r18_present) {
-      j.write_str("pusch-CB-2PTRS-SingleDCI-STx2P-SDM-r18", "supported");
-    }
-    if (pusch_non_cb_2_ptrs_single_dci_s_tx2_p_sdm_r18_present) {
-      j.write_str("pusch-NonCB-2PTRS-SingleDCI-STx2P-SDM-r18", "supported");
-    }
-    if (pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18.is_present()) {
-      j.write_fieldname("pusch-NonCB-SingleDCI-STx2P-SDM-CSI-RS-SRS-r18");
-      j.start_obj();
-      j.write_int("maxNumberPeriodicSRS-Resource-PerBWP-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->max_num_periodic_srs_res_per_bwp_r18);
-      j.write_int("maxNumberAperiodicSRS-Resource-PerBWP-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->max_num_aperiodic_srs_res_per_bwp_r18);
-      j.write_int("maxNumberSemiPersistentSRS-ResourcePerBWP-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->max_num_semi_persistent_srs_res_per_bwp_r18);
-      j.write_int("valueY-SRS-ResourceAssociate-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->value_y_srs_res_associate_r18);
-      j.write_int("valueX-CSI-RS-ResourceAssociate-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->value_x_csi_rs_res_associate_r18);
-      j.end_obj();
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18.is_present()) {
-      j.write_fieldname("twoPUSCH-NonCB-Multi-DCI-STx2P-CSI-RS-Resource-r18");
-      j.start_obj();
-      j.write_int("maxNumberPeriodicSRS-r18",
-                  two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->max_num_periodic_srs_r18);
-      j.write_int("maxNumberAperiodicSRS-r18",
-                  two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->max_num_aperiodic_srs_r18);
-      j.write_int("maxNumberSemiPersistentSRS-r18",
-                  two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->max_num_semi_persistent_srs_r18);
-      j.write_int("simultaneousSRS-PerCC-r18", two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->simul_srs_per_cc_r18);
-      j.write_int("simultaneousCSI-RS-NonCB-r18",
-                  two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->simul_csi_rs_non_cb_r18);
-      j.end_obj();
-    }
-    if (dmrs_port_entry_single_dci_sdm_r18_present) {
-      j.write_str("dmrs-PortEntrySingleDCI-SDM-r18", "supported");
-    }
-    if (pusch_cb_2_ptrs_single_dci_s_tx2_p_sfn_r18_present) {
-      j.write_str("pusch-CB-2PTRS-SingleDCI-STx2P-SFN-r18", "supported");
-    }
-    if (pusch_non_cb_2_ptrs_single_dci_s_tx2_p_sfn_r18_present) {
-      j.write_str("pusch-NonCB-2PTRS-SingleDCI-STx2P-SFN-r18", "supported");
-    }
-    if (pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18.is_present()) {
-      j.write_fieldname("pusch-NonCB-SingleDCI-STx2P-SFN-CSI-RS-SRS-r18");
-      j.start_obj();
-      j.write_int("maxNumberPeriodicSRS-Resource-PerBWP-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->max_num_periodic_srs_res_per_bwp_r18);
-      j.write_int("maxNumberAperiodicSRS-Resource-PerBWP-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->max_num_aperiodic_srs_res_per_bwp_r18);
-      j.write_int("maxNumberSemiPersistentSRS-ResourcePerBWP-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->max_num_semi_persistent_srs_res_per_bwp_r18);
-      j.write_int("valueY-SRS-ResourceAssociate-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->value_y_srs_res_associate_r18);
-      j.write_int("valueX-CSI-RS-ResourceAssociate-r18",
-                  pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->value_x_csi_rs_res_associate_r18);
-      j.end_obj();
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_full_time_full_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-FullTimeFullFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_full_time_partial_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-FullTimePartialFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_partial_time_full_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-PartialTimeFullFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_partial_time_partial_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-PartialTimePartialFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_partial_time_non_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-PartialTimeNonFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_cg_cg_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-CG-CG-r18", "supported");
-    }
-    if (two_pusch_cb_multi_dci_s_tx2_p_cg_dg_r18_present) {
-      j.write_str("twoPUSCH-CB-MultiDCI-STx2P-CG-DG-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_full_time_full_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-FullTimeFullFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_full_time_partial_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-FullTimePartialFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_partial_time_full_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-PartialTimeFullFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_partial_time_partial_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-PartialTimePartialFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_partial_time_non_freq_overlap_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-PartialTimeNonFreqOverlap-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_cg_cg_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-CG-CG-r18", "supported");
-    }
-    if (two_pusch_non_cb_multi_dci_s_tx2_p_cg_dg_r18_present) {
-      j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-CG-DG-r18", "supported");
-    }
-    if (pucch_repeat_dyn_ind_sfn_r18_present) {
-      j.write_str("pucch-RepetitionDynamicIndicationSFN-r18", "supported");
-    }
-    if (group_beam_report_s_tx2_p_r18.is_present()) {
-      j.write_fieldname("groupBeamReporting-STx2P-r18");
-      j.start_obj();
-      j.write_str("groupL1-RSRP-Reporting-r18", group_beam_report_s_tx2_p_r18->group_l1_rsrp_report_r18.to_string());
-      j.write_int("maxNumberBeamGroups-r18", group_beam_report_s_tx2_p_r18->max_num_beam_groups_r18);
-      j.write_str("maxNumberResWithinSlotAcrossCC-r18",
-                  group_beam_report_s_tx2_p_r18->max_num_res_within_slot_across_cc_r18.to_string());
-      j.write_str("maxNumberResAcrossCC-r18", group_beam_report_s_tx2_p_r18->max_num_res_across_cc_r18.to_string());
-      j.end_obj();
-    }
-    if (simul_cfg_dmrs_dci_1_3_r18_present) {
-      j.write_str("simulConfigDMRS-DCI-1-3-r18", "supported");
-    }
+                  unified_joint_tci_multi_mac_ce_r17->min_beam_application_time_r17.to_string());
+    }
+    j.write_str("maxNumMAC-CE-PerCC", unified_joint_tci_multi_mac_ce_r17->max_num_mac_ce_per_cc.to_string());
+    j.end_obj();
+  }
+  if (unified_joint_tci_per_bwp_ca_r17_present) {
+    j.write_str("unifiedJointTCI-perBWP-CA-r17", "supported");
+  }
+  if (unified_joint_tci_list_sharing_ca_r17_present) {
+    j.write_str("unifiedJointTCI-ListSharingCA-r17", unified_joint_tci_list_sharing_ca_r17.to_string());
+  }
+  if (unified_joint_tci_common_multi_cc_r17_present) {
+    j.write_str("unifiedJointTCI-commonMultiCC-r17", "supported");
+  }
+  if (unified_joint_tci_beam_align_dl_rs_r17_present) {
+    j.write_str("unifiedJointTCI-BeamAlignDLRS-r17", "supported");
+  }
+  if (unified_joint_tci_pc_assoc_r17_present) {
+    j.write_str("unifiedJointTCI-PC-association-r17", "supported");
+  }
+  if (unified_joint_tci_legacy_r17_present) {
+    j.write_str("unifiedJointTCI-Legacy-r17", "supported");
+  }
+  if (unified_joint_tci_legacy_srs_r17_present) {
+    j.write_str("unifiedJointTCI-Legacy-SRS-r17", "supported");
+  }
+  if (unified_joint_tci_legacy_coreset0_r17_present) {
+    j.write_str("unifiedJointTCI-Legacy-CORESET0-r17", "supported");
+  }
+  if (unified_joint_tci_scell_bfr_r17_present) {
+    j.write_str("unifiedJointTCI-SCellBFR-r17", "supported");
+  }
+  if (unified_joint_tci_inter_cell_r17.is_present()) {
+    j.write_fieldname("unifiedJointTCI-InterCell-r17");
+    j.start_obj();
+    j.write_str("additionalMAC-CE-PerCC-r17", unified_joint_tci_inter_cell_r17->add_mac_ce_per_cc_r17.to_string());
+    j.write_str("additionalMAC-CE-AcrossCC-r17",
+                unified_joint_tci_inter_cell_r17->add_mac_ce_across_cc_r17.to_string());
+    j.end_obj();
+  }
+  if (unified_separate_tci_r17.is_present()) {
+    j.write_fieldname("unifiedSeparateTCI-r17");
+    j.start_obj();
+    j.write_str("maxConfiguredDL-TCI-r17", unified_separate_tci_r17->max_cfg_dl_tci_r17.to_string());
+    j.write_str("maxConfiguredUL-TCI-r17", unified_separate_tci_r17->max_cfg_ul_tci_r17.to_string());
+    j.write_str("maxActivatedDL-TCIAcrossCC-r17", unified_separate_tci_r17->max_activ_dl_tci_across_cc_r17.to_string());
+    j.write_str("maxActivatedUL-TCIAcrossCC-r17", unified_separate_tci_r17->max_activ_ul_tci_across_cc_r17.to_string());
+    j.end_obj();
+  }
+  if (unified_separate_tci_multi_mac_ce_r17.is_present()) {
+    j.write_fieldname("unifiedSeparateTCI-multiMAC-CE-r17");
+    j.start_obj();
+    j.write_str("minBeamApplicationTime-r17",
+                unified_separate_tci_multi_mac_ce_r17->min_beam_application_time_r17.to_string());
+    j.write_int("maxActivatedDL-TCIPerCC-r17", unified_separate_tci_multi_mac_ce_r17->max_activ_dl_tci_per_cc_r17);
+    j.write_int("maxActivatedUL-TCIPerCC-r17", unified_separate_tci_multi_mac_ce_r17->max_activ_ul_tci_per_cc_r17);
+    j.end_obj();
+  }
+  if (unified_separate_tci_per_bwp_ca_r17_present) {
+    j.write_str("unifiedSeparateTCI-perBWP-CA-r17", "supported");
+  }
+  if (unified_separate_tci_list_sharing_ca_r17.is_present()) {
+    j.write_fieldname("unifiedSeparateTCI-ListSharingCA-r17");
+    j.start_obj();
+    if (unified_separate_tci_list_sharing_ca_r17->max_num_list_dl_tci_r17_present) {
+      j.write_str("maxNumListDL-TCI-r17",
+                  unified_separate_tci_list_sharing_ca_r17->max_num_list_dl_tci_r17.to_string());
+    }
+    if (unified_separate_tci_list_sharing_ca_r17->max_num_list_ul_tci_r17_present) {
+      j.write_str("maxNumListUL-TCI-r17",
+                  unified_separate_tci_list_sharing_ca_r17->max_num_list_ul_tci_r17.to_string());
+    }
+    j.end_obj();
+  }
+  if (unified_separate_tci_common_multi_cc_r17_present) {
+    j.write_str("unifiedSeparateTCI-commonMultiCC-r17", "supported");
+  }
+  if (unified_separate_tci_inter_cell_r17.is_present()) {
+    j.write_fieldname("unifiedSeparateTCI-InterCell-r17");
+    j.start_obj();
+    j.write_str("k-DL-PerCC-r17", unified_separate_tci_inter_cell_r17->k_dl_per_cc_r17.to_string());
+    j.write_str("k-UL-PerCC-r17", unified_separate_tci_inter_cell_r17->k_ul_per_cc_r17.to_string());
+    j.write_str("k-DL-AcrossCC-r17", unified_separate_tci_inter_cell_r17->k_dl_across_cc_r17.to_string());
+    j.write_str("k-UL-AcrossCC-r17", unified_separate_tci_inter_cell_r17->k_ul_across_cc_r17.to_string());
+    j.end_obj();
+  }
+  if (unified_joint_tci_m_trp_inter_cell_bm_r17.is_present()) {
+    j.write_fieldname("unifiedJointTCI-mTRP-InterCell-BM-r17");
+    j.start_obj();
+    j.write_int("maxNumAdditionalPCI-L1-RSRP-r17",
+                unified_joint_tci_m_trp_inter_cell_bm_r17->max_num_add_pci_l1_rsrp_r17);
+    j.write_str("maxNumSSB-ResourceL1-RSRP-AcrossCC-r17",
+                unified_joint_tci_m_trp_inter_cell_bm_r17->max_num_ssb_res_l1_rsrp_across_cc_r17.to_string());
+    j.end_obj();
+  }
+  if (mpe_mitigation_r17.is_present()) {
+    j.write_fieldname("mpe-Mitigation-r17");
+    j.start_obj();
+    j.write_int("maxNumP-MPR-RI-pairs-r17", mpe_mitigation_r17->max_num_p_mpr_ri_pairs_r17);
+    j.write_str("maxNumConfRS-r17", mpe_mitigation_r17->max_num_conf_rs_r17.to_string());
+    j.end_obj();
+  }
+  if (srs_port_report_r17.is_present()) {
+    j.write_fieldname("srs-PortReport-r17");
+    j.start_obj();
+    if (srs_port_report_r17->cap_val1_r17_present) {
+      j.write_str("capVal1-r17", srs_port_report_r17->cap_val1_r17.to_string());
+    }
+    if (srs_port_report_r17->cap_val2_r17_present) {
+      j.write_str("capVal2-r17", srs_port_report_r17->cap_val2_r17.to_string());
+    }
+    if (srs_port_report_r17->cap_val3_r17_present) {
+      j.write_str("capVal3-r17", srs_port_report_r17->cap_val3_r17.to_string());
+    }
+    if (srs_port_report_r17->cap_val4_r17_present) {
+      j.write_str("capVal4-r17", srs_port_report_r17->cap_val4_r17.to_string());
+    }
+    j.end_obj();
+  }
+  if (mtrp_pdcch_individual_r17_present) {
+    j.write_str("mTRP-PDCCH-individual-r17", "supported");
+  }
+  if (mtrp_pdcch_any_span_3_symbols_r17_present) {
+    j.write_str("mTRP-PDCCH-anySpan-3Symbols-r17", "supported");
+  }
+  if (mtrp_pdcch_two_qcl_type_d_r17_present) {
+    j.write_str("mTRP-PDCCH-TwoQCL-TypeD-r17", "supported");
+  }
+  if (mtrp_pusch_csi_rs_r17.is_present()) {
+    j.write_fieldname("mTRP-PUSCH-CSI-RS-r17");
+    j.start_obj();
+    j.write_int("maxNumPeriodicSRS-r17", mtrp_pusch_csi_rs_r17->max_num_periodic_srs_r17);
+    j.write_int("maxNumAperiodicSRS-r17", mtrp_pusch_csi_rs_r17->max_num_aperiodic_srs_r17);
+    j.write_int("maxNumSP-SRS-r17", mtrp_pusch_csi_rs_r17->max_num_sp_srs_r17);
+    j.write_int("numSRS-ResourcePerCC-r17", mtrp_pusch_csi_rs_r17->num_srs_res_per_cc_r17);
+    j.write_int("numSRS-ResourceNonCodebook-r17", mtrp_pusch_csi_rs_r17->num_srs_res_non_codebook_r17);
+    j.end_obj();
+  }
+  if (mtrp_pusch_cyclic_map_r17_present) {
+    j.write_str("mTRP-PUSCH-cyclicMapping-r17", mtrp_pusch_cyclic_map_r17.to_string());
+  }
+  if (mtrp_pusch_second_tpc_r17_present) {
+    j.write_str("mTRP-PUSCH-secondTPC-r17", "supported");
+  }
+  if (mtrp_pusch_two_phr_report_r17_present) {
+    j.write_str("mTRP-PUSCH-twoPHR-Reporting-r17", "supported");
+  }
+  if (mtrp_pusch_a_csi_r17_present) {
+    j.write_str("mTRP-PUSCH-A-CSI-r17", "supported");
+  }
+  if (mtrp_pusch_sp_csi_r17_present) {
+    j.write_str("mTRP-PUSCH-SP-CSI-r17", "supported");
+  }
+  if (mtrp_pusch_cg_r17_present) {
+    j.write_str("mTRP-PUSCH-CG-r17", "supported");
+  }
+  if (mtrp_pucch_mac_ce_r17_present) {
+    j.write_str("mTRP-PUCCH-MAC-CE-r17", "supported");
+  }
+  if (mtrp_pucch_max_num_pc_fr1_r17_present) {
+    j.write_int("mTRP-PUCCH-maxNum-PC-FR1-r17", mtrp_pucch_max_num_pc_fr1_r17);
+  }
+  if (mtrp_inter_cell_r17.is_present()) {
+    j.write_fieldname("mTRP-inter-Cell-r17");
+    j.start_obj();
+    j.write_int("maxNumAdditionalPCI-Case1-r17", mtrp_inter_cell_r17->max_num_add_pci_case1_r17);
+    j.write_int("maxNumAdditionalPCI-Case2-r17", mtrp_inter_cell_r17->max_num_add_pci_case2_r17);
+    j.end_obj();
+  }
+  if (mtrp_group_based_l1_rsrp_r17.is_present()) {
+    j.write_fieldname("mTRP-GroupBasedL1-RSRP-r17");
+    j.start_obj();
+    j.write_int("maxNumBeamGroups-r17", mtrp_group_based_l1_rsrp_r17->max_num_beam_groups_r17);
+    j.write_str("maxNumRS-WithinSlot-r17", mtrp_group_based_l1_rsrp_r17->max_num_rs_within_slot_r17.to_string());
+    j.write_str("maxNumRS-AcrossSlot-r17", mtrp_group_based_l1_rsrp_r17->max_num_rs_across_slot_r17.to_string());
+    j.end_obj();
+  }
+  if (mtrp_bfd_rs_mac_ce_r17_present) {
+    j.write_str("mTRP-BFD-RS-MAC-CE-r17", mtrp_bfd_rs_mac_ce_r17.to_string());
+  }
+  if (mtrp_csi_enhancement_per_band_r17.is_present()) {
+    j.write_fieldname("mTRP-CSI-EnhancementPerBand-r17");
+    j.start_obj();
+    j.write_int("maxNumNZP-CSI-RS-r17", mtrp_csi_enhancement_per_band_r17->max_num_nzp_csi_rs_r17);
+    j.write_str("cSI-Report-mode-r17", mtrp_csi_enhancement_per_band_r17->csi_report_mode_r17.to_string());
+    j.start_array("supportedComboAcrossCCs-r17");
+    for (const auto& e1 : mtrp_csi_enhancement_per_band_r17->supported_combo_across_ccs_r17) {
+      e1.to_json(j);
+    }
+    j.end_array();
+    j.write_str("codebookModeNCJT-r17", mtrp_csi_enhancement_per_band_r17->codebook_mode_ncjt_r17.to_string());
+    j.end_obj();
+  }
+  if (codebook_combo_param_multi_trp_r17.is_present()) {
+    j.write_fieldname("codebookComboParameterMultiTRP-r17");
+    codebook_combo_param_multi_trp_r17->to_json(j);
+  }
+  if (mtrp_csi_add_csi_r17_present) {
+    j.write_str("mTRP-CSI-additionalCSI-r17", mtrp_csi_add_csi_r17.to_string());
+  }
+  if (mtrp_csi_n_max2_r17_present) {
+    j.write_str("mTRP-CSI-N-Max2-r17", "supported");
+  }
+  if (mtrp_csi_cmr_r17_present) {
+    j.write_str("mTRP-CSI-CMR-r17", "supported");
+  }
+  if (srs_partial_freq_nohop_sr17_present) {
+    j.write_str("srs-partialFreqSounding-r17", "supported");
+  }
+  if (beam_switch_timing_v1710.is_present()) {
+    j.write_fieldname("beamSwitchTiming-v1710");
+    j.start_obj();
+    if (beam_switch_timing_v1710->scs_480k_hz_present) {
+      j.write_str("scs-480kHz", beam_switch_timing_v1710->scs_480k_hz.to_string());
+    }
+    if (beam_switch_timing_v1710->scs_960k_hz_present) {
+      j.write_str("scs-960kHz", beam_switch_timing_v1710->scs_960k_hz.to_string());
+    }
+    j.end_obj();
+  }
+  if (beam_switch_timing_r17.is_present()) {
+    j.write_fieldname("beamSwitchTiming-r17");
+    j.start_obj();
+    if (beam_switch_timing_r17->scs_480k_hz_r17_present) {
+      j.write_str("scs-480kHz-r17", beam_switch_timing_r17->scs_480k_hz_r17.to_string());
+    }
+    if (beam_switch_timing_r17->scs_960k_hz_r17_present) {
+      j.write_str("scs-960kHz-r17", beam_switch_timing_r17->scs_960k_hz_r17.to_string());
+    }
+    j.end_obj();
+  }
+  if (beam_report_timing_v1710.is_present()) {
+    j.write_fieldname("beamReportTiming-v1710");
+    j.start_obj();
+    if (beam_report_timing_v1710->scs_480k_hz_r17_present) {
+      j.write_str("scs-480kHz-r17", beam_report_timing_v1710->scs_480k_hz_r17.to_string());
+    }
+    if (beam_report_timing_v1710->scs_960k_hz_r17_present) {
+      j.write_str("scs-960kHz-r17", beam_report_timing_v1710->scs_960k_hz_r17.to_string());
+    }
+    j.end_obj();
+  }
+  if (max_num_rx_tx_beam_switch_dl_v1710.is_present()) {
+    j.write_fieldname("maxNumberRxTxBeamSwitchDL-v1710");
+    j.start_obj();
+    if (max_num_rx_tx_beam_switch_dl_v1710->scs_480k_hz_r17_present) {
+      j.write_str("scs-480kHz-r17", max_num_rx_tx_beam_switch_dl_v1710->scs_480k_hz_r17.to_string());
+    }
+    if (max_num_rx_tx_beam_switch_dl_v1710->scs_960k_hz_r17_present) {
+      j.write_str("scs-960kHz-r17", max_num_rx_tx_beam_switch_dl_v1710->scs_960k_hz_r17.to_string());
+    }
+    j.end_obj();
+  }
+  if (srs_port_report_sp_ap_r17_present) {
+    j.write_str("srs-PortReportSP-AP-r17", "supported");
+  }
+  if (max_num_rx_beam_v1720_present) {
+    j.write_int("maxNumberRxBeam-v1720", max_num_rx_beam_v1720);
+  }
+  if (sfn_implicit_rs_two_tci_r17_present) {
+    j.write_str("sfn-ImplicitRS-twoTCI-r17", "supported");
+  }
+  if (sfn_qcl_type_d_collision_two_tci_r17_present) {
+    j.write_str("sfn-QCL-TypeD-Collision-twoTCI-r17", "supported");
+  }
+  if (mtrp_csi_num_cp_u_r17_present) {
+    j.write_str("mTRP-CSI-numCPU-r17", mtrp_csi_num_cp_u_r17.to_string());
+  }
+  if (support_rep_num_pdsch_tdra_dci_1_2_r17_present) {
+    j.write_str("supportRepNumPDSCH-TDRA-DCI-1-2-r17", support_rep_num_pdsch_tdra_dci_1_2_r17.to_string());
+  }
+  if (codebook_paramsetype2_doppler_csi_r18.is_present()) {
+    j.write_fieldname("codebookParametersetype2DopplerCSI-r18");
+    codebook_paramsetype2_doppler_csi_r18->to_json(j);
+  }
+  if (codebook_paramsfetype2_doppler_csi_r18.is_present()) {
+    j.write_fieldname("codebookParametersfetype2DopplerCSI-r18");
+    codebook_paramsfetype2_doppler_csi_r18->to_json(j);
+  }
+  if (codebook_paramsetype2_cjt_r18.is_present()) {
+    j.write_fieldname("codebookParametersetype2CJT-r18");
+    codebook_paramsetype2_cjt_r18->to_json(j);
+  }
+  if (codebook_paramsfetype2_cjt_r18.is_present()) {
+    j.write_fieldname("codebookParametersfetype2CJT-r18");
+    codebook_paramsfetype2_cjt_r18->to_json(j);
+  }
+  if (codebook_combo_params_cjt_r18.is_present()) {
+    j.write_fieldname("codebookComboParametersCJT-r18");
+    codebook_combo_params_cjt_r18->to_json(j);
+  }
+  if (codebook_params_harq_ack_pusch_r18.is_present()) {
+    j.write_fieldname("codebookParametersHARQ-ACK-PUSCH-r18");
+    codebook_params_harq_ack_pusch_r18->to_json(j);
+  }
+  if (tci_joint_tci_upd_single_active_tci_per_cc_r18.is_present()) {
+    j.write_fieldname("tci-JointTCI-UpdateSingleActiveTCI-PerCC-r18");
+    j.start_obj();
+    j.write_str("maxNumberConfigJointTCIPerCC-PerBWP-r18",
+                tci_joint_tci_upd_single_active_tci_per_cc_r18->max_num_cfg_joint_tci_per_cc_per_bwp_r18.to_string());
+    j.write_str("maxNumberActiveJointTCI-AcrossCC-r18",
+                tci_joint_tci_upd_single_active_tci_per_cc_r18->max_num_active_joint_tci_across_cc_r18.to_string());
+    j.end_obj();
+  }
+  if (tci_joint_tci_upd_multi_active_tci_per_cc_r18.is_present()) {
+    j.write_fieldname("tci-JointTCI-UpdateMultiActiveTCI-PerCC-r18");
+    j.start_obj();
+    j.write_str("tci-StateInd-r18", tci_joint_tci_upd_multi_active_tci_per_cc_r18->tci_state_ind_r18.to_string());
+    j.write_int("maxNumberActiveJointTCI-PerCC-r18",
+                tci_joint_tci_upd_multi_active_tci_per_cc_r18->max_num_active_joint_tci_per_cc_r18);
+    j.end_obj();
+  }
+  if (tci_sel_dci_r18_present) {
+    j.write_str("tci-SelectionDCI-r18", "supported");
+  }
+  if (tci_separate_tci_upd_single_active_tci_per_cc_r18.is_present()) {
+    j.write_fieldname("tci-SeparateTCI-UpdateSingleActiveTCI-PerCC-r18");
+    j.start_obj();
+    j.write_str("maxNumConfigDL-TCI-PerCC-PerBWP-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_cfg_dl_tci_per_cc_per_bwp_r18.to_string());
+    j.write_str("maxNumConfigUL-TCI-PerCC-PerBWP-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_cfg_ul_tci_per_cc_per_bwp_r18.to_string());
+    j.write_str("maxNumActiveDL-TCI-AcrossCC-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_active_dl_tci_across_cc_r18.to_string());
+    j.write_str("maxNumActiveUL-TCI-AcrossCC-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_r18->max_num_active_ul_tci_across_cc_r18.to_string());
+    j.end_obj();
+  }
+  if (tci_separate_tci_upd_multi_active_tci_per_cc_r18.is_present()) {
+    j.write_fieldname("tci-SeparateTCI-UpdateMultiActiveTCI-PerCC-r18");
+    j.start_obj();
+    j.write_str("maxNumActiveDL-TCI-AcrossCC-r18",
+                tci_separate_tci_upd_multi_active_tci_per_cc_r18->max_num_active_dl_tci_across_cc_r18.to_string());
+    j.write_str("maxNumActiveUL-TCI-AcrossCC-r18",
+                tci_separate_tci_upd_multi_active_tci_per_cc_r18->max_num_active_ul_tci_across_cc_r18.to_string());
+    j.end_obj();
+  }
+  if (tci_sel_aperiodic_csi_rs_r18_present) {
+    j.write_str("tci-SelectionAperiodicCSI-RS-r18", tci_sel_aperiodic_csi_rs_r18.to_string());
+  }
+  if (tci_sel_aperiodic_csi_rs_m_dci_r18_present) {
+    j.write_str("tci-SelectionAperiodicCSI-RS-M-DCI-r18", tci_sel_aperiodic_csi_rs_m_dci_r18.to_string());
+  }
+  if (two_tci_state_pdsch_cjt_tx_scheme_r18_present) {
+    j.write_str("twoTCI-StatePDSCH-CJT-TxScheme-r18", two_tci_state_pdsch_cjt_tx_scheme_r18.to_string());
+  }
+  if (tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18.is_present()) {
+    j.write_fieldname("tci-JointTCI-UpdateSingleActiveTCI-PerCC-PerCORESET-r18");
+    j.start_obj();
+    j.write_str("mTRP-Operation-r18",
+                tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18->mtrp_operation_r18.to_string());
+    j.write_str("maxNumberConfigJointTCIPerCC-PerBWP-r18",
+                tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_cfg_joint_tci_per_cc_per_bwp_r18
+                    .to_string());
+    j.write_str("maxNumberActiveJointTCIAcrossCC-PerCORESET-r18",
+                tci_joint_tci_upd_single_active_tci_per_cc_per_coreset_r18
+                    ->max_num_active_joint_tci_across_cc_per_coreset_r18.to_string());
+    j.end_obj();
+  }
+  if (tci_joint_tci_upd_multi_active_tci_per_cc_per_coreset_r18_present) {
+    j.write_int("tci-JointTCI-UpdateMultiActiveTCI-PerCC-PerCORESET-r18",
+                tci_joint_tci_upd_multi_active_tci_per_cc_per_coreset_r18);
+  }
+  if (tci_trp_bfr_r18_present) {
+    j.write_str("tci-TRP-BFR-r18", "supported");
+  }
+  if (tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18.is_present()) {
+    j.write_fieldname("tci-SeparateTCI-UpdateSingleActiveTCI-PerCC-PerCORESET-r18");
+    j.start_obj();
+    j.write_str("mTRP-Operation-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->mtrp_operation_r18.to_string());
+    j.write_str("maxNumConfigDL-TCI-PerCC-PerBWP-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_cfg_dl_tci_per_cc_per_bwp_r18
+                    .to_string());
+    j.write_str("maxNumConfigUL-TCI-PerCC-PerBWP-r18",
+                tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_cfg_ul_tci_per_cc_per_bwp_r18
+                    .to_string());
+    j.write_str(
+        "maxNumActiveDL-TCI-AcrossCC-r18",
+        tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_active_dl_tci_across_cc_r18.to_string());
+    j.write_str(
+        "maxNumActiveUL-TCI-AcrossCC-r18",
+        tci_separate_tci_upd_single_active_tci_per_cc_per_coreset_r18->max_num_active_ul_tci_across_cc_r18.to_string());
+    j.end_obj();
+  }
+  if (tci_separate_tci_upd_multi_active_tci_per_cc_per_coreset_r18.is_present()) {
+    j.write_fieldname("tci-SeparateTCI-UpdateMultiActiveTCI-PerCC-PerCORESET-r18");
+    j.start_obj();
+    j.write_int("maxNumConfigDL-TCI-PerCC-PerBWP-r18",
+                tci_separate_tci_upd_multi_active_tci_per_cc_per_coreset_r18->max_num_cfg_dl_tci_per_cc_per_bwp_r18);
+    j.write_int("maxNumConfigUL-TCI-PerCC-PerBWP-r18",
+                tci_separate_tci_upd_multi_active_tci_per_cc_per_coreset_r18->max_num_cfg_ul_tci_per_cc_per_bwp_r18);
+    j.end_obj();
+  }
+  if (common_tci_single_dci_r18_present) {
+    j.write_int("commonTCI-SingleDCI-r18", common_tci_single_dci_r18);
+  }
+  if (common_tci_multi_dci_r18_present) {
+    j.write_int("commonTCI-MultiDCI-r18", common_tci_multi_dci_r18);
+  }
+  if (two_phr_report_r18_present) {
+    j.write_str("twoPHR-Reporting-r18", "supported");
+  }
+  if (sp_cell_tag_ind_r18_present) {
+    j.write_str("spCell-TAG-Ind-r18", "supported");
+  }
+  if (inter_cell_cross_trp_pdcch_order_cfra_r18_present) {
+    j.write_str("interCellCrossTRP-PDCCH-OrderCFRA-r18", "supported");
+  }
+  if (intra_cell_cross_trp_pdcch_order_cfra_r18_present) {
+    j.write_str("intraCellCrossTRP-PDCCH-OrderCFRA-r18", "supported");
+  }
+  if (overlap_ul_trans_reduction_r18_present) {
+    j.write_str("overlapUL-TransReduction-r18", "supported");
+  }
+  if (max_periodicity_cmr_r18_present) {
+    j.write_str("maxPeriodicityCMR-r18", max_periodicity_cmr_r18.to_string());
+  }
+  if (tdcp_report_r18.is_present()) {
+    j.write_fieldname("tdcp-Report-r18");
+    j.start_obj();
+    j.write_int("valueX-r18", tdcp_report_r18->value_x_r18);
+    j.write_int("maxNumberActiveResource-r18", tdcp_report_r18->max_num_active_res_r18);
+    j.end_obj();
+  }
+  if (tdcp_res_r18.is_present()) {
+    j.write_fieldname("tdcp-Resource-r18");
+    j.start_obj();
+    j.write_str("maxNumberConfigPerCC-r18", tdcp_res_r18->max_num_cfg_per_cc_r18.to_string());
+    j.write_int("maxNumberConfigAcrossCC-r18", tdcp_res_r18->max_num_cfg_across_cc_r18);
+    j.write_str("maxNumberSimultaneousPerCC-r18", tdcp_res_r18->max_num_simul_per_cc_r18.to_string());
+    j.end_obj();
+  }
+  if (timeline_relax_cjt_csi_r18_present) {
+    j.write_str("timelineRelax-CJT-CSI-r18", timeline_relax_cjt_csi_r18.to_string());
+  }
+  if (joint_cfg_dmrs_port_dyn_switching_r18_present) {
+    j.write_str("jointConfigDMRSPortDynamicSwitching-r18", "supported");
+  }
+  if (srs_comb_offset_hop_r18_present) {
+    j.write_str("srs-combOffsetHopping-r18", "supported");
+  }
+  if (srs_comb_offset_in_time_r18_present) {
+    j.write_str("srs-combOffsetInTime-r18", srs_comb_offset_in_time_r18.to_string());
+  }
+  if (srs_comb_offset_combined_group_seq_r18_present) {
+    j.write_str("srs-combOffsetCombinedGroupSequence-r18", "supported");
+  }
+  if (srs_comb_offset_hop_within_subset_r18_present) {
+    j.write_str("srs-combOffsetHoppingWithinSubset-r18", "supported");
+  }
+  if (srs_cyclic_shift_hop_r18_present) {
+    j.write_str("srs-cyclicShiftHopping-r18", "supported");
+  }
+  if (srs_cyclic_shift_hop_small_granularity_r18_present) {
+    j.write_str("srs-cyclicShiftHoppingSmallGranularity-r18", "supported");
+  }
+  if (srs_cyclic_shift_combined_group_seq_r18_present) {
+    j.write_str("srs-cyclicShiftCombinedGroupSequence-r18", "supported");
+  }
+  if (cyclic_shift_hop_within_subset_r18_present) {
+    j.write_str("cyclicShiftHoppingWithinSubset-r18", "supported");
+  }
+  if (srs_cyclic_shift_combined_comb_offset_r18_present) {
+    j.write_str("srs-cyclicShiftCombinedCombOffset-r18", "supported");
+  }
+  if (pusch_cb_2_ptrs_single_dci_s_tx2_p_sdm_r18_present) {
+    j.write_str("pusch-CB-2PTRS-SingleDCI-STx2P-SDM-r18", "supported");
+  }
+  if (pusch_non_cb_2_ptrs_single_dci_s_tx2_p_sdm_r18_present) {
+    j.write_str("pusch-NonCB-2PTRS-SingleDCI-STx2P-SDM-r18", "supported");
+  }
+  if (pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18.is_present()) {
+    j.write_fieldname("pusch-NonCB-SingleDCI-STx2P-SDM-CSI-RS-SRS-r18");
+    j.start_obj();
+    j.write_int("maxNumberPeriodicSRS-Resource-PerBWP-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->max_num_periodic_srs_res_per_bwp_r18);
+    j.write_int("maxNumberAperiodicSRS-Resource-PerBWP-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->max_num_aperiodic_srs_res_per_bwp_r18);
+    j.write_int("maxNumberSemiPersistentSRS-ResourcePerBWP-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->max_num_semi_persistent_srs_res_per_bwp_r18);
+    j.write_int("valueY-SRS-ResourceAssociate-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->value_y_srs_res_associate_r18);
+    j.write_int("valueX-CSI-RS-ResourceAssociate-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sdm_csi_rs_srs_r18->value_x_csi_rs_res_associate_r18);
+    j.end_obj();
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18.is_present()) {
+    j.write_fieldname("twoPUSCH-NonCB-Multi-DCI-STx2P-CSI-RS-Resource-r18");
+    j.start_obj();
+    j.write_int("maxNumberPeriodicSRS-r18",
+                two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->max_num_periodic_srs_r18);
+    j.write_int("maxNumberAperiodicSRS-r18",
+                two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->max_num_aperiodic_srs_r18);
+    j.write_int("maxNumberSemiPersistentSRS-r18",
+                two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->max_num_semi_persistent_srs_r18);
+    j.write_int("simultaneousSRS-PerCC-r18", two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->simul_srs_per_cc_r18);
+    j.write_int("simultaneousCSI-RS-NonCB-r18",
+                two_pusch_non_cb_multi_dci_s_tx2_p_csi_rs_res_r18->simul_csi_rs_non_cb_r18);
+    j.end_obj();
+  }
+  if (dmrs_port_entry_single_dci_sdm_r18_present) {
+    j.write_str("dmrs-PortEntrySingleDCI-SDM-r18", "supported");
+  }
+  if (pusch_cb_2_ptrs_single_dci_s_tx2_p_sfn_r18_present) {
+    j.write_str("pusch-CB-2PTRS-SingleDCI-STx2P-SFN-r18", "supported");
+  }
+  if (pusch_non_cb_2_ptrs_single_dci_s_tx2_p_sfn_r18_present) {
+    j.write_str("pusch-NonCB-2PTRS-SingleDCI-STx2P-SFN-r18", "supported");
+  }
+  if (pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18.is_present()) {
+    j.write_fieldname("pusch-NonCB-SingleDCI-STx2P-SFN-CSI-RS-SRS-r18");
+    j.start_obj();
+    j.write_int("maxNumberPeriodicSRS-Resource-PerBWP-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->max_num_periodic_srs_res_per_bwp_r18);
+    j.write_int("maxNumberAperiodicSRS-Resource-PerBWP-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->max_num_aperiodic_srs_res_per_bwp_r18);
+    j.write_int("maxNumberSemiPersistentSRS-ResourcePerBWP-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->max_num_semi_persistent_srs_res_per_bwp_r18);
+    j.write_int("valueY-SRS-ResourceAssociate-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->value_y_srs_res_associate_r18);
+    j.write_int("valueX-CSI-RS-ResourceAssociate-r18",
+                pusch_non_cb_single_dci_s_tx2_p_sfn_csi_rs_srs_r18->value_x_csi_rs_res_associate_r18);
+    j.end_obj();
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_full_time_full_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-FullTimeFullFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_full_time_partial_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-FullTimePartialFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_partial_time_full_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-PartialTimeFullFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_partial_time_partial_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-PartialTimePartialFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_partial_time_non_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-PartialTimeNonFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_cg_cg_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-CG-CG-r18", "supported");
+  }
+  if (two_pusch_cb_multi_dci_s_tx2_p_cg_dg_r18_present) {
+    j.write_str("twoPUSCH-CB-MultiDCI-STx2P-CG-DG-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_full_time_full_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-FullTimeFullFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_full_time_partial_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-FullTimePartialFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_partial_time_full_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-PartialTimeFullFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_partial_time_partial_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-PartialTimePartialFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_partial_time_non_freq_overlap_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-PartialTimeNonFreqOverlap-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_cg_cg_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-CG-CG-r18", "supported");
+  }
+  if (two_pusch_non_cb_multi_dci_s_tx2_p_cg_dg_r18_present) {
+    j.write_str("twoPUSCH-NonCB-MultiDCI-STx2P-CG-DG-r18", "supported");
+  }
+  if (pucch_repeat_dyn_ind_sfn_r18_present) {
+    j.write_str("pucch-RepetitionDynamicIndicationSFN-r18", "supported");
+  }
+  if (group_beam_report_s_tx2_p_r18.is_present()) {
+    j.write_fieldname("groupBeamReporting-STx2P-r18");
+    j.start_obj();
+    j.write_str("groupL1-RSRP-Reporting-r18", group_beam_report_s_tx2_p_r18->group_l1_rsrp_report_r18.to_string());
+    j.write_int("maxNumberBeamGroups-r18", group_beam_report_s_tx2_p_r18->max_num_beam_groups_r18);
+    j.write_str("maxNumberResWithinSlotAcrossCC-r18",
+                group_beam_report_s_tx2_p_r18->max_num_res_within_slot_across_cc_r18.to_string());
+    j.write_str("maxNumberResAcrossCC-r18", group_beam_report_s_tx2_p_r18->max_num_res_across_cc_r18.to_string());
+    j.end_obj();
+  }
+  if (simul_cfg_dmrs_dci_1_3_r18_present) {
+    j.write_str("simulConfigDMRS-DCI-1-3-r18", "supported");
   }
   j.end_obj();
 }
@@ -20584,7 +20579,7 @@ OCUDUASN_CODE fr2_2_access_params_per_band_r17_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= mod64_qam_pusch_fr2_2_r17_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(dl_fr2_2_scs_120k_hz_r17_present, 1));
   HANDLE_CODE(bref.pack(ul_fr2_2_scs_120k_hz_r17_present, 1));
   HANDLE_CODE(bref.pack(init_access_ssb_120k_hz_r17_present, 1));
@@ -20624,7 +20619,7 @@ OCUDUASN_CODE fr2_2_access_params_per_band_r17_s::pack(bit_ref& bref) const
     HANDLE_CODE(bref.pack(support32_ul_harq_process_per_scs_r17.scs_960k_hz_r17_present, 1));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -20637,7 +20632,8 @@ OCUDUASN_CODE fr2_2_access_params_per_band_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE fr2_2_access_params_per_band_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(dl_fr2_2_scs_120k_hz_r17_present, 1));
   HANDLE_CODE(bref.unpack(ul_fr2_2_scs_120k_hz_r17_present, 1));
   HANDLE_CODE(bref.unpack(init_access_ssb_120k_hz_r17_present, 1));
@@ -20790,10 +20786,8 @@ void fr2_2_access_params_per_band_r17_s::to_json(json_writer& j) const
     }
     j.end_obj();
   }
-  if (ext) {
-    if (mod64_qam_pusch_fr2_2_r17_present) {
-      j.write_str("modulation64-QAM-PUSCH-FR2-2-r17", "supported");
-    }
+  if (mod64_qam_pusch_fr2_2_r17_present) {
+    j.write_str("modulation64-QAM-PUSCH-FR2-2-r17", "supported");
   }
   j.end_obj();
 }
@@ -21057,7 +21051,8 @@ OCUDUASN_CODE pos_srs_rrc_inactive_outside_init_ul_bwp_r17_s::pack(bit_ref& bref
 }
 OCUDUASN_CODE pos_srs_rrc_inactive_outside_init_ul_bwp_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_srs_pos_bw_for_each_scs_within_cc_fr1_r17_present, 1));
   HANDLE_CODE(bref.unpack(max_srs_pos_bw_for_each_scs_within_cc_fr2_r17_present, 1));
   HANDLE_CODE(bref.unpack(max_num_of_srs_pos_res_sets_r17_present, 1));
@@ -21404,7 +21399,8 @@ OCUDUASN_CODE prs_processing_cap_outside_m_gin_ppw_per_type_r17_s::unpack(cbit_r
   if (ppw_dur_of_prs_processing_r17_present) {
     HANDLE_CODE(ppw_dur_of_prs_processing_r17.unpack(bref));
   }
-  bref.unpack(ppw_max_num_of_dl_prs_res_processed_per_slot_r17.ext, 1);
+  bool ppw_max_num_of_dl_prs_res_processed_per_slot_r17_ext;
+  HANDLE_CODE(bref.unpack(ppw_max_num_of_dl_prs_res_processed_per_slot_r17_ext, 1));
   HANDLE_CODE(bref.unpack(ppw_max_num_of_dl_prs_res_processed_per_slot_r17.scs15_r17_present, 1));
   HANDLE_CODE(bref.unpack(ppw_max_num_of_dl_prs_res_processed_per_slot_r17.scs30_r17_present, 1));
   HANDLE_CODE(bref.unpack(ppw_max_num_of_dl_prs_res_processed_per_slot_r17.scs60_r17_present, 1));
@@ -21421,7 +21417,7 @@ OCUDUASN_CODE prs_processing_cap_outside_m_gin_ppw_per_type_r17_s::unpack(cbit_r
   if (ppw_max_num_of_dl_prs_res_processed_per_slot_r17.scs120_r17_present) {
     HANDLE_CODE(ppw_max_num_of_dl_prs_res_processed_per_slot_r17.scs120_r17.unpack(bref));
   }
-  if (ppw_max_num_of_dl_prs_res_processed_per_slot_r17.ext) {
+  if (ppw_max_num_of_dl_prs_res_processed_per_slot_r17_ext) {
     ext_groups_unpacker unknown_ext_unpacker(bref);
     HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
   }
@@ -22026,7 +22022,8 @@ OCUDUASN_CODE dl_prs_meas_with_rx_fh_rrc_connected_r18_s::pack(bit_ref& bref) co
 }
 OCUDUASN_CODE dl_prs_meas_with_rx_fh_rrc_connected_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_prs_bw_across_all_hops_fr1_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_prs_bw_across_all_hops_fr2_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_fh_hops_r18_present, 1));
@@ -22263,7 +22260,8 @@ OCUDUASN_CODE pos_srs_tx_freq_hop_rrc_connected_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pos_srs_tx_freq_hop_rrc_connected_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_srs_bw_across_all_hops_fr1_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_srs_bw_across_all_hops_fr2_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_tx_fh_hops_r18_present, 1));
@@ -22512,7 +22510,8 @@ OCUDUASN_CODE pos_srs_tx_freq_hop_rrc_inactive_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pos_srs_tx_freq_hop_rrc_inactive_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_srs_bw_across_all_hops_fr1_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_srs_bw_across_all_hops_fr2_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_tx_fh_hops_r18_present, 1));
@@ -22737,7 +22736,8 @@ OCUDUASN_CODE pos_srs_bwa_rrc_inactive_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pos_srs_bwa_rrc_inactive_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_two_carriers_fr1_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_two_carriers_fr2_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_three_carriers_fr1_r18_present, 1));
@@ -23196,7 +23196,8 @@ OCUDUASN_CODE mac_params_per_band_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_per_band_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ptm_retx_r18_present, 1));
   HANDLE_CODE(bref.unpack(ptm_retx_inactive_r18_present, 1));
 
@@ -23460,7 +23461,7 @@ OCUDUASN_CODE band_nr_s::pack(bit_ref& bref) const
   group_flags[17] |= ltm_mac_ce_separate_tci_r18.is_present();
   group_flags[18] |= event_a4_based_cond_ho_atg_r18_present;
   group_flags[19] |= pos_srs_tx_fh_with_time_win_for_red_cap_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(modified_mpr_behaviour_present, 1));
   HANDLE_CODE(bref.pack(mimo_params_per_band_present, 1));
   HANDLE_CODE(bref.pack(extended_cp_present, 1));
@@ -23496,7 +23497,7 @@ OCUDUASN_CODE band_nr_s::pack(bit_ref& bref) const
     HANDLE_CODE(ch_bws_ul.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -24301,7 +24302,8 @@ OCUDUASN_CODE band_nr_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE band_nr_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(modified_mpr_behaviour_present, 1));
   HANDLE_CODE(bref.unpack(mimo_params_per_band_present, 1));
   HANDLE_CODE(bref.unpack(extended_cp_present, 1));
@@ -25172,1016 +25174,1010 @@ void band_nr_s::to_json(json_writer& j) const
     j.write_fieldname("channelBWs-UL");
     ch_bws_ul.to_json(j);
   }
-  if (ext) {
-    if (max_ul_duty_cycle_pc2_fr1_present) {
-      j.write_str("maxUplinkDutyCycle-PC2-FR1", max_ul_duty_cycle_pc2_fr1.to_string());
-    }
-    if (pucch_spatial_rel_info_mac_ce_present) {
-      j.write_str("pucch-SpatialRelInfoMAC-CE", "supported");
-    }
-    if (pwr_boosting_pi2_bpsk_present) {
-      j.write_str("powerBoosting-pi2BPSK", "supported");
-    }
-    if (max_ul_duty_cycle_fr2_present) {
-      j.write_str("maxUplinkDutyCycle-FR2", max_ul_duty_cycle_fr2.to_string());
-    }
-    if (ch_bws_dl_v1590.is_present()) {
-      j.write_fieldname("channelBWs-DL-v1590");
-      ch_bws_dl_v1590->to_json(j);
-    }
-    if (ch_bws_ul_v1590.is_present()) {
-      j.write_fieldname("channelBWs-UL-v1590");
-      ch_bws_ul_v1590->to_json(j);
-    }
-    if (asymmetric_bw_combination_set_present) {
-      j.write_str("asymmetricBandwidthCombinationSet", asymmetric_bw_combination_set.to_string());
-    }
-    if (shared_spec_ch_access_params_per_band_r16.is_present()) {
-      j.write_fieldname("sharedSpectrumChAccessParamsPerBand-r16");
-      shared_spec_ch_access_params_per_band_r16->to_json(j);
-    }
-    if (cancel_overlapping_pusch_r16_present) {
-      j.write_str("cancelOverlappingPUSCH-r16", "supported");
-    }
-    if (multiple_rate_matching_eutra_crs_r16.is_present()) {
-      j.write_fieldname("multipleRateMatchingEUTRA-CRS-r16");
-      j.start_obj();
-      j.write_int("maxNumberPatterns-r16", multiple_rate_matching_eutra_crs_r16->max_num_patterns_r16);
-      j.write_int("maxNumberNon-OverlapPatterns-r16",
-                  multiple_rate_matching_eutra_crs_r16->max_num_non_overlap_patterns_r16);
-      j.end_obj();
-    }
-    if (overlap_rate_matching_eutra_crs_r16_present) {
-      j.write_str("overlapRateMatchingEUTRA-CRS-r16", "supported");
-    }
-    if (pdsch_map_type_b_alt_r16_present) {
-      j.write_str("pdsch-MappingTypeB-Alt-r16", "supported");
-    }
-    if (one_slot_periodic_trs_r16_present) {
-      j.write_str("oneSlotPeriodicTRS-r16", "supported");
-    }
-    if (olpc_srs_pos_r16.is_present()) {
-      j.write_fieldname("olpc-SRS-Pos-r16");
-      olpc_srs_pos_r16->to_json(j);
-    }
-    if (spatial_relations_srs_pos_r16.is_present()) {
-      j.write_fieldname("spatialRelationsSRS-Pos-r16");
-      spatial_relations_srs_pos_r16->to_json(j);
-    }
-    if (simul_srs_mimo_trans_within_band_r16_present) {
-      j.write_str("simulSRS-MIMO-TransWithinBand-r16", "n2");
-    }
-    if (ch_bw_dl_iab_r16.is_present()) {
-      j.write_fieldname("channelBW-DL-IAB-r16");
-      ch_bw_dl_iab_r16->to_json(j);
-    }
-    if (ch_bw_ul_iab_r16.is_present()) {
-      j.write_fieldname("channelBW-UL-IAB-r16");
-      ch_bw_ul_iab_r16->to_json(j);
-    }
-    if (raster_shift7dot5_iab_r16_present) {
-      j.write_str("rasterShift7dot5-IAB-r16", "supported");
-    }
-    if (ue_pwr_class_v1610_present) {
-      j.write_str("ue-PowerClass-v1610", "pc1dot5");
-    }
-    if (cond_ho_r16_present) {
-      j.write_str("condHandover-r16", "supported");
-    }
-    if (cond_ho_fail_r16_present) {
-      j.write_str("condHandoverFailure-r16", "supported");
-    }
-    if (cond_ho_two_trigger_events_r16_present) {
-      j.write_str("condHandoverTwoTriggerEvents-r16", "supported");
-    }
-    if (cond_pscell_change_r16_present) {
-      j.write_str("condPSCellChange-r16", "supported");
-    }
-    if (cond_pscell_change_two_trigger_events_r16_present) {
-      j.write_str("condPSCellChangeTwoTriggerEvents-r16", "supported");
-    }
-    if (mpr_pwr_boost_fr2_r16_present) {
-      j.write_str("mpr-PowerBoost-FR2-r16", "supported");
-    }
-    if (active_cfg_grant_r16.is_present()) {
-      j.write_fieldname("activeConfiguredGrant-r16");
-      j.start_obj();
-      j.write_str("maxNumberConfigsPerBWP-r16", active_cfg_grant_r16->max_num_cfgs_per_bwp_r16.to_string());
-      j.write_int("maxNumberConfigsAllCC-r16", active_cfg_grant_r16->max_num_cfgs_all_cc_r16);
-      j.end_obj();
-    }
-    if (joint_release_cfg_grant_type2_r16_present) {
-      j.write_str("jointReleaseConfiguredGrantType2-r16", "supported");
-    }
-    if (sps_r16.is_present()) {
-      j.write_fieldname("sps-r16");
-      j.start_obj();
-      j.write_int("maxNumberConfigsPerBWP-r16", sps_r16->max_num_cfgs_per_bwp_r16);
-      j.write_int("maxNumberConfigsAllCC-r16", sps_r16->max_num_cfgs_all_cc_r16);
-      j.end_obj();
-    }
-    if (joint_release_sps_r16_present) {
-      j.write_str("jointReleaseSPS-r16", "supported");
-    }
-    if (simul_srs_trans_within_band_r16_present) {
-      j.write_str("simulSRS-TransWithinBand-r16", "n2");
-    }
-    if (trs_add_bw_r16_present) {
-      j.write_str("trs-AdditionalBandwidth-r16", trs_add_bw_r16.to_string());
-    }
-    if (ho_intra_f_iab_r16_present) {
-      j.write_str("handoverIntraF-IAB-r16", "supported");
-    }
-    if (simul_tx_srs_ant_switching_intra_band_ul_ca_r16.is_present()) {
-      j.write_fieldname("simulTX-SRS-AntSwitchingIntraBandUL-CA-r16");
-      simul_tx_srs_ant_switching_intra_band_ul_ca_r16->to_json(j);
-    }
-    if (shared_spec_ch_access_params_per_band_v1630.is_present()) {
-      j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1630");
-      shared_spec_ch_access_params_per_band_v1630->to_json(j);
-    }
-    if (ho_utra_fdd_r16_present) {
-      j.write_str("handoverUTRA-FDD-r16", "supported");
-    }
-    if (enhanced_ul_transient_period_r16_present) {
-      j.write_str("enhancedUL-TransientPeriod-r16", enhanced_ul_transient_period_r16.to_string());
-    }
-    if (shared_spec_ch_access_params_per_band_v1640.is_present()) {
-      j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1640");
-      shared_spec_ch_access_params_per_band_v1640->to_json(j);
-    }
-    if (type1_pusch_repeat_multi_slots_v1650_present) {
-      j.write_str("type1-PUSCH-RepetitionMultiSlots-v1650", "supported");
-    }
-    if (type2_pusch_repeat_multi_slots_v1650_present) {
-      j.write_str("type2-PUSCH-RepetitionMultiSlots-v1650", "supported");
-    }
-    if (pusch_repeat_multi_slots_v1650_present) {
-      j.write_str("pusch-RepetitionMultiSlots-v1650", "supported");
-    }
-    if (cfg_ul_grant_type1_v1650_present) {
-      j.write_str("configuredUL-GrantType1-v1650", "supported");
-    }
-    if (cfg_ul_grant_type2_v1650_present) {
-      j.write_str("configuredUL-GrantType2-v1650", "supported");
-    }
-    if (shared_spec_ch_access_params_per_band_v1650.is_present()) {
-      j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1650");
-      shared_spec_ch_access_params_per_band_v1650->to_json(j);
-    }
-    if (enhanced_skip_ul_tx_cfg_v1660_present) {
-      j.write_str("enhancedSkipUplinkTxConfigured-v1660", "supported");
-    }
-    if (enhanced_skip_ul_tx_dyn_v1660_present) {
-      j.write_str("enhancedSkipUplinkTxDynamic-v1660", "supported");
-    }
-    if (max_ul_duty_cycle_pc1dot5_mpe_fr1_r16_present) {
-      j.write_str("maxUplinkDutyCycle-PC1dot5-MPE-FR1-r16", max_ul_duty_cycle_pc1dot5_mpe_fr1_r16.to_string());
-    }
-    if (tx_diversity_r16_present) {
-      j.write_str("txDiversity-r16", "supported");
-    }
-    if (pdsch_1024_qam_fr1_r17_present) {
-      j.write_str("pdsch-1024QAM-FR1-r17", "supported");
-    }
-    if (ue_pwr_class_v1700_present) {
-      j.write_str("ue-PowerClass-v1700", ue_pwr_class_v1700.to_string());
-    }
-    if (fr2_2_access_params_per_band_r17.is_present()) {
-      j.write_fieldname("fr2-2-AccessParamsPerBand-r17");
-      fr2_2_access_params_per_band_r17->to_json(j);
-    }
-    if (rlm_relaxation_r17_present) {
-      j.write_str("rlm-Relaxation-r17", "supported");
-    }
-    if (bfd_relaxation_r17_present) {
-      j.write_str("bfd-Relaxation-r17", "supported");
-    }
-    if (cg_sdt_r17_present) {
-      j.write_str("cg-SDT-r17", "supported");
-    }
-    if (location_based_cond_ho_r17_present) {
-      j.write_str("locationBasedCondHandover-r17", "supported");
-    }
-    if (time_based_cond_ho_r17_present) {
-      j.write_str("timeBasedCondHandover-r17", "supported");
-    }
-    if (event_a4_based_cond_ho_r17_present) {
-      j.write_str("eventA4BasedCondHandover-r17", "supported");
-    }
-    if (mn_initiated_cond_pscell_change_nrdc_r17_present) {
-      j.write_str("mn-InitiatedCondPSCellChangeNRDC-r17", "supported");
-    }
-    if (sn_initiated_cond_pscell_change_nrdc_r17_present) {
-      j.write_str("sn-InitiatedCondPSCellChangeNRDC-r17", "supported");
-    }
-    if (pdcch_skipping_without_sssg_r17_present) {
-      j.write_str("pdcch-SkippingWithoutSSSG-r17", "supported");
-    }
-    if (sssg_switching_1_bit_ind_r17_present) {
-      j.write_str("sssg-Switching-1BitInd-r17", "supported");
-    }
-    if (sssg_switching_2_bit_ind_r17_present) {
-      j.write_str("sssg-Switching-2BitInd-r17", "supported");
-    }
-    if (pdcch_skipping_with_sssg_r17_present) {
-      j.write_str("pdcch-SkippingWithSSSG-r17", "supported");
-    }
-    if (search_space_set_grp_switch_cap2_r17_present) {
-      j.write_str("searchSpaceSetGrp-switchCap2-r17", "supported");
-    }
-    if (ul_pre_compensation_r17_present) {
-      j.write_str("uplinkPreCompensation-r17", "supported");
-    }
-    if (ul_ta_report_r17_present) {
-      j.write_str("uplink-TA-Reporting-r17", "supported");
-    }
-    if (max_harq_process_num_r17_present) {
-      j.write_str("max-HARQ-ProcessNumber-r17", max_harq_process_num_r17.to_string());
-    }
-    if (type2_harq_codebook_r17_present) {
-      j.write_str("type2-HARQ-Codebook-r17", "supported");
-    }
-    if (type1_harq_codebook_r17_present) {
-      j.write_str("type1-HARQ-Codebook-r17", "supported");
-    }
-    if (type3_harq_codebook_r17_present) {
-      j.write_str("type3-HARQ-Codebook-r17", "supported");
-    }
-    if (ue_specific_k_offset_r17_present) {
-      j.write_str("ue-specific-K-Offset-r17", "supported");
-    }
-    if (multi_pdsch_single_dci_fr2_1_scs_120k_hz_r17_present) {
-      j.write_str("multiPDSCH-SingleDCI-FR2-1-SCS-120kHz-r17", "supported");
-    }
-    if (multi_pusch_single_dci_fr2_1_scs_120k_hz_r17_present) {
-      j.write_str("multiPUSCH-SingleDCI-FR2-1-SCS-120kHz-r17", "supported");
-    }
-    if (parallel_prs_meas_rrc_inactive_r17_present) {
-      j.write_str("parallelPRS-MeasRRC-Inactive-r17", "supported");
-    }
-    if (nr_ue_tx_teg_id_max_support_r17_present) {
-      j.write_str("nr-UE-TxTEG-ID-MaxSupport-r17", nr_ue_tx_teg_id_max_support_r17.to_string());
-    }
-    if (prs_processing_rrc_inactive_r17_present) {
-      j.write_str("prs-ProcessingRRC-Inactive-r17", "supported");
-    }
-    if (prs_processing_win_type1_a_r17_present) {
-      j.write_str("prs-ProcessingWindowType1A-r17", prs_processing_win_type1_a_r17.to_string());
-    }
-    if (prs_processing_win_type1_b_r17_present) {
-      j.write_str("prs-ProcessingWindowType1B-r17", prs_processing_win_type1_b_r17.to_string());
-    }
-    if (prs_processing_win_type2_r17_present) {
-      j.write_str("prs-ProcessingWindowType2-r17", prs_processing_win_type2_r17.to_string());
-    }
-    if (srs_all_pos_res_rrc_inactive_r17.is_present()) {
-      j.write_fieldname("srs-AllPosResourcesRRC-Inactive-r17");
-      srs_all_pos_res_rrc_inactive_r17->to_json(j);
-    }
-    if (olpc_srs_pos_rrc_inactive_r17.is_present()) {
-      j.write_fieldname("olpc-SRS-PosRRC-Inactive-r17");
-      olpc_srs_pos_rrc_inactive_r17->to_json(j);
-    }
-    if (spatial_relations_srs_pos_rrc_inactive_r17.is_present()) {
-      j.write_fieldname("spatialRelationsSRS-PosRRC-Inactive-r17");
-      spatial_relations_srs_pos_rrc_inactive_r17->to_json(j);
-    }
-    if (max_num_pusch_type_a_repeat_r17_present) {
-      j.write_str("maxNumberPUSCH-TypeA-Repetition-r17", "supported");
-    }
-    if (pusch_type_a_repeats_avail_slot_r17_present) {
-      j.write_str("puschTypeA-RepetitionsAvailSlot-r17", "supported");
-    }
-    if (tb_processing_multi_slot_pusch_r17_present) {
-      j.write_str("tb-ProcessingMultiSlotPUSCH-r17", "supported");
-    }
-    if (tb_processing_rep_multi_slot_pusch_r17_present) {
-      j.write_str("tb-ProcessingRepMultiSlotPUSCH-r17", "supported");
-    }
-    if (max_dur_dmrs_bundling_r17.is_present()) {
-      j.write_fieldname("maxDurationDMRS-Bundling-r17");
-      j.start_obj();
-      if (max_dur_dmrs_bundling_r17->fdd_r17_present) {
-        j.write_str("fdd-r17", max_dur_dmrs_bundling_r17->fdd_r17.to_string());
-      }
-      if (max_dur_dmrs_bundling_r17->tdd_r17_present) {
-        j.write_str("tdd-r17", max_dur_dmrs_bundling_r17->tdd_r17.to_string());
-      }
-      j.end_obj();
-    }
-    if (pusch_repeat_msg3_r17_present) {
-      j.write_str("pusch-RepetitionMsg3-r17", "supported");
-    }
-    if (shared_spec_ch_access_params_per_band_v1710.is_present()) {
-      j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1710");
-      shared_spec_ch_access_params_per_band_v1710->to_json(j);
-    }
-    if (parallel_meas_without_restrict_r17_present) {
-      j.write_str("parallelMeasurementWithoutRestriction-r17", "supported");
-    }
-    if (max_num_ngso_satellites_within_one_smtc_r17_present) {
-      j.write_str("maxNumber-NGSO-SatellitesWithinOneSMTC-r17",
-                  max_num_ngso_satellites_within_one_smtc_r17.to_string());
-    }
-    if (k1_range_ext_r17_present) {
-      j.write_str("k1-RangeExtension-r17", "supported");
-    }
-    if (aperiodic_csi_rs_fast_scell_activation_r17.is_present()) {
-      j.write_fieldname("aperiodicCSI-RS-FastScellActivation-r17");
-      j.start_obj();
-      j.write_str("maxNumberAperiodicCSI-RS-PerCC-r17",
-                  aperiodic_csi_rs_fast_scell_activation_r17->max_num_aperiodic_csi_rs_per_cc_r17.to_string());
-      j.write_str("maxNumberAperiodicCSI-RS-AcrossCCs-r17",
-                  aperiodic_csi_rs_fast_scell_activation_r17->max_num_aperiodic_csi_rs_across_ccs_r17.to_string());
-      j.end_obj();
-    }
-    if (aperiodic_csi_rs_add_bw_r17_present) {
-      j.write_str("aperiodicCSI-RS-AdditionalBandwidth-r17", aperiodic_csi_rs_add_bw_r17.to_string());
-    }
-    if (bwp_without_cd_ssb_or_ncd_ssb_red_cap_r17_present) {
-      j.write_str("bwp-WithoutCD-SSB-OrNCD-SSB-RedCap-r17", "supported");
-    }
-    if (half_duplex_fdd_type_a_red_cap_r17_present) {
-      j.write_str("halfDuplexFDD-TypeA-RedCap-r17", "supported");
-    }
-    if (pos_srs_rrc_inactive_outside_init_ul_bwp_r17.is_present()) {
-      j.write_fieldname("posSRS-RRC-Inactive-OutsideInitialUL-BWP-r17");
-      pos_srs_rrc_inactive_outside_init_ul_bwp_r17->to_json(j);
-    }
-    if (ch_bws_dl_scs_480k_hz_fr2_2_r17_present) {
-      j.write_str("channelBWs-DL-SCS-480kHz-FR2-2-r17", ch_bws_dl_scs_480k_hz_fr2_2_r17.to_string());
-    }
-    if (ch_bws_ul_scs_480k_hz_fr2_2_r17_present) {
-      j.write_str("channelBWs-UL-SCS-480kHz-FR2-2-r17", ch_bws_ul_scs_480k_hz_fr2_2_r17.to_string());
-    }
-    if (ch_bws_dl_scs_960k_hz_fr2_2_r17_present) {
-      j.write_str("channelBWs-DL-SCS-960kHz-FR2-2-r17", ch_bws_dl_scs_960k_hz_fr2_2_r17.to_string());
-    }
-    if (ch_bws_ul_scs_960k_hz_fr2_2_r17_present) {
-      j.write_str("channelBWs-UL-SCS-960kHz-FR2-2-r17", ch_bws_ul_scs_960k_hz_fr2_2_r17.to_string());
-    }
-    if (ul_gap_fr2_r17_present) {
-      j.write_str("ul-GapFR2-r17", "supported");
-    }
-    if (one_shot_harq_feedback_triggered_by_dci_1_2_r17_present) {
-      j.write_str("oneShotHARQ-feedbackTriggeredByDCI-1-2-r17", "supported");
-    }
-    if (one_shot_harq_feedback_phy_prio_r17_present) {
-      j.write_str("oneShotHARQ-feedbackPhy-Priority-r17", "supported");
-    }
-    if (enhanced_type3_harq_codebook_feedback_r17.is_present()) {
-      j.write_fieldname("enhancedType3-HARQ-CodebookFeedback-r17");
-      j.start_obj();
-      j.write_str("enhancedType3-HARQ-Codebooks-r17",
-                  enhanced_type3_harq_codebook_feedback_r17->enhanced_type3_harq_codebooks_r17.to_string());
-      j.write_str("maxNumberPUCCH-Transmissions-r17",
-                  enhanced_type3_harq_codebook_feedback_r17->max_num_pucch_txs_r17.to_string());
-      j.end_obj();
-    }
-    if (triggered_harq_codebook_retx_r17.is_present()) {
-      j.write_fieldname("triggeredHARQ-CodebookRetx-r17");
-      j.start_obj();
-      j.write_str("minHARQ-Retx-Offset-r17", triggered_harq_codebook_retx_r17->min_harq_retx_offset_r17.to_string());
-      j.write_str("maxHARQ-Retx-Offset-r17", triggered_harq_codebook_retx_r17->max_harq_retx_offset_r17.to_string());
-      j.end_obj();
-    }
-    if (ue_one_shot_ul_timing_adj_r17_present) {
-      j.write_str("ue-OneShotUL-TimingAdj-r17", "supported");
-    }
-    if (pucch_repeat_f0_2_r17_present) {
-      j.write_str("pucch-Repetition-F0-2-r17", "supported");
-    }
-    if (cqi_4_bits_subband_ntn_shared_spec_ch_access_r17_present) {
-      j.write_str("cqi-4-BitsSubbandNTN-SharedSpectrumChAccess-r17", "supported");
-    }
-    if (mux_harq_ack_diff_priorities_r17_present) {
-      j.write_str("mux-HARQ-ACK-DiffPriorities-r17", "supported");
-    }
-    if (ta_based_pdc_ntn_shared_spec_ch_access_r17_present) {
-      j.write_str("ta-BasedPDC-NTN-SharedSpectrumChAccess-r17", "supported");
-    }
-    if (ack_nack_feedback_for_multicast_with_dci_enabler_r17_present) {
-      j.write_str("ack-NACK-FeedbackForMulticastWithDCI-Enabler-r17", "supported");
-    }
-    if (max_num_g_rnti_r17_present) {
-      j.write_int("maxNumberG-RNTI-r17", max_num_g_rnti_r17);
-    }
-    if (dyn_multicast_dci_format4_2_r17_present) {
-      j.write_str("dynamicMulticastDCI-Format4-2-r17", "supported");
-    }
-    if (max_mod_order_for_multicast_r17.is_present()) {
-      j.write_fieldname("maxModulationOrderForMulticast-r17");
-      max_mod_order_for_multicast_r17->to_json(j);
-    }
-    if (dyn_slot_repeat_multicast_tn_non_shared_spec_ch_access_r17_present) {
-      j.write_str("dynamicSlotRepetitionMulticastTN-NonSharedSpectrumChAccess-r17",
-                  dyn_slot_repeat_multicast_tn_non_shared_spec_ch_access_r17.to_string());
-    }
-    if (dyn_slot_repeat_multicast_ntn_shared_spec_ch_access_r17_present) {
-      j.write_str("dynamicSlotRepetitionMulticastNTN-SharedSpectrumChAccess-r17",
-                  dyn_slot_repeat_multicast_ntn_shared_spec_ch_access_r17.to_string());
-    }
-    if (nack_only_feedback_for_multicast_with_dci_enabler_r17_present) {
-      j.write_str("nack-OnlyFeedbackForMulticastWithDCI-Enabler-r17", "supported");
-    }
-    if (ack_nack_feedback_for_sps_multicast_with_dci_enabler_r17_present) {
-      j.write_str("ack-NACK-FeedbackForSPS-MulticastWithDCI-Enabler-r17", "supported");
-    }
-    if (max_num_g_cs_rnti_r17_present) {
-      j.write_int("maxNumberG-CS-RNTI-r17", max_num_g_cs_rnti_r17);
-    }
-    if (re_level_rate_matching_for_multicast_r17_present) {
-      j.write_str("re-LevelRateMatchingForMulticast-r17", "supported");
-    }
-    if (pdsch_1024_qam_2_mimo_fr1_r17_present) {
-      j.write_str("pdsch-1024QAM-2MIMO-FR1-r17", "supported");
-    }
-    if (prs_meas_without_mg_r17_present) {
-      j.write_str("prs-MeasurementWithoutMG-r17", prs_meas_without_mg_r17.to_string());
-    }
-    if (max_num_ngso_satellites_per_carrier_r17_present) {
-      j.write_int("maxNumber-NGSO-SatellitesPerCarrier-r17", max_num_ngso_satellites_per_carrier_r17);
-    }
-    if (prs_processing_cap_outside_m_gin_ppw_r17.is_present()) {
-      j.start_array("prs-ProcessingCapabilityOutsideMGinPPW-r17");
-      for (const auto& e1 : *prs_processing_cap_outside_m_gin_ppw_r17) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (srs_semi_persistent_pos_res_rrc_inactive_r17.is_present()) {
-      j.write_fieldname("srs-SemiPersistent-PosResourcesRRC-Inactive-r17");
-      j.start_obj();
-      j.write_str("maxNumOfSemiPersistentSRSposResources-r17",
-                  srs_semi_persistent_pos_res_rrc_inactive_r17->max_num_of_semi_persistent_srs_pos_res_r17.to_string());
-      j.write_str("maxNumOfSemiPersistentSRSposResourcesPerSlot-r17",
-                  srs_semi_persistent_pos_res_rrc_inactive_r17->max_num_of_semi_persistent_srs_pos_res_per_slot_r17
-                      .to_string());
-      j.end_obj();
-    }
-    if (ch_bws_dl_scs_120k_hz_fr2_2_r17_present) {
-      j.write_str("channelBWs-DL-SCS-120kHz-FR2-2-r17", ch_bws_dl_scs_120k_hz_fr2_2_r17.to_string());
-    }
-    if (ch_bws_ul_scs_120k_hz_fr2_2_r17_present) {
-      j.write_str("channelBWs-UL-SCS-120kHz-FR2-2-r17", ch_bws_ul_scs_120k_hz_fr2_2_r17.to_string());
-    }
-    if (dmrs_bundling_pusch_rep_type_a_r17_present) {
-      j.write_str("dmrs-BundlingPUSCH-RepTypeA-r17", "supported");
-    }
-    if (dmrs_bundling_pusch_rep_type_b_r17_present) {
-      j.write_str("dmrs-BundlingPUSCH-RepTypeB-r17", "supported");
-    }
-    if (dmrs_bundling_pusch_multi_slot_r17_present) {
-      j.write_str("dmrs-BundlingPUSCH-multiSlot-r17", "supported");
-    }
-    if (dmrs_bundling_pucch_rep_r17_present) {
-      j.write_str("dmrs-BundlingPUCCH-Rep-r17", "supported");
-    }
-    if (inter_slot_freq_hop_inter_slot_bundling_pusch_r17_present) {
-      j.write_str("interSlotFreqHopInterSlotBundlingPUSCH-r17", "supported");
-    }
-    if (inter_slot_freq_hop_pucch_r17_present) {
-      j.write_str("interSlotFreqHopPUCCH-r17", "supported");
-    }
-    if (dmrs_bundling_restart_r17_present) {
-      j.write_str("dmrs-BundlingRestart-r17", "supported");
-    }
-    if (dmrs_bundling_non_back_to_back_tx_r17_present) {
-      j.write_str("dmrs-BundlingNonBackToBackTX-r17", "supported");
-    }
-    if (max_dyn_slot_repeat_for_sps_multicast_r17_present) {
-      j.write_str("maxDynamicSlotRepetitionForSPS-Multicast-r17",
-                  max_dyn_slot_repeat_for_sps_multicast_r17.to_string());
-    }
-    if (nack_only_feedback_for_sps_multicast_with_dci_enabler_r17_present) {
-      j.write_str("nack-OnlyFeedbackForSPS-MulticastWithDCI-Enabler-r17", "supported");
-    }
-    if (sps_multicast_dci_format4_2_r17_present) {
-      j.write_str("sps-MulticastDCI-Format4-2-r17", "supported");
-    }
-    if (sps_multicast_multi_cfg_r17_present) {
-      j.write_int("sps-MulticastMultiConfig-r17", sps_multicast_multi_cfg_r17);
-    }
-    if (prio_ind_in_dci_multicast_r17_present) {
-      j.write_str("priorityIndicatorInDCI-Multicast-r17", "supported");
-    }
-    if (prio_ind_in_dci_sps_multicast_r17_present) {
-      j.write_str("priorityIndicatorInDCI-SPS-Multicast-r17", "supported");
-    }
-    if (two_harq_ack_codebook_for_unicast_and_multicast_r17_present) {
-      j.write_str("twoHARQ-ACK-CodebookForUnicastAndMulticast-r17", "supported");
-    }
-    if (multi_pucch_harq_ack_for_multicast_unicast_r17_present) {
-      j.write_str("multiPUCCH-HARQ-ACK-ForMulticastUnicast-r17", "supported");
-    }
-    if (release_sps_multicast_with_cs_rnti_r17_present) {
-      j.write_str("releaseSPS-MulticastWithCS-RNTI-r17", "supported");
-    }
-    if (pos_ue_ta_auto_adjustment_r18_present) {
-      j.write_str("posUE-TA-AutoAdjustment-r18", "supported");
-    }
-    if (pos_srs_validity_area_rrc_inactive_init_ul_bwp_r18_present) {
-      j.write_str("posSRS-ValidityAreaRRC-InactiveInitialUL-BWP-r18", "supported");
-    }
-    if (pos_srs_validity_area_rrc_inactive_outside_init_ul_bwp_r18_present) {
-      j.write_str("posSRS-ValidityAreaRRC-InactiveOutsideInitialUL-BWP-r18", "supported");
-    }
-    if (dl_prs_meas_with_rx_fh_rrc_connected_for_red_cap_r18.is_present()) {
-      j.write_fieldname("dl-PRS-MeasurementWithRxFH-RRC-ConnectedForRedCap-r18");
-      dl_prs_meas_with_rx_fh_rrc_connected_for_red_cap_r18->to_json(j);
-    }
-    if (pos_srs_tx_fh_rrc_connected_for_red_cap_r18.is_present()) {
-      j.write_fieldname("posSRS-TxFH-RRC-ConnectedForRedCap-r18");
-      pos_srs_tx_fh_rrc_connected_for_red_cap_r18->to_json(j);
-    }
-    if (pos_srs_tx_fh_rrc_inactive_for_red_cap_r18.is_present()) {
-      j.write_fieldname("posSRS-TxFH-RRC-InactiveForRedCap-r18");
-      pos_srs_tx_fh_rrc_inactive_for_red_cap_r18->to_json(j);
-    }
-    if (pos_srs_bwa_rrc_inactive_r18.is_present()) {
-      j.write_fieldname("posSRS-BWA-RRC-Inactive-r18");
-      pos_srs_bwa_rrc_inactive_r18->to_json(j);
-    }
-    if (pos_joint_trigger_by_single_dci_rrc_connected_r18_present) {
-      j.write_str("posJointTriggerBySingleDCI-RRC-Connected-r18", "supported");
-    }
-    if (dl_prs_meas_with_rx_fh_rrc_inactivefor_red_cap_r18_present) {
-      j.write_str("dl-PRS-MeasurementWithRxFH-RRC-InactiveforRedCap-r18", "supported");
-    }
-    if (dl_prs_meas_with_rx_fh_rrc_idlefor_red_cap_r18_present) {
-      j.write_str("dl-PRS-MeasurementWithRxFH-RRC-IdleforRedCap-r18", "supported");
-    }
-    if (spatial_adaptation_csi_feedback_r18.is_present()) {
-      j.write_fieldname("spatialAdaptation-CSI-Feedback-r18");
-      j.start_obj();
-      j.write_str("csiFeedbackType-r18", spatial_adaptation_csi_feedback_r18->csi_feedback_type_r18.to_string());
-      j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_r18->max_num_lmax_r18);
-      j.write_fieldname("maxNumberCSI-ResourcePerCC-r18");
-      j.start_obj();
-      j.write_int("sdType1-Resource-r18",
-                  spatial_adaptation_csi_feedback_r18->max_num_csi_res_per_cc_r18.sd_type1_res_r18);
-      j.write_int("sdType2-Resource-r18",
-                  spatial_adaptation_csi_feedback_r18->max_num_csi_res_per_cc_r18.sd_type2_res_r18);
-      j.end_obj();
-      j.write_fieldname("maxNumberTotalCSI-ResourcePerCC-r18");
-      j.start_obj();
-      j.write_str("sdType1-Resource-r18",
-                  spatial_adaptation_csi_feedback_r18->max_num_total_csi_res_per_cc_r18.sd_type1_res_r18.to_string());
-      j.write_str("sdType2-Resource-r18",
-                  spatial_adaptation_csi_feedback_r18->max_num_total_csi_res_per_cc_r18.sd_type2_res_r18.to_string());
-      j.end_obj();
-      j.write_int("totalNumberCSI-Reporting-r18", spatial_adaptation_csi_feedback_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (spatial_adaptation_csi_feedback_pusch_r18.is_present()) {
-      j.write_fieldname("spatialAdaptation-CSI-FeedbackPUSCH-r18");
-      j.start_obj();
-      j.write_str("csiFeedbackType-r18", spatial_adaptation_csi_feedback_pusch_r18->csi_feedback_type_r18.to_string());
-      j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_pusch_r18->max_num_lmax_r18);
-      j.write_int("subReportCSI-r18", spatial_adaptation_csi_feedback_pusch_r18->sub_report_csi_r18);
-      j.write_int("maxNumberCSI-ResourcePerCC-r18",
-                  spatial_adaptation_csi_feedback_pusch_r18->max_num_csi_res_per_cc_r18);
-      j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
-                  spatial_adaptation_csi_feedback_pusch_r18->max_num_total_csi_res_per_cc_r18.to_string());
-      j.write_int("totalNumberCSI-Reporting-r18", spatial_adaptation_csi_feedback_pusch_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (spatial_adaptation_csi_feedback_aperiodic_r18.is_present()) {
-      j.write_fieldname("spatialAdaptation-CSI-FeedbackAperiodic-r18");
-      j.start_obj();
-      j.write_str("csiFeedbackType-r18",
-                  spatial_adaptation_csi_feedback_aperiodic_r18->csi_feedback_type_r18.to_string());
-      j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_aperiodic_r18->max_num_lmax_r18);
-      j.write_int("subReportCSI-r18", spatial_adaptation_csi_feedback_aperiodic_r18->sub_report_csi_r18);
-      j.write_fieldname("maxNumberCSI-ResourcePerCC-r18");
-      j.start_obj();
-      j.write_int("sdType1-Resource-r18",
-                  spatial_adaptation_csi_feedback_aperiodic_r18->max_num_csi_res_per_cc_r18.sd_type1_res_r18);
-      j.write_int("sdType2-Resource-r18",
-                  spatial_adaptation_csi_feedback_aperiodic_r18->max_num_csi_res_per_cc_r18.sd_type2_res_r18);
-      j.end_obj();
-      j.write_fieldname("maxNumberTotalCSI-ResourcePerCC-r18");
-      j.start_obj();
-      j.write_str(
-          "sdType1-Resource-r18",
-          spatial_adaptation_csi_feedback_aperiodic_r18->max_num_total_csi_res_per_cc_r18.sd_type1_res_r18.to_string());
-      j.write_str(
-          "sdType2-Resource-r18",
-          spatial_adaptation_csi_feedback_aperiodic_r18->max_num_total_csi_res_per_cc_r18.sd_type2_res_r18.to_string());
-      j.end_obj();
-      j.write_int("totalNumberCSI-Reporting-r18",
-                  spatial_adaptation_csi_feedback_aperiodic_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (spatial_adaptation_csi_feedback_pucch_r18.is_present()) {
-      j.write_fieldname("spatialAdaptation-CSI-FeedbackPUCCH-r18");
-      j.start_obj();
-      j.write_str("csiFeedbackType-r18", spatial_adaptation_csi_feedback_pucch_r18->csi_feedback_type_r18.to_string());
-      j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_pucch_r18->max_num_lmax_r18);
-      j.write_int("subReportCSI-r18", spatial_adaptation_csi_feedback_pucch_r18->sub_report_csi_r18);
-      j.write_int("maxNumberCSI-ResourcePerCC-r18",
-                  spatial_adaptation_csi_feedback_pucch_r18->max_num_csi_res_per_cc_r18);
-      j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
-                  spatial_adaptation_csi_feedback_pucch_r18->max_num_total_csi_res_per_cc_r18.to_string());
-      j.write_int("totalNumberCSI-Reporting-r18", spatial_adaptation_csi_feedback_pucch_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (pwr_adaptation_csi_feedback_r18.is_present()) {
-      j.write_fieldname("powerAdaptation-CSI-Feedback-r18");
-      j.start_obj();
-      j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_r18->max_num_lmax_r18);
-      j.write_int("maxNumberCSI-ResourcePerCC-r18", pwr_adaptation_csi_feedback_r18->max_num_csi_res_per_cc_r18);
-      j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
-                  pwr_adaptation_csi_feedback_r18->max_num_total_csi_res_per_cc_r18.to_string());
-      j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (pwr_adaptation_csi_feedback_pusch_r18.is_present()) {
-      j.write_fieldname("powerAdaptation-CSI-FeedbackPUSCH-r18");
-      j.start_obj();
-      j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_pusch_r18->max_num_lmax_r18);
-      j.write_int("subReportCSI-r18", pwr_adaptation_csi_feedback_pusch_r18->sub_report_csi_r18);
-      j.write_int("maxNumberCSI-ResourcePerCC-r18", pwr_adaptation_csi_feedback_pusch_r18->max_num_csi_res_per_cc_r18);
-      j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
-                  pwr_adaptation_csi_feedback_pusch_r18->max_num_total_csi_res_per_cc_r18.to_string());
-      j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_pusch_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (pwr_adaptation_csi_feedback_aperiodic_r18.is_present()) {
-      j.write_fieldname("powerAdaptation-CSI-FeedbackAperiodic-r18");
-      j.start_obj();
-      j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_aperiodic_r18->max_num_lmax_r18);
-      j.write_int("subReportCSI-r18", pwr_adaptation_csi_feedback_aperiodic_r18->sub_report_csi_r18);
-      j.write_int("maxNumberCSI-ResourcePerCC-r18",
-                  pwr_adaptation_csi_feedback_aperiodic_r18->max_num_csi_res_per_cc_r18);
-      j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
-                  pwr_adaptation_csi_feedback_aperiodic_r18->max_num_total_csi_res_per_cc_r18.to_string());
-      j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_aperiodic_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (pwr_adaptation_csi_feedback_pucch_r18.is_present()) {
-      j.write_fieldname("powerAdaptation-CSI-FeedbackPUCCH-r18");
-      j.start_obj();
-      j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_pucch_r18->max_num_lmax_r18);
-      j.write_int("subReportCSI-r18", pwr_adaptation_csi_feedback_pucch_r18->sub_report_csi_r18);
-      j.write_int("maxNumberCSI-ResourcePerCC-r18", pwr_adaptation_csi_feedback_pucch_r18->max_num_csi_res_per_cc_r18);
-      j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
-                  pwr_adaptation_csi_feedback_pucch_r18->max_num_total_csi_res_per_cc_r18.to_string());
-      j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_pucch_r18->total_num_csi_report_r18);
-      j.end_obj();
-    }
-    if (nes_cell_dtx_drx_r18_present) {
-      j.write_str("nes-CellDTX-DRX-r18", nes_cell_dtx_drx_r18.to_string());
-    }
-    if (nes_cell_dtx_drx_dci2_9_r18_present) {
-      j.write_str("nes-CellDTX-DRX-DCI2-9-r18", "supported");
-    }
-    if (mix_code_book_spatial_adaptation_r18_present) {
-      j.write_str("mixCodeBookSpatialAdaptation-r18", "supported");
-    }
-    if (simul_csi_sub_reports_per_cc_r18_present) {
-      j.write_int("simultaneousCSI-SubReportsPerCC-r18", simul_csi_sub_reports_per_cc_r18);
-    }
-    if (ntn_dmrs_bundling_ngso_r18_present) {
-      j.write_str("ntn-DMRS-BundlingNGSO-r18", ntn_dmrs_bundling_ngso_r18.to_string());
-    }
-    if (ltm_beam_ind_joint_tci_r18.is_present()) {
-      j.write_fieldname("ltm-BeamIndicationJointTCI-r18");
-      j.start_obj();
-      j.write_str("maxNumberJointTCI-PerCell-r18",
-                  ltm_beam_ind_joint_tci_r18->max_num_joint_tci_per_cell_r18.to_string());
-      j.write_str("qcl-Resource-r18", ltm_beam_ind_joint_tci_r18->qcl_res_r18.to_string());
-      j.write_int("maxNumberJointTCI-AcrossCells-r18", ltm_beam_ind_joint_tci_r18->max_num_joint_tci_across_cells_r18);
-      j.write_int("maxNumberCells-r18", ltm_beam_ind_joint_tci_r18->max_num_cells_r18);
-      j.end_obj();
-    }
-    if (dummy_ltm_mac_ce_joint_tci_r18.is_present()) {
-      j.write_fieldname("dummy-ltm-MAC-CE-JointTCI-r18");
-      j.start_obj();
-      j.write_str("qcl-Resource-r18", dummy_ltm_mac_ce_joint_tci_r18->qcl_res_r18.to_string());
-      j.write_int("maxNumberJointTCI-PerCell-r18", dummy_ltm_mac_ce_joint_tci_r18->max_num_joint_tci_per_cell_r18);
-      j.write_str("maxNumberJointTCI-AcrossCells-r18",
-                  dummy_ltm_mac_ce_joint_tci_r18->max_num_joint_tci_across_cells_r18.to_string());
-      j.end_obj();
-    }
-    if (ltm_beam_ind_separate_tci_r18.is_present()) {
-      j.write_fieldname("ltm-BeamIndicationSeparateTCI-r18");
-      j.start_obj();
-      j.write_str("maxNumberDL-TCI-PerCell-r18",
-                  ltm_beam_ind_separate_tci_r18->max_num_dl_tci_per_cell_r18.to_string());
-      j.write_str("maxNumberUL-TCI-PerCell-r18",
-                  ltm_beam_ind_separate_tci_r18->max_num_ul_tci_per_cell_r18.to_string());
-      j.write_str("qcl-Resource-r18", ltm_beam_ind_separate_tci_r18->qcl_res_r18.to_string());
-      j.write_int("maxNumberDL-TCI-AcrossCells-r18", ltm_beam_ind_separate_tci_r18->max_num_dl_tci_across_cells_r18);
-      j.write_int("maxNumberUL-TCI-AcrossCells-r18", ltm_beam_ind_separate_tci_r18->max_num_ul_tci_across_cells_r18);
-      j.write_int("maxNumberCells-r18", ltm_beam_ind_separate_tci_r18->max_num_cells_r18);
-      j.end_obj();
-    }
-    if (dummy_ltm_mac_ce_separate_tci_r18.is_present()) {
-      j.write_fieldname("dummy-ltm-MAC-CE-SeparateTCI-r18");
-      j.start_obj();
-      j.write_str("qcl-Resource-r18", dummy_ltm_mac_ce_separate_tci_r18->qcl_res_r18.to_string());
-      j.write_int("maxNumberDL-TCI-PerCell-r18", dummy_ltm_mac_ce_separate_tci_r18->max_num_dl_tci_per_cell_r18);
-      j.write_int("maxNumberUL-TCI-PerCell-r18", dummy_ltm_mac_ce_separate_tci_r18->max_num_ul_tci_per_cell_r18);
-      j.write_str("maxNumberDL-TCI-AcrossCells-r18",
-                  dummy_ltm_mac_ce_separate_tci_r18->max_num_dl_tci_across_cells_r18.to_string());
-      j.write_str("maxNumberUL-TCI-AcrossCells-r18",
-                  dummy_ltm_mac_ce_separate_tci_r18->max_num_ul_tci_across_cells_r18.to_string());
-      j.end_obj();
-    }
-    if (rach_early_ta_meas_r18_present) {
-      j.write_int("rach-EarlyTA-Measurement-r18", rach_early_ta_meas_r18);
-    }
-    if (ue_ta_meas_r18_present) {
-      j.write_int("ue-TA-Measurement-r18", ue_ta_meas_r18);
-    }
-    if (ta_ind_cell_switch_r18_present) {
-      j.write_str("ta-IndicationCellSwitch-r18", "supported");
-    }
-    if (triggered_harq_codebook_retx_dci_1_3_r18.is_present()) {
-      j.write_fieldname("triggeredHARQ-CodebookRetxDCI-1-3-r18");
-      j.start_obj();
-      j.write_str("minHARQ-Retx-Offset-r18",
-                  triggered_harq_codebook_retx_dci_1_3_r18->min_harq_retx_offset_r18.to_string());
-      j.write_str("maxHARQ-Retx-Offset-r18",
-                  triggered_harq_codebook_retx_dci_1_3_r18->max_harq_retx_offset_r18.to_string());
-      j.end_obj();
-    }
-    if (unified_joint_tci_multi_mac_ce_dci_1_3_r18.is_present()) {
-      j.write_fieldname("unifiedJointTCI-MultiMAC-CE-DCI-1-3-r18");
-      j.start_obj();
-      j.write_fieldname("minBeamApplicationTime-r18");
-      unified_joint_tci_multi_mac_ce_dci_1_3_r18->min_beam_application_time_r18.to_json(j);
-      if (unified_joint_tci_multi_mac_ce_dci_1_3_r18->max_activ_tci_per_cc_r18_present) {
-        j.write_int("maxActivatedTCI-PerCC-r18", unified_joint_tci_multi_mac_ce_dci_1_3_r18->max_activ_tci_per_cc_r18);
-      }
-      j.end_obj();
-    }
-    if (unified_separate_tci_multi_mac_ce_intra_cell_r18.is_present()) {
-      j.write_fieldname("unifiedSeparateTCI-MultiMAC-CE-IntraCell-r18");
-      j.start_obj();
-      j.write_fieldname("minBeamApplicationTime-r18");
-      unified_separate_tci_multi_mac_ce_intra_cell_r18->min_beam_application_time_r18.to_json(j);
-      if (unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_dl_tci_per_cc_r18_present) {
-        j.write_int("maxActivatedDL-TCI-PerCC-r18",
-                    unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_dl_tci_per_cc_r18);
-      }
-      if (unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_ul_tci_per_cc_r18_present) {
-        j.write_int("maxActivatedUL-TCI-PerCC-r18",
-                    unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_ul_tci_per_cc_r18);
-      }
-      j.end_obj();
-    }
-    if (multi_pusch_cg_r18_present) {
-      j.write_str("multiPUSCH-CG-r18", multi_pusch_cg_r18.to_string());
-    }
-    if (multi_pusch_active_cfg_grant_r18.is_present()) {
-      j.write_fieldname("multiPUSCH-ActiveConfiguredGrant-r18");
-      j.start_obj();
-      j.write_str("maxNumberConfigsPerBWP", multi_pusch_active_cfg_grant_r18->max_num_cfgs_per_bwp.to_string());
-      j.write_int("maxNumberConfigsAllCC-FR1", multi_pusch_active_cfg_grant_r18->max_num_cfgs_all_cc_fr1);
-      j.write_int("maxNumberConfigsAllCC-FR2", multi_pusch_active_cfg_grant_r18->max_num_cfgs_all_cc_fr2);
-      j.end_obj();
-    }
-    if (joint_release_dci_r18_present) {
-      j.write_str("jointReleaseDCI-r18", "supported");
-    }
-    if (cg_pusch_uto_uci_ind_r18_present) {
-      j.write_str("cg-PUSCH-UTO-UCI-Ind-r18", "supported");
-    }
-    if (pdcch_monitoring_resumption_after_ul_nack_r18_present) {
-      j.write_str("pdcch-MonitoringResumptionAfterUL-NACK-r18", "supported");
-    }
-    if (support3_m_hz_ch_bw_symmetric_r18_present) {
-      j.write_str("support3MHz-ChannelBW-Symmetric-r18", "supported");
-    }
-    if (support3_m_hz_ch_bw_asymmetric_r18_present) {
-      j.write_str("support3MHz-ChannelBW-Asymmetric-r18", "supported");
-    }
-    if (support12_prb_coreset0_r18_present) {
-      j.write_str("support12PRB-CORESET0-r18", "supported");
-    }
-    if (nr_pdcch_overlap_lte_crs_re_r18.is_present()) {
-      j.write_fieldname("nr-PDCCH-OverlapLTE-CRS-RE-r18");
-      j.start_obj();
-      j.write_str("overlapInRE-r18", nr_pdcch_overlap_lte_crs_re_r18->overlap_in_re_r18.to_string());
-      j.write_str("overlapInSymbol-r18", nr_pdcch_overlap_lte_crs_re_r18->overlap_in_symbol_r18.to_string());
-      j.end_obj();
-    }
-    if (nr_pdcch_overlap_lte_crs_re_multi_patterns_r18_present) {
-      j.write_str("nr-PDCCH-OverlapLTE-CRS-RE-MultiPatterns-r18", "supported");
-    }
-    if (nr_pdcch_overlap_lte_crs_re_span_3_4_r18_present) {
-      j.write_str("nr-PDCCH-OverlapLTE-CRS-RE-Span-3-4-r18", "supported");
-    }
-    if (two_rate_matching_eutra_crs_patterns_3_4_r18.is_present()) {
-      j.write_fieldname("twoRateMatchingEUTRA-CRS-patterns-3-4-r18");
-      j.start_obj();
-      j.write_int("maxNumberPatterns-r18", two_rate_matching_eutra_crs_patterns_3_4_r18->max_num_patterns_r18);
-      j.write_int("maxNumberNon-OverlapPatterns-r18",
-                  two_rate_matching_eutra_crs_patterns_3_4_r18->max_num_non_overlap_patterns_r18);
-      j.end_obj();
-    }
-    if (overlap_rate_matching_eutra_crs_patterns_3_4_diff_cs_pool_r18_present) {
-      j.write_str("overlapRateMatchingEUTRA-CRS-Patterns-3-4-Diff-CS-Pool-r18", "supported");
-    }
-    if (ncd_ssb_bwp_wor_r18_present) {
-      j.write_str("ncd-SSB-BWP-Wor-r18", "supported");
-    }
-    if (rlm_bm_bfd_csi_rs_outside_active_bwp_r18_present) {
-      j.write_str("rlm-BM-BFD-CSI-RS-OutsideActiveBWP-r18", "supported");
-    }
-    if (prach_coverage_enh_r18_present) {
-      j.write_str("prach-CoverageEnh-r18", "supported");
-    }
-    if (prach_repeat_r18_present) {
-      j.write_str("prach-Repetition-r18", "supported");
-    }
-    if (dyn_waveform_switch_r18_present) {
-      j.write_str("dynamicWaveformSwitch-r18", "supported");
-    }
-    if (dyn_waveform_switch_phr_r18_present) {
-      j.write_str("dynamicWaveformSwitchPHR-r18", "supported");
-    }
-    if (dyn_waveform_switch_intra_ca_r18_present) {
-      j.write_int("dynamicWaveformSwitchIntraCA-r18", dyn_waveform_switch_intra_ca_r18);
-    }
-    if (multi_pusch_single_dci_non_cons_slots_r18_present) {
-      j.write_str("multiPUSCH-SingleDCI-NonConsSlots-r18", "supported");
-    }
-    if (pdc_max_num_prs_res_processed_per_slot_r18.is_present()) {
-      j.write_fieldname("pdc-maxNumberPRS-ResourceProcessedPerSlot-r18");
-      j.start_obj();
-      j.write_fieldname("fr1-r18");
-      j.start_obj();
-      if (pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_15k_hz_r18_present) {
-        j.write_str("scs-15kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_15k_hz_r18.to_string());
-      }
-      if (pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_30k_hz_r18_present) {
-        j.write_str("scs-30kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_30k_hz_r18.to_string());
-      }
-      if (pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_60k_hz_r18_present) {
-        j.write_str("scs-60kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_60k_hz_r18.to_string());
-      }
-      j.end_obj();
-      j.write_fieldname("fr2-r18");
-      j.start_obj();
-      if (pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_60k_hz_r18_present) {
-        j.write_str("scs-60kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_60k_hz_r18.to_string());
-      }
-      if (pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_120k_hz_r18_present) {
-        j.write_str("scs-120kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_120k_hz_r18.to_string());
-      }
-      j.end_obj();
-      j.end_obj();
-    }
-    if (intra_slot_pdsch_multicast_inactive_r18_present) {
-      j.write_bool("intraSlot-PDSCH-MulticastInactive-r18", intra_slot_pdsch_multicast_inactive_r18);
-    }
-    if (multicast_inactive_r18_present) {
-      j.write_str("multicastInactive-r18", "supported");
-    }
-    if (thres_based_multicast_resume_r18_present) {
-      j.write_str("thresholdBasedMulticastResume-r18", "supported");
-    }
-    if (lower_msd_r18.is_present()) {
-      j.start_array("lowerMSD-r18");
-      for (const auto& e1 : *lower_msd_r18) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (lower_msd_endc_r18.is_present()) {
-      j.start_array("lowerMSD-ENDC-r18");
-      for (const auto& e1 : *lower_msd_endc_r18) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (enhanced_ch_raster_r18_present) {
-      j.write_str("enhancedChannelRaster-r18", "supported");
-    }
-    if (fast_beam_sweeping_multi_rx_r18_present) {
-      j.write_str("fastBeamSweepingMultiRx-r18", fast_beam_sweeping_multi_rx_r18.to_string());
-    }
-    if (beam_sweeping_factor_reduction_r18.is_present()) {
-      j.write_fieldname("beamSweepingFactorReduction-r18");
-      j.start_obj();
-      j.write_str("reduceForCellDetection", beam_sweeping_factor_reduction_r18->reduce_for_cell_detection.to_string());
-      j.write_int("reduceForSSB-L1-RSRP-Meas", beam_sweeping_factor_reduction_r18->reduce_for_ssb_l1_rsrp_meas);
-      j.end_obj();
-    }
-    if (simul_reception_two_qcl_r18_present) {
-      j.write_str("simultaneousReceptionTwoQCL-r18", "supported");
-    }
-    if (meas_enh_ca_inter_freq_fr2_r18_present) {
-      j.write_str("measEnhCAInterFreqFR2-r18", "supported");
-    }
-    if (tci_state_switch_ind_r18_present) {
-      j.write_str("tci-StateSwitchInd-r18", "supported");
-    }
-    if (ant_array_type_r18_present) {
-      j.write_str("antennaArrayType-r18", "supported");
-    }
-    if (location_based_cond_ho_atg_r18_present) {
-      j.write_str("locationBasedCondHandoverATG-r18", "supported");
-    }
-    if (max_output_pwr_atg_r18_present) {
-      j.write_int("maxOutputPowerATG-r18", max_output_pwr_atg_r18);
-    }
-    if (ltm_fast_processing_cfg_r18.is_present()) {
-      j.write_fieldname("ltm-FastProcessingConfig-r18");
-      j.start_obj();
-      j.write_str("maxNumberStoredConfigCells-r18",
-                  ltm_fast_processing_cfg_r18->max_num_stored_cfg_cells_r18.to_string());
-      j.write_int("maxNumberConfigs-r18", ltm_fast_processing_cfg_r18->max_num_cfgs_r18);
-      j.end_obj();
-    }
-    if (meas_validation_report_emr_r18_present) {
-      j.write_str("measValidationReportEMR-r18", "supported");
-    }
-    if (meas_validation_report_resel_meass_r18_present) {
-      j.write_str("measValidationReportReselectionMeasurements-r18", "supported");
-    }
-    if (event_a4_based_cond_ho_nes_r18_present) {
-      j.write_str("eventA4BasedCondHandoverNES-r18", "supported");
-    }
-    if (nes_based_cond_ho_with_dci_r18_present) {
-      j.write_str("nesBasedCondHandoverWithDCI-r18", "supported");
-    }
-    if (rach_less_ho_cg_r18_present) {
-      j.write_str("rach-LessHandoverCG-r18", "supported");
-    }
-    if (rach_less_ho_dg_r18_present) {
-      j.write_str("rach-LessHandoverDG-r18", "supported");
-    }
-    if (location_based_cond_ho_emc_r18_present) {
-      j.write_str("locationBasedCondHandoverEMC-r18", "supported");
-    }
-    if (mt_cg_sdt_r18_present) {
-      j.write_str("mt-CG-SDT-r18", "supported");
-    }
-    if (pos_srs_precfgure_rrc_inactive_init_ul_bwp_r18_present) {
-      j.write_str("posSRS-PreconfigureRRC-InactiveInitialUL-BWP-r18", "supported");
-    }
-    if (pos_srs_precfgure_rrc_inactive_outside_init_ul_bwp_r18_present) {
-      j.write_str("posSRS-PreconfigureRRC-InactiveOutsideInitialUL-BWP-r18", "supported");
-    }
-    if (cg_sdt_periodicity_ext_r18_present) {
-      j.write_str("cg-SDT-PeriodicityExt-r18", "supported");
-    }
-    if (support_of2_rx_xr_r18_present) {
-      j.write_str("supportOf2RxXR-r18", "supported");
-    }
-    if (cond_ho_with_cand_scg_change_r18_present) {
-      j.write_str("condHandoverWithCandSCG-change-r18", "supported");
-    }
-    if (mac_params_per_band_r18.is_present()) {
-      j.write_fieldname("mac-ParametersPerBand-r18");
-      mac_params_per_band_r18->to_json(j);
-    }
-    if (ch_bw_dl_ncr_r18.is_present()) {
-      j.write_fieldname("channelBW-DL-NCR-r18");
-      ch_bw_dl_ncr_r18->to_json(j);
-    }
-    if (ch_bw_ul_ncr_r18.is_present()) {
-      j.write_fieldname("channelBW-UL-NCR-r18");
-      ch_bw_ul_ncr_r18->to_json(j);
-    }
-    if (ncr_pdsch_64_qam_fr2_r18_present) {
-      j.write_str("ncr-PDSCH-64QAM-FR2-r18", "supported");
-    }
-    if (ltm_mcg_intra_freq_r18_present) {
-      j.write_str("ltm-MCG-IntraFreq-r18", "supported");
-    }
-    if (ltm_scg_intra_freq_r18_present) {
-      j.write_str("ltm-SCG-IntraFreq-r18", "supported");
-    }
-    if (ltm_mac_ce_joint_tci_r18.is_present()) {
-      j.write_fieldname("ltm-MAC-CE-JointTCI-r18");
-      j.start_obj();
-      j.write_str("qcl-Resource-r18", ltm_mac_ce_joint_tci_r18->qcl_res_r18.to_string());
-      j.write_int("maxNumberJointTCI-PerCell-r18", ltm_mac_ce_joint_tci_r18->max_num_joint_tci_per_cell_r18);
-      j.write_int("maxNumberJointTCI-AcrossCells-r18", ltm_mac_ce_joint_tci_r18->max_num_joint_tci_across_cells_r18);
-      j.end_obj();
-    }
-    if (ltm_mac_ce_separate_tci_r18.is_present()) {
-      j.write_fieldname("ltm-MAC-CE-SeparateTCI-r18");
-      j.start_obj();
-      j.write_str("qcl-Resource-r18", ltm_mac_ce_separate_tci_r18->qcl_res_r18.to_string());
-      j.write_int("maxNumberDL-TCI-PerCell-r18", ltm_mac_ce_separate_tci_r18->max_num_dl_tci_per_cell_r18);
-      j.write_int("maxNumberUL-TCI-PerCell-r18", ltm_mac_ce_separate_tci_r18->max_num_ul_tci_per_cell_r18);
-      j.write_int("maxNumberDL-TCI-AcrossCells-r18", ltm_mac_ce_separate_tci_r18->max_num_dl_tci_across_cells_r18);
-      j.write_int("maxNumberUL-TCI-AcrossCells-r18", ltm_mac_ce_separate_tci_r18->max_num_ul_tci_across_cells_r18);
-      j.end_obj();
-    }
-    if (event_a4_based_cond_ho_atg_r18_present) {
-      j.write_str("eventA4BasedCondHandoverATG-r18", "supported");
-    }
-    if (pos_srs_tx_fh_with_time_win_for_red_cap_r18_present) {
-      j.write_str("posSRS-TxFH-WithTimeWindowForRedCap-r18", "supported");
-    }
+  if (max_ul_duty_cycle_pc2_fr1_present) {
+    j.write_str("maxUplinkDutyCycle-PC2-FR1", max_ul_duty_cycle_pc2_fr1.to_string());
+  }
+  if (pucch_spatial_rel_info_mac_ce_present) {
+    j.write_str("pucch-SpatialRelInfoMAC-CE", "supported");
+  }
+  if (pwr_boosting_pi2_bpsk_present) {
+    j.write_str("powerBoosting-pi2BPSK", "supported");
+  }
+  if (max_ul_duty_cycle_fr2_present) {
+    j.write_str("maxUplinkDutyCycle-FR2", max_ul_duty_cycle_fr2.to_string());
+  }
+  if (ch_bws_dl_v1590.is_present()) {
+    j.write_fieldname("channelBWs-DL-v1590");
+    ch_bws_dl_v1590->to_json(j);
+  }
+  if (ch_bws_ul_v1590.is_present()) {
+    j.write_fieldname("channelBWs-UL-v1590");
+    ch_bws_ul_v1590->to_json(j);
+  }
+  if (asymmetric_bw_combination_set_present) {
+    j.write_str("asymmetricBandwidthCombinationSet", asymmetric_bw_combination_set.to_string());
+  }
+  if (shared_spec_ch_access_params_per_band_r16.is_present()) {
+    j.write_fieldname("sharedSpectrumChAccessParamsPerBand-r16");
+    shared_spec_ch_access_params_per_band_r16->to_json(j);
+  }
+  if (cancel_overlapping_pusch_r16_present) {
+    j.write_str("cancelOverlappingPUSCH-r16", "supported");
+  }
+  if (multiple_rate_matching_eutra_crs_r16.is_present()) {
+    j.write_fieldname("multipleRateMatchingEUTRA-CRS-r16");
+    j.start_obj();
+    j.write_int("maxNumberPatterns-r16", multiple_rate_matching_eutra_crs_r16->max_num_patterns_r16);
+    j.write_int("maxNumberNon-OverlapPatterns-r16",
+                multiple_rate_matching_eutra_crs_r16->max_num_non_overlap_patterns_r16);
+    j.end_obj();
+  }
+  if (overlap_rate_matching_eutra_crs_r16_present) {
+    j.write_str("overlapRateMatchingEUTRA-CRS-r16", "supported");
+  }
+  if (pdsch_map_type_b_alt_r16_present) {
+    j.write_str("pdsch-MappingTypeB-Alt-r16", "supported");
+  }
+  if (one_slot_periodic_trs_r16_present) {
+    j.write_str("oneSlotPeriodicTRS-r16", "supported");
+  }
+  if (olpc_srs_pos_r16.is_present()) {
+    j.write_fieldname("olpc-SRS-Pos-r16");
+    olpc_srs_pos_r16->to_json(j);
+  }
+  if (spatial_relations_srs_pos_r16.is_present()) {
+    j.write_fieldname("spatialRelationsSRS-Pos-r16");
+    spatial_relations_srs_pos_r16->to_json(j);
+  }
+  if (simul_srs_mimo_trans_within_band_r16_present) {
+    j.write_str("simulSRS-MIMO-TransWithinBand-r16", "n2");
+  }
+  if (ch_bw_dl_iab_r16.is_present()) {
+    j.write_fieldname("channelBW-DL-IAB-r16");
+    ch_bw_dl_iab_r16->to_json(j);
+  }
+  if (ch_bw_ul_iab_r16.is_present()) {
+    j.write_fieldname("channelBW-UL-IAB-r16");
+    ch_bw_ul_iab_r16->to_json(j);
+  }
+  if (raster_shift7dot5_iab_r16_present) {
+    j.write_str("rasterShift7dot5-IAB-r16", "supported");
+  }
+  if (ue_pwr_class_v1610_present) {
+    j.write_str("ue-PowerClass-v1610", "pc1dot5");
+  }
+  if (cond_ho_r16_present) {
+    j.write_str("condHandover-r16", "supported");
+  }
+  if (cond_ho_fail_r16_present) {
+    j.write_str("condHandoverFailure-r16", "supported");
+  }
+  if (cond_ho_two_trigger_events_r16_present) {
+    j.write_str("condHandoverTwoTriggerEvents-r16", "supported");
+  }
+  if (cond_pscell_change_r16_present) {
+    j.write_str("condPSCellChange-r16", "supported");
+  }
+  if (cond_pscell_change_two_trigger_events_r16_present) {
+    j.write_str("condPSCellChangeTwoTriggerEvents-r16", "supported");
+  }
+  if (mpr_pwr_boost_fr2_r16_present) {
+    j.write_str("mpr-PowerBoost-FR2-r16", "supported");
+  }
+  if (active_cfg_grant_r16.is_present()) {
+    j.write_fieldname("activeConfiguredGrant-r16");
+    j.start_obj();
+    j.write_str("maxNumberConfigsPerBWP-r16", active_cfg_grant_r16->max_num_cfgs_per_bwp_r16.to_string());
+    j.write_int("maxNumberConfigsAllCC-r16", active_cfg_grant_r16->max_num_cfgs_all_cc_r16);
+    j.end_obj();
+  }
+  if (joint_release_cfg_grant_type2_r16_present) {
+    j.write_str("jointReleaseConfiguredGrantType2-r16", "supported");
+  }
+  if (sps_r16.is_present()) {
+    j.write_fieldname("sps-r16");
+    j.start_obj();
+    j.write_int("maxNumberConfigsPerBWP-r16", sps_r16->max_num_cfgs_per_bwp_r16);
+    j.write_int("maxNumberConfigsAllCC-r16", sps_r16->max_num_cfgs_all_cc_r16);
+    j.end_obj();
+  }
+  if (joint_release_sps_r16_present) {
+    j.write_str("jointReleaseSPS-r16", "supported");
+  }
+  if (simul_srs_trans_within_band_r16_present) {
+    j.write_str("simulSRS-TransWithinBand-r16", "n2");
+  }
+  if (trs_add_bw_r16_present) {
+    j.write_str("trs-AdditionalBandwidth-r16", trs_add_bw_r16.to_string());
+  }
+  if (ho_intra_f_iab_r16_present) {
+    j.write_str("handoverIntraF-IAB-r16", "supported");
+  }
+  if (simul_tx_srs_ant_switching_intra_band_ul_ca_r16.is_present()) {
+    j.write_fieldname("simulTX-SRS-AntSwitchingIntraBandUL-CA-r16");
+    simul_tx_srs_ant_switching_intra_band_ul_ca_r16->to_json(j);
+  }
+  if (shared_spec_ch_access_params_per_band_v1630.is_present()) {
+    j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1630");
+    shared_spec_ch_access_params_per_band_v1630->to_json(j);
+  }
+  if (ho_utra_fdd_r16_present) {
+    j.write_str("handoverUTRA-FDD-r16", "supported");
+  }
+  if (enhanced_ul_transient_period_r16_present) {
+    j.write_str("enhancedUL-TransientPeriod-r16", enhanced_ul_transient_period_r16.to_string());
+  }
+  if (shared_spec_ch_access_params_per_band_v1640.is_present()) {
+    j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1640");
+    shared_spec_ch_access_params_per_band_v1640->to_json(j);
+  }
+  if (type1_pusch_repeat_multi_slots_v1650_present) {
+    j.write_str("type1-PUSCH-RepetitionMultiSlots-v1650", "supported");
+  }
+  if (type2_pusch_repeat_multi_slots_v1650_present) {
+    j.write_str("type2-PUSCH-RepetitionMultiSlots-v1650", "supported");
+  }
+  if (pusch_repeat_multi_slots_v1650_present) {
+    j.write_str("pusch-RepetitionMultiSlots-v1650", "supported");
+  }
+  if (cfg_ul_grant_type1_v1650_present) {
+    j.write_str("configuredUL-GrantType1-v1650", "supported");
+  }
+  if (cfg_ul_grant_type2_v1650_present) {
+    j.write_str("configuredUL-GrantType2-v1650", "supported");
+  }
+  if (shared_spec_ch_access_params_per_band_v1650.is_present()) {
+    j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1650");
+    shared_spec_ch_access_params_per_band_v1650->to_json(j);
+  }
+  if (enhanced_skip_ul_tx_cfg_v1660_present) {
+    j.write_str("enhancedSkipUplinkTxConfigured-v1660", "supported");
+  }
+  if (enhanced_skip_ul_tx_dyn_v1660_present) {
+    j.write_str("enhancedSkipUplinkTxDynamic-v1660", "supported");
+  }
+  if (max_ul_duty_cycle_pc1dot5_mpe_fr1_r16_present) {
+    j.write_str("maxUplinkDutyCycle-PC1dot5-MPE-FR1-r16", max_ul_duty_cycle_pc1dot5_mpe_fr1_r16.to_string());
+  }
+  if (tx_diversity_r16_present) {
+    j.write_str("txDiversity-r16", "supported");
+  }
+  if (pdsch_1024_qam_fr1_r17_present) {
+    j.write_str("pdsch-1024QAM-FR1-r17", "supported");
+  }
+  if (ue_pwr_class_v1700_present) {
+    j.write_str("ue-PowerClass-v1700", ue_pwr_class_v1700.to_string());
+  }
+  if (fr2_2_access_params_per_band_r17.is_present()) {
+    j.write_fieldname("fr2-2-AccessParamsPerBand-r17");
+    fr2_2_access_params_per_band_r17->to_json(j);
+  }
+  if (rlm_relaxation_r17_present) {
+    j.write_str("rlm-Relaxation-r17", "supported");
+  }
+  if (bfd_relaxation_r17_present) {
+    j.write_str("bfd-Relaxation-r17", "supported");
+  }
+  if (cg_sdt_r17_present) {
+    j.write_str("cg-SDT-r17", "supported");
+  }
+  if (location_based_cond_ho_r17_present) {
+    j.write_str("locationBasedCondHandover-r17", "supported");
+  }
+  if (time_based_cond_ho_r17_present) {
+    j.write_str("timeBasedCondHandover-r17", "supported");
+  }
+  if (event_a4_based_cond_ho_r17_present) {
+    j.write_str("eventA4BasedCondHandover-r17", "supported");
+  }
+  if (mn_initiated_cond_pscell_change_nrdc_r17_present) {
+    j.write_str("mn-InitiatedCondPSCellChangeNRDC-r17", "supported");
+  }
+  if (sn_initiated_cond_pscell_change_nrdc_r17_present) {
+    j.write_str("sn-InitiatedCondPSCellChangeNRDC-r17", "supported");
+  }
+  if (pdcch_skipping_without_sssg_r17_present) {
+    j.write_str("pdcch-SkippingWithoutSSSG-r17", "supported");
+  }
+  if (sssg_switching_1_bit_ind_r17_present) {
+    j.write_str("sssg-Switching-1BitInd-r17", "supported");
+  }
+  if (sssg_switching_2_bit_ind_r17_present) {
+    j.write_str("sssg-Switching-2BitInd-r17", "supported");
+  }
+  if (pdcch_skipping_with_sssg_r17_present) {
+    j.write_str("pdcch-SkippingWithSSSG-r17", "supported");
+  }
+  if (search_space_set_grp_switch_cap2_r17_present) {
+    j.write_str("searchSpaceSetGrp-switchCap2-r17", "supported");
+  }
+  if (ul_pre_compensation_r17_present) {
+    j.write_str("uplinkPreCompensation-r17", "supported");
+  }
+  if (ul_ta_report_r17_present) {
+    j.write_str("uplink-TA-Reporting-r17", "supported");
+  }
+  if (max_harq_process_num_r17_present) {
+    j.write_str("max-HARQ-ProcessNumber-r17", max_harq_process_num_r17.to_string());
+  }
+  if (type2_harq_codebook_r17_present) {
+    j.write_str("type2-HARQ-Codebook-r17", "supported");
+  }
+  if (type1_harq_codebook_r17_present) {
+    j.write_str("type1-HARQ-Codebook-r17", "supported");
+  }
+  if (type3_harq_codebook_r17_present) {
+    j.write_str("type3-HARQ-Codebook-r17", "supported");
+  }
+  if (ue_specific_k_offset_r17_present) {
+    j.write_str("ue-specific-K-Offset-r17", "supported");
+  }
+  if (multi_pdsch_single_dci_fr2_1_scs_120k_hz_r17_present) {
+    j.write_str("multiPDSCH-SingleDCI-FR2-1-SCS-120kHz-r17", "supported");
+  }
+  if (multi_pusch_single_dci_fr2_1_scs_120k_hz_r17_present) {
+    j.write_str("multiPUSCH-SingleDCI-FR2-1-SCS-120kHz-r17", "supported");
+  }
+  if (parallel_prs_meas_rrc_inactive_r17_present) {
+    j.write_str("parallelPRS-MeasRRC-Inactive-r17", "supported");
+  }
+  if (nr_ue_tx_teg_id_max_support_r17_present) {
+    j.write_str("nr-UE-TxTEG-ID-MaxSupport-r17", nr_ue_tx_teg_id_max_support_r17.to_string());
+  }
+  if (prs_processing_rrc_inactive_r17_present) {
+    j.write_str("prs-ProcessingRRC-Inactive-r17", "supported");
+  }
+  if (prs_processing_win_type1_a_r17_present) {
+    j.write_str("prs-ProcessingWindowType1A-r17", prs_processing_win_type1_a_r17.to_string());
+  }
+  if (prs_processing_win_type1_b_r17_present) {
+    j.write_str("prs-ProcessingWindowType1B-r17", prs_processing_win_type1_b_r17.to_string());
+  }
+  if (prs_processing_win_type2_r17_present) {
+    j.write_str("prs-ProcessingWindowType2-r17", prs_processing_win_type2_r17.to_string());
+  }
+  if (srs_all_pos_res_rrc_inactive_r17.is_present()) {
+    j.write_fieldname("srs-AllPosResourcesRRC-Inactive-r17");
+    srs_all_pos_res_rrc_inactive_r17->to_json(j);
+  }
+  if (olpc_srs_pos_rrc_inactive_r17.is_present()) {
+    j.write_fieldname("olpc-SRS-PosRRC-Inactive-r17");
+    olpc_srs_pos_rrc_inactive_r17->to_json(j);
+  }
+  if (spatial_relations_srs_pos_rrc_inactive_r17.is_present()) {
+    j.write_fieldname("spatialRelationsSRS-PosRRC-Inactive-r17");
+    spatial_relations_srs_pos_rrc_inactive_r17->to_json(j);
+  }
+  if (max_num_pusch_type_a_repeat_r17_present) {
+    j.write_str("maxNumberPUSCH-TypeA-Repetition-r17", "supported");
+  }
+  if (pusch_type_a_repeats_avail_slot_r17_present) {
+    j.write_str("puschTypeA-RepetitionsAvailSlot-r17", "supported");
+  }
+  if (tb_processing_multi_slot_pusch_r17_present) {
+    j.write_str("tb-ProcessingMultiSlotPUSCH-r17", "supported");
+  }
+  if (tb_processing_rep_multi_slot_pusch_r17_present) {
+    j.write_str("tb-ProcessingRepMultiSlotPUSCH-r17", "supported");
+  }
+  if (max_dur_dmrs_bundling_r17.is_present()) {
+    j.write_fieldname("maxDurationDMRS-Bundling-r17");
+    j.start_obj();
+    if (max_dur_dmrs_bundling_r17->fdd_r17_present) {
+      j.write_str("fdd-r17", max_dur_dmrs_bundling_r17->fdd_r17.to_string());
+    }
+    if (max_dur_dmrs_bundling_r17->tdd_r17_present) {
+      j.write_str("tdd-r17", max_dur_dmrs_bundling_r17->tdd_r17.to_string());
+    }
+    j.end_obj();
+  }
+  if (pusch_repeat_msg3_r17_present) {
+    j.write_str("pusch-RepetitionMsg3-r17", "supported");
+  }
+  if (shared_spec_ch_access_params_per_band_v1710.is_present()) {
+    j.write_fieldname("sharedSpectrumChAccessParamsPerBand-v1710");
+    shared_spec_ch_access_params_per_band_v1710->to_json(j);
+  }
+  if (parallel_meas_without_restrict_r17_present) {
+    j.write_str("parallelMeasurementWithoutRestriction-r17", "supported");
+  }
+  if (max_num_ngso_satellites_within_one_smtc_r17_present) {
+    j.write_str("maxNumber-NGSO-SatellitesWithinOneSMTC-r17", max_num_ngso_satellites_within_one_smtc_r17.to_string());
+  }
+  if (k1_range_ext_r17_present) {
+    j.write_str("k1-RangeExtension-r17", "supported");
+  }
+  if (aperiodic_csi_rs_fast_scell_activation_r17.is_present()) {
+    j.write_fieldname("aperiodicCSI-RS-FastScellActivation-r17");
+    j.start_obj();
+    j.write_str("maxNumberAperiodicCSI-RS-PerCC-r17",
+                aperiodic_csi_rs_fast_scell_activation_r17->max_num_aperiodic_csi_rs_per_cc_r17.to_string());
+    j.write_str("maxNumberAperiodicCSI-RS-AcrossCCs-r17",
+                aperiodic_csi_rs_fast_scell_activation_r17->max_num_aperiodic_csi_rs_across_ccs_r17.to_string());
+    j.end_obj();
+  }
+  if (aperiodic_csi_rs_add_bw_r17_present) {
+    j.write_str("aperiodicCSI-RS-AdditionalBandwidth-r17", aperiodic_csi_rs_add_bw_r17.to_string());
+  }
+  if (bwp_without_cd_ssb_or_ncd_ssb_red_cap_r17_present) {
+    j.write_str("bwp-WithoutCD-SSB-OrNCD-SSB-RedCap-r17", "supported");
+  }
+  if (half_duplex_fdd_type_a_red_cap_r17_present) {
+    j.write_str("halfDuplexFDD-TypeA-RedCap-r17", "supported");
+  }
+  if (pos_srs_rrc_inactive_outside_init_ul_bwp_r17.is_present()) {
+    j.write_fieldname("posSRS-RRC-Inactive-OutsideInitialUL-BWP-r17");
+    pos_srs_rrc_inactive_outside_init_ul_bwp_r17->to_json(j);
+  }
+  if (ch_bws_dl_scs_480k_hz_fr2_2_r17_present) {
+    j.write_str("channelBWs-DL-SCS-480kHz-FR2-2-r17", ch_bws_dl_scs_480k_hz_fr2_2_r17.to_string());
+  }
+  if (ch_bws_ul_scs_480k_hz_fr2_2_r17_present) {
+    j.write_str("channelBWs-UL-SCS-480kHz-FR2-2-r17", ch_bws_ul_scs_480k_hz_fr2_2_r17.to_string());
+  }
+  if (ch_bws_dl_scs_960k_hz_fr2_2_r17_present) {
+    j.write_str("channelBWs-DL-SCS-960kHz-FR2-2-r17", ch_bws_dl_scs_960k_hz_fr2_2_r17.to_string());
+  }
+  if (ch_bws_ul_scs_960k_hz_fr2_2_r17_present) {
+    j.write_str("channelBWs-UL-SCS-960kHz-FR2-2-r17", ch_bws_ul_scs_960k_hz_fr2_2_r17.to_string());
+  }
+  if (ul_gap_fr2_r17_present) {
+    j.write_str("ul-GapFR2-r17", "supported");
+  }
+  if (one_shot_harq_feedback_triggered_by_dci_1_2_r17_present) {
+    j.write_str("oneShotHARQ-feedbackTriggeredByDCI-1-2-r17", "supported");
+  }
+  if (one_shot_harq_feedback_phy_prio_r17_present) {
+    j.write_str("oneShotHARQ-feedbackPhy-Priority-r17", "supported");
+  }
+  if (enhanced_type3_harq_codebook_feedback_r17.is_present()) {
+    j.write_fieldname("enhancedType3-HARQ-CodebookFeedback-r17");
+    j.start_obj();
+    j.write_str("enhancedType3-HARQ-Codebooks-r17",
+                enhanced_type3_harq_codebook_feedback_r17->enhanced_type3_harq_codebooks_r17.to_string());
+    j.write_str("maxNumberPUCCH-Transmissions-r17",
+                enhanced_type3_harq_codebook_feedback_r17->max_num_pucch_txs_r17.to_string());
+    j.end_obj();
+  }
+  if (triggered_harq_codebook_retx_r17.is_present()) {
+    j.write_fieldname("triggeredHARQ-CodebookRetx-r17");
+    j.start_obj();
+    j.write_str("minHARQ-Retx-Offset-r17", triggered_harq_codebook_retx_r17->min_harq_retx_offset_r17.to_string());
+    j.write_str("maxHARQ-Retx-Offset-r17", triggered_harq_codebook_retx_r17->max_harq_retx_offset_r17.to_string());
+    j.end_obj();
+  }
+  if (ue_one_shot_ul_timing_adj_r17_present) {
+    j.write_str("ue-OneShotUL-TimingAdj-r17", "supported");
+  }
+  if (pucch_repeat_f0_2_r17_present) {
+    j.write_str("pucch-Repetition-F0-2-r17", "supported");
+  }
+  if (cqi_4_bits_subband_ntn_shared_spec_ch_access_r17_present) {
+    j.write_str("cqi-4-BitsSubbandNTN-SharedSpectrumChAccess-r17", "supported");
+  }
+  if (mux_harq_ack_diff_priorities_r17_present) {
+    j.write_str("mux-HARQ-ACK-DiffPriorities-r17", "supported");
+  }
+  if (ta_based_pdc_ntn_shared_spec_ch_access_r17_present) {
+    j.write_str("ta-BasedPDC-NTN-SharedSpectrumChAccess-r17", "supported");
+  }
+  if (ack_nack_feedback_for_multicast_with_dci_enabler_r17_present) {
+    j.write_str("ack-NACK-FeedbackForMulticastWithDCI-Enabler-r17", "supported");
+  }
+  if (max_num_g_rnti_r17_present) {
+    j.write_int("maxNumberG-RNTI-r17", max_num_g_rnti_r17);
+  }
+  if (dyn_multicast_dci_format4_2_r17_present) {
+    j.write_str("dynamicMulticastDCI-Format4-2-r17", "supported");
+  }
+  if (max_mod_order_for_multicast_r17.is_present()) {
+    j.write_fieldname("maxModulationOrderForMulticast-r17");
+    max_mod_order_for_multicast_r17->to_json(j);
+  }
+  if (dyn_slot_repeat_multicast_tn_non_shared_spec_ch_access_r17_present) {
+    j.write_str("dynamicSlotRepetitionMulticastTN-NonSharedSpectrumChAccess-r17",
+                dyn_slot_repeat_multicast_tn_non_shared_spec_ch_access_r17.to_string());
+  }
+  if (dyn_slot_repeat_multicast_ntn_shared_spec_ch_access_r17_present) {
+    j.write_str("dynamicSlotRepetitionMulticastNTN-SharedSpectrumChAccess-r17",
+                dyn_slot_repeat_multicast_ntn_shared_spec_ch_access_r17.to_string());
+  }
+  if (nack_only_feedback_for_multicast_with_dci_enabler_r17_present) {
+    j.write_str("nack-OnlyFeedbackForMulticastWithDCI-Enabler-r17", "supported");
+  }
+  if (ack_nack_feedback_for_sps_multicast_with_dci_enabler_r17_present) {
+    j.write_str("ack-NACK-FeedbackForSPS-MulticastWithDCI-Enabler-r17", "supported");
+  }
+  if (max_num_g_cs_rnti_r17_present) {
+    j.write_int("maxNumberG-CS-RNTI-r17", max_num_g_cs_rnti_r17);
+  }
+  if (re_level_rate_matching_for_multicast_r17_present) {
+    j.write_str("re-LevelRateMatchingForMulticast-r17", "supported");
+  }
+  if (pdsch_1024_qam_2_mimo_fr1_r17_present) {
+    j.write_str("pdsch-1024QAM-2MIMO-FR1-r17", "supported");
+  }
+  if (prs_meas_without_mg_r17_present) {
+    j.write_str("prs-MeasurementWithoutMG-r17", prs_meas_without_mg_r17.to_string());
+  }
+  if (max_num_ngso_satellites_per_carrier_r17_present) {
+    j.write_int("maxNumber-NGSO-SatellitesPerCarrier-r17", max_num_ngso_satellites_per_carrier_r17);
+  }
+  if (prs_processing_cap_outside_m_gin_ppw_r17.is_present()) {
+    j.start_array("prs-ProcessingCapabilityOutsideMGinPPW-r17");
+    for (const auto& e1 : *prs_processing_cap_outside_m_gin_ppw_r17) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (srs_semi_persistent_pos_res_rrc_inactive_r17.is_present()) {
+    j.write_fieldname("srs-SemiPersistent-PosResourcesRRC-Inactive-r17");
+    j.start_obj();
+    j.write_str("maxNumOfSemiPersistentSRSposResources-r17",
+                srs_semi_persistent_pos_res_rrc_inactive_r17->max_num_of_semi_persistent_srs_pos_res_r17.to_string());
+    j.write_str(
+        "maxNumOfSemiPersistentSRSposResourcesPerSlot-r17",
+        srs_semi_persistent_pos_res_rrc_inactive_r17->max_num_of_semi_persistent_srs_pos_res_per_slot_r17.to_string());
+    j.end_obj();
+  }
+  if (ch_bws_dl_scs_120k_hz_fr2_2_r17_present) {
+    j.write_str("channelBWs-DL-SCS-120kHz-FR2-2-r17", ch_bws_dl_scs_120k_hz_fr2_2_r17.to_string());
+  }
+  if (ch_bws_ul_scs_120k_hz_fr2_2_r17_present) {
+    j.write_str("channelBWs-UL-SCS-120kHz-FR2-2-r17", ch_bws_ul_scs_120k_hz_fr2_2_r17.to_string());
+  }
+  if (dmrs_bundling_pusch_rep_type_a_r17_present) {
+    j.write_str("dmrs-BundlingPUSCH-RepTypeA-r17", "supported");
+  }
+  if (dmrs_bundling_pusch_rep_type_b_r17_present) {
+    j.write_str("dmrs-BundlingPUSCH-RepTypeB-r17", "supported");
+  }
+  if (dmrs_bundling_pusch_multi_slot_r17_present) {
+    j.write_str("dmrs-BundlingPUSCH-multiSlot-r17", "supported");
+  }
+  if (dmrs_bundling_pucch_rep_r17_present) {
+    j.write_str("dmrs-BundlingPUCCH-Rep-r17", "supported");
+  }
+  if (inter_slot_freq_hop_inter_slot_bundling_pusch_r17_present) {
+    j.write_str("interSlotFreqHopInterSlotBundlingPUSCH-r17", "supported");
+  }
+  if (inter_slot_freq_hop_pucch_r17_present) {
+    j.write_str("interSlotFreqHopPUCCH-r17", "supported");
+  }
+  if (dmrs_bundling_restart_r17_present) {
+    j.write_str("dmrs-BundlingRestart-r17", "supported");
+  }
+  if (dmrs_bundling_non_back_to_back_tx_r17_present) {
+    j.write_str("dmrs-BundlingNonBackToBackTX-r17", "supported");
+  }
+  if (max_dyn_slot_repeat_for_sps_multicast_r17_present) {
+    j.write_str("maxDynamicSlotRepetitionForSPS-Multicast-r17", max_dyn_slot_repeat_for_sps_multicast_r17.to_string());
+  }
+  if (nack_only_feedback_for_sps_multicast_with_dci_enabler_r17_present) {
+    j.write_str("nack-OnlyFeedbackForSPS-MulticastWithDCI-Enabler-r17", "supported");
+  }
+  if (sps_multicast_dci_format4_2_r17_present) {
+    j.write_str("sps-MulticastDCI-Format4-2-r17", "supported");
+  }
+  if (sps_multicast_multi_cfg_r17_present) {
+    j.write_int("sps-MulticastMultiConfig-r17", sps_multicast_multi_cfg_r17);
+  }
+  if (prio_ind_in_dci_multicast_r17_present) {
+    j.write_str("priorityIndicatorInDCI-Multicast-r17", "supported");
+  }
+  if (prio_ind_in_dci_sps_multicast_r17_present) {
+    j.write_str("priorityIndicatorInDCI-SPS-Multicast-r17", "supported");
+  }
+  if (two_harq_ack_codebook_for_unicast_and_multicast_r17_present) {
+    j.write_str("twoHARQ-ACK-CodebookForUnicastAndMulticast-r17", "supported");
+  }
+  if (multi_pucch_harq_ack_for_multicast_unicast_r17_present) {
+    j.write_str("multiPUCCH-HARQ-ACK-ForMulticastUnicast-r17", "supported");
+  }
+  if (release_sps_multicast_with_cs_rnti_r17_present) {
+    j.write_str("releaseSPS-MulticastWithCS-RNTI-r17", "supported");
+  }
+  if (pos_ue_ta_auto_adjustment_r18_present) {
+    j.write_str("posUE-TA-AutoAdjustment-r18", "supported");
+  }
+  if (pos_srs_validity_area_rrc_inactive_init_ul_bwp_r18_present) {
+    j.write_str("posSRS-ValidityAreaRRC-InactiveInitialUL-BWP-r18", "supported");
+  }
+  if (pos_srs_validity_area_rrc_inactive_outside_init_ul_bwp_r18_present) {
+    j.write_str("posSRS-ValidityAreaRRC-InactiveOutsideInitialUL-BWP-r18", "supported");
+  }
+  if (dl_prs_meas_with_rx_fh_rrc_connected_for_red_cap_r18.is_present()) {
+    j.write_fieldname("dl-PRS-MeasurementWithRxFH-RRC-ConnectedForRedCap-r18");
+    dl_prs_meas_with_rx_fh_rrc_connected_for_red_cap_r18->to_json(j);
+  }
+  if (pos_srs_tx_fh_rrc_connected_for_red_cap_r18.is_present()) {
+    j.write_fieldname("posSRS-TxFH-RRC-ConnectedForRedCap-r18");
+    pos_srs_tx_fh_rrc_connected_for_red_cap_r18->to_json(j);
+  }
+  if (pos_srs_tx_fh_rrc_inactive_for_red_cap_r18.is_present()) {
+    j.write_fieldname("posSRS-TxFH-RRC-InactiveForRedCap-r18");
+    pos_srs_tx_fh_rrc_inactive_for_red_cap_r18->to_json(j);
+  }
+  if (pos_srs_bwa_rrc_inactive_r18.is_present()) {
+    j.write_fieldname("posSRS-BWA-RRC-Inactive-r18");
+    pos_srs_bwa_rrc_inactive_r18->to_json(j);
+  }
+  if (pos_joint_trigger_by_single_dci_rrc_connected_r18_present) {
+    j.write_str("posJointTriggerBySingleDCI-RRC-Connected-r18", "supported");
+  }
+  if (dl_prs_meas_with_rx_fh_rrc_inactivefor_red_cap_r18_present) {
+    j.write_str("dl-PRS-MeasurementWithRxFH-RRC-InactiveforRedCap-r18", "supported");
+  }
+  if (dl_prs_meas_with_rx_fh_rrc_idlefor_red_cap_r18_present) {
+    j.write_str("dl-PRS-MeasurementWithRxFH-RRC-IdleforRedCap-r18", "supported");
+  }
+  if (spatial_adaptation_csi_feedback_r18.is_present()) {
+    j.write_fieldname("spatialAdaptation-CSI-Feedback-r18");
+    j.start_obj();
+    j.write_str("csiFeedbackType-r18", spatial_adaptation_csi_feedback_r18->csi_feedback_type_r18.to_string());
+    j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_r18->max_num_lmax_r18);
+    j.write_fieldname("maxNumberCSI-ResourcePerCC-r18");
+    j.start_obj();
+    j.write_int("sdType1-Resource-r18",
+                spatial_adaptation_csi_feedback_r18->max_num_csi_res_per_cc_r18.sd_type1_res_r18);
+    j.write_int("sdType2-Resource-r18",
+                spatial_adaptation_csi_feedback_r18->max_num_csi_res_per_cc_r18.sd_type2_res_r18);
+    j.end_obj();
+    j.write_fieldname("maxNumberTotalCSI-ResourcePerCC-r18");
+    j.start_obj();
+    j.write_str("sdType1-Resource-r18",
+                spatial_adaptation_csi_feedback_r18->max_num_total_csi_res_per_cc_r18.sd_type1_res_r18.to_string());
+    j.write_str("sdType2-Resource-r18",
+                spatial_adaptation_csi_feedback_r18->max_num_total_csi_res_per_cc_r18.sd_type2_res_r18.to_string());
+    j.end_obj();
+    j.write_int("totalNumberCSI-Reporting-r18", spatial_adaptation_csi_feedback_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (spatial_adaptation_csi_feedback_pusch_r18.is_present()) {
+    j.write_fieldname("spatialAdaptation-CSI-FeedbackPUSCH-r18");
+    j.start_obj();
+    j.write_str("csiFeedbackType-r18", spatial_adaptation_csi_feedback_pusch_r18->csi_feedback_type_r18.to_string());
+    j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_pusch_r18->max_num_lmax_r18);
+    j.write_int("subReportCSI-r18", spatial_adaptation_csi_feedback_pusch_r18->sub_report_csi_r18);
+    j.write_int("maxNumberCSI-ResourcePerCC-r18",
+                spatial_adaptation_csi_feedback_pusch_r18->max_num_csi_res_per_cc_r18);
+    j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
+                spatial_adaptation_csi_feedback_pusch_r18->max_num_total_csi_res_per_cc_r18.to_string());
+    j.write_int("totalNumberCSI-Reporting-r18", spatial_adaptation_csi_feedback_pusch_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (spatial_adaptation_csi_feedback_aperiodic_r18.is_present()) {
+    j.write_fieldname("spatialAdaptation-CSI-FeedbackAperiodic-r18");
+    j.start_obj();
+    j.write_str("csiFeedbackType-r18",
+                spatial_adaptation_csi_feedback_aperiodic_r18->csi_feedback_type_r18.to_string());
+    j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_aperiodic_r18->max_num_lmax_r18);
+    j.write_int("subReportCSI-r18", spatial_adaptation_csi_feedback_aperiodic_r18->sub_report_csi_r18);
+    j.write_fieldname("maxNumberCSI-ResourcePerCC-r18");
+    j.start_obj();
+    j.write_int("sdType1-Resource-r18",
+                spatial_adaptation_csi_feedback_aperiodic_r18->max_num_csi_res_per_cc_r18.sd_type1_res_r18);
+    j.write_int("sdType2-Resource-r18",
+                spatial_adaptation_csi_feedback_aperiodic_r18->max_num_csi_res_per_cc_r18.sd_type2_res_r18);
+    j.end_obj();
+    j.write_fieldname("maxNumberTotalCSI-ResourcePerCC-r18");
+    j.start_obj();
+    j.write_str(
+        "sdType1-Resource-r18",
+        spatial_adaptation_csi_feedback_aperiodic_r18->max_num_total_csi_res_per_cc_r18.sd_type1_res_r18.to_string());
+    j.write_str(
+        "sdType2-Resource-r18",
+        spatial_adaptation_csi_feedback_aperiodic_r18->max_num_total_csi_res_per_cc_r18.sd_type2_res_r18.to_string());
+    j.end_obj();
+    j.write_int("totalNumberCSI-Reporting-r18",
+                spatial_adaptation_csi_feedback_aperiodic_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (spatial_adaptation_csi_feedback_pucch_r18.is_present()) {
+    j.write_fieldname("spatialAdaptation-CSI-FeedbackPUCCH-r18");
+    j.start_obj();
+    j.write_str("csiFeedbackType-r18", spatial_adaptation_csi_feedback_pucch_r18->csi_feedback_type_r18.to_string());
+    j.write_int("maxNumberLmax-r18", spatial_adaptation_csi_feedback_pucch_r18->max_num_lmax_r18);
+    j.write_int("subReportCSI-r18", spatial_adaptation_csi_feedback_pucch_r18->sub_report_csi_r18);
+    j.write_int("maxNumberCSI-ResourcePerCC-r18",
+                spatial_adaptation_csi_feedback_pucch_r18->max_num_csi_res_per_cc_r18);
+    j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
+                spatial_adaptation_csi_feedback_pucch_r18->max_num_total_csi_res_per_cc_r18.to_string());
+    j.write_int("totalNumberCSI-Reporting-r18", spatial_adaptation_csi_feedback_pucch_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (pwr_adaptation_csi_feedback_r18.is_present()) {
+    j.write_fieldname("powerAdaptation-CSI-Feedback-r18");
+    j.start_obj();
+    j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_r18->max_num_lmax_r18);
+    j.write_int("maxNumberCSI-ResourcePerCC-r18", pwr_adaptation_csi_feedback_r18->max_num_csi_res_per_cc_r18);
+    j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
+                pwr_adaptation_csi_feedback_r18->max_num_total_csi_res_per_cc_r18.to_string());
+    j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (pwr_adaptation_csi_feedback_pusch_r18.is_present()) {
+    j.write_fieldname("powerAdaptation-CSI-FeedbackPUSCH-r18");
+    j.start_obj();
+    j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_pusch_r18->max_num_lmax_r18);
+    j.write_int("subReportCSI-r18", pwr_adaptation_csi_feedback_pusch_r18->sub_report_csi_r18);
+    j.write_int("maxNumberCSI-ResourcePerCC-r18", pwr_adaptation_csi_feedback_pusch_r18->max_num_csi_res_per_cc_r18);
+    j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
+                pwr_adaptation_csi_feedback_pusch_r18->max_num_total_csi_res_per_cc_r18.to_string());
+    j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_pusch_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (pwr_adaptation_csi_feedback_aperiodic_r18.is_present()) {
+    j.write_fieldname("powerAdaptation-CSI-FeedbackAperiodic-r18");
+    j.start_obj();
+    j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_aperiodic_r18->max_num_lmax_r18);
+    j.write_int("subReportCSI-r18", pwr_adaptation_csi_feedback_aperiodic_r18->sub_report_csi_r18);
+    j.write_int("maxNumberCSI-ResourcePerCC-r18",
+                pwr_adaptation_csi_feedback_aperiodic_r18->max_num_csi_res_per_cc_r18);
+    j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
+                pwr_adaptation_csi_feedback_aperiodic_r18->max_num_total_csi_res_per_cc_r18.to_string());
+    j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_aperiodic_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (pwr_adaptation_csi_feedback_pucch_r18.is_present()) {
+    j.write_fieldname("powerAdaptation-CSI-FeedbackPUCCH-r18");
+    j.start_obj();
+    j.write_int("maxNumberLmax-r18", pwr_adaptation_csi_feedback_pucch_r18->max_num_lmax_r18);
+    j.write_int("subReportCSI-r18", pwr_adaptation_csi_feedback_pucch_r18->sub_report_csi_r18);
+    j.write_int("maxNumberCSI-ResourcePerCC-r18", pwr_adaptation_csi_feedback_pucch_r18->max_num_csi_res_per_cc_r18);
+    j.write_str("maxNumberTotalCSI-ResourcePerCC-r18",
+                pwr_adaptation_csi_feedback_pucch_r18->max_num_total_csi_res_per_cc_r18.to_string());
+    j.write_int("totalNumberCSI-Reporting-r18", pwr_adaptation_csi_feedback_pucch_r18->total_num_csi_report_r18);
+    j.end_obj();
+  }
+  if (nes_cell_dtx_drx_r18_present) {
+    j.write_str("nes-CellDTX-DRX-r18", nes_cell_dtx_drx_r18.to_string());
+  }
+  if (nes_cell_dtx_drx_dci2_9_r18_present) {
+    j.write_str("nes-CellDTX-DRX-DCI2-9-r18", "supported");
+  }
+  if (mix_code_book_spatial_adaptation_r18_present) {
+    j.write_str("mixCodeBookSpatialAdaptation-r18", "supported");
+  }
+  if (simul_csi_sub_reports_per_cc_r18_present) {
+    j.write_int("simultaneousCSI-SubReportsPerCC-r18", simul_csi_sub_reports_per_cc_r18);
+  }
+  if (ntn_dmrs_bundling_ngso_r18_present) {
+    j.write_str("ntn-DMRS-BundlingNGSO-r18", ntn_dmrs_bundling_ngso_r18.to_string());
+  }
+  if (ltm_beam_ind_joint_tci_r18.is_present()) {
+    j.write_fieldname("ltm-BeamIndicationJointTCI-r18");
+    j.start_obj();
+    j.write_str("maxNumberJointTCI-PerCell-r18",
+                ltm_beam_ind_joint_tci_r18->max_num_joint_tci_per_cell_r18.to_string());
+    j.write_str("qcl-Resource-r18", ltm_beam_ind_joint_tci_r18->qcl_res_r18.to_string());
+    j.write_int("maxNumberJointTCI-AcrossCells-r18", ltm_beam_ind_joint_tci_r18->max_num_joint_tci_across_cells_r18);
+    j.write_int("maxNumberCells-r18", ltm_beam_ind_joint_tci_r18->max_num_cells_r18);
+    j.end_obj();
+  }
+  if (dummy_ltm_mac_ce_joint_tci_r18.is_present()) {
+    j.write_fieldname("dummy-ltm-MAC-CE-JointTCI-r18");
+    j.start_obj();
+    j.write_str("qcl-Resource-r18", dummy_ltm_mac_ce_joint_tci_r18->qcl_res_r18.to_string());
+    j.write_int("maxNumberJointTCI-PerCell-r18", dummy_ltm_mac_ce_joint_tci_r18->max_num_joint_tci_per_cell_r18);
+    j.write_str("maxNumberJointTCI-AcrossCells-r18",
+                dummy_ltm_mac_ce_joint_tci_r18->max_num_joint_tci_across_cells_r18.to_string());
+    j.end_obj();
+  }
+  if (ltm_beam_ind_separate_tci_r18.is_present()) {
+    j.write_fieldname("ltm-BeamIndicationSeparateTCI-r18");
+    j.start_obj();
+    j.write_str("maxNumberDL-TCI-PerCell-r18", ltm_beam_ind_separate_tci_r18->max_num_dl_tci_per_cell_r18.to_string());
+    j.write_str("maxNumberUL-TCI-PerCell-r18", ltm_beam_ind_separate_tci_r18->max_num_ul_tci_per_cell_r18.to_string());
+    j.write_str("qcl-Resource-r18", ltm_beam_ind_separate_tci_r18->qcl_res_r18.to_string());
+    j.write_int("maxNumberDL-TCI-AcrossCells-r18", ltm_beam_ind_separate_tci_r18->max_num_dl_tci_across_cells_r18);
+    j.write_int("maxNumberUL-TCI-AcrossCells-r18", ltm_beam_ind_separate_tci_r18->max_num_ul_tci_across_cells_r18);
+    j.write_int("maxNumberCells-r18", ltm_beam_ind_separate_tci_r18->max_num_cells_r18);
+    j.end_obj();
+  }
+  if (dummy_ltm_mac_ce_separate_tci_r18.is_present()) {
+    j.write_fieldname("dummy-ltm-MAC-CE-SeparateTCI-r18");
+    j.start_obj();
+    j.write_str("qcl-Resource-r18", dummy_ltm_mac_ce_separate_tci_r18->qcl_res_r18.to_string());
+    j.write_int("maxNumberDL-TCI-PerCell-r18", dummy_ltm_mac_ce_separate_tci_r18->max_num_dl_tci_per_cell_r18);
+    j.write_int("maxNumberUL-TCI-PerCell-r18", dummy_ltm_mac_ce_separate_tci_r18->max_num_ul_tci_per_cell_r18);
+    j.write_str("maxNumberDL-TCI-AcrossCells-r18",
+                dummy_ltm_mac_ce_separate_tci_r18->max_num_dl_tci_across_cells_r18.to_string());
+    j.write_str("maxNumberUL-TCI-AcrossCells-r18",
+                dummy_ltm_mac_ce_separate_tci_r18->max_num_ul_tci_across_cells_r18.to_string());
+    j.end_obj();
+  }
+  if (rach_early_ta_meas_r18_present) {
+    j.write_int("rach-EarlyTA-Measurement-r18", rach_early_ta_meas_r18);
+  }
+  if (ue_ta_meas_r18_present) {
+    j.write_int("ue-TA-Measurement-r18", ue_ta_meas_r18);
+  }
+  if (ta_ind_cell_switch_r18_present) {
+    j.write_str("ta-IndicationCellSwitch-r18", "supported");
+  }
+  if (triggered_harq_codebook_retx_dci_1_3_r18.is_present()) {
+    j.write_fieldname("triggeredHARQ-CodebookRetxDCI-1-3-r18");
+    j.start_obj();
+    j.write_str("minHARQ-Retx-Offset-r18",
+                triggered_harq_codebook_retx_dci_1_3_r18->min_harq_retx_offset_r18.to_string());
+    j.write_str("maxHARQ-Retx-Offset-r18",
+                triggered_harq_codebook_retx_dci_1_3_r18->max_harq_retx_offset_r18.to_string());
+    j.end_obj();
+  }
+  if (unified_joint_tci_multi_mac_ce_dci_1_3_r18.is_present()) {
+    j.write_fieldname("unifiedJointTCI-MultiMAC-CE-DCI-1-3-r18");
+    j.start_obj();
+    j.write_fieldname("minBeamApplicationTime-r18");
+    unified_joint_tci_multi_mac_ce_dci_1_3_r18->min_beam_application_time_r18.to_json(j);
+    if (unified_joint_tci_multi_mac_ce_dci_1_3_r18->max_activ_tci_per_cc_r18_present) {
+      j.write_int("maxActivatedTCI-PerCC-r18", unified_joint_tci_multi_mac_ce_dci_1_3_r18->max_activ_tci_per_cc_r18);
+    }
+    j.end_obj();
+  }
+  if (unified_separate_tci_multi_mac_ce_intra_cell_r18.is_present()) {
+    j.write_fieldname("unifiedSeparateTCI-MultiMAC-CE-IntraCell-r18");
+    j.start_obj();
+    j.write_fieldname("minBeamApplicationTime-r18");
+    unified_separate_tci_multi_mac_ce_intra_cell_r18->min_beam_application_time_r18.to_json(j);
+    if (unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_dl_tci_per_cc_r18_present) {
+      j.write_int("maxActivatedDL-TCI-PerCC-r18",
+                  unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_dl_tci_per_cc_r18);
+    }
+    if (unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_ul_tci_per_cc_r18_present) {
+      j.write_int("maxActivatedUL-TCI-PerCC-r18",
+                  unified_separate_tci_multi_mac_ce_intra_cell_r18->max_activ_ul_tci_per_cc_r18);
+    }
+    j.end_obj();
+  }
+  if (multi_pusch_cg_r18_present) {
+    j.write_str("multiPUSCH-CG-r18", multi_pusch_cg_r18.to_string());
+  }
+  if (multi_pusch_active_cfg_grant_r18.is_present()) {
+    j.write_fieldname("multiPUSCH-ActiveConfiguredGrant-r18");
+    j.start_obj();
+    j.write_str("maxNumberConfigsPerBWP", multi_pusch_active_cfg_grant_r18->max_num_cfgs_per_bwp.to_string());
+    j.write_int("maxNumberConfigsAllCC-FR1", multi_pusch_active_cfg_grant_r18->max_num_cfgs_all_cc_fr1);
+    j.write_int("maxNumberConfigsAllCC-FR2", multi_pusch_active_cfg_grant_r18->max_num_cfgs_all_cc_fr2);
+    j.end_obj();
+  }
+  if (joint_release_dci_r18_present) {
+    j.write_str("jointReleaseDCI-r18", "supported");
+  }
+  if (cg_pusch_uto_uci_ind_r18_present) {
+    j.write_str("cg-PUSCH-UTO-UCI-Ind-r18", "supported");
+  }
+  if (pdcch_monitoring_resumption_after_ul_nack_r18_present) {
+    j.write_str("pdcch-MonitoringResumptionAfterUL-NACK-r18", "supported");
+  }
+  if (support3_m_hz_ch_bw_symmetric_r18_present) {
+    j.write_str("support3MHz-ChannelBW-Symmetric-r18", "supported");
+  }
+  if (support3_m_hz_ch_bw_asymmetric_r18_present) {
+    j.write_str("support3MHz-ChannelBW-Asymmetric-r18", "supported");
+  }
+  if (support12_prb_coreset0_r18_present) {
+    j.write_str("support12PRB-CORESET0-r18", "supported");
+  }
+  if (nr_pdcch_overlap_lte_crs_re_r18.is_present()) {
+    j.write_fieldname("nr-PDCCH-OverlapLTE-CRS-RE-r18");
+    j.start_obj();
+    j.write_str("overlapInRE-r18", nr_pdcch_overlap_lte_crs_re_r18->overlap_in_re_r18.to_string());
+    j.write_str("overlapInSymbol-r18", nr_pdcch_overlap_lte_crs_re_r18->overlap_in_symbol_r18.to_string());
+    j.end_obj();
+  }
+  if (nr_pdcch_overlap_lte_crs_re_multi_patterns_r18_present) {
+    j.write_str("nr-PDCCH-OverlapLTE-CRS-RE-MultiPatterns-r18", "supported");
+  }
+  if (nr_pdcch_overlap_lte_crs_re_span_3_4_r18_present) {
+    j.write_str("nr-PDCCH-OverlapLTE-CRS-RE-Span-3-4-r18", "supported");
+  }
+  if (two_rate_matching_eutra_crs_patterns_3_4_r18.is_present()) {
+    j.write_fieldname("twoRateMatchingEUTRA-CRS-patterns-3-4-r18");
+    j.start_obj();
+    j.write_int("maxNumberPatterns-r18", two_rate_matching_eutra_crs_patterns_3_4_r18->max_num_patterns_r18);
+    j.write_int("maxNumberNon-OverlapPatterns-r18",
+                two_rate_matching_eutra_crs_patterns_3_4_r18->max_num_non_overlap_patterns_r18);
+    j.end_obj();
+  }
+  if (overlap_rate_matching_eutra_crs_patterns_3_4_diff_cs_pool_r18_present) {
+    j.write_str("overlapRateMatchingEUTRA-CRS-Patterns-3-4-Diff-CS-Pool-r18", "supported");
+  }
+  if (ncd_ssb_bwp_wor_r18_present) {
+    j.write_str("ncd-SSB-BWP-Wor-r18", "supported");
+  }
+  if (rlm_bm_bfd_csi_rs_outside_active_bwp_r18_present) {
+    j.write_str("rlm-BM-BFD-CSI-RS-OutsideActiveBWP-r18", "supported");
+  }
+  if (prach_coverage_enh_r18_present) {
+    j.write_str("prach-CoverageEnh-r18", "supported");
+  }
+  if (prach_repeat_r18_present) {
+    j.write_str("prach-Repetition-r18", "supported");
+  }
+  if (dyn_waveform_switch_r18_present) {
+    j.write_str("dynamicWaveformSwitch-r18", "supported");
+  }
+  if (dyn_waveform_switch_phr_r18_present) {
+    j.write_str("dynamicWaveformSwitchPHR-r18", "supported");
+  }
+  if (dyn_waveform_switch_intra_ca_r18_present) {
+    j.write_int("dynamicWaveformSwitchIntraCA-r18", dyn_waveform_switch_intra_ca_r18);
+  }
+  if (multi_pusch_single_dci_non_cons_slots_r18_present) {
+    j.write_str("multiPUSCH-SingleDCI-NonConsSlots-r18", "supported");
+  }
+  if (pdc_max_num_prs_res_processed_per_slot_r18.is_present()) {
+    j.write_fieldname("pdc-maxNumberPRS-ResourceProcessedPerSlot-r18");
+    j.start_obj();
+    j.write_fieldname("fr1-r18");
+    j.start_obj();
+    if (pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_15k_hz_r18_present) {
+      j.write_str("scs-15kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_15k_hz_r18.to_string());
+    }
+    if (pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_30k_hz_r18_present) {
+      j.write_str("scs-30kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_30k_hz_r18.to_string());
+    }
+    if (pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_60k_hz_r18_present) {
+      j.write_str("scs-60kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr1_r18.scs_60k_hz_r18.to_string());
+    }
+    j.end_obj();
+    j.write_fieldname("fr2-r18");
+    j.start_obj();
+    if (pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_60k_hz_r18_present) {
+      j.write_str("scs-60kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_60k_hz_r18.to_string());
+    }
+    if (pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_120k_hz_r18_present) {
+      j.write_str("scs-120kHz-r18", pdc_max_num_prs_res_processed_per_slot_r18->fr2_r18.scs_120k_hz_r18.to_string());
+    }
+    j.end_obj();
+    j.end_obj();
+  }
+  if (intra_slot_pdsch_multicast_inactive_r18_present) {
+    j.write_bool("intraSlot-PDSCH-MulticastInactive-r18", intra_slot_pdsch_multicast_inactive_r18);
+  }
+  if (multicast_inactive_r18_present) {
+    j.write_str("multicastInactive-r18", "supported");
+  }
+  if (thres_based_multicast_resume_r18_present) {
+    j.write_str("thresholdBasedMulticastResume-r18", "supported");
+  }
+  if (lower_msd_r18.is_present()) {
+    j.start_array("lowerMSD-r18");
+    for (const auto& e1 : *lower_msd_r18) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (lower_msd_endc_r18.is_present()) {
+    j.start_array("lowerMSD-ENDC-r18");
+    for (const auto& e1 : *lower_msd_endc_r18) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (enhanced_ch_raster_r18_present) {
+    j.write_str("enhancedChannelRaster-r18", "supported");
+  }
+  if (fast_beam_sweeping_multi_rx_r18_present) {
+    j.write_str("fastBeamSweepingMultiRx-r18", fast_beam_sweeping_multi_rx_r18.to_string());
+  }
+  if (beam_sweeping_factor_reduction_r18.is_present()) {
+    j.write_fieldname("beamSweepingFactorReduction-r18");
+    j.start_obj();
+    j.write_str("reduceForCellDetection", beam_sweeping_factor_reduction_r18->reduce_for_cell_detection.to_string());
+    j.write_int("reduceForSSB-L1-RSRP-Meas", beam_sweeping_factor_reduction_r18->reduce_for_ssb_l1_rsrp_meas);
+    j.end_obj();
+  }
+  if (simul_reception_two_qcl_r18_present) {
+    j.write_str("simultaneousReceptionTwoQCL-r18", "supported");
+  }
+  if (meas_enh_ca_inter_freq_fr2_r18_present) {
+    j.write_str("measEnhCAInterFreqFR2-r18", "supported");
+  }
+  if (tci_state_switch_ind_r18_present) {
+    j.write_str("tci-StateSwitchInd-r18", "supported");
+  }
+  if (ant_array_type_r18_present) {
+    j.write_str("antennaArrayType-r18", "supported");
+  }
+  if (location_based_cond_ho_atg_r18_present) {
+    j.write_str("locationBasedCondHandoverATG-r18", "supported");
+  }
+  if (max_output_pwr_atg_r18_present) {
+    j.write_int("maxOutputPowerATG-r18", max_output_pwr_atg_r18);
+  }
+  if (ltm_fast_processing_cfg_r18.is_present()) {
+    j.write_fieldname("ltm-FastProcessingConfig-r18");
+    j.start_obj();
+    j.write_str("maxNumberStoredConfigCells-r18",
+                ltm_fast_processing_cfg_r18->max_num_stored_cfg_cells_r18.to_string());
+    j.write_int("maxNumberConfigs-r18", ltm_fast_processing_cfg_r18->max_num_cfgs_r18);
+    j.end_obj();
+  }
+  if (meas_validation_report_emr_r18_present) {
+    j.write_str("measValidationReportEMR-r18", "supported");
+  }
+  if (meas_validation_report_resel_meass_r18_present) {
+    j.write_str("measValidationReportReselectionMeasurements-r18", "supported");
+  }
+  if (event_a4_based_cond_ho_nes_r18_present) {
+    j.write_str("eventA4BasedCondHandoverNES-r18", "supported");
+  }
+  if (nes_based_cond_ho_with_dci_r18_present) {
+    j.write_str("nesBasedCondHandoverWithDCI-r18", "supported");
+  }
+  if (rach_less_ho_cg_r18_present) {
+    j.write_str("rach-LessHandoverCG-r18", "supported");
+  }
+  if (rach_less_ho_dg_r18_present) {
+    j.write_str("rach-LessHandoverDG-r18", "supported");
+  }
+  if (location_based_cond_ho_emc_r18_present) {
+    j.write_str("locationBasedCondHandoverEMC-r18", "supported");
+  }
+  if (mt_cg_sdt_r18_present) {
+    j.write_str("mt-CG-SDT-r18", "supported");
+  }
+  if (pos_srs_precfgure_rrc_inactive_init_ul_bwp_r18_present) {
+    j.write_str("posSRS-PreconfigureRRC-InactiveInitialUL-BWP-r18", "supported");
+  }
+  if (pos_srs_precfgure_rrc_inactive_outside_init_ul_bwp_r18_present) {
+    j.write_str("posSRS-PreconfigureRRC-InactiveOutsideInitialUL-BWP-r18", "supported");
+  }
+  if (cg_sdt_periodicity_ext_r18_present) {
+    j.write_str("cg-SDT-PeriodicityExt-r18", "supported");
+  }
+  if (support_of2_rx_xr_r18_present) {
+    j.write_str("supportOf2RxXR-r18", "supported");
+  }
+  if (cond_ho_with_cand_scg_change_r18_present) {
+    j.write_str("condHandoverWithCandSCG-change-r18", "supported");
+  }
+  if (mac_params_per_band_r18.is_present()) {
+    j.write_fieldname("mac-ParametersPerBand-r18");
+    mac_params_per_band_r18->to_json(j);
+  }
+  if (ch_bw_dl_ncr_r18.is_present()) {
+    j.write_fieldname("channelBW-DL-NCR-r18");
+    ch_bw_dl_ncr_r18->to_json(j);
+  }
+  if (ch_bw_ul_ncr_r18.is_present()) {
+    j.write_fieldname("channelBW-UL-NCR-r18");
+    ch_bw_ul_ncr_r18->to_json(j);
+  }
+  if (ncr_pdsch_64_qam_fr2_r18_present) {
+    j.write_str("ncr-PDSCH-64QAM-FR2-r18", "supported");
+  }
+  if (ltm_mcg_intra_freq_r18_present) {
+    j.write_str("ltm-MCG-IntraFreq-r18", "supported");
+  }
+  if (ltm_scg_intra_freq_r18_present) {
+    j.write_str("ltm-SCG-IntraFreq-r18", "supported");
+  }
+  if (ltm_mac_ce_joint_tci_r18.is_present()) {
+    j.write_fieldname("ltm-MAC-CE-JointTCI-r18");
+    j.start_obj();
+    j.write_str("qcl-Resource-r18", ltm_mac_ce_joint_tci_r18->qcl_res_r18.to_string());
+    j.write_int("maxNumberJointTCI-PerCell-r18", ltm_mac_ce_joint_tci_r18->max_num_joint_tci_per_cell_r18);
+    j.write_int("maxNumberJointTCI-AcrossCells-r18", ltm_mac_ce_joint_tci_r18->max_num_joint_tci_across_cells_r18);
+    j.end_obj();
+  }
+  if (ltm_mac_ce_separate_tci_r18.is_present()) {
+    j.write_fieldname("ltm-MAC-CE-SeparateTCI-r18");
+    j.start_obj();
+    j.write_str("qcl-Resource-r18", ltm_mac_ce_separate_tci_r18->qcl_res_r18.to_string());
+    j.write_int("maxNumberDL-TCI-PerCell-r18", ltm_mac_ce_separate_tci_r18->max_num_dl_tci_per_cell_r18);
+    j.write_int("maxNumberUL-TCI-PerCell-r18", ltm_mac_ce_separate_tci_r18->max_num_ul_tci_per_cell_r18);
+    j.write_int("maxNumberDL-TCI-AcrossCells-r18", ltm_mac_ce_separate_tci_r18->max_num_dl_tci_across_cells_r18);
+    j.write_int("maxNumberUL-TCI-AcrossCells-r18", ltm_mac_ce_separate_tci_r18->max_num_ul_tci_across_cells_r18);
+    j.end_obj();
+  }
+  if (event_a4_based_cond_ho_atg_r18_present) {
+    j.write_str("eventA4BasedCondHandoverATG-r18", "supported");
+  }
+  if (pos_srs_tx_fh_with_time_win_for_red_cap_r18_present) {
+    j.write_str("posSRS-TxFH-WithTimeWindowForRedCap-r18", "supported");
   }
   j.end_obj();
 }
@@ -29598,7 +29594,7 @@ OCUDUASN_CODE band_sidelink_r16_s::pack(bit_ref& bref) const
   group_flags[3] |= sl_ca_psfch_r18.is_present();
   group_flags[3] |= sl_reception_intra_carrier_guard_band_r18_present;
   group_flags[4] |= sl_pathloss_based_olpc_sl_rsrp_report_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(sl_reception_r16_present, 1));
   HANDLE_CODE(bref.pack(sl_tx_mode1_r16_present, 1));
   HANDLE_CODE(bref.pack(sync_sidelink_r16_present, 1));
@@ -29633,7 +29629,7 @@ OCUDUASN_CODE band_sidelink_r16_s::pack(bit_ref& bref) const
     HANDLE_CODE(psfch_format_zero_sidelink_r16.psfch_tx_num.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -29753,7 +29749,8 @@ OCUDUASN_CODE band_sidelink_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE band_sidelink_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(sl_reception_r16_present, 1));
   HANDLE_CODE(bref.unpack(sl_tx_mode1_r16_present, 1));
   HANDLE_CODE(bref.unpack(sync_sidelink_r16_present, 1));
@@ -29964,175 +29961,172 @@ void band_sidelink_r16_s::to_json(json_writer& j) const
   if (enb_sync_sidelink_r16_present) {
     j.write_str("enb-sync-Sidelink-r16", "supported");
   }
-  if (ext) {
-    if (sl_tx_mode2_r16.is_present()) {
-      j.write_fieldname("sl-TransmissionMode2-r16");
-      j.start_obj();
-      j.write_str("harq-TxProcessModeTwoSidelink-r16",
-                  sl_tx_mode2_r16->harq_tx_process_mode_two_sidelink_r16.to_string());
-      if (sl_tx_mode2_r16->scs_cp_pattern_tx_sidelink_mode_two_r16_present) {
-        j.write_str("scs-CP-PatternTxSidelinkModeTwo-r16", "supported");
-      }
-      if (sl_tx_mode2_r16->dl_open_loop_pc_sidelink_r16_present) {
-        j.write_str("dl-openLoopPC-Sidelink-r16", "supported");
-      }
-      j.end_obj();
+  if (sl_tx_mode2_r16.is_present()) {
+    j.write_fieldname("sl-TransmissionMode2-r16");
+    j.start_obj();
+    j.write_str("harq-TxProcessModeTwoSidelink-r16",
+                sl_tx_mode2_r16->harq_tx_process_mode_two_sidelink_r16.to_string());
+    if (sl_tx_mode2_r16->scs_cp_pattern_tx_sidelink_mode_two_r16_present) {
+      j.write_str("scs-CP-PatternTxSidelinkModeTwo-r16", "supported");
     }
-    if (congestion_ctrl_sidelink_r16.is_present()) {
-      j.write_fieldname("congestionControlSidelink-r16");
-      j.start_obj();
-      if (congestion_ctrl_sidelink_r16->cbr_report_sidelink_r16_present) {
-        j.write_str("cbr-ReportSidelink-r16", "supported");
-      }
-      j.write_str("cbr-CR-TimeLimitSidelink-r16",
-                  congestion_ctrl_sidelink_r16->cbr_cr_time_limit_sidelink_r16.to_string());
-      j.end_obj();
+    if (sl_tx_mode2_r16->dl_open_loop_pc_sidelink_r16_present) {
+      j.write_str("dl-openLoopPC-Sidelink-r16", "supported");
     }
-    if (fewer_symbol_slot_sidelink_r16_present) {
-      j.write_str("fewerSymbolSlotSidelink-r16", "supported");
+    j.end_obj();
+  }
+  if (congestion_ctrl_sidelink_r16.is_present()) {
+    j.write_fieldname("congestionControlSidelink-r16");
+    j.start_obj();
+    if (congestion_ctrl_sidelink_r16->cbr_report_sidelink_r16_present) {
+      j.write_str("cbr-ReportSidelink-r16", "supported");
     }
-    if (sl_open_loop_pc_rsrp_report_sidelink_r16_present) {
-      j.write_str("sl-openLoopPC-RSRP-ReportSidelink-r16", "supported");
+    j.write_str("cbr-CR-TimeLimitSidelink-r16",
+                congestion_ctrl_sidelink_r16->cbr_cr_time_limit_sidelink_r16.to_string());
+    j.end_obj();
+  }
+  if (fewer_symbol_slot_sidelink_r16_present) {
+    j.write_str("fewerSymbolSlotSidelink-r16", "supported");
+  }
+  if (sl_open_loop_pc_rsrp_report_sidelink_r16_present) {
+    j.write_str("sl-openLoopPC-RSRP-ReportSidelink-r16", "supported");
+  }
+  if (sl_rx_256_qam_r16_present) {
+    j.write_str("sl-Rx-256QAM-r16", "supported");
+  }
+  if (ue_pwr_class_sidelink_r16_present) {
+    j.write_str("ue-PowerClassSidelink-r16", ue_pwr_class_sidelink_r16.to_string());
+  }
+  if (sl_tx_mode2_random_res_sel_r17.is_present()) {
+    j.write_fieldname("sl-TransmissionMode2-RandomResourceSelection-r17");
+    j.start_obj();
+    j.write_str("harq-TxProcessModeTwoSidelink-r17",
+                sl_tx_mode2_random_res_sel_r17->harq_tx_process_mode_two_sidelink_r17.to_string());
+    if (sl_tx_mode2_random_res_sel_r17->scs_cp_pattern_tx_sidelink_mode_two_r17_present) {
+      j.write_fieldname("scs-CP-PatternTxSidelinkModeTwo-r17");
+      sl_tx_mode2_random_res_sel_r17->scs_cp_pattern_tx_sidelink_mode_two_r17.to_json(j);
     }
-    if (sl_rx_256_qam_r16_present) {
-      j.write_str("sl-Rx-256QAM-r16", "supported");
+    if (sl_tx_mode2_random_res_sel_r17->extended_cp_mode2_random_r17_present) {
+      j.write_str("extendedCP-Mode2Random-r17", "supported");
     }
-    if (ue_pwr_class_sidelink_r16_present) {
-      j.write_str("ue-PowerClassSidelink-r16", ue_pwr_class_sidelink_r16.to_string());
+    if (sl_tx_mode2_random_res_sel_r17->dl_open_loop_pc_sidelink_r17_present) {
+      j.write_str("dl-openLoopPC-Sidelink-r17", "supported");
     }
-    if (sl_tx_mode2_random_res_sel_r17.is_present()) {
-      j.write_fieldname("sl-TransmissionMode2-RandomResourceSelection-r17");
-      j.start_obj();
-      j.write_str("harq-TxProcessModeTwoSidelink-r17",
-                  sl_tx_mode2_random_res_sel_r17->harq_tx_process_mode_two_sidelink_r17.to_string());
-      if (sl_tx_mode2_random_res_sel_r17->scs_cp_pattern_tx_sidelink_mode_two_r17_present) {
-        j.write_fieldname("scs-CP-PatternTxSidelinkModeTwo-r17");
-        sl_tx_mode2_random_res_sel_r17->scs_cp_pattern_tx_sidelink_mode_two_r17.to_json(j);
-      }
-      if (sl_tx_mode2_random_res_sel_r17->extended_cp_mode2_random_r17_present) {
-        j.write_str("extendedCP-Mode2Random-r17", "supported");
-      }
-      if (sl_tx_mode2_random_res_sel_r17->dl_open_loop_pc_sidelink_r17_present) {
-        j.write_str("dl-openLoopPC-Sidelink-r17", "supported");
-      }
-      j.end_obj();
+    j.end_obj();
+  }
+  if (sync_sidelink_v1710.is_present()) {
+    j.write_fieldname("sync-Sidelink-v1710");
+    j.start_obj();
+    if (sync_sidelink_v1710->sync_gnss_r17_present) {
+      j.write_str("sync-GNSS-r17", "supported");
     }
-    if (sync_sidelink_v1710.is_present()) {
-      j.write_fieldname("sync-Sidelink-v1710");
-      j.start_obj();
-      if (sync_sidelink_v1710->sync_gnss_r17_present) {
-        j.write_str("sync-GNSS-r17", "supported");
-      }
-      if (sync_sidelink_v1710->gnb_sync_r17_present) {
-        j.write_str("gNB-Sync-r17", "supported");
-      }
-      if (sync_sidelink_v1710->gnb_gnss_ue_sync_with_prio_on_gnb_enb_r17_present) {
-        j.write_str("gNB-GNSS-UE-SyncWithPriorityOnGNB-ENB-r17", "supported");
-      }
-      if (sync_sidelink_v1710->gnb_gnss_ue_sync_with_prio_on_gnss_r17_present) {
-        j.write_str("gNB-GNSS-UE-SyncWithPriorityOnGNSS-r17", "supported");
-      }
-      j.end_obj();
+    if (sync_sidelink_v1710->gnb_sync_r17_present) {
+      j.write_str("gNB-Sync-r17", "supported");
     }
-    if (enb_sync_sidelink_v1710_present) {
-      j.write_str("enb-sync-Sidelink-v1710", "supported");
+    if (sync_sidelink_v1710->gnb_gnss_ue_sync_with_prio_on_gnb_enb_r17_present) {
+      j.write_str("gNB-GNSS-UE-SyncWithPriorityOnGNB-ENB-r17", "supported");
     }
-    if (rx_iuc_scheme1_preferred_mode2_sidelink_r17_present) {
-      j.write_str("rx-IUC-Scheme1-PreferredMode2Sidelink-r17", "supported");
+    if (sync_sidelink_v1710->gnb_gnss_ue_sync_with_prio_on_gnss_r17_present) {
+      j.write_str("gNB-GNSS-UE-SyncWithPriorityOnGNSS-r17", "supported");
     }
-    if (rx_iuc_scheme1_non_preferred_mode2_sidelink_r17_present) {
-      j.write_str("rx-IUC-Scheme1-NonPreferredMode2Sidelink-r17", "supported");
-    }
-    if (rx_iuc_scheme2_mode2_sidelink_r17_present) {
-      j.write_str("rx-IUC-Scheme2-Mode2Sidelink-r17", rx_iuc_scheme2_mode2_sidelink_r17.to_string());
-    }
-    if (rx_iuc_scheme1_sci_r17_present) {
-      j.write_str("rx-IUC-Scheme1-SCI-r17", "supported");
-    }
-    if (rx_iuc_scheme1_sci_explicit_req_r17_present) {
-      j.write_str("rx-IUC-Scheme1-SCI-ExplicitReq-r17", "supported");
-    }
-    if (shared_spec_ch_access_params_sidelink_per_band_r18.is_present()) {
-      j.write_fieldname("sharedSpectrumChAccessParamsSidelinkPerBand-r18");
-      shared_spec_ch_access_params_sidelink_per_band_r18->to_json(j);
-    }
-    if (sl_prs_common_proc_cap_per_band_r18.is_present()) {
-      j.write_fieldname("sl-PRS-CommonProcCapabilityPerBand-r18");
-      j.start_obj();
-      j.write_fieldname("maxSL-PRS-Bandwidth-r18");
-      sl_prs_common_proc_cap_per_band_r18->max_sl_prs_bw_r18.to_json(j);
-      j.write_fieldname("maxNumOfActiveSL-PRS-ResourcesInOneSlot-r18");
-      sl_prs_common_proc_cap_per_band_r18->max_num_of_active_sl_prs_res_in_one_slot_r18.to_json(j);
-      j.write_fieldname("maxNumOfSlotsWithActiveSL-PRS-Resources-r18");
-      sl_prs_common_proc_cap_per_band_r18->max_num_of_slots_with_active_sl_prs_res_r18.to_json(j);
-      j.write_str(
-          "minTimeAfterEndofSlotCarryActiveSL-PRS-Resources-r18",
-          sl_prs_common_proc_cap_per_band_r18->min_time_after_endof_slot_carry_active_sl_prs_res_r18.to_string());
-      j.end_obj();
-    }
-    if (sl_prs_rx_in_shared_res_pool_r18_present) {
-      j.write_str("sl-PRS-RxInSharedResourcePool-r18", "supported");
-    }
-    if (sl_prs_rx_in_ded_res_pool_r18.is_present()) {
-      j.write_fieldname("sl-PRS-RxInDedicatedResourcePool-r18");
-      j.start_obj();
-      j.write_str("numOfSupportedRxPSCCH-PerSlot-r18",
-                  sl_prs_rx_in_ded_res_pool_r18->num_of_supported_rx_pscch_per_slot_r18.to_string());
-      j.write_str("supportedCP-TypeFor60kHzSCS-r18",
-                  sl_prs_rx_in_ded_res_pool_r18->supported_cp_type_for60k_hz_scs_r18.to_string());
-      j.end_obj();
-    }
-    if (sl_prs_tx_in_shared_res_pool_r18_present) {
-      j.write_str("sl-PRS-TxInSharedResourcePool-r18", "supported");
-    }
-    if (sl_prs_tx_scheme1_in_ded_res_pool_r18_present) {
-      j.write_str("sl-PRS-TxScheme1InDedicatedResourcePool-r18", "supported");
-    }
-    if (sl_prs_tx_scheme2_in_ded_res_pool_r18_present) {
-      j.write_str("sl-PRS-TxScheme2InDedicatedResourcePool-r18", "supported");
-    }
-    if (sl_prs_congestion_ctrl_r18_present) {
-      j.write_str("sl-PRS-CongestionCtrl-r18", sl_prs_congestion_ctrl_r18.to_string());
-    }
-    if (sl_prs_tx_random_sel_r18_present) {
-      j.write_str("sl-PRS-TxRandomSelection-r18", "supported");
-    }
-    if (sl_prs_tx_using_full_sensing_r18_present) {
-      j.write_str("sl-PRS-TxUsingFullSensing-r18", sl_prs_tx_using_full_sensing_r18.to_string());
-    }
-    if (sl_prs_rx_for_band_with_sl_ca_r18_present) {
-      j.write_str("sl-PRS-RxForBandWithSL-CA-r18", "supported");
-    }
-    if (sl_prs_tx_for_band_with_sl_ca_r18_present) {
-      j.write_str("sl-PRS-TxForBandWithSL-CA-r18", "supported");
-    }
-    if (sl_dyn_sharing_tx_rx_r18_present) {
-      j.write_str("sl-DynamicSharingTxRx-r18", "supported");
-    }
-    if (sl_ca_communication_r18.is_present()) {
-      j.write_fieldname("sl-CA-Communication-r18");
-      j.start_obj();
-      j.write_int("numberOfCarriers-r18", sl_ca_communication_r18->nof_carriers_r18);
-      j.write_int("numberOfPSCCH-DecodeValueZ-r18", sl_ca_communication_r18->nof_pscch_decode_value_z_r18);
-      j.write_str("totalBandwidth-r18", sl_ca_communication_r18->total_bw_r18.to_string());
-      j.end_obj();
-    }
-    if (sl_ca_sync_r18_present) {
-      j.write_str("sl-CA-Synchronization-r18", "supported");
-    }
-    if (sl_ca_psfch_r18.is_present()) {
-      j.write_fieldname("sl-CA-PSFCH-r18");
-      j.start_obj();
-      j.write_str("rx-PSFCH-Resource-r18", sl_ca_psfch_r18->rx_psfch_res_r18.to_string());
-      j.write_str("tx-PSFCH-Resource-r18", sl_ca_psfch_r18->tx_psfch_res_r18.to_string());
-      j.end_obj();
-    }
-    if (sl_reception_intra_carrier_guard_band_r18_present) {
-      j.write_str("sl-ReceptionIntraCarrierGuardBand-r18", "supported");
-    }
-    if (sl_pathloss_based_olpc_sl_rsrp_report_r18_present) {
-      j.write_str("sl-PathlossBasedOLPC-SL-RSRP-Report-r18", "supported");
-    }
+    j.end_obj();
+  }
+  if (enb_sync_sidelink_v1710_present) {
+    j.write_str("enb-sync-Sidelink-v1710", "supported");
+  }
+  if (rx_iuc_scheme1_preferred_mode2_sidelink_r17_present) {
+    j.write_str("rx-IUC-Scheme1-PreferredMode2Sidelink-r17", "supported");
+  }
+  if (rx_iuc_scheme1_non_preferred_mode2_sidelink_r17_present) {
+    j.write_str("rx-IUC-Scheme1-NonPreferredMode2Sidelink-r17", "supported");
+  }
+  if (rx_iuc_scheme2_mode2_sidelink_r17_present) {
+    j.write_str("rx-IUC-Scheme2-Mode2Sidelink-r17", rx_iuc_scheme2_mode2_sidelink_r17.to_string());
+  }
+  if (rx_iuc_scheme1_sci_r17_present) {
+    j.write_str("rx-IUC-Scheme1-SCI-r17", "supported");
+  }
+  if (rx_iuc_scheme1_sci_explicit_req_r17_present) {
+    j.write_str("rx-IUC-Scheme1-SCI-ExplicitReq-r17", "supported");
+  }
+  if (shared_spec_ch_access_params_sidelink_per_band_r18.is_present()) {
+    j.write_fieldname("sharedSpectrumChAccessParamsSidelinkPerBand-r18");
+    shared_spec_ch_access_params_sidelink_per_band_r18->to_json(j);
+  }
+  if (sl_prs_common_proc_cap_per_band_r18.is_present()) {
+    j.write_fieldname("sl-PRS-CommonProcCapabilityPerBand-r18");
+    j.start_obj();
+    j.write_fieldname("maxSL-PRS-Bandwidth-r18");
+    sl_prs_common_proc_cap_per_band_r18->max_sl_prs_bw_r18.to_json(j);
+    j.write_fieldname("maxNumOfActiveSL-PRS-ResourcesInOneSlot-r18");
+    sl_prs_common_proc_cap_per_band_r18->max_num_of_active_sl_prs_res_in_one_slot_r18.to_json(j);
+    j.write_fieldname("maxNumOfSlotsWithActiveSL-PRS-Resources-r18");
+    sl_prs_common_proc_cap_per_band_r18->max_num_of_slots_with_active_sl_prs_res_r18.to_json(j);
+    j.write_str("minTimeAfterEndofSlotCarryActiveSL-PRS-Resources-r18",
+                sl_prs_common_proc_cap_per_band_r18->min_time_after_endof_slot_carry_active_sl_prs_res_r18.to_string());
+    j.end_obj();
+  }
+  if (sl_prs_rx_in_shared_res_pool_r18_present) {
+    j.write_str("sl-PRS-RxInSharedResourcePool-r18", "supported");
+  }
+  if (sl_prs_rx_in_ded_res_pool_r18.is_present()) {
+    j.write_fieldname("sl-PRS-RxInDedicatedResourcePool-r18");
+    j.start_obj();
+    j.write_str("numOfSupportedRxPSCCH-PerSlot-r18",
+                sl_prs_rx_in_ded_res_pool_r18->num_of_supported_rx_pscch_per_slot_r18.to_string());
+    j.write_str("supportedCP-TypeFor60kHzSCS-r18",
+                sl_prs_rx_in_ded_res_pool_r18->supported_cp_type_for60k_hz_scs_r18.to_string());
+    j.end_obj();
+  }
+  if (sl_prs_tx_in_shared_res_pool_r18_present) {
+    j.write_str("sl-PRS-TxInSharedResourcePool-r18", "supported");
+  }
+  if (sl_prs_tx_scheme1_in_ded_res_pool_r18_present) {
+    j.write_str("sl-PRS-TxScheme1InDedicatedResourcePool-r18", "supported");
+  }
+  if (sl_prs_tx_scheme2_in_ded_res_pool_r18_present) {
+    j.write_str("sl-PRS-TxScheme2InDedicatedResourcePool-r18", "supported");
+  }
+  if (sl_prs_congestion_ctrl_r18_present) {
+    j.write_str("sl-PRS-CongestionCtrl-r18", sl_prs_congestion_ctrl_r18.to_string());
+  }
+  if (sl_prs_tx_random_sel_r18_present) {
+    j.write_str("sl-PRS-TxRandomSelection-r18", "supported");
+  }
+  if (sl_prs_tx_using_full_sensing_r18_present) {
+    j.write_str("sl-PRS-TxUsingFullSensing-r18", sl_prs_tx_using_full_sensing_r18.to_string());
+  }
+  if (sl_prs_rx_for_band_with_sl_ca_r18_present) {
+    j.write_str("sl-PRS-RxForBandWithSL-CA-r18", "supported");
+  }
+  if (sl_prs_tx_for_band_with_sl_ca_r18_present) {
+    j.write_str("sl-PRS-TxForBandWithSL-CA-r18", "supported");
+  }
+  if (sl_dyn_sharing_tx_rx_r18_present) {
+    j.write_str("sl-DynamicSharingTxRx-r18", "supported");
+  }
+  if (sl_ca_communication_r18.is_present()) {
+    j.write_fieldname("sl-CA-Communication-r18");
+    j.start_obj();
+    j.write_int("numberOfCarriers-r18", sl_ca_communication_r18->nof_carriers_r18);
+    j.write_int("numberOfPSCCH-DecodeValueZ-r18", sl_ca_communication_r18->nof_pscch_decode_value_z_r18);
+    j.write_str("totalBandwidth-r18", sl_ca_communication_r18->total_bw_r18.to_string());
+    j.end_obj();
+  }
+  if (sl_ca_sync_r18_present) {
+    j.write_str("sl-CA-Synchronization-r18", "supported");
+  }
+  if (sl_ca_psfch_r18.is_present()) {
+    j.write_fieldname("sl-CA-PSFCH-r18");
+    j.start_obj();
+    j.write_str("rx-PSFCH-Resource-r18", sl_ca_psfch_r18->rx_psfch_res_r18.to_string());
+    j.write_str("tx-PSFCH-Resource-r18", sl_ca_psfch_r18->tx_psfch_res_r18.to_string());
+    j.end_obj();
+  }
+  if (sl_reception_intra_carrier_guard_band_r18_present) {
+    j.write_str("sl-ReceptionIntraCarrierGuardBand-r18", "supported");
+  }
+  if (sl_pathloss_based_olpc_sl_rsrp_report_r18_present) {
+    j.write_str("sl-PathlossBasedOLPC-SL-RSRP-Report-r18", "supported");
   }
   j.end_obj();
 }
@@ -32289,7 +32283,7 @@ OCUDUASN_CODE eutra_params_common_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ne_dc_present;
   group_flags[1] |= nr_ho_to_en_dc_r16_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(mfbi_eutra_present, 1));
   HANDLE_CODE(bref.pack(modified_mpr_behavior_eutra_present, 1));
   HANDLE_CODE(bref.pack(multi_ns_pmax_eutra_present, 1));
@@ -32299,7 +32293,7 @@ OCUDUASN_CODE eutra_params_common_s::pack(bit_ref& bref) const
     HANDLE_CODE(modified_mpr_behavior_eutra.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -32317,7 +32311,8 @@ OCUDUASN_CODE eutra_params_common_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE eutra_params_common_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(mfbi_eutra_present, 1));
   HANDLE_CODE(bref.unpack(modified_mpr_behavior_eutra_present, 1));
   HANDLE_CODE(bref.unpack(multi_ns_pmax_eutra_present, 1));
@@ -32357,13 +32352,11 @@ void eutra_params_common_s::to_json(json_writer& j) const
   if (rs_sinr_meas_eutra_present) {
     j.write_str("rs-SINR-MeasEUTRA", "supported");
   }
-  if (ext) {
-    if (ne_dc_present) {
-      j.write_str("ne-DC", "supported");
-    }
-    if (nr_ho_to_en_dc_r16_present) {
-      j.write_str("nr-HO-ToEN-DC-r16", "supported");
-    }
+  if (ne_dc_present) {
+    j.write_str("ne-DC", "supported");
+  }
+  if (nr_ho_to_en_dc_r16_present) {
+    j.write_str("nr-HO-ToEN-DC-r16", "supported");
   }
   j.end_obj();
 }
@@ -32378,7 +32371,8 @@ OCUDUASN_CODE eutra_params_xdd_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE eutra_params_xdd_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(rsrq_meas_wideband_eutra_present, 1));
 
   if (ext) {
@@ -32415,7 +32409,8 @@ OCUDUASN_CODE eutra_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE eutra_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(eutra_params_common_present, 1));
   HANDLE_CODE(bref.unpack(eutra_params_xdd_diff_present, 1));
 
@@ -37597,7 +37592,8 @@ OCUDUASN_CODE pos_srs_bwa_rrc_connected_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pos_srs_bwa_rrc_connected_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_two_carriers_fr1_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_two_carriers_fr2_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_three_carriers_fr1_r18_present, 1));
@@ -37828,7 +37824,8 @@ OCUDUASN_CODE pos_srs_bwa_independent_ca_rrc_connected_r18_s::pack(bit_ref& bref
 }
 OCUDUASN_CODE pos_srs_bwa_independent_ca_rrc_connected_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_two_carriers_fr1_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_two_carriers_fr2_r18_present, 1));
   HANDLE_CODE(bref.unpack(max_aggr_bw_three_carriers_fr1_r18_present, 1));
@@ -40458,7 +40455,7 @@ OCUDUASN_CODE feature_sets_s::pack(bit_ref& bref) const
   group_flags[12] |= feature_sets_ul_v1850.is_present();
   group_flags[12] |= feature_sets_ul_per_cc_v1850.is_present();
   group_flags[13] |= feature_sets_dl_v1860.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(feature_sets_dl.size() > 0, 1));
   HANDLE_CODE(bref.pack(feature_sets_dl_per_cc.size() > 0, 1));
   HANDLE_CODE(bref.pack(feature_sets_ul.size() > 0, 1));
@@ -40477,7 +40474,7 @@ OCUDUASN_CODE feature_sets_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_dyn_seq_of(bref, feature_sets_ul_per_cc, 1, 1024));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -40661,7 +40658,8 @@ OCUDUASN_CODE feature_sets_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE feature_sets_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool feature_sets_dl_present;
   HANDLE_CODE(bref.unpack(feature_sets_dl_present, 1));
   bool feature_sets_dl_per_cc_present;
@@ -40884,217 +40882,215 @@ void feature_sets_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (feature_sets_dl_v1540.is_present()) {
-      j.start_array("featureSetsDownlink-v1540");
-      for (const auto& e1 : *feature_sets_dl_v1540) {
-        e1.to_json(j);
-      }
-      j.end_array();
+  if (feature_sets_dl_v1540.is_present()) {
+    j.start_array("featureSetsDownlink-v1540");
+    for (const auto& e1 : *feature_sets_dl_v1540) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1540.is_present()) {
-      j.start_array("featureSetsUplink-v1540");
-      for (const auto& e1 : *feature_sets_ul_v1540) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1540.is_present()) {
+    j.start_array("featureSetsUplink-v1540");
+    for (const auto& e1 : *feature_sets_ul_v1540) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_per_cc_v1540.is_present()) {
-      j.start_array("featureSetsUplinkPerCC-v1540");
-      for (const auto& e1 : *feature_sets_ul_per_cc_v1540) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_per_cc_v1540.is_present()) {
+    j.start_array("featureSetsUplinkPerCC-v1540");
+    for (const auto& e1 : *feature_sets_ul_per_cc_v1540) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v15a0.is_present()) {
-      j.start_array("featureSetsDownlink-v15a0");
-      for (const auto& e1 : *feature_sets_dl_v15a0) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v15a0.is_present()) {
+    j.start_array("featureSetsDownlink-v15a0");
+    for (const auto& e1 : *feature_sets_dl_v15a0) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1610.is_present()) {
-      j.start_array("featureSetsDownlink-v1610");
-      for (const auto& e1 : *feature_sets_dl_v1610) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1610.is_present()) {
+    j.start_array("featureSetsDownlink-v1610");
+    for (const auto& e1 : *feature_sets_dl_v1610) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1610.is_present()) {
-      j.start_array("featureSetsUplink-v1610");
-      for (const auto& e1 : *feature_sets_ul_v1610) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1610.is_present()) {
+    j.start_array("featureSetsUplink-v1610");
+    for (const auto& e1 : *feature_sets_ul_v1610) {
+      e1.to_json(j);
     }
-    if (feature_set_dl_per_cc_v1620.is_present()) {
-      j.start_array("featureSetDownlinkPerCC-v1620");
-      for (const auto& e1 : *feature_set_dl_per_cc_v1620) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_set_dl_per_cc_v1620.is_present()) {
+    j.start_array("featureSetDownlinkPerCC-v1620");
+    for (const auto& e1 : *feature_set_dl_per_cc_v1620) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1630.is_present()) {
-      j.start_array("featureSetsUplink-v1630");
-      for (const auto& e1 : *feature_sets_ul_v1630) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1630.is_present()) {
+    j.start_array("featureSetsUplink-v1630");
+    for (const auto& e1 : *feature_sets_ul_v1630) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1640.is_present()) {
-      j.start_array("featureSetsUplink-v1640");
-      for (const auto& e1 : *feature_sets_ul_v1640) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1640.is_present()) {
+    j.start_array("featureSetsUplink-v1640");
+    for (const auto& e1 : *feature_sets_ul_v1640) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1700.is_present()) {
-      j.start_array("featureSetsDownlink-v1700");
-      for (const auto& e1 : *feature_sets_dl_v1700) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1700.is_present()) {
+    j.start_array("featureSetsDownlink-v1700");
+    for (const auto& e1 : *feature_sets_dl_v1700) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_per_cc_v1700.is_present()) {
-      j.start_array("featureSetsDownlinkPerCC-v1700");
-      for (const auto& e1 : *feature_sets_dl_per_cc_v1700) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_per_cc_v1700.is_present()) {
+    j.start_array("featureSetsDownlinkPerCC-v1700");
+    for (const auto& e1 : *feature_sets_dl_per_cc_v1700) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1710.is_present()) {
-      j.start_array("featureSetsUplink-v1710");
-      for (const auto& e1 : *feature_sets_ul_v1710) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1710.is_present()) {
+    j.start_array("featureSetsUplink-v1710");
+    for (const auto& e1 : *feature_sets_ul_v1710) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_per_cc_v1700.is_present()) {
-      j.start_array("featureSetsUplinkPerCC-v1700");
-      for (const auto& e1 : *feature_sets_ul_per_cc_v1700) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_per_cc_v1700.is_present()) {
+    j.start_array("featureSetsUplinkPerCC-v1700");
+    for (const auto& e1 : *feature_sets_ul_per_cc_v1700) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1720.is_present()) {
-      j.start_array("featureSetsDownlink-v1720");
-      for (const auto& e1 : *feature_sets_dl_v1720) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1720.is_present()) {
+    j.start_array("featureSetsDownlink-v1720");
+    for (const auto& e1 : *feature_sets_dl_v1720) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_per_cc_v1720.is_present()) {
-      j.start_array("featureSetsDownlinkPerCC-v1720");
-      for (const auto& e1 : *feature_sets_dl_per_cc_v1720) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_per_cc_v1720.is_present()) {
+    j.start_array("featureSetsDownlinkPerCC-v1720");
+    for (const auto& e1 : *feature_sets_dl_per_cc_v1720) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1720.is_present()) {
-      j.start_array("featureSetsUplink-v1720");
-      for (const auto& e1 : *feature_sets_ul_v1720) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1720.is_present()) {
+    j.start_array("featureSetsUplink-v1720");
+    for (const auto& e1 : *feature_sets_ul_v1720) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1730.is_present()) {
-      j.start_array("featureSetsDownlink-v1730");
-      for (const auto& e1 : *feature_sets_dl_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1730.is_present()) {
+    j.start_array("featureSetsDownlink-v1730");
+    for (const auto& e1 : *feature_sets_dl_v1730) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_per_cc_v1730.is_present()) {
-      j.start_array("featureSetsDownlinkPerCC-v1730");
-      for (const auto& e1 : *feature_sets_dl_per_cc_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_per_cc_v1730.is_present()) {
+    j.start_array("featureSetsDownlinkPerCC-v1730");
+    for (const auto& e1 : *feature_sets_dl_per_cc_v1730) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_per_cc_v1780.is_present()) {
-      j.start_array("featureSetsDownlinkPerCC-v1780");
-      for (const auto& e1 : *feature_sets_dl_per_cc_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_per_cc_v1780.is_present()) {
+    j.start_array("featureSetsDownlinkPerCC-v1780");
+    for (const auto& e1 : *feature_sets_dl_per_cc_v1780) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_per_cc_v1780.is_present()) {
-      j.start_array("featureSetsUplinkPerCC-v1780");
-      for (const auto& e1 : *feature_sets_ul_per_cc_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_per_cc_v1780.is_present()) {
+    j.start_array("featureSetsUplinkPerCC-v1780");
+    for (const auto& e1 : *feature_sets_ul_per_cc_v1780) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1800.is_present()) {
-      j.start_array("featureSetsDownlink-v1800");
-      for (const auto& e1 : *feature_sets_dl_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1800.is_present()) {
+    j.start_array("featureSetsDownlink-v1800");
+    for (const auto& e1 : *feature_sets_dl_v1800) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_per_cc_v1800.is_present()) {
-      j.start_array("featureSetsDownlinkPerCC-v1800");
-      for (const auto& e1 : *feature_sets_dl_per_cc_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_per_cc_v1800.is_present()) {
+    j.start_array("featureSetsDownlinkPerCC-v1800");
+    for (const auto& e1 : *feature_sets_dl_per_cc_v1800) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1800.is_present()) {
-      j.start_array("featureSetsUplink-v1800");
-      for (const auto& e1 : *feature_sets_ul_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1800.is_present()) {
+    j.start_array("featureSetsUplink-v1800");
+    for (const auto& e1 : *feature_sets_ul_v1800) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_per_cc_v1800.is_present()) {
-      j.start_array("featureSetsUplinkPerCC-v1800");
-      for (const auto& e1 : *feature_sets_ul_per_cc_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_per_cc_v1800.is_present()) {
+    j.start_array("featureSetsUplinkPerCC-v1800");
+    for (const auto& e1 : *feature_sets_ul_per_cc_v1800) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1830.is_present()) {
-      j.start_array("featureSetsDownlink-v1830");
-      for (const auto& e1 : *feature_sets_dl_v1830) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1830.is_present()) {
+    j.start_array("featureSetsDownlink-v1830");
+    for (const auto& e1 : *feature_sets_dl_v1830) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_per_cc_v1840.is_present()) {
-      j.start_array("featureSetsDownlinkPerCC-v1840");
-      for (const auto& e1 : *feature_sets_dl_per_cc_v1840) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_per_cc_v1840.is_present()) {
+    j.start_array("featureSetsDownlinkPerCC-v1840");
+    for (const auto& e1 : *feature_sets_dl_per_cc_v1840) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_per_cc_v1840.is_present()) {
-      j.start_array("featureSetsUplinkPerCC-v1840");
-      for (const auto& e1 : *feature_sets_ul_per_cc_v1840) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_per_cc_v1840.is_present()) {
+    j.start_array("featureSetsUplinkPerCC-v1840");
+    for (const auto& e1 : *feature_sets_ul_per_cc_v1840) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_v1850.is_present()) {
-      j.start_array("featureSetsUplink-v1850");
-      for (const auto& e1 : *feature_sets_ul_v1850) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_v1850.is_present()) {
+    j.start_array("featureSetsUplink-v1850");
+    for (const auto& e1 : *feature_sets_ul_v1850) {
+      e1.to_json(j);
     }
-    if (feature_sets_ul_per_cc_v1850.is_present()) {
-      j.start_array("featureSetsUplinkPerCC-v1850");
-      for (const auto& e1 : *feature_sets_ul_per_cc_v1850) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_ul_per_cc_v1850.is_present()) {
+    j.start_array("featureSetsUplinkPerCC-v1850");
+    for (const auto& e1 : *feature_sets_ul_per_cc_v1850) {
+      e1.to_json(j);
     }
-    if (feature_sets_dl_v1860.is_present()) {
-      j.start_array("featureSetsDownlink-v1860");
-      for (const auto& e1 : *feature_sets_dl_v1860) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (feature_sets_dl_v1860.is_present()) {
+    j.start_array("featureSetsDownlink-v1860");
+    for (const auto& e1 : *feature_sets_dl_v1860) {
+      e1.to_json(j);
     }
+    j.end_array();
   }
   j.end_obj();
 }
@@ -41358,7 +41354,8 @@ OCUDUASN_CODE general_params_mrdc_xdd_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE general_params_mrdc_xdd_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(split_srb_with_one_ul_path_present, 1));
   HANDLE_CODE(bref.unpack(split_drb_with_ul_both_mcg_scg_present, 1));
   HANDLE_CODE(bref.unpack(srb3_present, 1));
@@ -41507,10 +41504,10 @@ OCUDUASN_CODE ims_params_common_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= voice_over_scg_bearer_eutra_5_gc_present;
   group_flags[1] |= voice_fallback_ind_eps_r16_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(voice_over_eutra_5_gc_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -41528,7 +41525,8 @@ OCUDUASN_CODE ims_params_common_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ims_params_common_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(voice_over_eutra_5_gc_present, 1));
 
   if (ext) {
@@ -41552,13 +41550,11 @@ void ims_params_common_s::to_json(json_writer& j) const
   if (voice_over_eutra_5_gc_present) {
     j.write_str("voiceOverEUTRA-5GC", "supported");
   }
-  if (ext) {
-    if (voice_over_scg_bearer_eutra_5_gc_present) {
-      j.write_str("voiceOverSCG-BearerEUTRA-5GC", "supported");
-    }
-    if (voice_fallback_ind_eps_r16_present) {
-      j.write_str("voiceFallbackIndicationEPS-r16", "supported");
-    }
+  if (voice_over_scg_bearer_eutra_5_gc_present) {
+    j.write_str("voiceOverSCG-BearerEUTRA-5GC", "supported");
+  }
+  if (voice_fallback_ind_eps_r16_present) {
+    j.write_str("voiceFallbackIndicationEPS-r16", "supported");
   }
   j.end_obj();
 }
@@ -41573,7 +41569,8 @@ OCUDUASN_CODE ims_params_frx_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ims_params_frx_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(voice_over_nr_present, 1));
 
   if (ext) {
@@ -41609,7 +41606,8 @@ OCUDUASN_CODE ims_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ims_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ims_params_common_present, 1));
   HANDLE_CODE(bref.unpack(ims_params_frx_diff_present, 1));
 
@@ -41650,7 +41648,8 @@ OCUDUASN_CODE ims_params_fr2_2_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ims_params_fr2_2_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(voice_over_nr_r17_present, 1));
 
   if (ext) {
@@ -41720,7 +41719,8 @@ OCUDUASN_CODE utra_fdd_params_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE utra_fdd_params_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(supported_band_list_utra_fdd_r16, bref, 1, 64));
 
   if (ext) {
@@ -41745,14 +41745,14 @@ OCUDUASN_CODE inter_rat_params_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= utra_fdd_r16.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(eutra_present, 1));
 
   if (eutra_present) {
     HANDLE_CODE(eutra.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -41768,7 +41768,8 @@ OCUDUASN_CODE inter_rat_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE inter_rat_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(eutra_present, 1));
 
   if (eutra_present) {
@@ -41796,11 +41797,9 @@ void inter_rat_params_s::to_json(json_writer& j) const
     j.write_fieldname("eutra");
     eutra.to_json(j);
   }
-  if (ext) {
-    if (utra_fdd_r16.is_present()) {
-      j.write_fieldname("utra-FDD-r16");
-      utra_fdd_r16->to_json(j);
-    }
+  if (utra_fdd_r16.is_present()) {
+    j.write_fieldname("utra-FDD-r16");
+    utra_fdd_r16->to_json(j);
   }
   j.end_obj();
 }
@@ -41843,12 +41842,12 @@ OCUDUASN_CODE mac_params_common_s::pack(bit_ref& bref) const
   group_flags[6] |= delay_status_report_r18_present;
   group_flags[6] |= cg_retx_monitoring_disabling_r18_present;
   group_flags[6] |= non_integer_drx_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(lcp_restrict_present, 1));
   HANDLE_CODE(bref.pack(dummy_present, 1));
   HANDLE_CODE(bref.pack(lch_to_scell_restrict_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -41918,7 +41917,8 @@ OCUDUASN_CODE mac_params_common_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_common_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lcp_restrict_present, 1));
   HANDLE_CODE(bref.unpack(dummy_present, 1));
   HANDLE_CODE(bref.unpack(lch_to_scell_restrict_present, 1));
@@ -41997,109 +41997,107 @@ void mac_params_common_s::to_json(json_writer& j) const
   if (lch_to_scell_restrict_present) {
     j.write_str("lch-ToSCellRestriction", "supported");
   }
-  if (ext) {
-    if (recommended_bit_rate_present) {
-      j.write_str("recommendedBitRate", "supported");
-    }
-    if (recommended_bit_rate_query_present) {
-      j.write_str("recommendedBitRateQuery", "supported");
-    }
-    if (recommended_bit_rate_multiplier_r16_present) {
-      j.write_str("recommendedBitRateMultiplier-r16", "supported");
-    }
-    if (pre_emptive_bsr_r16_present) {
-      j.write_str("preEmptiveBSR-r16", "supported");
-    }
-    if (autonomous_tx_r16_present) {
-      j.write_str("autonomousTransmission-r16", "supported");
-    }
-    if (lch_prio_based_prioritization_r16_present) {
-      j.write_str("lch-PriorityBasedPrioritization-r16", "supported");
-    }
-    if (lch_to_cfg_grant_map_r16_present) {
-      j.write_str("lch-ToConfiguredGrantMapping-r16", "supported");
-    }
-    if (lch_to_grant_prio_restrict_r16_present) {
-      j.write_str("lch-ToGrantPriorityRestriction-r16", "supported");
-    }
-    if (single_phr_p_r16_present) {
-      j.write_str("singlePHR-P-r16", "supported");
-    }
-    if (ul_lbt_fail_detection_recovery_r16_present) {
-      j.write_str("ul-LBT-FailureDetectionRecovery-r16", "supported");
-    }
-    if (tdd_mpe_p_mpr_report_r16_present) {
-      j.write_str("tdd-MPE-P-MPR-Reporting-r16", "supported");
-    }
-    if (lcid_ext_iab_r16_present) {
-      j.write_str("lcid-ExtensionIAB-r16", "supported");
-    }
-    if (sp_cell_bfr_cbra_r16_present) {
-      j.write_str("spCell-BFR-CBRA-r16", "supported");
-    }
-    if (srs_res_id_ext_r16_present) {
-      j.write_str("srs-ResourceId-Ext-r16", "supported");
-    }
-    if (enhanced_uu_drx_for_sidelink_r17_present) {
-      j.write_str("enhancedUuDRX-forSidelink-r17", "supported");
-    }
-    if (mg_activation_request_prs_meas_r17_present) {
-      j.write_str("mg-ActivationRequestPRS-Meas-r17", "supported");
-    }
-    if (mg_activation_comm_prs_meas_r17_present) {
-      j.write_str("mg-ActivationCommPRS-Meas-r17", "supported");
-    }
-    if (intra_cg_prioritization_r17_present) {
-      j.write_str("intraCG-Prioritization-r17", "supported");
-    }
-    if (joint_prioritization_cg_retx_timer_r17_present) {
-      j.write_str("jointPrioritizationCG-Retx-Timer-r17", "supported");
-    }
-    if (survival_time_r17_present) {
-      j.write_str("survivalTime-r17", "supported");
-    }
-    if (lcg_ext_iab_r17_present) {
-      j.write_str("lcg-ExtensionIAB-r17", "supported");
-    }
-    if (harq_feedback_disabled_r17_present) {
-      j.write_str("harq-FeedbackDisabled-r17", "supported");
-    }
-    if (ul_harq_mode_b_r17_present) {
-      j.write_str("uplink-Harq-ModeB-r17", "supported");
-    }
-    if (sr_triggered_by_ta_report_r17_present) {
-      j.write_str("sr-TriggeredBy-TA-Report-r17", "supported");
-    }
-    if (extended_drx_cycle_inactive_r17_present) {
-      j.write_str("extendedDRX-CycleInactive-r17", "supported");
-    }
-    if (simul_sr_pusch_diff_pucch_groups_r17_present) {
-      j.write_str("simultaneousSR-PUSCH-DiffPUCCH-groups-r17", "supported");
-    }
-    if (last_tx_ul_r17_present) {
-      j.write_str("lastTransmissionUL-r17", "supported");
-    }
-    if (harq_rtt_timer_dl_for_ntn_multicast_mbs_r17_present) {
-      j.write_str("harq-RTT-TimerDL-ForNTN-MulticastMBS-r17", "supported");
-    }
-    if (sr_triggered_by_ta_report_atg_r18_present) {
-      j.write_str("sr-TriggeredByTA-ReportATG-r18", "supported");
-    }
-    if (extended_drx_cycle_inactive_r18_present) {
-      j.write_str("extendedDRX-CycleInactive-r18", "supported");
-    }
-    if (add_bs_table_r18_present) {
-      j.write_str("additionalBS-Table-r18", "supported");
-    }
-    if (delay_status_report_r18_present) {
-      j.write_str("delayStatusReport-r18", "supported");
-    }
-    if (cg_retx_monitoring_disabling_r18_present) {
-      j.write_str("cg-RetransmissionMonitoringDisabling-r18", "supported");
-    }
-    if (non_integer_drx_r18_present) {
-      j.write_str("non-IntegerDRX-r18", "supported");
-    }
+  if (recommended_bit_rate_present) {
+    j.write_str("recommendedBitRate", "supported");
+  }
+  if (recommended_bit_rate_query_present) {
+    j.write_str("recommendedBitRateQuery", "supported");
+  }
+  if (recommended_bit_rate_multiplier_r16_present) {
+    j.write_str("recommendedBitRateMultiplier-r16", "supported");
+  }
+  if (pre_emptive_bsr_r16_present) {
+    j.write_str("preEmptiveBSR-r16", "supported");
+  }
+  if (autonomous_tx_r16_present) {
+    j.write_str("autonomousTransmission-r16", "supported");
+  }
+  if (lch_prio_based_prioritization_r16_present) {
+    j.write_str("lch-PriorityBasedPrioritization-r16", "supported");
+  }
+  if (lch_to_cfg_grant_map_r16_present) {
+    j.write_str("lch-ToConfiguredGrantMapping-r16", "supported");
+  }
+  if (lch_to_grant_prio_restrict_r16_present) {
+    j.write_str("lch-ToGrantPriorityRestriction-r16", "supported");
+  }
+  if (single_phr_p_r16_present) {
+    j.write_str("singlePHR-P-r16", "supported");
+  }
+  if (ul_lbt_fail_detection_recovery_r16_present) {
+    j.write_str("ul-LBT-FailureDetectionRecovery-r16", "supported");
+  }
+  if (tdd_mpe_p_mpr_report_r16_present) {
+    j.write_str("tdd-MPE-P-MPR-Reporting-r16", "supported");
+  }
+  if (lcid_ext_iab_r16_present) {
+    j.write_str("lcid-ExtensionIAB-r16", "supported");
+  }
+  if (sp_cell_bfr_cbra_r16_present) {
+    j.write_str("spCell-BFR-CBRA-r16", "supported");
+  }
+  if (srs_res_id_ext_r16_present) {
+    j.write_str("srs-ResourceId-Ext-r16", "supported");
+  }
+  if (enhanced_uu_drx_for_sidelink_r17_present) {
+    j.write_str("enhancedUuDRX-forSidelink-r17", "supported");
+  }
+  if (mg_activation_request_prs_meas_r17_present) {
+    j.write_str("mg-ActivationRequestPRS-Meas-r17", "supported");
+  }
+  if (mg_activation_comm_prs_meas_r17_present) {
+    j.write_str("mg-ActivationCommPRS-Meas-r17", "supported");
+  }
+  if (intra_cg_prioritization_r17_present) {
+    j.write_str("intraCG-Prioritization-r17", "supported");
+  }
+  if (joint_prioritization_cg_retx_timer_r17_present) {
+    j.write_str("jointPrioritizationCG-Retx-Timer-r17", "supported");
+  }
+  if (survival_time_r17_present) {
+    j.write_str("survivalTime-r17", "supported");
+  }
+  if (lcg_ext_iab_r17_present) {
+    j.write_str("lcg-ExtensionIAB-r17", "supported");
+  }
+  if (harq_feedback_disabled_r17_present) {
+    j.write_str("harq-FeedbackDisabled-r17", "supported");
+  }
+  if (ul_harq_mode_b_r17_present) {
+    j.write_str("uplink-Harq-ModeB-r17", "supported");
+  }
+  if (sr_triggered_by_ta_report_r17_present) {
+    j.write_str("sr-TriggeredBy-TA-Report-r17", "supported");
+  }
+  if (extended_drx_cycle_inactive_r17_present) {
+    j.write_str("extendedDRX-CycleInactive-r17", "supported");
+  }
+  if (simul_sr_pusch_diff_pucch_groups_r17_present) {
+    j.write_str("simultaneousSR-PUSCH-DiffPUCCH-groups-r17", "supported");
+  }
+  if (last_tx_ul_r17_present) {
+    j.write_str("lastTransmissionUL-r17", "supported");
+  }
+  if (harq_rtt_timer_dl_for_ntn_multicast_mbs_r17_present) {
+    j.write_str("harq-RTT-TimerDL-ForNTN-MulticastMBS-r17", "supported");
+  }
+  if (sr_triggered_by_ta_report_atg_r18_present) {
+    j.write_str("sr-TriggeredByTA-ReportATG-r18", "supported");
+  }
+  if (extended_drx_cycle_inactive_r18_present) {
+    j.write_str("extendedDRX-CycleInactive-r18", "supported");
+  }
+  if (add_bs_table_r18_present) {
+    j.write_str("additionalBS-Table-r18", "supported");
+  }
+  if (delay_status_report_r18_present) {
+    j.write_str("delayStatusReport-r18", "supported");
+  }
+  if (cg_retx_monitoring_disabling_r18_present) {
+    j.write_str("cg-RetransmissionMonitoringDisabling-r18", "supported");
+  }
+  if (non_integer_drx_r18_present) {
+    j.write_str("non-IntegerDRX-r18", "supported");
   }
   j.end_obj();
 }
@@ -42113,7 +42111,7 @@ OCUDUASN_CODE mac_params_xdd_diff_s::pack(bit_ref& bref) const
   group_flags[1] |= enhanced_skip_ul_tx_cfg_r16_present;
   group_flags[2] |= dummy1_present;
   group_flags[2] |= dummy2_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(skip_ul_tx_dyn_present, 1));
   HANDLE_CODE(bref.pack(lc_ch_sr_delay_timer_present, 1));
   HANDLE_CODE(bref.pack(long_drx_cycle_present, 1));
@@ -42121,7 +42119,7 @@ OCUDUASN_CODE mac_params_xdd_diff_s::pack(bit_ref& bref) const
   HANDLE_CODE(bref.pack(multiple_sr_cfgs_present, 1));
   HANDLE_CODE(bref.pack(multiple_cfg_grants_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -42146,7 +42144,8 @@ OCUDUASN_CODE mac_params_xdd_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_xdd_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(skip_ul_tx_dyn_present, 1));
   HANDLE_CODE(bref.unpack(lc_ch_sr_delay_timer_present, 1));
   HANDLE_CODE(bref.unpack(long_drx_cycle_present, 1));
@@ -42196,22 +42195,20 @@ void mac_params_xdd_diff_s::to_json(json_writer& j) const
   if (multiple_cfg_grants_present) {
     j.write_str("multipleConfiguredGrants", "supported");
   }
-  if (ext) {
-    if (secondary_drx_group_r16_present) {
-      j.write_str("secondaryDRX-Group-r16", "supported");
-    }
-    if (enhanced_skip_ul_tx_dyn_r16_present) {
-      j.write_str("enhancedSkipUplinkTxDynamic-r16", "supported");
-    }
-    if (enhanced_skip_ul_tx_cfg_r16_present) {
-      j.write_str("enhancedSkipUplinkTxConfigured-r16", "supported");
-    }
-    if (dummy1_present) {
-      j.write_str("dummy1", "supported");
-    }
-    if (dummy2_present) {
-      j.write_str("dummy2", "supported");
-    }
+  if (secondary_drx_group_r16_present) {
+    j.write_str("secondaryDRX-Group-r16", "supported");
+  }
+  if (enhanced_skip_ul_tx_dyn_r16_present) {
+    j.write_str("enhancedSkipUplinkTxDynamic-r16", "supported");
+  }
+  if (enhanced_skip_ul_tx_cfg_r16_present) {
+    j.write_str("enhancedSkipUplinkTxConfigured-r16", "supported");
+  }
+  if (dummy1_present) {
+    j.write_str("dummy1", "supported");
+  }
+  if (dummy2_present) {
+    j.write_str("dummy2", "supported");
   }
   j.end_obj();
 }
@@ -42391,7 +42388,8 @@ OCUDUASN_CODE mac_params_frx_diff_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_frx_diff_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(direct_mcg_scell_activation_r16_present, 1));
   HANDLE_CODE(bref.unpack(direct_mcg_scell_activation_resume_r16_present, 1));
   HANDLE_CODE(bref.unpack(direct_scg_scell_activation_r16_present, 1));
@@ -42587,7 +42585,8 @@ OCUDUASN_CODE mac_params_fr2_2_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_fr2_2_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(direct_mcg_scell_activation_r17_present, 1));
   HANDLE_CODE(bref.unpack(direct_mcg_scell_activation_resume_r17_present, 1));
   HANDLE_CODE(bref.unpack(direct_scg_scell_activation_r17_present, 1));
@@ -42679,11 +42678,11 @@ OCUDUASN_CODE mac_params_sidelink_common_r16_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= drx_on_sidelink_r17_present;
   group_flags[1] |= sl_lbt_fail_dectection_recovery_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(lcp_restrict_sidelink_r16_present, 1));
   HANDLE_CODE(bref.pack(multiple_cfg_grants_sidelink_r16_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -42701,7 +42700,8 @@ OCUDUASN_CODE mac_params_sidelink_common_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_sidelink_common_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lcp_restrict_sidelink_r16_present, 1));
   HANDLE_CODE(bref.unpack(multiple_cfg_grants_sidelink_r16_present, 1));
 
@@ -42729,13 +42729,11 @@ void mac_params_sidelink_common_r16_s::to_json(json_writer& j) const
   if (multiple_cfg_grants_sidelink_r16_present) {
     j.write_str("multipleConfiguredGrantsSidelink-r16", "supported");
   }
-  if (ext) {
-    if (drx_on_sidelink_r17_present) {
-      j.write_str("drx-OnSidelink-r17", "supported");
-    }
-    if (sl_lbt_fail_dectection_recovery_r18_present) {
-      j.write_str("sl-LBT-FailureDectectionRecovery-r18", "supported");
-    }
+  if (drx_on_sidelink_r17_present) {
+    j.write_str("drx-OnSidelink-r17", "supported");
+  }
+  if (sl_lbt_fail_dectection_recovery_r18_present) {
+    j.write_str("sl-LBT-FailureDectectionRecovery-r18", "supported");
   }
   j.end_obj();
 }
@@ -42751,7 +42749,8 @@ OCUDUASN_CODE mac_params_sidelink_xdd_diff_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_sidelink_xdd_diff_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(multiple_sr_cfgs_sidelink_r16_present, 1));
   HANDLE_CODE(bref.unpack(lc_ch_sr_delay_timer_sidelink_r16_present, 1));
 
@@ -42791,7 +42790,8 @@ OCUDUASN_CODE mac_params_sidelink_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE mac_params_sidelink_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(mac_params_sidelink_common_r16_present, 1));
   HANDLE_CODE(bref.unpack(mac_params_sidelink_xdd_diff_r16_present, 1));
 
@@ -42943,7 +42943,7 @@ OCUDUASN_CODE meas_and_mob_params_common_s::pack(bit_ref& bref) const
   group_flags[10] |= ltm_fast_ue_processing_r18.is_present();
   group_flags[10] |= ntn_neighbour_cell_info_support_r18_present;
   group_flags[11] |= ltm_inter_freq_l1_only_in_bc_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(supported_gap_pattern_present, 1));
   HANDLE_CODE(bref.pack(ssb_rlm_present, 1));
   HANDLE_CODE(bref.pack(ssb_and_csi_rs_rlm_present, 1));
@@ -42952,7 +42952,7 @@ OCUDUASN_CODE meas_and_mob_params_common_s::pack(bit_ref& bref) const
     HANDLE_CODE(supported_gap_pattern.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -43162,7 +43162,8 @@ OCUDUASN_CODE meas_and_mob_params_common_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE meas_and_mob_params_common_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(supported_gap_pattern_present, 1));
   HANDLE_CODE(bref.unpack(ssb_rlm_present, 1));
   HANDLE_CODE(bref.unpack(ssb_and_csi_rs_rlm_present, 1));
@@ -43380,304 +43381,302 @@ void meas_and_mob_params_common_s::to_json(json_writer& j) const
   if (ssb_and_csi_rs_rlm_present) {
     j.write_str("ssb-AndCSI-RS-RLM", "supported");
   }
-  if (ext) {
-    if (event_b_meas_and_report_present) {
-      j.write_str("eventB-MeasAndReport", "supported");
-    }
-    if (ho_fdd_tdd_present) {
-      j.write_str("handoverFDD-TDD", "supported");
-    }
-    if (eutra_cgi_report_present) {
-      j.write_str("eutra-CGI-Reporting", "supported");
-    }
-    if (nr_cgi_report_present) {
-      j.write_str("nr-CGI-Reporting", "supported");
-    }
-    if (independent_gap_cfg_present) {
-      j.write_str("independentGapConfig", "supported");
-    }
-    if (periodic_eutra_meas_and_report_present) {
-      j.write_str("periodicEUTRA-MeasAndReport", "supported");
-    }
-    if (ho_fr1_fr2_present) {
-      j.write_str("handoverFR1-FR2", "supported");
-    }
-    if (max_num_csi_rs_rrm_rs_sinr_present) {
-      j.write_str("maxNumberCSI-RS-RRM-RS-SINR", max_num_csi_rs_rrm_rs_sinr.to_string());
-    }
-    if (nr_cgi_report_endc_present) {
-      j.write_str("nr-CGI-Reporting-ENDC", "supported");
-    }
-    if (eutra_cgi_report_nedc_present) {
-      j.write_str("eutra-CGI-Reporting-NEDC", "supported");
-    }
-    if (eutra_cgi_report_nrdc_present) {
-      j.write_str("eutra-CGI-Reporting-NRDC", "supported");
-    }
-    if (nr_cgi_report_nedc_present) {
-      j.write_str("nr-CGI-Reporting-NEDC", "supported");
-    }
-    if (nr_cgi_report_nrdc_present) {
-      j.write_str("nr-CGI-Reporting-NRDC", "supported");
-    }
-    if (report_add_neigh_meas_for_periodic_r16_present) {
-      j.write_str("reportAddNeighMeasForPeriodic-r16", "supported");
-    }
-    if (cond_ho_params_common_r16.is_present()) {
-      j.write_fieldname("condHandoverParametersCommon-r16");
-      j.start_obj();
-      if (cond_ho_params_common_r16->cond_ho_fdd_tdd_r16_present) {
-        j.write_str("condHandoverFDD-TDD-r16", "supported");
-      }
-      if (cond_ho_params_common_r16->cond_ho_fr1_fr2_r16_present) {
-        j.write_str("condHandoverFR1-FR2-r16", "supported");
-      }
-      j.end_obj();
-    }
-    if (nr_need_for_gap_report_r16_present) {
-      j.write_str("nr-NeedForGap-Reporting-r16", "supported");
-    }
-    if (supported_gap_pattern_nr_only_r16_present) {
-      j.write_str("supportedGapPattern-NRonly-r16", supported_gap_pattern_nr_only_r16.to_string());
-    }
-    if (supported_gap_pattern_nr_only_nedc_r16_present) {
-      j.write_str("supportedGapPattern-NRonly-NEDC-r16", "supported");
-    }
-    if (max_num_cli_rssi_r16_present) {
-      j.write_str("maxNumberCLI-RSSI-r16", max_num_cli_rssi_r16.to_string());
-    }
-    if (max_num_cli_srs_rsrp_r16_present) {
-      j.write_str("maxNumberCLI-SRS-RSRP-r16", max_num_cli_srs_rsrp_r16.to_string());
-    }
-    if (max_num_per_slot_cli_srs_rsrp_r16_present) {
-      j.write_str("maxNumberPerSlotCLI-SRS-RSRP-r16", max_num_per_slot_cli_srs_rsrp_r16.to_string());
-    }
-    if (mfbi_iab_r16_present) {
-      j.write_str("mfbi-IAB-r16", "supported");
-    }
-    if (dummy_present) {
-      j.write_str("dummy", "supported");
-    }
-    if (nr_cgi_report_npn_r16_present) {
-      j.write_str("nr-CGI-Reporting-NPN-r16", "supported");
-    }
-    if (idle_inactive_eutra_meas_report_r16_present) {
-      j.write_str("idleInactiveEUTRA-MeasReport-r16", "supported");
-    }
-    if (idle_inactive_validity_area_r16_present) {
-      j.write_str("idleInactive-ValidityArea-r16", "supported");
-    }
-    if (eutra_autonomous_gaps_r16_present) {
-      j.write_str("eutra-AutonomousGaps-r16", "supported");
-    }
-    if (eutra_autonomous_gaps_nedc_r16_present) {
-      j.write_str("eutra-AutonomousGaps-NEDC-r16", "supported");
-    }
-    if (eutra_autonomous_gaps_nrdc_r16_present) {
-      j.write_str("eutra-AutonomousGaps-NRDC-r16", "supported");
-    }
-    if (pcell_t312_r16_present) {
-      j.write_str("pcellT312-r16", "supported");
-    }
-    if (supported_gap_pattern_r16_present) {
-      j.write_str("supportedGapPattern-r16", supported_gap_pattern_r16.to_string());
-    }
-    if (concurrent_meas_gap_r17.is_present()) {
-      j.write_fieldname("concurrentMeasGap-r17");
-      concurrent_meas_gap_r17->to_json(j);
-    }
-    if (nr_need_for_gap_ncsg_report_r17_present) {
-      j.write_str("nr-NeedForGapNCSG-Reporting-r17", "supported");
-    }
-    if (eutra_need_for_gap_ncsg_report_r17_present) {
-      j.write_str("eutra-NeedForGapNCSG-Reporting-r17", "supported");
-    }
-    if (ncsg_meas_gap_per_fr_r17_present) {
-      j.write_str("ncsg-MeasGapPerFR-r17", "supported");
-    }
-    if (ncsg_meas_gap_patterns_r17_present) {
-      j.write_str("ncsg-MeasGapPatterns-r17", ncsg_meas_gap_patterns_r17.to_string());
-    }
-    if (ncsg_meas_gap_nr_patterns_r17_present) {
-      j.write_str("ncsg-MeasGapNR-Patterns-r17", ncsg_meas_gap_nr_patterns_r17.to_string());
-    }
-    if (precfg_ue_autonomous_meas_gap_r17_present) {
-      j.write_str("preconfiguredUE-AutonomousMeasGap-r17", "supported");
-    }
-    if (precfg_nw_ctrl_meas_gap_r17_present) {
-      j.write_str("preconfiguredNW-ControlledMeasGap-r17", "supported");
-    }
-    if (ho_fr1_fr2_2_r17_present) {
-      j.write_str("handoverFR1-FR2-2-r17", "supported");
-    }
-    if (ho_fr2_1_fr2_2_r17_present) {
-      j.write_str("handoverFR2-1-FR2-2-r17", "supported");
-    }
-    if (independent_gap_cfg_prs_r17_present) {
-      j.write_str("independentGapConfigPRS-r17", "supported");
-    }
-    if (rrm_relaxation_rrc_connected_red_cap_r17_present) {
-      j.write_str("rrm-RelaxationRRC-ConnectedRedCap-r17", "supported");
-    }
-    if (parallel_meas_gap_r17_present) {
-      j.write_str("parallelMeasurementGap-r17", "n2");
-    }
-    if (cond_ho_with_scg_nrdc_r17_present) {
-      j.write_str("condHandoverWithSCG-NRDC-r17", "supported");
-    }
-    if (gnb_id_len_report_r17_present) {
-      j.write_str("gNB-ID-LengthReporting-r17", "supported");
-    }
-    if (gnb_id_len_report_endc_r17_present) {
-      j.write_str("gNB-ID-LengthReporting-ENDC-r17", "supported");
-    }
-    if (gnb_id_len_report_nedc_r17_present) {
-      j.write_str("gNB-ID-LengthReporting-NEDC-r17", "supported");
-    }
-    if (gnb_id_len_report_nrdc_r17_present) {
-      j.write_str("gNB-ID-LengthReporting-NRDC-r17", "supported");
-    }
-    if (gnb_id_len_report_npn_r17_present) {
-      j.write_str("gNB-ID-LengthReporting-NPN-r17", "supported");
-    }
-    if (parallel_smtc_r17_present) {
-      j.write_str("parallelSMTC-r17", "n4");
-    }
-    if (concurrent_meas_gap_eutra_r17_present) {
-      j.write_str("concurrentMeasGapEUTRA-r17", "supported");
-    }
-    if (service_link_prop_delay_diff_report_r17_present) {
-      j.write_str("serviceLinkPropDelayDiffReporting-r17", "supported");
-    }
-    if (ncsg_symbol_level_schedule_restrict_inter_r17_present) {
-      j.write_str("ncsg-SymbolLevelScheduleRestrictionInter-r17", "supported");
-    }
-    if (event_d1_meas_report_trigger_r17_present) {
-      j.write_str("eventD1-MeasReportTrigger-r17", "supported");
-    }
-    if (independent_gap_cfg_max_cc_r17.is_present()) {
-      j.write_fieldname("independentGapConfig-maxCC-r17");
-      j.start_obj();
-      if (independent_gap_cfg_max_cc_r17->fr1_only_r17_present) {
-        j.write_int("fr1-Only-r17", independent_gap_cfg_max_cc_r17->fr1_only_r17);
-      }
-      if (independent_gap_cfg_max_cc_r17->fr2_only_r17_present) {
-        j.write_int("fr2-Only-r17", independent_gap_cfg_max_cc_r17->fr2_only_r17);
-      }
-      if (independent_gap_cfg_max_cc_r17->fr1_and_fr2_r17_present) {
-        j.write_int("fr1-AndFR2-r17", independent_gap_cfg_max_cc_r17->fr1_and_fr2_r17);
-      }
-      j.end_obj();
-    }
-    if (inter_sat_meas_r17_present) {
-      j.write_str("interSatMeas-r17", "supported");
-    }
-    if (derive_ssb_idx_from_cell_inter_non_ncsg_r17_present) {
-      j.write_str("deriveSSB-IndexFromCellInterNon-NCSG-r17", "supported");
-    }
-    if (l3_meas_unknown_scell_activation_r18_present) {
-      j.write_str("l3-MeasUnknownSCellActivation-r18", "supported");
-    }
-    if (short_meas_interv_r18_present) {
-      j.write_str("shortMeasInterval-r18", "supported");
-    }
-    if (nr_need_for_interruption_report_r18_present) {
-      j.write_str("nr-NeedForInterruptionReport-r18", "supported");
-    }
-    if (meas_seq_cfg_r18_present) {
-      j.write_str("measSequenceConfig-r18", "supported");
-    }
-    if (cell_individual_offset_per_meas_event_r18_present) {
-      j.write_str("cellIndividualOffsetPerMeasEvent-r18", "supported");
-    }
-    if (event_d2_meas_report_trigger_r18_present) {
-      j.write_str("eventD2-MeasReportTrigger-r18", "supported");
-    }
-    if (concurrent_meas_gaps_pre_mg_r18_present) {
-      j.write_str("concurrentMeasGapsPreMG-r18", "supported");
-    }
-    if (dyn_collision_r18_present) {
-      j.write_str("dynamicCollision-r18", "supported");
-    }
-    if (concurrent_meas_gaps_ncsg_r18_present) {
-      j.write_str("concurrentMeasGapsNCSG-r18", "supported");
-    }
-    if (eutra_no_gap_meas_outside_bwp_r18_present) {
-      j.write_str("eutra-NoGapMeasurementOutsideBWP-r18", "supported");
-    }
-    if (eutra_no_gap_meas_inside_bwp_r18_present) {
-      j.write_str("eutra-NoGapMeasurementInsideBWP-r18", "supported");
-    }
-    if (eutra_meas_emw_r18_present) {
-      j.write_str("eutra-MeasEMW-r18", eutra_meas_emw_r18.to_string());
-    }
-    if (concurrent_meas_crs_inside_bwp_eutra_r18_present) {
-      j.write_str("concurrentMeasCRS-InsideBWP-EUTRA-r18", "supported");
-    }
-    if (ltm_inter_freq_meas_gap_r18_present) {
-      j.write_str("ltm-InterFreqMeasGap-r18", "supported");
-    }
-    if (dummy_ltm_fast_ue_processing_r18.is_present()) {
-      j.write_fieldname("dummy-ltm-FastUE-Processing-r18");
-      j.start_obj();
-      j.write_str("fr1-r18", dummy_ltm_fast_ue_processing_r18->fr1_r18.to_string());
-      j.write_str("fr2-r18", dummy_ltm_fast_ue_processing_r18->fr2_r18.to_string());
-      j.write_str("fr1-AndFR2-r18", dummy_ltm_fast_ue_processing_r18->fr1_and_fr2_r18.to_string());
-      j.end_obj();
-    }
-    if (rach_less_ho_inter_freq_r18_present) {
-      j.write_str("rach-LessHandoverInterFreq-r18", "supported");
-    }
-    if (enter_and_leave_cell_report_r18_present) {
-      j.write_str("enterAndLeaveCellReport-r18", "supported");
-    }
-    if (best_cell_change_report_r18_present) {
-      j.write_str("bestCellChangeReport-r18", "supported");
-    }
-    if (second_best_cell_change_report_r18_present) {
-      j.write_str("secondBestCellChangeReport-r18", "supported");
-    }
-    if (ltm_inter_freq_r18_present) {
-      j.write_str("ltm-InterFreq-r18", "supported");
-    }
-    if (ltm_mcg_nrdc_r18_present) {
-      j.write_str("ltm-MCG-NRDC-r18", "supported");
-    }
-    if (ltm_rach_less_dg_r18_present) {
-      j.write_str("ltm-RACH-LessDG-r18", "supported");
-    }
-    if (ltm_rach_less_cg_r18_present) {
-      j.write_str("ltm-RACH-LessCG-r18", "supported");
-    }
-    if (ltm_recovery_r18_present) {
-      j.write_str("ltm-Recovery-r18", "supported");
-    }
-    if (ltm_ref_cfg_r18_present) {
-      j.write_str("ltm-ReferenceConfig-r18", "supported");
-    }
-    if (ltm_mcg_nrdc_release_r18_present) {
-      j.write_str("ltm-MCG-NRDC-Release-r18", "supported");
-    }
-    if (ltm_fast_ue_processing_r18.is_present()) {
-      j.write_fieldname("ltm-FastUE-Processing-r18");
-      j.start_obj();
-      if (ltm_fast_ue_processing_r18->fr1_r18_present) {
-        j.write_str("fr1-r18", ltm_fast_ue_processing_r18->fr1_r18.to_string());
-      }
-      if (ltm_fast_ue_processing_r18->fr2_r18_present) {
-        j.write_str("fr2-r18", ltm_fast_ue_processing_r18->fr2_r18.to_string());
-      }
-      if (ltm_fast_ue_processing_r18->fr1_and_fr2_r18_present) {
-        j.write_str("fr1-AndFR2-r18", ltm_fast_ue_processing_r18->fr1_and_fr2_r18.to_string());
-      }
-      j.end_obj();
-    }
-    if (ntn_neighbour_cell_info_support_r18_present) {
-      j.write_str("ntn-NeighbourCellInfoSupport-r18", "supported");
-    }
-    if (ltm_inter_freq_l1_only_in_bc_r18_present) {
-      j.write_str("ltm-interFreqL1-OnlyInBC-r18", "supported");
-    }
+  if (event_b_meas_and_report_present) {
+    j.write_str("eventB-MeasAndReport", "supported");
+  }
+  if (ho_fdd_tdd_present) {
+    j.write_str("handoverFDD-TDD", "supported");
+  }
+  if (eutra_cgi_report_present) {
+    j.write_str("eutra-CGI-Reporting", "supported");
+  }
+  if (nr_cgi_report_present) {
+    j.write_str("nr-CGI-Reporting", "supported");
+  }
+  if (independent_gap_cfg_present) {
+    j.write_str("independentGapConfig", "supported");
+  }
+  if (periodic_eutra_meas_and_report_present) {
+    j.write_str("periodicEUTRA-MeasAndReport", "supported");
+  }
+  if (ho_fr1_fr2_present) {
+    j.write_str("handoverFR1-FR2", "supported");
+  }
+  if (max_num_csi_rs_rrm_rs_sinr_present) {
+    j.write_str("maxNumberCSI-RS-RRM-RS-SINR", max_num_csi_rs_rrm_rs_sinr.to_string());
+  }
+  if (nr_cgi_report_endc_present) {
+    j.write_str("nr-CGI-Reporting-ENDC", "supported");
+  }
+  if (eutra_cgi_report_nedc_present) {
+    j.write_str("eutra-CGI-Reporting-NEDC", "supported");
+  }
+  if (eutra_cgi_report_nrdc_present) {
+    j.write_str("eutra-CGI-Reporting-NRDC", "supported");
+  }
+  if (nr_cgi_report_nedc_present) {
+    j.write_str("nr-CGI-Reporting-NEDC", "supported");
+  }
+  if (nr_cgi_report_nrdc_present) {
+    j.write_str("nr-CGI-Reporting-NRDC", "supported");
+  }
+  if (report_add_neigh_meas_for_periodic_r16_present) {
+    j.write_str("reportAddNeighMeasForPeriodic-r16", "supported");
+  }
+  if (cond_ho_params_common_r16.is_present()) {
+    j.write_fieldname("condHandoverParametersCommon-r16");
+    j.start_obj();
+    if (cond_ho_params_common_r16->cond_ho_fdd_tdd_r16_present) {
+      j.write_str("condHandoverFDD-TDD-r16", "supported");
+    }
+    if (cond_ho_params_common_r16->cond_ho_fr1_fr2_r16_present) {
+      j.write_str("condHandoverFR1-FR2-r16", "supported");
+    }
+    j.end_obj();
+  }
+  if (nr_need_for_gap_report_r16_present) {
+    j.write_str("nr-NeedForGap-Reporting-r16", "supported");
+  }
+  if (supported_gap_pattern_nr_only_r16_present) {
+    j.write_str("supportedGapPattern-NRonly-r16", supported_gap_pattern_nr_only_r16.to_string());
+  }
+  if (supported_gap_pattern_nr_only_nedc_r16_present) {
+    j.write_str("supportedGapPattern-NRonly-NEDC-r16", "supported");
+  }
+  if (max_num_cli_rssi_r16_present) {
+    j.write_str("maxNumberCLI-RSSI-r16", max_num_cli_rssi_r16.to_string());
+  }
+  if (max_num_cli_srs_rsrp_r16_present) {
+    j.write_str("maxNumberCLI-SRS-RSRP-r16", max_num_cli_srs_rsrp_r16.to_string());
+  }
+  if (max_num_per_slot_cli_srs_rsrp_r16_present) {
+    j.write_str("maxNumberPerSlotCLI-SRS-RSRP-r16", max_num_per_slot_cli_srs_rsrp_r16.to_string());
+  }
+  if (mfbi_iab_r16_present) {
+    j.write_str("mfbi-IAB-r16", "supported");
+  }
+  if (dummy_present) {
+    j.write_str("dummy", "supported");
+  }
+  if (nr_cgi_report_npn_r16_present) {
+    j.write_str("nr-CGI-Reporting-NPN-r16", "supported");
+  }
+  if (idle_inactive_eutra_meas_report_r16_present) {
+    j.write_str("idleInactiveEUTRA-MeasReport-r16", "supported");
+  }
+  if (idle_inactive_validity_area_r16_present) {
+    j.write_str("idleInactive-ValidityArea-r16", "supported");
+  }
+  if (eutra_autonomous_gaps_r16_present) {
+    j.write_str("eutra-AutonomousGaps-r16", "supported");
+  }
+  if (eutra_autonomous_gaps_nedc_r16_present) {
+    j.write_str("eutra-AutonomousGaps-NEDC-r16", "supported");
+  }
+  if (eutra_autonomous_gaps_nrdc_r16_present) {
+    j.write_str("eutra-AutonomousGaps-NRDC-r16", "supported");
+  }
+  if (pcell_t312_r16_present) {
+    j.write_str("pcellT312-r16", "supported");
+  }
+  if (supported_gap_pattern_r16_present) {
+    j.write_str("supportedGapPattern-r16", supported_gap_pattern_r16.to_string());
+  }
+  if (concurrent_meas_gap_r17.is_present()) {
+    j.write_fieldname("concurrentMeasGap-r17");
+    concurrent_meas_gap_r17->to_json(j);
+  }
+  if (nr_need_for_gap_ncsg_report_r17_present) {
+    j.write_str("nr-NeedForGapNCSG-Reporting-r17", "supported");
+  }
+  if (eutra_need_for_gap_ncsg_report_r17_present) {
+    j.write_str("eutra-NeedForGapNCSG-Reporting-r17", "supported");
+  }
+  if (ncsg_meas_gap_per_fr_r17_present) {
+    j.write_str("ncsg-MeasGapPerFR-r17", "supported");
+  }
+  if (ncsg_meas_gap_patterns_r17_present) {
+    j.write_str("ncsg-MeasGapPatterns-r17", ncsg_meas_gap_patterns_r17.to_string());
+  }
+  if (ncsg_meas_gap_nr_patterns_r17_present) {
+    j.write_str("ncsg-MeasGapNR-Patterns-r17", ncsg_meas_gap_nr_patterns_r17.to_string());
+  }
+  if (precfg_ue_autonomous_meas_gap_r17_present) {
+    j.write_str("preconfiguredUE-AutonomousMeasGap-r17", "supported");
+  }
+  if (precfg_nw_ctrl_meas_gap_r17_present) {
+    j.write_str("preconfiguredNW-ControlledMeasGap-r17", "supported");
+  }
+  if (ho_fr1_fr2_2_r17_present) {
+    j.write_str("handoverFR1-FR2-2-r17", "supported");
+  }
+  if (ho_fr2_1_fr2_2_r17_present) {
+    j.write_str("handoverFR2-1-FR2-2-r17", "supported");
+  }
+  if (independent_gap_cfg_prs_r17_present) {
+    j.write_str("independentGapConfigPRS-r17", "supported");
+  }
+  if (rrm_relaxation_rrc_connected_red_cap_r17_present) {
+    j.write_str("rrm-RelaxationRRC-ConnectedRedCap-r17", "supported");
+  }
+  if (parallel_meas_gap_r17_present) {
+    j.write_str("parallelMeasurementGap-r17", "n2");
+  }
+  if (cond_ho_with_scg_nrdc_r17_present) {
+    j.write_str("condHandoverWithSCG-NRDC-r17", "supported");
+  }
+  if (gnb_id_len_report_r17_present) {
+    j.write_str("gNB-ID-LengthReporting-r17", "supported");
+  }
+  if (gnb_id_len_report_endc_r17_present) {
+    j.write_str("gNB-ID-LengthReporting-ENDC-r17", "supported");
+  }
+  if (gnb_id_len_report_nedc_r17_present) {
+    j.write_str("gNB-ID-LengthReporting-NEDC-r17", "supported");
+  }
+  if (gnb_id_len_report_nrdc_r17_present) {
+    j.write_str("gNB-ID-LengthReporting-NRDC-r17", "supported");
+  }
+  if (gnb_id_len_report_npn_r17_present) {
+    j.write_str("gNB-ID-LengthReporting-NPN-r17", "supported");
+  }
+  if (parallel_smtc_r17_present) {
+    j.write_str("parallelSMTC-r17", "n4");
+  }
+  if (concurrent_meas_gap_eutra_r17_present) {
+    j.write_str("concurrentMeasGapEUTRA-r17", "supported");
+  }
+  if (service_link_prop_delay_diff_report_r17_present) {
+    j.write_str("serviceLinkPropDelayDiffReporting-r17", "supported");
+  }
+  if (ncsg_symbol_level_schedule_restrict_inter_r17_present) {
+    j.write_str("ncsg-SymbolLevelScheduleRestrictionInter-r17", "supported");
+  }
+  if (event_d1_meas_report_trigger_r17_present) {
+    j.write_str("eventD1-MeasReportTrigger-r17", "supported");
+  }
+  if (independent_gap_cfg_max_cc_r17.is_present()) {
+    j.write_fieldname("independentGapConfig-maxCC-r17");
+    j.start_obj();
+    if (independent_gap_cfg_max_cc_r17->fr1_only_r17_present) {
+      j.write_int("fr1-Only-r17", independent_gap_cfg_max_cc_r17->fr1_only_r17);
+    }
+    if (independent_gap_cfg_max_cc_r17->fr2_only_r17_present) {
+      j.write_int("fr2-Only-r17", independent_gap_cfg_max_cc_r17->fr2_only_r17);
+    }
+    if (independent_gap_cfg_max_cc_r17->fr1_and_fr2_r17_present) {
+      j.write_int("fr1-AndFR2-r17", independent_gap_cfg_max_cc_r17->fr1_and_fr2_r17);
+    }
+    j.end_obj();
+  }
+  if (inter_sat_meas_r17_present) {
+    j.write_str("interSatMeas-r17", "supported");
+  }
+  if (derive_ssb_idx_from_cell_inter_non_ncsg_r17_present) {
+    j.write_str("deriveSSB-IndexFromCellInterNon-NCSG-r17", "supported");
+  }
+  if (l3_meas_unknown_scell_activation_r18_present) {
+    j.write_str("l3-MeasUnknownSCellActivation-r18", "supported");
+  }
+  if (short_meas_interv_r18_present) {
+    j.write_str("shortMeasInterval-r18", "supported");
+  }
+  if (nr_need_for_interruption_report_r18_present) {
+    j.write_str("nr-NeedForInterruptionReport-r18", "supported");
+  }
+  if (meas_seq_cfg_r18_present) {
+    j.write_str("measSequenceConfig-r18", "supported");
+  }
+  if (cell_individual_offset_per_meas_event_r18_present) {
+    j.write_str("cellIndividualOffsetPerMeasEvent-r18", "supported");
+  }
+  if (event_d2_meas_report_trigger_r18_present) {
+    j.write_str("eventD2-MeasReportTrigger-r18", "supported");
+  }
+  if (concurrent_meas_gaps_pre_mg_r18_present) {
+    j.write_str("concurrentMeasGapsPreMG-r18", "supported");
+  }
+  if (dyn_collision_r18_present) {
+    j.write_str("dynamicCollision-r18", "supported");
+  }
+  if (concurrent_meas_gaps_ncsg_r18_present) {
+    j.write_str("concurrentMeasGapsNCSG-r18", "supported");
+  }
+  if (eutra_no_gap_meas_outside_bwp_r18_present) {
+    j.write_str("eutra-NoGapMeasurementOutsideBWP-r18", "supported");
+  }
+  if (eutra_no_gap_meas_inside_bwp_r18_present) {
+    j.write_str("eutra-NoGapMeasurementInsideBWP-r18", "supported");
+  }
+  if (eutra_meas_emw_r18_present) {
+    j.write_str("eutra-MeasEMW-r18", eutra_meas_emw_r18.to_string());
+  }
+  if (concurrent_meas_crs_inside_bwp_eutra_r18_present) {
+    j.write_str("concurrentMeasCRS-InsideBWP-EUTRA-r18", "supported");
+  }
+  if (ltm_inter_freq_meas_gap_r18_present) {
+    j.write_str("ltm-InterFreqMeasGap-r18", "supported");
+  }
+  if (dummy_ltm_fast_ue_processing_r18.is_present()) {
+    j.write_fieldname("dummy-ltm-FastUE-Processing-r18");
+    j.start_obj();
+    j.write_str("fr1-r18", dummy_ltm_fast_ue_processing_r18->fr1_r18.to_string());
+    j.write_str("fr2-r18", dummy_ltm_fast_ue_processing_r18->fr2_r18.to_string());
+    j.write_str("fr1-AndFR2-r18", dummy_ltm_fast_ue_processing_r18->fr1_and_fr2_r18.to_string());
+    j.end_obj();
+  }
+  if (rach_less_ho_inter_freq_r18_present) {
+    j.write_str("rach-LessHandoverInterFreq-r18", "supported");
+  }
+  if (enter_and_leave_cell_report_r18_present) {
+    j.write_str("enterAndLeaveCellReport-r18", "supported");
+  }
+  if (best_cell_change_report_r18_present) {
+    j.write_str("bestCellChangeReport-r18", "supported");
+  }
+  if (second_best_cell_change_report_r18_present) {
+    j.write_str("secondBestCellChangeReport-r18", "supported");
+  }
+  if (ltm_inter_freq_r18_present) {
+    j.write_str("ltm-InterFreq-r18", "supported");
+  }
+  if (ltm_mcg_nrdc_r18_present) {
+    j.write_str("ltm-MCG-NRDC-r18", "supported");
+  }
+  if (ltm_rach_less_dg_r18_present) {
+    j.write_str("ltm-RACH-LessDG-r18", "supported");
+  }
+  if (ltm_rach_less_cg_r18_present) {
+    j.write_str("ltm-RACH-LessCG-r18", "supported");
+  }
+  if (ltm_recovery_r18_present) {
+    j.write_str("ltm-Recovery-r18", "supported");
+  }
+  if (ltm_ref_cfg_r18_present) {
+    j.write_str("ltm-ReferenceConfig-r18", "supported");
+  }
+  if (ltm_mcg_nrdc_release_r18_present) {
+    j.write_str("ltm-MCG-NRDC-Release-r18", "supported");
+  }
+  if (ltm_fast_ue_processing_r18.is_present()) {
+    j.write_fieldname("ltm-FastUE-Processing-r18");
+    j.start_obj();
+    if (ltm_fast_ue_processing_r18->fr1_r18_present) {
+      j.write_str("fr1-r18", ltm_fast_ue_processing_r18->fr1_r18.to_string());
+    }
+    if (ltm_fast_ue_processing_r18->fr2_r18_present) {
+      j.write_str("fr2-r18", ltm_fast_ue_processing_r18->fr2_r18.to_string());
+    }
+    if (ltm_fast_ue_processing_r18->fr1_and_fr2_r18_present) {
+      j.write_str("fr1-AndFR2-r18", ltm_fast_ue_processing_r18->fr1_and_fr2_r18.to_string());
+    }
+    j.end_obj();
+  }
+  if (ntn_neighbour_cell_info_support_r18_present) {
+    j.write_str("ntn-NeighbourCellInfoSupport-r18", "supported");
+  }
+  if (ltm_inter_freq_l1_only_in_bc_r18_present) {
+    j.write_str("ltm-interFreqL1-OnlyInBC-r18", "supported");
   }
   j.end_obj();
 }
@@ -43846,11 +43845,11 @@ OCUDUASN_CODE meas_and_mob_params_xdd_diff_s::pack(bit_ref& bref) const
   group_flags[1] |= sftd_meas_nr_neigh_present;
   group_flags[1] |= sftd_meas_nr_neigh_drx_present;
   group_flags[2] |= dummy_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(intra_and_inter_f_meas_and_report_present, 1));
   HANDLE_CODE(bref.pack(event_a_meas_and_report_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -43876,7 +43875,8 @@ OCUDUASN_CODE meas_and_mob_params_xdd_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE meas_and_mob_params_xdd_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(intra_and_inter_f_meas_and_report_present, 1));
   HANDLE_CODE(bref.unpack(event_a_meas_and_report_present, 1));
 
@@ -43911,25 +43911,23 @@ void meas_and_mob_params_xdd_diff_s::to_json(json_writer& j) const
   if (event_a_meas_and_report_present) {
     j.write_str("eventA-MeasAndReport", "supported");
   }
-  if (ext) {
-    if (ho_inter_f_present) {
-      j.write_str("handoverInterF", "supported");
-    }
-    if (ho_lte_epc_present) {
-      j.write_str("handoverLTE-EPC", "supported");
-    }
-    if (ho_lte_5_gc_present) {
-      j.write_str("handoverLTE-5GC", "supported");
-    }
-    if (sftd_meas_nr_neigh_present) {
-      j.write_str("sftd-MeasNR-Neigh", "supported");
-    }
-    if (sftd_meas_nr_neigh_drx_present) {
-      j.write_str("sftd-MeasNR-Neigh-DRX", "supported");
-    }
-    if (dummy_present) {
-      j.write_str("dummy", "supported");
-    }
+  if (ho_inter_f_present) {
+    j.write_str("handoverInterF", "supported");
+  }
+  if (ho_lte_epc_present) {
+    j.write_str("handoverLTE-EPC", "supported");
+  }
+  if (ho_lte_5_gc_present) {
+    j.write_str("handoverLTE-5GC", "supported");
+  }
+  if (sftd_meas_nr_neigh_present) {
+    j.write_str("sftd-MeasNR-Neigh", "supported");
+  }
+  if (sftd_meas_nr_neigh_drx_present) {
+    j.write_str("sftd-MeasNR-Neigh-DRX", "supported");
+  }
+  if (dummy_present) {
+    j.write_str("dummy", "supported");
   }
   j.end_obj();
 }
@@ -43955,14 +43953,14 @@ OCUDUASN_CODE meas_and_mob_params_frx_diff_s::pack(bit_ref& bref) const
   group_flags[3] |= idle_inactive_nr_meas_report_r16_present;
   group_flags[3] |= idle_inactive_nr_meas_beam_report_r16_present;
   group_flags[4] |= increased_numof_csi_rs_per_mo_r16_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ss_sinr_meas_present, 1));
   HANDLE_CODE(bref.pack(csi_rsrp_and_rsrq_meas_with_ssb_present, 1));
   HANDLE_CODE(bref.pack(csi_rsrp_and_rsrq_meas_without_ssb_present, 1));
   HANDLE_CODE(bref.pack(csi_sinr_meas_present, 1));
   HANDLE_CODE(bref.pack(csi_rs_rlm_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -44010,7 +44008,8 @@ OCUDUASN_CODE meas_and_mob_params_frx_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE meas_and_mob_params_frx_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ss_sinr_meas_present, 1));
   HANDLE_CODE(bref.unpack(csi_rsrp_and_rsrq_meas_with_ssb_present, 1));
   HANDLE_CODE(bref.unpack(csi_rsrp_and_rsrq_meas_without_ssb_present, 1));
@@ -44077,58 +44076,56 @@ void meas_and_mob_params_frx_diff_s::to_json(json_writer& j) const
   if (csi_rs_rlm_present) {
     j.write_str("csi-RS-RLM", "supported");
   }
-  if (ext) {
-    if (ho_inter_f_present) {
-      j.write_str("handoverInterF", "supported");
-    }
-    if (ho_lte_epc_present) {
-      j.write_str("handoverLTE-EPC", "supported");
-    }
-    if (ho_lte_5_gc_present) {
-      j.write_str("handoverLTE-5GC", "supported");
-    }
-    if (max_num_res_csi_rs_rlm_present) {
-      j.write_str("maxNumberResource-CSI-RS-RLM", max_num_res_csi_rs_rlm.to_string());
-    }
-    if (simul_rx_data_ssb_diff_numerology_present) {
-      j.write_str("simultaneousRxDataSSB-DiffNumerology", "supported");
-    }
-    if (nr_autonomous_gaps_r16_present) {
-      j.write_str("nr-AutonomousGaps-r16", "supported");
-    }
-    if (nr_autonomous_gaps_endc_r16_present) {
-      j.write_str("nr-AutonomousGaps-ENDC-r16", "supported");
-    }
-    if (nr_autonomous_gaps_nedc_r16_present) {
-      j.write_str("nr-AutonomousGaps-NEDC-r16", "supported");
-    }
-    if (nr_autonomous_gaps_nrdc_r16_present) {
-      j.write_str("nr-AutonomousGaps-NRDC-r16", "supported");
-    }
-    if (dummy_present) {
-      j.write_str("dummy", "supported");
-    }
-    if (cli_rssi_meas_r16_present) {
-      j.write_str("cli-RSSI-Meas-r16", "supported");
-    }
-    if (cli_srs_rsrp_meas_r16_present) {
-      j.write_str("cli-SRS-RSRP-Meas-r16", "supported");
-    }
-    if (interfreq_meas_no_gap_r16_present) {
-      j.write_str("interFrequencyMeas-NoGap-r16", "supported");
-    }
-    if (simul_rx_data_ssb_diff_numerology_inter_r16_present) {
-      j.write_str("simultaneousRxDataSSB-DiffNumerology-Inter-r16", "supported");
-    }
-    if (idle_inactive_nr_meas_report_r16_present) {
-      j.write_str("idleInactiveNR-MeasReport-r16", "supported");
-    }
-    if (idle_inactive_nr_meas_beam_report_r16_present) {
-      j.write_str("idleInactiveNR-MeasBeamReport-r16", "supported");
-    }
-    if (increased_numof_csi_rs_per_mo_r16_present) {
-      j.write_str("increasedNumberofCSIRSPerMO-r16", "supported");
-    }
+  if (ho_inter_f_present) {
+    j.write_str("handoverInterF", "supported");
+  }
+  if (ho_lte_epc_present) {
+    j.write_str("handoverLTE-EPC", "supported");
+  }
+  if (ho_lte_5_gc_present) {
+    j.write_str("handoverLTE-5GC", "supported");
+  }
+  if (max_num_res_csi_rs_rlm_present) {
+    j.write_str("maxNumberResource-CSI-RS-RLM", max_num_res_csi_rs_rlm.to_string());
+  }
+  if (simul_rx_data_ssb_diff_numerology_present) {
+    j.write_str("simultaneousRxDataSSB-DiffNumerology", "supported");
+  }
+  if (nr_autonomous_gaps_r16_present) {
+    j.write_str("nr-AutonomousGaps-r16", "supported");
+  }
+  if (nr_autonomous_gaps_endc_r16_present) {
+    j.write_str("nr-AutonomousGaps-ENDC-r16", "supported");
+  }
+  if (nr_autonomous_gaps_nedc_r16_present) {
+    j.write_str("nr-AutonomousGaps-NEDC-r16", "supported");
+  }
+  if (nr_autonomous_gaps_nrdc_r16_present) {
+    j.write_str("nr-AutonomousGaps-NRDC-r16", "supported");
+  }
+  if (dummy_present) {
+    j.write_str("dummy", "supported");
+  }
+  if (cli_rssi_meas_r16_present) {
+    j.write_str("cli-RSSI-Meas-r16", "supported");
+  }
+  if (cli_srs_rsrp_meas_r16_present) {
+    j.write_str("cli-SRS-RSRP-Meas-r16", "supported");
+  }
+  if (interfreq_meas_no_gap_r16_present) {
+    j.write_str("interFrequencyMeas-NoGap-r16", "supported");
+  }
+  if (simul_rx_data_ssb_diff_numerology_inter_r16_present) {
+    j.write_str("simultaneousRxDataSSB-DiffNumerology-Inter-r16", "supported");
+  }
+  if (idle_inactive_nr_meas_report_r16_present) {
+    j.write_str("idleInactiveNR-MeasReport-r16", "supported");
+  }
+  if (idle_inactive_nr_meas_beam_report_r16_present) {
+    j.write_str("idleInactiveNR-MeasBeamReport-r16", "supported");
+  }
+  if (increased_numof_csi_rs_per_mo_r16_present) {
+    j.write_str("increasedNumberofCSIRSPerMO-r16", "supported");
   }
   j.end_obj();
 }
@@ -44212,7 +44209,8 @@ OCUDUASN_CODE meas_and_mob_params_fr2_2_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE meas_and_mob_params_fr2_2_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ho_inter_f_r17_present, 1));
   HANDLE_CODE(bref.unpack(ho_lte_epc_r17_present, 1));
   HANDLE_CODE(bref.unpack(ho_lte_5_gc_r17_present, 1));
@@ -44842,7 +44840,8 @@ OCUDUASN_CODE naics_cap_entry_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE naics_cap_entry_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(nof_naics_capable_cc, bref, (uint8_t)1u, (uint8_t)5u));
   HANDLE_CODE(nof_aggr_prb.unpack(bref));
 
@@ -45285,7 +45284,7 @@ OCUDUASN_CODE phy_params_common_s::pack(bit_ref& bref) const
   group_flags[12] |= pathloss_rs_upd_for_type1_cg_pusch_r18_present;
   group_flags[12] |= bwp_switching_multi_dormancy_cc_dci_0_3_and_1_3_r18.is_present();
   group_flags[13] |= ncr_dft_s_ofdm_waveform_ul_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(csi_rs_cfra_for_ho_present, 1));
   HANDLE_CODE(bref.pack(dyn_prb_bundling_dl_present, 1));
   HANDLE_CODE(bref.pack(sp_csi_report_pucch_present, 1));
@@ -45325,7 +45324,7 @@ OCUDUASN_CODE phy_params_common_s::pack(bit_ref& bref) const
     HANDLE_CODE(bwp_switching_delay.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -45571,7 +45570,8 @@ OCUDUASN_CODE phy_params_common_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_common_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(csi_rs_cfra_for_ho_present, 1));
   HANDLE_CODE(bref.unpack(dyn_prb_bundling_dl_present, 1));
   HANDLE_CODE(bref.unpack(sp_csi_report_pucch_present, 1));
@@ -45947,347 +45947,345 @@ void phy_params_common_s::to_json(json_writer& j) const
   if (bwp_switching_delay_present) {
     j.write_str("bwp-SwitchingDelay", bwp_switching_delay.to_string());
   }
-  if (ext) {
-    if (dummy_present) {
-      j.write_str("dummy", "supported");
-    }
-    if (max_num_search_spaces_present) {
-      j.write_str("maxNumberSearchSpaces", "n10");
-    }
-    if (rate_matching_ctrl_resrc_set_dyn_present) {
-      j.write_str("rateMatchingCtrlResrcSetDynamic", "supported");
-    }
-    if (max_layers_mimo_ind_present) {
-      j.write_str("maxLayersMIMO-Indication", "supported");
-    }
-    if (sp_cell_placement.is_present()) {
-      j.write_fieldname("spCellPlacement");
-      sp_cell_placement->to_json(j);
-    }
-    if (two_step_rach_r16_present) {
-      j.write_str("twoStepRACH-r16", "supported");
-    }
-    if (dci_format1_2_and0_2_r16_present) {
-      j.write_str("dci-Format1-2And0-2-r16", "supported");
-    }
-    if (monitoring_dci_same_search_space_r16_present) {
-      j.write_str("monitoringDCI-SameSearchSpace-r16", "supported");
-    }
-    if (type2_cg_release_dci_0_1_r16_present) {
-      j.write_str("type2-CG-ReleaseDCI-0-1-r16", "supported");
-    }
-    if (type2_cg_release_dci_0_2_r16_present) {
-      j.write_str("type2-CG-ReleaseDCI-0-2-r16", "supported");
-    }
-    if (sps_release_dci_1_1_r16_present) {
-      j.write_str("sps-ReleaseDCI-1-1-r16", "supported");
-    }
-    if (sps_release_dci_1_2_r16_present) {
-      j.write_str("sps-ReleaseDCI-1-2-r16", "supported");
-    }
-    if (csi_trigger_state_non_active_bwp_r16_present) {
-      j.write_str("csi-TriggerStateNon-ActiveBWP-r16", "supported");
-    }
-    if (separate_smtc_inter_iab_support_r16_present) {
-      j.write_str("separateSMTC-InterIAB-Support-r16", "supported");
-    }
-    if (separate_rach_iab_support_r16_present) {
-      j.write_str("separateRACH-IAB-Support-r16", "supported");
-    }
-    if (ul_flex_dl_slot_format_semi_static_iab_r16_present) {
-      j.write_str("ul-flexibleDL-SlotFormatSemiStatic-IAB-r16", "supported");
-    }
-    if (ul_flex_dl_slot_format_dyns_iab_r16_present) {
-      j.write_str("ul-flexibleDL-SlotFormatDynamics-IAB-r16", "supported");
-    }
-    if (dft_s_ofdm_waveform_ul_iab_r16_present) {
-      j.write_str("dft-S-OFDM-WaveformUL-IAB-r16", "supported");
-    }
-    if (dci_25_ai_rnti_support_iab_r16_present) {
-      j.write_str("dci-25-AI-RNTI-Support-IAB-r16", "supported");
-    }
-    if (t_delta_reception_support_iab_r16_present) {
-      j.write_str("t-DeltaReceptionSupport-IAB-r16", "supported");
-    }
-    if (guard_symbol_report_reception_iab_r16_present) {
-      j.write_str("guardSymbolReportReception-IAB-r16", "supported");
-    }
-    if (harq_ack_cb_spatial_bundling_pucch_group_r16_present) {
-      j.write_str("harqACK-CB-SpatialBundlingPUCCH-Group-r16", "supported");
-    }
-    if (cross_slot_sched_r16.is_present()) {
-      j.write_fieldname("crossSlotScheduling-r16");
-      j.start_obj();
-      if (cross_slot_sched_r16->non_shared_spec_ch_access_r16_present) {
-        j.write_str("non-SharedSpectrumChAccess-r16", "supported");
-      }
-      if (cross_slot_sched_r16->shared_spec_ch_access_r16_present) {
-        j.write_str("sharedSpectrumChAccess-r16", "supported");
-      }
-      j.end_obj();
-    }
-    if (max_num_srs_pos_path_loss_estimate_all_serving_cells_r16_present) {
-      j.write_str("maxNumberSRS-PosPathLossEstimateAllServingCells-r16",
-                  max_num_srs_pos_path_loss_estimate_all_serving_cells_r16.to_string());
-    }
-    if (extended_cg_periodicities_r16_present) {
-      j.write_str("extendedCG-Periodicities-r16", "supported");
-    }
-    if (extended_sps_periodicities_r16_present) {
-      j.write_str("extendedSPS-Periodicities-r16", "supported");
-    }
-    if (codebook_variants_list_r16.is_present()) {
-      j.start_array("codebookVariantsList-r16");
-      for (const auto& e1 : *codebook_variants_list_r16) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (pusch_repeat_type_a_r16.is_present()) {
-      j.write_fieldname("pusch-RepetitionTypeA-r16");
-      j.start_obj();
-      if (pusch_repeat_type_a_r16->shared_spec_ch_access_r16_present) {
-        j.write_str("sharedSpectrumChAccess-r16", "supported");
-      }
-      if (pusch_repeat_type_a_r16->non_shared_spec_ch_access_r16_present) {
-        j.write_str("non-SharedSpectrumChAccess-r16", "supported");
-      }
-      j.end_obj();
-    }
-    if (dci_dl_prio_ind_r16_present) {
-      j.write_str("dci-DL-PriorityIndicator-r16", "supported");
-    }
-    if (dci_ul_prio_ind_r16_present) {
-      j.write_str("dci-UL-PriorityIndicator-r16", "supported");
-    }
-    if (max_num_pathloss_rs_upd_r16_present) {
-      j.write_str("maxNumberPathlossRS-Update-r16", max_num_pathloss_rs_upd_r16.to_string());
-    }
-    if (type2_harq_ack_codebook_r16_present) {
-      j.write_str("type2-HARQ-ACK-Codebook-r16", "supported");
-    }
-    if (max_total_res_for_across_freq_ranges_r16.is_present()) {
-      j.write_fieldname("maxTotalResourcesForAcrossFreqRanges-r16");
-      j.start_obj();
-      if (max_total_res_for_across_freq_ranges_r16->max_num_res_within_slot_across_cc_across_fr_r16_present) {
-        j.write_str(
-            "maxNumberResWithinSlotAcrossCC-AcrossFR-r16",
-            max_total_res_for_across_freq_ranges_r16->max_num_res_within_slot_across_cc_across_fr_r16.to_string());
-      }
-      if (max_total_res_for_across_freq_ranges_r16->max_num_res_across_cc_across_fr_r16_present) {
-        j.write_str("maxNumberResAcrossCC-AcrossFR-r16",
-                    max_total_res_for_across_freq_ranges_r16->max_num_res_across_cc_across_fr_r16.to_string());
-      }
-      j.end_obj();
-    }
-    if (harq_ack_separate_multi_dci_multi_trp_r16.is_present()) {
-      j.write_fieldname("harqACK-separateMultiDCI-MultiTRP-r16");
-      j.start_obj();
-      if (harq_ack_separate_multi_dci_multi_trp_r16->max_num_long_pucch_s_r16_present) {
-        j.write_str("maxNumberLongPUCCHs-r16",
-                    harq_ack_separate_multi_dci_multi_trp_r16->max_num_long_pucch_s_r16.to_string());
-      }
-      j.end_obj();
-    }
-    if (harq_ack_joint_multi_dci_multi_trp_r16_present) {
-      j.write_str("harqACK-jointMultiDCI-MultiTRP-r16", "supported");
-    }
-    if (bwp_switching_multi_ccs_r16.is_present()) {
-      j.write_fieldname("bwp-SwitchingMultiCCs-r16");
-      bwp_switching_multi_ccs_r16->to_json(j);
-    }
-    if (target_smtc_scg_r16_present) {
-      j.write_str("targetSMTC-SCG-r16", "supported");
-    }
-    if (support_repeat_zero_offset_rv_r16_present) {
-      j.write_str("supportRepetitionZeroOffsetRV-r16", "supported");
-    }
-    if (cbg_trans_in_order_pusch_ul_r16_present) {
-      j.write_str("cbg-TransInOrderPUSCH-UL-r16", "supported");
-    }
-    if (bwp_switching_multi_dormancy_ccs_r16.is_present()) {
-      j.write_fieldname("bwp-SwitchingMultiDormancyCCs-r16");
-      bwp_switching_multi_dormancy_ccs_r16->to_json(j);
-    }
-    if (support_retx_diff_coreset_pool_multi_dci_trp_r16_present) {
-      j.write_str("supportRetx-Diff-CoresetPool-Multi-DCI-TRP-r16", "notSupported");
-    }
-    if (pdcch_monitoring_any_occasions_with_span_gap_cross_carrier_sch_r16_present) {
-      j.write_str("pdcch-MonitoringAnyOccasionsWithSpanGapCrossCarrierSch-r16",
-                  pdcch_monitoring_any_occasions_with_span_gap_cross_carrier_sch_r16.to_string());
-    }
-    if (new_beam_identifs2_port_csi_rs_r16_present) {
-      j.write_str("newBeamIdentifications2PortCSI-RS-r16", "supported");
-    }
-    if (pathloss_estimation2_port_csi_rs_r16_present) {
-      j.write_str("pathlossEstimation2PortCSI-RS-r16", "supported");
-    }
-    if (mux_harq_ack_without_pucch_on_pusch_r16_present) {
-      j.write_str("mux-HARQ-ACK-withoutPUCCH-onPUSCH-r16", "supported");
-    }
-    if (guard_symbol_report_reception_iab_r17_present) {
-      j.write_str("guardSymbolReportReception-IAB-r17", "supported");
-    }
-    if (restricted_iab_du_beam_reception_r17_present) {
-      j.write_str("restricted-IAB-DU-BeamReception-r17", "supported");
-    }
-    if (recommended_iab_mt_beam_tx_r17_present) {
-      j.write_str("recommended-IAB-MT-BeamTransmission-r17", "supported");
-    }
-    if (case6_timing_align_reception_iab_r17_present) {
-      j.write_str("case6-TimingAlignmentReception-IAB-r17", "supported");
-    }
-    if (case7_timing_align_reception_iab_r17_present) {
-      j.write_str("case7-TimingAlignmentReception-IAB-r17", "supported");
-    }
-    if (dl_tx_pwr_adjustment_iab_r17_present) {
-      j.write_str("dl-tx-PowerAdjustment-IAB-r17", "supported");
-    }
-    if (desired_ul_tx_pwr_adjustment_r17_present) {
-      j.write_str("desired-ul-tx-PowerAdjustment-r17", "supported");
-    }
-    if (fdm_soft_res_availability_dyn_ind_r17_present) {
-      j.write_str("fdm-SoftResourceAvailability-DynamicIndication-r17", "supported");
-    }
-    if (upd_t_delta_range_reception_r17_present) {
-      j.write_str("updated-T-DeltaRangeReception-r17", "supported");
-    }
-    if (slot_based_dyn_pucch_rep_r17_present) {
-      j.write_str("slotBasedDynamicPUCCH-Rep-r17", "supported");
-    }
-    if (sps_harq_ack_deferral_r17.is_present()) {
-      j.write_fieldname("sps-HARQ-ACK-Deferral-r17");
-      j.start_obj();
-      if (sps_harq_ack_deferral_r17->non_shared_spec_ch_access_r17_present) {
-        j.write_str("non-SharedSpectrumChAccess-r17", "supported");
-      }
-      if (sps_harq_ack_deferral_r17->shared_spec_ch_access_r17_present) {
-        j.write_str("sharedSpectrumChAccess-r17", "supported");
-      }
-      j.end_obj();
-    }
-    if (unified_joint_tci_common_upd_r17_present) {
-      j.write_int("unifiedJointTCI-commonUpdate-r17", unified_joint_tci_common_upd_r17);
-    }
-    if (mtrp_pdcch_single_span_r17_present) {
-      j.write_str("mTRP-PDCCH-singleSpan-r17", "supported");
-    }
-    if (supported_activ_prs_processing_win_r17_present) {
-      j.write_str("supportedActivatedPRS-ProcessingWindow-r17", supported_activ_prs_processing_win_r17.to_string());
-    }
-    if (cg_time_domain_alloc_ext_r17_present) {
-      j.write_str("cg-TimeDomainAllocationExtension-r17", "supported");
-    }
-    if (ta_based_pdc_tn_non_shared_spec_ch_access_r17_present) {
-      j.write_str("ta-BasedPDC-TN-NonSharedSpectrumChAccess-r17", "supported");
-    }
-    if (directional_collision_dc_iab_r17_present) {
-      j.write_str("directionalCollisionDC-IAB-r17", "supported");
-    }
-    if (dummy1_present) {
-      j.write_str("dummy1", "supported");
-    }
-    if (dummy2_present) {
-      j.write_str("dummy2", "supported");
-    }
-    if (dummy3_present) {
-      j.write_str("dummy3", "supported");
-    }
-    if (dummy4_present) {
-      j.write_str("dummy4", "supported");
-    }
-    if (srs_add_repeat_r17_present) {
-      j.write_str("srs-AdditionalRepetition-r17", "supported");
-    }
-    if (pusch_repeat_cg_sdt_r17_present) {
-      j.write_str("pusch-Repetition-CG-SDT-r17", "supported");
-    }
-    if (multi_pdsch_per_slot_type1_cb_support_r17_present) {
-      j.write_str("multiPDSCH-PerSlotType1-CB-Support-r17", "supported");
-    }
-    if (joint_pwr_spatial_adaptation_r18_present) {
-      j.write_str("jointPowerSpatialAdaptation-r18", "supported");
-    }
-    if (ncr_aperiodic_beam_ind_access_link_r18.is_present()) {
-      j.write_fieldname("ncr-AperiodicBeamInd-AccessLink-r18");
-      j.start_obj();
-      if (ncr_aperiodic_beam_ind_access_link_r18->scs_15k_hz_r18_present) {
-        j.write_int("scs-15kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_15k_hz_r18);
-      }
-      if (ncr_aperiodic_beam_ind_access_link_r18->scs_30k_hz_r18_present) {
-        j.write_int("scs-30kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_30k_hz_r18);
-      }
-      if (ncr_aperiodic_beam_ind_access_link_r18->scs_60k_hz_r18_present) {
-        j.write_int("scs-60kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_60k_hz_r18);
-      }
-      if (ncr_aperiodic_beam_ind_access_link_r18->scs_120k_hz_r18_present) {
-        j.write_int("scs-120kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_120k_hz_r18);
-      }
-      j.end_obj();
-    }
-    if (ncr_semi_persistent_beam_ind_access_link_r18_present) {
-      j.write_str("ncr-Semi-PersistentBeamInd-AccessLink-r18", "supported");
-    }
-    if (ncr_simul_ul_backhaul_and_c_link_r18_present) {
-      j.write_str("ncr-SimultaneousUL-BackhaulAndC-Link-r18", "supported");
-    }
-    if (ncr_backhaul_beam_ind_r18_present) {
-      j.write_str("ncr-BackhaulBeamInd-r18", ncr_backhaul_beam_ind_r18.to_string());
-    }
-    if (ncr_adaptive_beam_backhaul_and_c_link_r18_present) {
-      j.write_str("ncr-AdaptiveBeamBackhaulAndC-Link-r18", ncr_adaptive_beam_backhaul_and_c_link_r18.to_string());
-    }
-    if (nominal_rbg_size_of_cfg_3_fdra_type_0_dci_1_3_r18_present) {
-      j.write_str("nominalRBG-SizeOfConfig-3-FDRA-Type-0-DCI-1-3-r18", "supported");
-    }
-    if (nominal_rbg_size_of_cfg_3_fdra_type_0_dci_0_3_r18_present) {
-      j.write_str("nominalRBG-SizeOfConfig-3-FDRA-Type-0-DCI-0-3-r18", "supported");
-    }
-    if (cfgurable_type_1_a_fields_for_dci_0_3_and_1_3_r18_present) {
-      j.write_str("configurableType-1A-FieldsForDCI-0-3-And-1-3-r18", "supported");
-    }
-    if (fdra_type_1_gty_2_4_8_16_rbs_riv_dci_1_3_and_0_3_r18_present) {
-      j.write_str("fdra-Type-1-Gty-2-4-8-16-RBs-RIV-DCI-1-3-And-0-3-r18", "supported");
-    }
-    if (prio_ind_dl_r18_present) {
-      j.write_str("priorityIndicationDL-r18", "supported");
-    }
-    if (prio_ind_ul_r18_present) {
-      j.write_str("priorityIndicationUL-r18", "supported");
-    }
-    if (dyn_ind_sched_restrict_r18_present) {
-      j.write_str("dynamicIndicationSchedulingRestriction-r18", "supported");
-    }
-    if (prio_ind_one_slot_harq_r18_present) {
-      j.write_str("priorityIndicationOneSlotHARQ-r18", "supported");
-    }
-    if (multi_pusch_dci_0_1_r18_present) {
-      j.write_str("multiPUSCH-DCI-0-1-r18", "supported");
-    }
-    if (multi_pusch_dci_0_2_r18_present) {
-      j.write_str("multiPUSCH-DCI-0-2-r18", "supported");
-    }
-    if (add_sr_periodicities_r18.is_present()) {
-      j.write_fieldname("additionalSR-Periodicities-r18");
-      j.start_obj();
-      if (add_sr_periodicities_r18->scs_30k_hz_r18_present) {
-        j.write_str("scs-30kHz-r18", "supported");
-      }
-      if (add_sr_periodicities_r18->scs_120k_hz_r18_present) {
-        j.write_str("scs-120kHz-r18", "supported");
-      }
-      j.end_obj();
-    }
-    if (pathloss_rs_upd_for_type1_cg_pusch_r18_present) {
-      j.write_str("pathlossRS-UpdateForType1CG-PUSCH-r18", "supported");
-    }
-    if (bwp_switching_multi_dormancy_cc_dci_0_3_and_1_3_r18.is_present()) {
-      j.write_fieldname("bwp-SwitchingMultiDormancyCC-DCI-0-3-And-1-3-r18");
-      bwp_switching_multi_dormancy_cc_dci_0_3_and_1_3_r18->to_json(j);
-    }
-    if (ncr_dft_s_ofdm_waveform_ul_r18_present) {
-      j.write_str("ncr-dft-S-OFDM-WaveformUL-r18", "supported");
-    }
+  if (dummy_present) {
+    j.write_str("dummy", "supported");
+  }
+  if (max_num_search_spaces_present) {
+    j.write_str("maxNumberSearchSpaces", "n10");
+  }
+  if (rate_matching_ctrl_resrc_set_dyn_present) {
+    j.write_str("rateMatchingCtrlResrcSetDynamic", "supported");
+  }
+  if (max_layers_mimo_ind_present) {
+    j.write_str("maxLayersMIMO-Indication", "supported");
+  }
+  if (sp_cell_placement.is_present()) {
+    j.write_fieldname("spCellPlacement");
+    sp_cell_placement->to_json(j);
+  }
+  if (two_step_rach_r16_present) {
+    j.write_str("twoStepRACH-r16", "supported");
+  }
+  if (dci_format1_2_and0_2_r16_present) {
+    j.write_str("dci-Format1-2And0-2-r16", "supported");
+  }
+  if (monitoring_dci_same_search_space_r16_present) {
+    j.write_str("monitoringDCI-SameSearchSpace-r16", "supported");
+  }
+  if (type2_cg_release_dci_0_1_r16_present) {
+    j.write_str("type2-CG-ReleaseDCI-0-1-r16", "supported");
+  }
+  if (type2_cg_release_dci_0_2_r16_present) {
+    j.write_str("type2-CG-ReleaseDCI-0-2-r16", "supported");
+  }
+  if (sps_release_dci_1_1_r16_present) {
+    j.write_str("sps-ReleaseDCI-1-1-r16", "supported");
+  }
+  if (sps_release_dci_1_2_r16_present) {
+    j.write_str("sps-ReleaseDCI-1-2-r16", "supported");
+  }
+  if (csi_trigger_state_non_active_bwp_r16_present) {
+    j.write_str("csi-TriggerStateNon-ActiveBWP-r16", "supported");
+  }
+  if (separate_smtc_inter_iab_support_r16_present) {
+    j.write_str("separateSMTC-InterIAB-Support-r16", "supported");
+  }
+  if (separate_rach_iab_support_r16_present) {
+    j.write_str("separateRACH-IAB-Support-r16", "supported");
+  }
+  if (ul_flex_dl_slot_format_semi_static_iab_r16_present) {
+    j.write_str("ul-flexibleDL-SlotFormatSemiStatic-IAB-r16", "supported");
+  }
+  if (ul_flex_dl_slot_format_dyns_iab_r16_present) {
+    j.write_str("ul-flexibleDL-SlotFormatDynamics-IAB-r16", "supported");
+  }
+  if (dft_s_ofdm_waveform_ul_iab_r16_present) {
+    j.write_str("dft-S-OFDM-WaveformUL-IAB-r16", "supported");
+  }
+  if (dci_25_ai_rnti_support_iab_r16_present) {
+    j.write_str("dci-25-AI-RNTI-Support-IAB-r16", "supported");
+  }
+  if (t_delta_reception_support_iab_r16_present) {
+    j.write_str("t-DeltaReceptionSupport-IAB-r16", "supported");
+  }
+  if (guard_symbol_report_reception_iab_r16_present) {
+    j.write_str("guardSymbolReportReception-IAB-r16", "supported");
+  }
+  if (harq_ack_cb_spatial_bundling_pucch_group_r16_present) {
+    j.write_str("harqACK-CB-SpatialBundlingPUCCH-Group-r16", "supported");
+  }
+  if (cross_slot_sched_r16.is_present()) {
+    j.write_fieldname("crossSlotScheduling-r16");
+    j.start_obj();
+    if (cross_slot_sched_r16->non_shared_spec_ch_access_r16_present) {
+      j.write_str("non-SharedSpectrumChAccess-r16", "supported");
+    }
+    if (cross_slot_sched_r16->shared_spec_ch_access_r16_present) {
+      j.write_str("sharedSpectrumChAccess-r16", "supported");
+    }
+    j.end_obj();
+  }
+  if (max_num_srs_pos_path_loss_estimate_all_serving_cells_r16_present) {
+    j.write_str("maxNumberSRS-PosPathLossEstimateAllServingCells-r16",
+                max_num_srs_pos_path_loss_estimate_all_serving_cells_r16.to_string());
+  }
+  if (extended_cg_periodicities_r16_present) {
+    j.write_str("extendedCG-Periodicities-r16", "supported");
+  }
+  if (extended_sps_periodicities_r16_present) {
+    j.write_str("extendedSPS-Periodicities-r16", "supported");
+  }
+  if (codebook_variants_list_r16.is_present()) {
+    j.start_array("codebookVariantsList-r16");
+    for (const auto& e1 : *codebook_variants_list_r16) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (pusch_repeat_type_a_r16.is_present()) {
+    j.write_fieldname("pusch-RepetitionTypeA-r16");
+    j.start_obj();
+    if (pusch_repeat_type_a_r16->shared_spec_ch_access_r16_present) {
+      j.write_str("sharedSpectrumChAccess-r16", "supported");
+    }
+    if (pusch_repeat_type_a_r16->non_shared_spec_ch_access_r16_present) {
+      j.write_str("non-SharedSpectrumChAccess-r16", "supported");
+    }
+    j.end_obj();
+  }
+  if (dci_dl_prio_ind_r16_present) {
+    j.write_str("dci-DL-PriorityIndicator-r16", "supported");
+  }
+  if (dci_ul_prio_ind_r16_present) {
+    j.write_str("dci-UL-PriorityIndicator-r16", "supported");
+  }
+  if (max_num_pathloss_rs_upd_r16_present) {
+    j.write_str("maxNumberPathlossRS-Update-r16", max_num_pathloss_rs_upd_r16.to_string());
+  }
+  if (type2_harq_ack_codebook_r16_present) {
+    j.write_str("type2-HARQ-ACK-Codebook-r16", "supported");
+  }
+  if (max_total_res_for_across_freq_ranges_r16.is_present()) {
+    j.write_fieldname("maxTotalResourcesForAcrossFreqRanges-r16");
+    j.start_obj();
+    if (max_total_res_for_across_freq_ranges_r16->max_num_res_within_slot_across_cc_across_fr_r16_present) {
+      j.write_str(
+          "maxNumberResWithinSlotAcrossCC-AcrossFR-r16",
+          max_total_res_for_across_freq_ranges_r16->max_num_res_within_slot_across_cc_across_fr_r16.to_string());
+    }
+    if (max_total_res_for_across_freq_ranges_r16->max_num_res_across_cc_across_fr_r16_present) {
+      j.write_str("maxNumberResAcrossCC-AcrossFR-r16",
+                  max_total_res_for_across_freq_ranges_r16->max_num_res_across_cc_across_fr_r16.to_string());
+    }
+    j.end_obj();
+  }
+  if (harq_ack_separate_multi_dci_multi_trp_r16.is_present()) {
+    j.write_fieldname("harqACK-separateMultiDCI-MultiTRP-r16");
+    j.start_obj();
+    if (harq_ack_separate_multi_dci_multi_trp_r16->max_num_long_pucch_s_r16_present) {
+      j.write_str("maxNumberLongPUCCHs-r16",
+                  harq_ack_separate_multi_dci_multi_trp_r16->max_num_long_pucch_s_r16.to_string());
+    }
+    j.end_obj();
+  }
+  if (harq_ack_joint_multi_dci_multi_trp_r16_present) {
+    j.write_str("harqACK-jointMultiDCI-MultiTRP-r16", "supported");
+  }
+  if (bwp_switching_multi_ccs_r16.is_present()) {
+    j.write_fieldname("bwp-SwitchingMultiCCs-r16");
+    bwp_switching_multi_ccs_r16->to_json(j);
+  }
+  if (target_smtc_scg_r16_present) {
+    j.write_str("targetSMTC-SCG-r16", "supported");
+  }
+  if (support_repeat_zero_offset_rv_r16_present) {
+    j.write_str("supportRepetitionZeroOffsetRV-r16", "supported");
+  }
+  if (cbg_trans_in_order_pusch_ul_r16_present) {
+    j.write_str("cbg-TransInOrderPUSCH-UL-r16", "supported");
+  }
+  if (bwp_switching_multi_dormancy_ccs_r16.is_present()) {
+    j.write_fieldname("bwp-SwitchingMultiDormancyCCs-r16");
+    bwp_switching_multi_dormancy_ccs_r16->to_json(j);
+  }
+  if (support_retx_diff_coreset_pool_multi_dci_trp_r16_present) {
+    j.write_str("supportRetx-Diff-CoresetPool-Multi-DCI-TRP-r16", "notSupported");
+  }
+  if (pdcch_monitoring_any_occasions_with_span_gap_cross_carrier_sch_r16_present) {
+    j.write_str("pdcch-MonitoringAnyOccasionsWithSpanGapCrossCarrierSch-r16",
+                pdcch_monitoring_any_occasions_with_span_gap_cross_carrier_sch_r16.to_string());
+  }
+  if (new_beam_identifs2_port_csi_rs_r16_present) {
+    j.write_str("newBeamIdentifications2PortCSI-RS-r16", "supported");
+  }
+  if (pathloss_estimation2_port_csi_rs_r16_present) {
+    j.write_str("pathlossEstimation2PortCSI-RS-r16", "supported");
+  }
+  if (mux_harq_ack_without_pucch_on_pusch_r16_present) {
+    j.write_str("mux-HARQ-ACK-withoutPUCCH-onPUSCH-r16", "supported");
+  }
+  if (guard_symbol_report_reception_iab_r17_present) {
+    j.write_str("guardSymbolReportReception-IAB-r17", "supported");
+  }
+  if (restricted_iab_du_beam_reception_r17_present) {
+    j.write_str("restricted-IAB-DU-BeamReception-r17", "supported");
+  }
+  if (recommended_iab_mt_beam_tx_r17_present) {
+    j.write_str("recommended-IAB-MT-BeamTransmission-r17", "supported");
+  }
+  if (case6_timing_align_reception_iab_r17_present) {
+    j.write_str("case6-TimingAlignmentReception-IAB-r17", "supported");
+  }
+  if (case7_timing_align_reception_iab_r17_present) {
+    j.write_str("case7-TimingAlignmentReception-IAB-r17", "supported");
+  }
+  if (dl_tx_pwr_adjustment_iab_r17_present) {
+    j.write_str("dl-tx-PowerAdjustment-IAB-r17", "supported");
+  }
+  if (desired_ul_tx_pwr_adjustment_r17_present) {
+    j.write_str("desired-ul-tx-PowerAdjustment-r17", "supported");
+  }
+  if (fdm_soft_res_availability_dyn_ind_r17_present) {
+    j.write_str("fdm-SoftResourceAvailability-DynamicIndication-r17", "supported");
+  }
+  if (upd_t_delta_range_reception_r17_present) {
+    j.write_str("updated-T-DeltaRangeReception-r17", "supported");
+  }
+  if (slot_based_dyn_pucch_rep_r17_present) {
+    j.write_str("slotBasedDynamicPUCCH-Rep-r17", "supported");
+  }
+  if (sps_harq_ack_deferral_r17.is_present()) {
+    j.write_fieldname("sps-HARQ-ACK-Deferral-r17");
+    j.start_obj();
+    if (sps_harq_ack_deferral_r17->non_shared_spec_ch_access_r17_present) {
+      j.write_str("non-SharedSpectrumChAccess-r17", "supported");
+    }
+    if (sps_harq_ack_deferral_r17->shared_spec_ch_access_r17_present) {
+      j.write_str("sharedSpectrumChAccess-r17", "supported");
+    }
+    j.end_obj();
+  }
+  if (unified_joint_tci_common_upd_r17_present) {
+    j.write_int("unifiedJointTCI-commonUpdate-r17", unified_joint_tci_common_upd_r17);
+  }
+  if (mtrp_pdcch_single_span_r17_present) {
+    j.write_str("mTRP-PDCCH-singleSpan-r17", "supported");
+  }
+  if (supported_activ_prs_processing_win_r17_present) {
+    j.write_str("supportedActivatedPRS-ProcessingWindow-r17", supported_activ_prs_processing_win_r17.to_string());
+  }
+  if (cg_time_domain_alloc_ext_r17_present) {
+    j.write_str("cg-TimeDomainAllocationExtension-r17", "supported");
+  }
+  if (ta_based_pdc_tn_non_shared_spec_ch_access_r17_present) {
+    j.write_str("ta-BasedPDC-TN-NonSharedSpectrumChAccess-r17", "supported");
+  }
+  if (directional_collision_dc_iab_r17_present) {
+    j.write_str("directionalCollisionDC-IAB-r17", "supported");
+  }
+  if (dummy1_present) {
+    j.write_str("dummy1", "supported");
+  }
+  if (dummy2_present) {
+    j.write_str("dummy2", "supported");
+  }
+  if (dummy3_present) {
+    j.write_str("dummy3", "supported");
+  }
+  if (dummy4_present) {
+    j.write_str("dummy4", "supported");
+  }
+  if (srs_add_repeat_r17_present) {
+    j.write_str("srs-AdditionalRepetition-r17", "supported");
+  }
+  if (pusch_repeat_cg_sdt_r17_present) {
+    j.write_str("pusch-Repetition-CG-SDT-r17", "supported");
+  }
+  if (multi_pdsch_per_slot_type1_cb_support_r17_present) {
+    j.write_str("multiPDSCH-PerSlotType1-CB-Support-r17", "supported");
+  }
+  if (joint_pwr_spatial_adaptation_r18_present) {
+    j.write_str("jointPowerSpatialAdaptation-r18", "supported");
+  }
+  if (ncr_aperiodic_beam_ind_access_link_r18.is_present()) {
+    j.write_fieldname("ncr-AperiodicBeamInd-AccessLink-r18");
+    j.start_obj();
+    if (ncr_aperiodic_beam_ind_access_link_r18->scs_15k_hz_r18_present) {
+      j.write_int("scs-15kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_15k_hz_r18);
+    }
+    if (ncr_aperiodic_beam_ind_access_link_r18->scs_30k_hz_r18_present) {
+      j.write_int("scs-30kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_30k_hz_r18);
+    }
+    if (ncr_aperiodic_beam_ind_access_link_r18->scs_60k_hz_r18_present) {
+      j.write_int("scs-60kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_60k_hz_r18);
+    }
+    if (ncr_aperiodic_beam_ind_access_link_r18->scs_120k_hz_r18_present) {
+      j.write_int("scs-120kHz-r18", ncr_aperiodic_beam_ind_access_link_r18->scs_120k_hz_r18);
+    }
+    j.end_obj();
+  }
+  if (ncr_semi_persistent_beam_ind_access_link_r18_present) {
+    j.write_str("ncr-Semi-PersistentBeamInd-AccessLink-r18", "supported");
+  }
+  if (ncr_simul_ul_backhaul_and_c_link_r18_present) {
+    j.write_str("ncr-SimultaneousUL-BackhaulAndC-Link-r18", "supported");
+  }
+  if (ncr_backhaul_beam_ind_r18_present) {
+    j.write_str("ncr-BackhaulBeamInd-r18", ncr_backhaul_beam_ind_r18.to_string());
+  }
+  if (ncr_adaptive_beam_backhaul_and_c_link_r18_present) {
+    j.write_str("ncr-AdaptiveBeamBackhaulAndC-Link-r18", ncr_adaptive_beam_backhaul_and_c_link_r18.to_string());
+  }
+  if (nominal_rbg_size_of_cfg_3_fdra_type_0_dci_1_3_r18_present) {
+    j.write_str("nominalRBG-SizeOfConfig-3-FDRA-Type-0-DCI-1-3-r18", "supported");
+  }
+  if (nominal_rbg_size_of_cfg_3_fdra_type_0_dci_0_3_r18_present) {
+    j.write_str("nominalRBG-SizeOfConfig-3-FDRA-Type-0-DCI-0-3-r18", "supported");
+  }
+  if (cfgurable_type_1_a_fields_for_dci_0_3_and_1_3_r18_present) {
+    j.write_str("configurableType-1A-FieldsForDCI-0-3-And-1-3-r18", "supported");
+  }
+  if (fdra_type_1_gty_2_4_8_16_rbs_riv_dci_1_3_and_0_3_r18_present) {
+    j.write_str("fdra-Type-1-Gty-2-4-8-16-RBs-RIV-DCI-1-3-And-0-3-r18", "supported");
+  }
+  if (prio_ind_dl_r18_present) {
+    j.write_str("priorityIndicationDL-r18", "supported");
+  }
+  if (prio_ind_ul_r18_present) {
+    j.write_str("priorityIndicationUL-r18", "supported");
+  }
+  if (dyn_ind_sched_restrict_r18_present) {
+    j.write_str("dynamicIndicationSchedulingRestriction-r18", "supported");
+  }
+  if (prio_ind_one_slot_harq_r18_present) {
+    j.write_str("priorityIndicationOneSlotHARQ-r18", "supported");
+  }
+  if (multi_pusch_dci_0_1_r18_present) {
+    j.write_str("multiPUSCH-DCI-0-1-r18", "supported");
+  }
+  if (multi_pusch_dci_0_2_r18_present) {
+    j.write_str("multiPUSCH-DCI-0-2-r18", "supported");
+  }
+  if (add_sr_periodicities_r18.is_present()) {
+    j.write_fieldname("additionalSR-Periodicities-r18");
+    j.start_obj();
+    if (add_sr_periodicities_r18->scs_30k_hz_r18_present) {
+      j.write_str("scs-30kHz-r18", "supported");
+    }
+    if (add_sr_periodicities_r18->scs_120k_hz_r18_present) {
+      j.write_str("scs-120kHz-r18", "supported");
+    }
+    j.end_obj();
+  }
+  if (pathloss_rs_upd_for_type1_cg_pusch_r18_present) {
+    j.write_str("pathlossRS-UpdateForType1CG-PUSCH-r18", "supported");
+  }
+  if (bwp_switching_multi_dormancy_cc_dci_0_3_and_1_3_r18.is_present()) {
+    j.write_fieldname("bwp-SwitchingMultiDormancyCC-DCI-0-3-And-1-3-r18");
+    bwp_switching_multi_dormancy_cc_dci_0_3_and_1_3_r18->to_json(j);
+  }
+  if (ncr_dft_s_ofdm_waveform_ul_r18_present) {
+    j.write_str("ncr-dft-S-OFDM-WaveformUL-r18", "supported");
   }
   j.end_obj();
 }
@@ -46862,13 +46860,13 @@ OCUDUASN_CODE phy_params_xdd_diff_s::pack(bit_ref& bref) const
   group_flags[0] |= dl_sched_offset_pdsch_type_a_present;
   group_flags[0] |= dl_sched_offset_pdsch_type_b_present;
   group_flags[0] |= ul_sched_offset_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(dyn_sfi_present, 1));
   HANDLE_CODE(bref.pack(two_pucch_f0_2_consec_symbols_present, 1));
   HANDLE_CODE(bref.pack(two_different_tpc_loop_pusch_present, 1));
   HANDLE_CODE(bref.pack(two_different_tpc_loop_pucch_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -46883,7 +46881,8 @@ OCUDUASN_CODE phy_params_xdd_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_xdd_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(dyn_sfi_present, 1));
   HANDLE_CODE(bref.unpack(two_pucch_f0_2_consec_symbols_present, 1));
   HANDLE_CODE(bref.unpack(two_different_tpc_loop_pusch_present, 1));
@@ -46917,16 +46916,14 @@ void phy_params_xdd_diff_s::to_json(json_writer& j) const
   if (two_different_tpc_loop_pucch_present) {
     j.write_str("twoDifferentTPC-Loop-PUCCH", "supported");
   }
-  if (ext) {
-    if (dl_sched_offset_pdsch_type_a_present) {
-      j.write_str("dl-SchedulingOffset-PDSCH-TypeA", "supported");
-    }
-    if (dl_sched_offset_pdsch_type_b_present) {
-      j.write_str("dl-SchedulingOffset-PDSCH-TypeB", "supported");
-    }
-    if (ul_sched_offset_present) {
-      j.write_str("ul-SchedulingOffset", "supported");
-    }
+  if (dl_sched_offset_pdsch_type_a_present) {
+    j.write_str("dl-SchedulingOffset-PDSCH-TypeA", "supported");
+  }
+  if (dl_sched_offset_pdsch_type_b_present) {
+    j.write_str("dl-SchedulingOffset-PDSCH-TypeB", "supported");
+  }
+  if (ul_sched_offset_present) {
+    j.write_str("ul-SchedulingOffset", "supported");
   }
   j.end_obj();
 }
@@ -46966,7 +46963,7 @@ OCUDUASN_CODE phy_params_frx_diff_s::pack(bit_ref& bref) const
   group_flags[4] |= cri_ri_cqi_without_non_pmi_port_ind_r16_present;
   group_flags[5] |= cqi_4_bits_subband_tn_non_shared_spec_ch_access_r17_present;
   group_flags[6] |= multiple_coreset_red_cap_r17_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(dyn_sfi_present, 1));
   HANDLE_CODE(bref.pack(dummy1_present, 1));
   HANDLE_CODE(bref.pack(two_fl_dmrs_present, 1));
@@ -47030,7 +47027,7 @@ OCUDUASN_CODE phy_params_frx_diff_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_integer(bref, pdcch_blind_detection_ca, (uint8_t)4u, (uint8_t)16u));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -47130,7 +47127,8 @@ OCUDUASN_CODE phy_params_frx_diff_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_frx_diff_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(dyn_sfi_present, 1));
   HANDLE_CODE(bref.unpack(dummy1_present, 1));
   HANDLE_CODE(bref.unpack(two_fl_dmrs_present, 1));
@@ -47400,126 +47398,124 @@ void phy_params_frx_diff_s::to_json(json_writer& j) const
   if (multiple_coreset_present) {
     j.write_str("multipleCORESET", "supported");
   }
-  if (ext) {
-    if (csi_rs_im_reception_for_feedback.is_present()) {
-      j.write_fieldname("csi-RS-IM-ReceptionForFeedback");
-      csi_rs_im_reception_for_feedback->to_json(j);
+  if (csi_rs_im_reception_for_feedback.is_present()) {
+    j.write_fieldname("csi-RS-IM-ReceptionForFeedback");
+    csi_rs_im_reception_for_feedback->to_json(j);
+  }
+  if (csi_rs_proc_framework_for_srs.is_present()) {
+    j.write_fieldname("csi-RS-ProcFrameworkForSRS");
+    csi_rs_proc_framework_for_srs->to_json(j);
+  }
+  if (csi_report_framework.is_present()) {
+    j.write_fieldname("csi-ReportFramework");
+    csi_report_framework->to_json(j);
+  }
+  if (mux_sr_harq_ack_csi_pucch_once_per_slot.is_present()) {
+    j.write_fieldname("mux-SR-HARQ-ACK-CSI-PUCCH-OncePerSlot");
+    j.start_obj();
+    if (mux_sr_harq_ack_csi_pucch_once_per_slot->same_symbol_present) {
+      j.write_str("sameSymbol", "supported");
     }
-    if (csi_rs_proc_framework_for_srs.is_present()) {
-      j.write_fieldname("csi-RS-ProcFrameworkForSRS");
-      csi_rs_proc_framework_for_srs->to_json(j);
+    if (mux_sr_harq_ack_csi_pucch_once_per_slot->diff_symbol_present) {
+      j.write_str("diffSymbol", "supported");
     }
-    if (csi_report_framework.is_present()) {
-      j.write_fieldname("csi-ReportFramework");
-      csi_report_framework->to_json(j);
+    j.end_obj();
+  }
+  if (mux_sr_harq_ack_pucch_present) {
+    j.write_str("mux-SR-HARQ-ACK-PUCCH", "supported");
+  }
+  if (mux_multiple_group_ctrl_ch_overlap_present) {
+    j.write_str("mux-MultipleGroupCtrlCH-Overlap", "supported");
+  }
+  if (dl_sched_offset_pdsch_type_a_present) {
+    j.write_str("dl-SchedulingOffset-PDSCH-TypeA", "supported");
+  }
+  if (dl_sched_offset_pdsch_type_b_present) {
+    j.write_str("dl-SchedulingOffset-PDSCH-TypeB", "supported");
+  }
+  if (ul_sched_offset_present) {
+    j.write_str("ul-SchedulingOffset", "supported");
+  }
+  if (dl_64_qam_mcs_table_alt_present) {
+    j.write_str("dl-64QAM-MCS-TableAlt", "supported");
+  }
+  if (ul_64_qam_mcs_table_alt_present) {
+    j.write_str("ul-64QAM-MCS-TableAlt", "supported");
+  }
+  if (cqi_table_alt_present) {
+    j.write_str("cqi-TableAlt", "supported");
+  }
+  if (one_fl_dmrs_two_add_dmrs_ul_present) {
+    j.write_str("oneFL-DMRS-TwoAdditionalDMRS-UL", "supported");
+  }
+  if (two_fl_dmrs_two_add_dmrs_ul_present) {
+    j.write_str("twoFL-DMRS-TwoAdditionalDMRS-UL", "supported");
+  }
+  if (one_fl_dmrs_three_add_dmrs_ul_present) {
+    j.write_str("oneFL-DMRS-ThreeAdditionalDMRS-UL", "supported");
+  }
+  if (pdcch_blind_detection_nrdc.is_present()) {
+    j.write_fieldname("pdcch-BlindDetectionNRDC");
+    j.start_obj();
+    j.write_int("pdcch-BlindDetectionMCG-UE", pdcch_blind_detection_nrdc->pdcch_blind_detection_mcg_ue);
+    j.write_int("pdcch-BlindDetectionSCG-UE", pdcch_blind_detection_nrdc->pdcch_blind_detection_scg_ue);
+    j.end_obj();
+  }
+  if (mux_harq_ack_pusch_diff_symbol_present) {
+    j.write_str("mux-HARQ-ACK-PUSCH-DiffSymbol", "supported");
+  }
+  if (type1_harq_ack_codebook_r16_present) {
+    j.write_str("type1-HARQ-ACK-Codebook-r16", "supported");
+  }
+  if (enhanced_pwr_ctrl_r16_present) {
+    j.write_str("enhancedPowerControl-r16", "supported");
+  }
+  if (simul_tci_act_multiple_cc_r16_present) {
+    j.write_str("simultaneousTCI-ActMultipleCC-r16", "supported");
+  }
+  if (simul_spatial_relation_multiple_cc_r16_present) {
+    j.write_str("simultaneousSpatialRelationMultipleCC-r16", "supported");
+  }
+  if (cli_rssi_fdm_dl_r16_present) {
+    j.write_str("cli-RSSI-FDM-DL-r16", "supported");
+  }
+  if (cli_srs_rsrp_fdm_dl_r16_present) {
+    j.write_str("cli-SRS-RSRP-FDM-DL-r16", "supported");
+  }
+  if (max_layers_mimo_adaptation_r16_present) {
+    j.write_str("maxLayersMIMO-Adaptation-r16", "supported");
+  }
+  if (aggregation_factor_sps_dl_r16_present) {
+    j.write_str("aggregationFactorSPS-DL-r16", "supported");
+  }
+  if (max_total_res_for_one_freq_range_r16.is_present()) {
+    j.write_fieldname("maxTotalResourcesForOneFreqRange-r16");
+    j.start_obj();
+    if (max_total_res_for_one_freq_range_r16->max_num_res_within_slot_across_cc_one_fr_r16_present) {
+      j.write_str("maxNumberResWithinSlotAcrossCC-OneFR-r16",
+                  max_total_res_for_one_freq_range_r16->max_num_res_within_slot_across_cc_one_fr_r16.to_string());
     }
-    if (mux_sr_harq_ack_csi_pucch_once_per_slot.is_present()) {
-      j.write_fieldname("mux-SR-HARQ-ACK-CSI-PUCCH-OncePerSlot");
-      j.start_obj();
-      if (mux_sr_harq_ack_csi_pucch_once_per_slot->same_symbol_present) {
-        j.write_str("sameSymbol", "supported");
-      }
-      if (mux_sr_harq_ack_csi_pucch_once_per_slot->diff_symbol_present) {
-        j.write_str("diffSymbol", "supported");
-      }
-      j.end_obj();
+    if (max_total_res_for_one_freq_range_r16->max_num_res_across_cc_one_fr_r16_present) {
+      j.write_str("maxNumberResAcrossCC-OneFR-r16",
+                  max_total_res_for_one_freq_range_r16->max_num_res_across_cc_one_fr_r16.to_string());
     }
-    if (mux_sr_harq_ack_pucch_present) {
-      j.write_str("mux-SR-HARQ-ACK-PUCCH", "supported");
-    }
-    if (mux_multiple_group_ctrl_ch_overlap_present) {
-      j.write_str("mux-MultipleGroupCtrlCH-Overlap", "supported");
-    }
-    if (dl_sched_offset_pdsch_type_a_present) {
-      j.write_str("dl-SchedulingOffset-PDSCH-TypeA", "supported");
-    }
-    if (dl_sched_offset_pdsch_type_b_present) {
-      j.write_str("dl-SchedulingOffset-PDSCH-TypeB", "supported");
-    }
-    if (ul_sched_offset_present) {
-      j.write_str("ul-SchedulingOffset", "supported");
-    }
-    if (dl_64_qam_mcs_table_alt_present) {
-      j.write_str("dl-64QAM-MCS-TableAlt", "supported");
-    }
-    if (ul_64_qam_mcs_table_alt_present) {
-      j.write_str("ul-64QAM-MCS-TableAlt", "supported");
-    }
-    if (cqi_table_alt_present) {
-      j.write_str("cqi-TableAlt", "supported");
-    }
-    if (one_fl_dmrs_two_add_dmrs_ul_present) {
-      j.write_str("oneFL-DMRS-TwoAdditionalDMRS-UL", "supported");
-    }
-    if (two_fl_dmrs_two_add_dmrs_ul_present) {
-      j.write_str("twoFL-DMRS-TwoAdditionalDMRS-UL", "supported");
-    }
-    if (one_fl_dmrs_three_add_dmrs_ul_present) {
-      j.write_str("oneFL-DMRS-ThreeAdditionalDMRS-UL", "supported");
-    }
-    if (pdcch_blind_detection_nrdc.is_present()) {
-      j.write_fieldname("pdcch-BlindDetectionNRDC");
-      j.start_obj();
-      j.write_int("pdcch-BlindDetectionMCG-UE", pdcch_blind_detection_nrdc->pdcch_blind_detection_mcg_ue);
-      j.write_int("pdcch-BlindDetectionSCG-UE", pdcch_blind_detection_nrdc->pdcch_blind_detection_scg_ue);
-      j.end_obj();
-    }
-    if (mux_harq_ack_pusch_diff_symbol_present) {
-      j.write_str("mux-HARQ-ACK-PUSCH-DiffSymbol", "supported");
-    }
-    if (type1_harq_ack_codebook_r16_present) {
-      j.write_str("type1-HARQ-ACK-Codebook-r16", "supported");
-    }
-    if (enhanced_pwr_ctrl_r16_present) {
-      j.write_str("enhancedPowerControl-r16", "supported");
-    }
-    if (simul_tci_act_multiple_cc_r16_present) {
-      j.write_str("simultaneousTCI-ActMultipleCC-r16", "supported");
-    }
-    if (simul_spatial_relation_multiple_cc_r16_present) {
-      j.write_str("simultaneousSpatialRelationMultipleCC-r16", "supported");
-    }
-    if (cli_rssi_fdm_dl_r16_present) {
-      j.write_str("cli-RSSI-FDM-DL-r16", "supported");
-    }
-    if (cli_srs_rsrp_fdm_dl_r16_present) {
-      j.write_str("cli-SRS-RSRP-FDM-DL-r16", "supported");
-    }
-    if (max_layers_mimo_adaptation_r16_present) {
-      j.write_str("maxLayersMIMO-Adaptation-r16", "supported");
-    }
-    if (aggregation_factor_sps_dl_r16_present) {
-      j.write_str("aggregationFactorSPS-DL-r16", "supported");
-    }
-    if (max_total_res_for_one_freq_range_r16.is_present()) {
-      j.write_fieldname("maxTotalResourcesForOneFreqRange-r16");
-      j.start_obj();
-      if (max_total_res_for_one_freq_range_r16->max_num_res_within_slot_across_cc_one_fr_r16_present) {
-        j.write_str("maxNumberResWithinSlotAcrossCC-OneFR-r16",
-                    max_total_res_for_one_freq_range_r16->max_num_res_within_slot_across_cc_one_fr_r16.to_string());
-      }
-      if (max_total_res_for_one_freq_range_r16->max_num_res_across_cc_one_fr_r16_present) {
-        j.write_str("maxNumberResAcrossCC-OneFR-r16",
-                    max_total_res_for_one_freq_range_r16->max_num_res_across_cc_one_fr_r16.to_string());
-      }
-      j.end_obj();
-    }
-    if (csi_report_framework_ext_r16.is_present()) {
-      j.write_fieldname("csi-ReportFrameworkExt-r16");
-      csi_report_framework_ext_r16->to_json(j);
-    }
-    if (two_tci_act_serving_cell_in_cc_list_r16_present) {
-      j.write_str("twoTCI-Act-servingCellInCC-List-r16", "supported");
-    }
-    if (cri_ri_cqi_without_non_pmi_port_ind_r16_present) {
-      j.write_str("cri-RI-CQI-WithoutNon-PMI-PortInd-r16", "supported");
-    }
-    if (cqi_4_bits_subband_tn_non_shared_spec_ch_access_r17_present) {
-      j.write_str("cqi-4-BitsSubbandTN-NonSharedSpectrumChAccess-r17", "supported");
-    }
-    if (multiple_coreset_red_cap_r17_present) {
-      j.write_str("multipleCORESET-RedCap-r17", "supported");
-    }
+    j.end_obj();
+  }
+  if (csi_report_framework_ext_r16.is_present()) {
+    j.write_fieldname("csi-ReportFrameworkExt-r16");
+    csi_report_framework_ext_r16->to_json(j);
+  }
+  if (two_tci_act_serving_cell_in_cc_list_r16_present) {
+    j.write_str("twoTCI-Act-servingCellInCC-List-r16", "supported");
+  }
+  if (cri_ri_cqi_without_non_pmi_port_ind_r16_present) {
+    j.write_str("cri-RI-CQI-WithoutNon-PMI-PortInd-r16", "supported");
+  }
+  if (cqi_4_bits_subband_tn_non_shared_spec_ch_access_r17_present) {
+    j.write_str("cqi-4-BitsSubbandTN-NonSharedSpectrumChAccess-r17", "supported");
+  }
+  if (multiple_coreset_red_cap_r17_present) {
+    j.write_str("multipleCORESET-RedCap-r17", "supported");
   }
   j.end_obj();
 }
@@ -47593,7 +47589,7 @@ OCUDUASN_CODE phy_params_fr1_s::pack(bit_ref& bref) const
   group_flags[2] |= delta_pwr_class_report_r18_present;
   group_flags[2] |= support12_prb_coreset0_gscn_41637_r18_present;
   group_flags[2] |= support5_m_hz_ch_bw_20_prb_coreset0_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(pdcch_monitoring_single_occasion_present, 1));
   HANDLE_CODE(bref.pack(scs_60k_hz_present, 1));
   HANDLE_CODE(bref.pack(pdsch_256_qam_fr1_present, 1));
@@ -47603,7 +47599,7 @@ OCUDUASN_CODE phy_params_fr1_s::pack(bit_ref& bref) const
     HANDLE_CODE(pdsch_re_map_fr1_per_symbol.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -47642,7 +47638,8 @@ OCUDUASN_CODE phy_params_fr1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_fr1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(pdcch_monitoring_single_occasion_present, 1));
   HANDLE_CODE(bref.unpack(scs_60k_hz_present, 1));
   HANDLE_CODE(bref.unpack(pdsch_256_qam_fr1_present, 1));
@@ -47702,37 +47699,35 @@ void phy_params_fr1_s::to_json(json_writer& j) const
   if (pdsch_re_map_fr1_per_symbol_present) {
     j.write_str("pdsch-RE-MappingFR1-PerSymbol", pdsch_re_map_fr1_per_symbol.to_string());
   }
-  if (ext) {
-    if (pdsch_re_map_fr1_per_slot_present) {
-      j.write_str("pdsch-RE-MappingFR1-PerSlot", pdsch_re_map_fr1_per_slot.to_string());
-    }
-    if (pdcch_monitoring_single_span_first4_sym_r16_present) {
-      j.write_str("pdcch-MonitoringSingleSpanFirst4Sym-r16", "supported");
-    }
-    if (k1_range_ext_atg_r18_present) {
-      j.write_str("k1-RangeExtensionATG-r18", "supported");
-    }
-    if (max_harq_process_num_atg_r18_present) {
-      j.write_str("maxHARQ-ProcessNumberATG-r18", max_harq_process_num_atg_r18.to_string());
-    }
-    if (ul_pre_compensation_atg_r18_present) {
-      j.write_str("uplinkPreCompensationATG-r18", "supported");
-    }
-    if (ul_ta_report_atg_r18_present) {
-      j.write_str("uplinkTA-ReportingATG-r18", "supported");
-    }
-    if (adv_receiver_mu_mimo_r18_present) {
-      j.write_str("advReceiver-MU-MIMO-r18", "supported");
-    }
-    if (delta_pwr_class_report_r18_present) {
-      j.write_str("deltaPowerClassReporting-r18", delta_pwr_class_report_r18.to_string());
-    }
-    if (support12_prb_coreset0_gscn_41637_r18_present) {
-      j.write_str("support12PRB-CORESET0-GSCN-41637-r18", "supported");
-    }
-    if (support5_m_hz_ch_bw_20_prb_coreset0_r18_present) {
-      j.write_str("support5MHz-ChannelBW-20PRB-CORESET0-r18", "supported");
-    }
+  if (pdsch_re_map_fr1_per_slot_present) {
+    j.write_str("pdsch-RE-MappingFR1-PerSlot", pdsch_re_map_fr1_per_slot.to_string());
+  }
+  if (pdcch_monitoring_single_span_first4_sym_r16_present) {
+    j.write_str("pdcch-MonitoringSingleSpanFirst4Sym-r16", "supported");
+  }
+  if (k1_range_ext_atg_r18_present) {
+    j.write_str("k1-RangeExtensionATG-r18", "supported");
+  }
+  if (max_harq_process_num_atg_r18_present) {
+    j.write_str("maxHARQ-ProcessNumberATG-r18", max_harq_process_num_atg_r18.to_string());
+  }
+  if (ul_pre_compensation_atg_r18_present) {
+    j.write_str("uplinkPreCompensationATG-r18", "supported");
+  }
+  if (ul_ta_report_atg_r18_present) {
+    j.write_str("uplinkTA-ReportingATG-r18", "supported");
+  }
+  if (adv_receiver_mu_mimo_r18_present) {
+    j.write_str("advReceiver-MU-MIMO-r18", "supported");
+  }
+  if (delta_pwr_class_report_r18_present) {
+    j.write_str("deltaPowerClassReporting-r18", delta_pwr_class_report_r18.to_string());
+  }
+  if (support12_prb_coreset0_gscn_41637_r18_present) {
+    j.write_str("support12PRB-CORESET0-GSCN-41637-r18", "supported");
+  }
+  if (support5_m_hz_ch_bw_20_prb_coreset0_r18_present) {
+    j.write_str("support5MHz-ChannelBW-20PRB-CORESET0-r18", "supported");
   }
   j.end_obj();
 }
@@ -47801,7 +47796,7 @@ OCUDUASN_CODE phy_params_fr2_s::pack(bit_ref& bref) const
   group_flags[1] |= spatial_relation_upd_ap_srs_r16_present;
   group_flags[1] |= max_num_srs_pos_spatial_relations_all_serving_cells_r16_present;
   group_flags[2] |= multi_rx_pref_ind_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(dummy_present, 1));
   HANDLE_CODE(bref.pack(pdsch_re_map_fr2_per_symbol_present, 1));
 
@@ -47809,7 +47804,7 @@ OCUDUASN_CODE phy_params_fr2_s::pack(bit_ref& bref) const
     HANDLE_CODE(pdsch_re_map_fr2_per_symbol.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -47841,7 +47836,8 @@ OCUDUASN_CODE phy_params_fr2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_fr2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(dummy_present, 1));
   HANDLE_CODE(bref.unpack(pdsch_re_map_fr2_per_symbol_present, 1));
 
@@ -47886,26 +47882,24 @@ void phy_params_fr2_s::to_json(json_writer& j) const
   if (pdsch_re_map_fr2_per_symbol_present) {
     j.write_str("pdsch-RE-MappingFR2-PerSymbol", pdsch_re_map_fr2_per_symbol.to_string());
   }
-  if (ext) {
-    if (pcell_fr2_present) {
-      j.write_str("pCell-FR2", "supported");
-    }
-    if (pdsch_re_map_fr2_per_slot_present) {
-      j.write_str("pdsch-RE-MappingFR2-PerSlot", pdsch_re_map_fr2_per_slot.to_string());
-    }
-    if (default_spatial_relation_pathloss_rs_r16_present) {
-      j.write_str("defaultSpatialRelationPathlossRS-r16", "supported");
-    }
-    if (spatial_relation_upd_ap_srs_r16_present) {
-      j.write_str("spatialRelationUpdateAP-SRS-r16", "supported");
-    }
-    if (max_num_srs_pos_spatial_relations_all_serving_cells_r16_present) {
-      j.write_str("maxNumberSRS-PosSpatialRelationsAllServingCells-r16",
-                  max_num_srs_pos_spatial_relations_all_serving_cells_r16.to_string());
-    }
-    if (multi_rx_pref_ind_r18_present) {
-      j.write_str("multiRxPreferenceIndication-r18", "supported");
-    }
+  if (pcell_fr2_present) {
+    j.write_str("pCell-FR2", "supported");
+  }
+  if (pdsch_re_map_fr2_per_slot_present) {
+    j.write_str("pdsch-RE-MappingFR2-PerSlot", pdsch_re_map_fr2_per_slot.to_string());
+  }
+  if (default_spatial_relation_pathloss_rs_r16_present) {
+    j.write_str("defaultSpatialRelationPathlossRS-r16", "supported");
+  }
+  if (spatial_relation_upd_ap_srs_r16_present) {
+    j.write_str("spatialRelationUpdateAP-SRS-r16", "supported");
+  }
+  if (max_num_srs_pos_spatial_relations_all_serving_cells_r16_present) {
+    j.write_str("maxNumberSRS-PosSpatialRelationsAllServingCells-r16",
+                max_num_srs_pos_spatial_relations_all_serving_cells_r16.to_string());
+  }
+  if (multi_rx_pref_ind_r18_present) {
+    j.write_str("multiRxPreferenceIndication-r18", "supported");
   }
   j.end_obj();
 }
@@ -48147,7 +48141,7 @@ OCUDUASN_CODE ue_based_perf_meas_params_r16_s::pack(bit_ref& bref) const
   group_flags[0] |= early_meas_log_r17_present;
   group_flags[1] |= logged_mdt_pni_npn_r18_present;
   group_flags[1] |= logged_mdt_sn_pn_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(barometer_meas_report_r16_present, 1));
   HANDLE_CODE(bref.pack(imm_meas_bt_r16_present, 1));
   HANDLE_CODE(bref.pack(imm_meas_wlan_r16_present, 1));
@@ -48159,7 +48153,7 @@ OCUDUASN_CODE ue_based_perf_meas_params_r16_s::pack(bit_ref& bref) const
   HANDLE_CODE(bref.pack(gnss_location_r16_present, 1));
   HANDLE_CODE(bref.pack(ul_pdcp_delay_r16_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -48181,7 +48175,8 @@ OCUDUASN_CODE ue_based_perf_meas_params_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ue_based_perf_meas_params_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(barometer_meas_report_r16_present, 1));
   HANDLE_CODE(bref.unpack(imm_meas_bt_r16_present, 1));
   HANDLE_CODE(bref.unpack(imm_meas_wlan_r16_present, 1));
@@ -48245,25 +48240,23 @@ void ue_based_perf_meas_params_r16_s::to_json(json_writer& j) const
   if (ul_pdcp_delay_r16_present) {
     j.write_str("ulPDCP-Delay-r16", "supported");
   }
-  if (ext) {
-    if (sig_based_log_mdt_override_protect_r17_present) {
-      j.write_str("sigBasedLogMDT-OverrideProtect-r17", "supported");
-    }
-    if (multiple_cef_report_r17_present) {
-      j.write_str("multipleCEF-Report-r17", "supported");
-    }
-    if (excess_packet_delay_r17_present) {
-      j.write_str("excessPacketDelay-r17", "supported");
-    }
-    if (early_meas_log_r17_present) {
-      j.write_str("earlyMeasLog-r17", "supported");
-    }
-    if (logged_mdt_pni_npn_r18_present) {
-      j.write_str("loggedMDT-PNI-NPN-r18", "supported");
-    }
-    if (logged_mdt_sn_pn_r18_present) {
-      j.write_str("loggedMDT-SNPN-r18", "supported");
-    }
+  if (sig_based_log_mdt_override_protect_r17_present) {
+    j.write_str("sigBasedLogMDT-OverrideProtect-r17", "supported");
+  }
+  if (multiple_cef_report_r17_present) {
+    j.write_str("multipleCEF-Report-r17", "supported");
+  }
+  if (excess_packet_delay_r17_present) {
+    j.write_str("excessPacketDelay-r17", "supported");
+  }
+  if (early_meas_log_r17_present) {
+    j.write_str("earlyMeasLog-r17", "supported");
+  }
+  if (logged_mdt_pni_npn_r18_present) {
+    j.write_str("loggedMDT-PNI-NPN-r18", "supported");
+  }
+  if (logged_mdt_sn_pn_r18_present) {
+    j.write_str("loggedMDT-SNPN-r18", "supported");
   }
   j.end_obj();
 }
@@ -48282,10 +48275,10 @@ OCUDUASN_CODE son_params_r16_s::pack(bit_ref& bref) const
   group_flags[1] |= rlf_report_red_cap_r17_present;
   group_flags[2] |= spr_report_r18_present;
   group_flags[2] |= success_irat_ho_report_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(rach_report_r16_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -48315,7 +48308,8 @@ OCUDUASN_CODE son_params_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE son_params_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(rach_report_r16_present, 1));
 
   if (ext) {
@@ -48350,37 +48344,35 @@ void son_params_r16_s::to_json(json_writer& j) const
   if (rach_report_r16_present) {
     j.write_str("rach-Report-r16", "supported");
   }
-  if (ext) {
-    if (rlf_report_cho_r17_present) {
-      j.write_str("rlfReportCHO-r17", "supported");
-    }
-    if (rlf_report_daps_r17_present) {
-      j.write_str("rlfReportDAPS-r17", "supported");
-    }
-    if (success_ho_report_r17_present) {
-      j.write_str("success-HO-Report-r17", "supported");
-    }
-    if (two_step_rach_report_r17_present) {
-      j.write_str("twoStepRACH-Report-r17", "supported");
-    }
-    if (pscell_mhi_report_r17_present) {
-      j.write_str("pscell-MHI-Report-r17", "supported");
-    }
-    if (on_demand_si_report_r17_present) {
-      j.write_str("onDemandSI-Report-r17", "supported");
-    }
-    if (cef_report_red_cap_r17_present) {
-      j.write_str("cef-ReportRedCap-r17", "supported");
-    }
-    if (rlf_report_red_cap_r17_present) {
-      j.write_str("rlf-ReportRedCap-r17", "supported");
-    }
-    if (spr_report_r18_present) {
-      j.write_str("spr-Report-r18", "supported");
-    }
-    if (success_irat_ho_report_r18_present) {
-      j.write_str("successIRAT-HO-Report-r18", "supported");
-    }
+  if (rlf_report_cho_r17_present) {
+    j.write_str("rlfReportCHO-r17", "supported");
+  }
+  if (rlf_report_daps_r17_present) {
+    j.write_str("rlfReportDAPS-r17", "supported");
+  }
+  if (success_ho_report_r17_present) {
+    j.write_str("success-HO-Report-r17", "supported");
+  }
+  if (two_step_rach_report_r17_present) {
+    j.write_str("twoStepRACH-Report-r17", "supported");
+  }
+  if (pscell_mhi_report_r17_present) {
+    j.write_str("pscell-MHI-Report-r17", "supported");
+  }
+  if (on_demand_si_report_r17_present) {
+    j.write_str("onDemandSI-Report-r17", "supported");
+  }
+  if (cef_report_red_cap_r17_present) {
+    j.write_str("cef-ReportRedCap-r17", "supported");
+  }
+  if (rlf_report_red_cap_r17_present) {
+    j.write_str("rlf-ReportRedCap-r17", "supported");
+  }
+  if (spr_report_r18_present) {
+    j.write_str("spr-Report-r18", "supported");
+  }
+  if (success_irat_ho_report_r18_present) {
+    j.write_str("successIRAT-HO-Report-r18", "supported");
   }
   j.end_obj();
 }
@@ -48552,7 +48544,7 @@ OCUDUASN_CODE pdcp_params_s::pack(bit_ref& bref) const
   group_flags[2] |= support_of_pdu_set_discard_r18_present;
   group_flags[2] |= psi_based_discard_r18_present;
   group_flags[2] |= support_of_sn_gap_report_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ul_only_rohc_profiles_present, 1));
   HANDLE_CODE(bref.pack(continue_rohc_context_present, 1));
   HANDLE_CODE(bref.pack(out_of_order_delivery_present, 1));
@@ -48572,7 +48564,7 @@ OCUDUASN_CODE pdcp_params_s::pack(bit_ref& bref) const
   HANDLE_CODE(bref.pack(supported_rohc_profiles.profile0x0104, 1));
   HANDLE_CODE(max_num_rohc_context_sessions.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -48623,7 +48615,8 @@ OCUDUASN_CODE pdcp_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pdcp_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ul_only_rohc_profiles_present, 1));
   HANDLE_CODE(bref.unpack(continue_rohc_context_present, 1));
   HANDLE_CODE(bref.unpack(out_of_order_delivery_present, 1));
@@ -48725,68 +48718,66 @@ void pdcp_params_s::to_json(json_writer& j) const
   if (pdcp_dupl_mcg_or_scg_drb_present) {
     j.write_str("pdcp-DuplicationMCG-OrSCG-DRB", "supported");
   }
-  if (ext) {
-    if (drb_iab_r16_present) {
-      j.write_str("drb-IAB-r16", "supported");
+  if (drb_iab_r16_present) {
+    j.write_str("drb-IAB-r16", "supported");
+  }
+  if (non_drb_iab_r16_present) {
+    j.write_str("non-DRB-IAB-r16", "supported");
+  }
+  if (extended_discard_timer_r16_present) {
+    j.write_str("extendedDiscardTimer-r16", "supported");
+  }
+  if (continue_ehc_context_r16_present) {
+    j.write_str("continueEHC-Context-r16", "supported");
+  }
+  if (ehc_r16_present) {
+    j.write_str("ehc-r16", "supported");
+  }
+  if (max_num_ehc_contexts_r16_present) {
+    j.write_str("maxNumberEHC-Contexts-r16", max_num_ehc_contexts_r16.to_string());
+  }
+  if (joint_ehc_rohc_cfg_r16_present) {
+    j.write_str("jointEHC-ROHC-Config-r16", "supported");
+  }
+  if (pdcp_dupl_more_than_two_rlc_r16_present) {
+    j.write_str("pdcp-DuplicationMoreThanTwoRLC-r16", "supported");
+  }
+  if (long_sn_red_cap_r17_present) {
+    j.write_str("longSN-RedCap-r17", "supported");
+  }
+  if (udc_r17.is_present()) {
+    j.write_fieldname("udc-r17");
+    j.start_obj();
+    if (udc_r17->standard_dictionary_r17_present) {
+      j.write_str("standardDictionary-r17", "supported");
     }
-    if (non_drb_iab_r16_present) {
-      j.write_str("non-DRB-IAB-r16", "supported");
-    }
-    if (extended_discard_timer_r16_present) {
-      j.write_str("extendedDiscardTimer-r16", "supported");
-    }
-    if (continue_ehc_context_r16_present) {
-      j.write_str("continueEHC-Context-r16", "supported");
-    }
-    if (ehc_r16_present) {
-      j.write_str("ehc-r16", "supported");
-    }
-    if (max_num_ehc_contexts_r16_present) {
-      j.write_str("maxNumberEHC-Contexts-r16", max_num_ehc_contexts_r16.to_string());
-    }
-    if (joint_ehc_rohc_cfg_r16_present) {
-      j.write_str("jointEHC-ROHC-Config-r16", "supported");
-    }
-    if (pdcp_dupl_more_than_two_rlc_r16_present) {
-      j.write_str("pdcp-DuplicationMoreThanTwoRLC-r16", "supported");
-    }
-    if (long_sn_red_cap_r17_present) {
-      j.write_str("longSN-RedCap-r17", "supported");
-    }
-    if (udc_r17.is_present()) {
-      j.write_fieldname("udc-r17");
+    if (udc_r17->operator_dictionary_r17_present) {
+      j.write_fieldname("operatorDictionary-r17");
       j.start_obj();
-      if (udc_r17->standard_dictionary_r17_present) {
-        j.write_str("standardDictionary-r17", "supported");
-      }
-      if (udc_r17->operator_dictionary_r17_present) {
-        j.write_fieldname("operatorDictionary-r17");
-        j.start_obj();
-        j.write_int("versionOfDictionary-r17", udc_r17->operator_dictionary_r17.version_of_dictionary_r17);
-        j.write_fieldname("associatedPLMN-ID-r17");
-        udc_r17->operator_dictionary_r17.associated_plmn_id_r17.to_json(j);
-        j.end_obj();
-      }
-      if (udc_r17->continue_udc_r17_present) {
-        j.write_str("continueUDC-r17", "supported");
-      }
-      if (udc_r17->support_of_buffer_size_r17_present) {
-        j.write_str("supportOfBufferSize-r17", udc_r17->support_of_buffer_size_r17.to_string());
-      }
+      j.write_int("versionOfDictionary-r17", udc_r17->operator_dictionary_r17.version_of_dictionary_r17);
+      j.write_fieldname("associatedPLMN-ID-r17");
+      udc_r17->operator_dictionary_r17.associated_plmn_id_r17.to_json(j);
       j.end_obj();
     }
-    if (long_sn_ncr_r18_present) {
-      j.write_str("longSN-NCR-r18", "supported");
+    if (udc_r17->continue_udc_r17_present) {
+      j.write_str("continueUDC-r17", "supported");
     }
-    if (support_of_pdu_set_discard_r18_present) {
-      j.write_str("supportOfPDU-SetDiscard-r18", "supported");
+    if (udc_r17->support_of_buffer_size_r17_present) {
+      j.write_str("supportOfBufferSize-r17", udc_r17->support_of_buffer_size_r17.to_string());
     }
-    if (psi_based_discard_r18_present) {
-      j.write_str("psi-BasedDiscard-r18", "supported");
-    }
-    if (support_of_sn_gap_report_r18_present) {
-      j.write_str("supportOfSN-GapReport-r18", "supported");
-    }
+    j.end_obj();
+  }
+  if (long_sn_ncr_r18_present) {
+    j.write_str("longSN-NCR-r18", "supported");
+  }
+  if (support_of_pdu_set_discard_r18_present) {
+    j.write_str("supportOfPDU-SetDiscard-r18", "supported");
+  }
+  if (psi_based_discard_r18_present) {
+    j.write_str("psi-BasedDiscard-r18", "supported");
+  }
+  if (support_of_sn_gap_report_r18_present) {
+    j.write_str("supportOfSN-GapReport-r18", "supported");
   }
   j.end_obj();
 }
@@ -48914,7 +48905,8 @@ OCUDUASN_CODE pdcp_params_sidelink_r18_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pdcp_params_sidelink_r18_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(pdcp_dupl_srb_sidelink_r18_present, 1));
   HANDLE_CODE(bref.unpack(pdcp_dupl_drb_sidelink_r18_present, 1));
 
@@ -48943,14 +48935,14 @@ OCUDUASN_CODE phy_params_mrdc_s::pack(bit_ref& bref) const
   group_flags[0] |= sp_cell_placement.is_present();
   group_flags[1] |= tdd_pcell_ul_tx_all_ul_sf_r16_present;
   group_flags[1] |= fdd_pcell_ul_tx_all_ul_sf_r16_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(naics_cap_list.size() > 0, 1));
 
   if (naics_cap_list.size() > 0) {
     HANDLE_CODE(pack_dyn_seq_of(bref, naics_cap_list, 1, 8));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -48972,7 +48964,8 @@ OCUDUASN_CODE phy_params_mrdc_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_mrdc_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool naics_cap_list_present;
   HANDLE_CODE(bref.unpack(naics_cap_list_present, 1));
 
@@ -49009,17 +49002,15 @@ void phy_params_mrdc_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (sp_cell_placement.is_present()) {
-      j.write_fieldname("spCellPlacement");
-      sp_cell_placement->to_json(j);
-    }
-    if (tdd_pcell_ul_tx_all_ul_sf_r16_present) {
-      j.write_str("tdd-PCellUL-TX-AllUL-Subframe-r16", "supported");
-    }
-    if (fdd_pcell_ul_tx_all_ul_sf_r16_present) {
-      j.write_str("fdd-PCellUL-TX-AllUL-Subframe-r16", "supported");
-    }
+  if (sp_cell_placement.is_present()) {
+    j.write_fieldname("spCellPlacement");
+    sp_cell_placement->to_json(j);
+  }
+  if (tdd_pcell_ul_tx_all_ul_sf_r16_present) {
+    j.write_str("tdd-PCellUL-TX-AllUL-Subframe-r16", "supported");
+  }
+  if (fdd_pcell_ul_tx_all_ul_sf_r16_present) {
+    j.write_str("fdd-PCellUL-TX-AllUL-Subframe-r16", "supported");
   }
   j.end_obj();
 }
@@ -49055,7 +49046,8 @@ OCUDUASN_CODE phy_params_shared_spec_ch_access_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE phy_params_shared_spec_ch_access_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ss_sinr_meas_r16_present, 1));
   HANDLE_CODE(bref.unpack(sp_csi_report_pucch_r16_present, 1));
   HANDLE_CODE(bref.unpack(sp_csi_report_pusch_r16_present, 1));
@@ -49163,7 +49155,8 @@ OCUDUASN_CODE pow_sav_params_common_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pow_sav_params_common_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(drx_pref_r16_present, 1));
   HANDLE_CODE(bref.unpack(max_cc_pref_r16_present, 1));
   HANDLE_CODE(bref.unpack(release_pref_r16_present, 1));
@@ -49204,7 +49197,8 @@ OCUDUASN_CODE pow_sav_params_frx_diff_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pow_sav_params_frx_diff_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_bw_pref_r16_present, 1));
   HANDLE_CODE(bref.unpack(max_mimo_layer_pref_r16_present, 1));
 
@@ -49244,7 +49238,8 @@ OCUDUASN_CODE pow_sav_params_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pow_sav_params_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(pow_sav_params_common_r16_present, 1));
   HANDLE_CODE(bref.unpack(pow_sav_params_frx_diff_r16_present, 1));
 
@@ -49286,7 +49281,8 @@ OCUDUASN_CODE pow_sav_params_fr2_2_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pow_sav_params_fr2_2_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(max_bw_pref_r17_present, 1));
   HANDLE_CODE(bref.unpack(max_mimo_layer_pref_r17_present, 1));
 
@@ -49322,7 +49318,8 @@ OCUDUASN_CODE pow_sav_params_v1700_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE pow_sav_params_v1700_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(pow_sav_params_fr2_2_r17_present, 1));
 
   if (pow_sav_params_fr2_2_r17_present) {
@@ -49398,7 +49395,7 @@ OCUDUASN_CODE rf_params_s::pack(bit_ref& bref) const
   group_flags[20] |= supported_band_combination_list_ul_tx_switch_v1840.is_present();
   group_flags[21] |= supported_band_combination_list_v1860.is_present();
   group_flags[21] |= supported_band_combination_list_ul_tx_switch_v1860.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(supported_band_combination_list.size() > 0, 1));
   HANDLE_CODE(bref.pack(applied_freq_band_list_filt.size() > 0, 1));
 
@@ -49410,7 +49407,7 @@ OCUDUASN_CODE rf_params_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_dyn_seq_of(bref, applied_freq_band_list_filt, 1, 1280));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -49720,7 +49717,8 @@ OCUDUASN_CODE rf_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE rf_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool supported_band_combination_list_present;
   HANDLE_CODE(bref.unpack(supported_band_combination_list_present, 1));
   bool applied_freq_band_list_filt_present;
@@ -50041,353 +50039,351 @@ void rf_params_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (supported_band_combination_list_v1540.is_present()) {
-      j.start_array("supportedBandCombinationList-v1540");
-      for (const auto& e1 : *supported_band_combination_list_v1540) {
+  if (supported_band_combination_list_v1540.is_present()) {
+    j.start_array("supportedBandCombinationList-v1540");
+    for (const auto& e1 : *supported_band_combination_list_v1540) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (srs_switching_time_requested_present) {
+    j.write_str("srs-SwitchingTimeRequested", "true");
+  }
+  if (supported_band_combination_list_v1550.is_present()) {
+    j.start_array("supportedBandCombinationList-v1550");
+    for (const auto& e1 : *supported_band_combination_list_v1550) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1560.is_present()) {
+    j.start_array("supportedBandCombinationList-v1560");
+    for (const auto& e1 : *supported_band_combination_list_v1560) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1610.is_present()) {
+    j.start_array("supportedBandCombinationList-v1610");
+    for (const auto& e1 : *supported_band_combination_list_v1610) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_sidelink_eutra_nr_r16.is_present()) {
+    j.start_array("supportedBandCombinationListSidelinkEUTRA-NR-r16");
+    for (const auto& e1 : *supported_band_combination_list_sidelink_eutra_nr_r16) {
+      j.start_array();
+      for (const auto& e2 : e1) {
+        e2.to_json(j);
+      }
+      j.end_array();
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_r16.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-r16");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_r16) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1630.is_present()) {
+    j.start_array("supportedBandCombinationList-v1630");
+    for (const auto& e1 : *supported_band_combination_list_v1630) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_sidelink_eutra_nr_v1630.is_present()) {
+    j.start_array("supportedBandCombinationListSidelinkEUTRA-NR-v1630");
+    for (const auto& e1 : *supported_band_combination_list_sidelink_eutra_nr_v1630) {
+      j.start_array();
+      for (const auto& e2 : e1) {
+        e2.to_json(j);
+      }
+      j.end_array();
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1630.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1630");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1630) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1640.is_present()) {
+    j.start_array("supportedBandCombinationList-v1640");
+    for (const auto& e1 : *supported_band_combination_list_v1640) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1640.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1640");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1640) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1650.is_present()) {
+    j.start_array("supportedBandCombinationList-v1650");
+    for (const auto& e1 : *supported_band_combination_list_v1650) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1650.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1650");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1650) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (extended_band_n77_r16_present) {
+    j.write_str("extendedBand-n77-r16", "supported");
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1670.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1670");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1670) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1680.is_present()) {
+    j.start_array("supportedBandCombinationList-v1680");
+    for (const auto& e1 : *supported_band_combination_list_v1680) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1690.is_present()) {
+    j.start_array("supportedBandCombinationList-v1690");
+    for (const auto& e1 : *supported_band_combination_list_v1690) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1690.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1690");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1690) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1700.is_present()) {
+    j.start_array("supportedBandCombinationList-v1700");
+    for (const auto& e1 : *supported_band_combination_list_v1700) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1700.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1700");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1700) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_sl_relay_discovery_r17.size() > 0) {
+    j.write_str("supportedBandCombinationListSL-RelayDiscovery-r17",
+                supported_band_combination_list_sl_relay_discovery_r17.to_string());
+  }
+  if (supported_band_combination_list_sl_non_relay_discovery_r17.size() > 0) {
+    j.write_str("supportedBandCombinationListSL-NonRelayDiscovery-r17",
+                supported_band_combination_list_sl_non_relay_discovery_r17.to_string());
+  }
+  if (supported_band_combination_list_sidelink_eutra_nr_v1710.is_present()) {
+    j.start_array("supportedBandCombinationListSidelinkEUTRA-NR-v1710");
+    for (const auto& e1 : *supported_band_combination_list_sidelink_eutra_nr_v1710) {
+      j.start_array();
+      for (const auto& e2 : e1) {
+        e2.to_json(j);
+      }
+      j.end_array();
+    }
+    j.end_array();
+  }
+  if (sidelink_requested_r17_present) {
+    j.write_str("sidelinkRequested-r17", "true");
+  }
+  if (extended_band_n77_2_r17_present) {
+    j.write_str("extendedBand-n77-2-r17", "supported");
+  }
+  if (supported_band_combination_list_v1720.is_present()) {
+    j.start_array("supportedBandCombinationList-v1720");
+    for (const auto& e1 : *supported_band_combination_list_v1720) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1720.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1720");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1720) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1730.is_present()) {
+    j.start_array("supportedBandCombinationList-v1730");
+    for (const auto& e1 : *supported_band_combination_list_v1730) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1730.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1730");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1730) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_sl_relay_discovery_v1730.is_present()) {
+    j.start_array("supportedBandCombinationListSL-RelayDiscovery-v1730");
+    for (const auto& e1 : *supported_band_combination_list_sl_relay_discovery_v1730) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_sl_non_relay_discovery_v1730.is_present()) {
+    j.start_array("supportedBandCombinationListSL-NonRelayDiscovery-v1730");
+    for (const auto& e1 : *supported_band_combination_list_sl_non_relay_discovery_v1730) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1740.is_present()) {
+    j.start_array("supportedBandCombinationList-v1740");
+    for (const auto& e1 : *supported_band_combination_list_v1740) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1740.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1740");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1740) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1760.is_present()) {
+    j.start_array("supportedBandCombinationList-v1760");
+    for (const auto& e1 : *supported_band_combination_list_v1760) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1760.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1760");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1760) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (dummy1.is_present()) {
+    j.start_array("dummy1");
+    for (const auto& e1 : *dummy1) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (dummy2.is_present()) {
+    j.start_array("dummy2");
+    for (const auto& e1 : *dummy2) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1780.is_present()) {
+    j.start_array("supportedBandCombinationList-v1780");
+    for (const auto& e1 : *supported_band_combination_list_v1780) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1780.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1780");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1780) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1800.is_present()) {
+    j.start_array("supportedBandCombinationList-v1800");
+    for (const auto& e1 : *supported_band_combination_list_v1800) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1800.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1800");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1800) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_sl_u2_u_relay_r18.is_present()) {
+    j.write_fieldname("supportedBandCombinationListSL-U2U-Relay-r18");
+    j.start_obj();
+    if (supported_band_combination_list_sl_u2_u_relay_r18->supported_band_combination_list_sl_u2_u_relay_discovery_r18
+            .size() > 0) {
+      j.write_str("supportedBandCombinationListSL-U2U-RelayDiscovery-r18",
+                  supported_band_combination_list_sl_u2_u_relay_r18
+                      ->supported_band_combination_list_sl_u2_u_relay_discovery_r18.to_string());
+    }
+    if (supported_band_combination_list_sl_u2_u_relay_r18->supported_band_combination_list_sl_u2_u_discovery_ext
+            .size() > 0) {
+      j.start_array("supportedBandCombinationListSL-U2U-DiscoveryExt");
+      for (const auto& e1 :
+           supported_band_combination_list_sl_u2_u_relay_r18->supported_band_combination_list_sl_u2_u_discovery_ext) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (srs_switching_time_requested_present) {
-      j.write_str("srs-SwitchingTimeRequested", "true");
+    j.end_obj();
+  }
+  if (supported_band_combination_list_v1830.is_present()) {
+    j.start_array("supportedBandCombinationList-v1830");
+    for (const auto& e1 : *supported_band_combination_list_v1830) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1550.is_present()) {
-      j.start_array("supportedBandCombinationList-v1550");
-      for (const auto& e1 : *supported_band_combination_list_v1550) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1830.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1830");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1830) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1560.is_present()) {
-      j.start_array("supportedBandCombinationList-v1560");
-      for (const auto& e1 : *supported_band_combination_list_v1560) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1840.is_present()) {
+    j.start_array("supportedBandCombinationList-v1840");
+    for (const auto& e1 : *supported_band_combination_list_v1840) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1610.is_present()) {
-      j.start_array("supportedBandCombinationList-v1610");
-      for (const auto& e1 : *supported_band_combination_list_v1610) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1840.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1840");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1840) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_sidelink_eutra_nr_r16.is_present()) {
-      j.start_array("supportedBandCombinationListSidelinkEUTRA-NR-r16");
-      for (const auto& e1 : *supported_band_combination_list_sidelink_eutra_nr_r16) {
-        j.start_array();
-        for (const auto& e2 : e1) {
-          e2.to_json(j);
-        }
-        j.end_array();
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1860.is_present()) {
+    j.start_array("supportedBandCombinationList-v1860");
+    for (const auto& e1 : *supported_band_combination_list_v1860) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_r16.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-r16");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_r16) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1860.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1860");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1860) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1630.is_present()) {
-      j.start_array("supportedBandCombinationList-v1630");
-      for (const auto& e1 : *supported_band_combination_list_v1630) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_sidelink_eutra_nr_v1630.is_present()) {
-      j.start_array("supportedBandCombinationListSidelinkEUTRA-NR-v1630");
-      for (const auto& e1 : *supported_band_combination_list_sidelink_eutra_nr_v1630) {
-        j.start_array();
-        for (const auto& e2 : e1) {
-          e2.to_json(j);
-        }
-        j.end_array();
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1630.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1630");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1630) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1640.is_present()) {
-      j.start_array("supportedBandCombinationList-v1640");
-      for (const auto& e1 : *supported_band_combination_list_v1640) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1640.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1640");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1640) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1650.is_present()) {
-      j.start_array("supportedBandCombinationList-v1650");
-      for (const auto& e1 : *supported_band_combination_list_v1650) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1650.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1650");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1650) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (extended_band_n77_r16_present) {
-      j.write_str("extendedBand-n77-r16", "supported");
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1670.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1670");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1670) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1680.is_present()) {
-      j.start_array("supportedBandCombinationList-v1680");
-      for (const auto& e1 : *supported_band_combination_list_v1680) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1690.is_present()) {
-      j.start_array("supportedBandCombinationList-v1690");
-      for (const auto& e1 : *supported_band_combination_list_v1690) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1690.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1690");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1690) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1700.is_present()) {
-      j.start_array("supportedBandCombinationList-v1700");
-      for (const auto& e1 : *supported_band_combination_list_v1700) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1700.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1700");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1700) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_sl_relay_discovery_r17.size() > 0) {
-      j.write_str("supportedBandCombinationListSL-RelayDiscovery-r17",
-                  supported_band_combination_list_sl_relay_discovery_r17.to_string());
-    }
-    if (supported_band_combination_list_sl_non_relay_discovery_r17.size() > 0) {
-      j.write_str("supportedBandCombinationListSL-NonRelayDiscovery-r17",
-                  supported_band_combination_list_sl_non_relay_discovery_r17.to_string());
-    }
-    if (supported_band_combination_list_sidelink_eutra_nr_v1710.is_present()) {
-      j.start_array("supportedBandCombinationListSidelinkEUTRA-NR-v1710");
-      for (const auto& e1 : *supported_band_combination_list_sidelink_eutra_nr_v1710) {
-        j.start_array();
-        for (const auto& e2 : e1) {
-          e2.to_json(j);
-        }
-        j.end_array();
-      }
-      j.end_array();
-    }
-    if (sidelink_requested_r17_present) {
-      j.write_str("sidelinkRequested-r17", "true");
-    }
-    if (extended_band_n77_2_r17_present) {
-      j.write_str("extendedBand-n77-2-r17", "supported");
-    }
-    if (supported_band_combination_list_v1720.is_present()) {
-      j.start_array("supportedBandCombinationList-v1720");
-      for (const auto& e1 : *supported_band_combination_list_v1720) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1720.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1720");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1720) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1730.is_present()) {
-      j.start_array("supportedBandCombinationList-v1730");
-      for (const auto& e1 : *supported_band_combination_list_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1730.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1730");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_sl_relay_discovery_v1730.is_present()) {
-      j.start_array("supportedBandCombinationListSL-RelayDiscovery-v1730");
-      for (const auto& e1 : *supported_band_combination_list_sl_relay_discovery_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_sl_non_relay_discovery_v1730.is_present()) {
-      j.start_array("supportedBandCombinationListSL-NonRelayDiscovery-v1730");
-      for (const auto& e1 : *supported_band_combination_list_sl_non_relay_discovery_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1740.is_present()) {
-      j.start_array("supportedBandCombinationList-v1740");
-      for (const auto& e1 : *supported_band_combination_list_v1740) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1740.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1740");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1740) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1760.is_present()) {
-      j.start_array("supportedBandCombinationList-v1760");
-      for (const auto& e1 : *supported_band_combination_list_v1760) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1760.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1760");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1760) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (dummy1.is_present()) {
-      j.start_array("dummy1");
-      for (const auto& e1 : *dummy1) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (dummy2.is_present()) {
-      j.start_array("dummy2");
-      for (const auto& e1 : *dummy2) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1780.is_present()) {
-      j.start_array("supportedBandCombinationList-v1780");
-      for (const auto& e1 : *supported_band_combination_list_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1780.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1780");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1800.is_present()) {
-      j.start_array("supportedBandCombinationList-v1800");
-      for (const auto& e1 : *supported_band_combination_list_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1800.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1800");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_sl_u2_u_relay_r18.is_present()) {
-      j.write_fieldname("supportedBandCombinationListSL-U2U-Relay-r18");
-      j.start_obj();
-      if (supported_band_combination_list_sl_u2_u_relay_r18->supported_band_combination_list_sl_u2_u_relay_discovery_r18
-              .size() > 0) {
-        j.write_str("supportedBandCombinationListSL-U2U-RelayDiscovery-r18",
-                    supported_band_combination_list_sl_u2_u_relay_r18
-                        ->supported_band_combination_list_sl_u2_u_relay_discovery_r18.to_string());
-      }
-      if (supported_band_combination_list_sl_u2_u_relay_r18->supported_band_combination_list_sl_u2_u_discovery_ext
-              .size() > 0) {
-        j.start_array("supportedBandCombinationListSL-U2U-DiscoveryExt");
-        for (const auto& e1 :
-             supported_band_combination_list_sl_u2_u_relay_r18->supported_band_combination_list_sl_u2_u_discovery_ext) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      j.end_obj();
-    }
-    if (supported_band_combination_list_v1830.is_present()) {
-      j.start_array("supportedBandCombinationList-v1830");
-      for (const auto& e1 : *supported_band_combination_list_v1830) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1830.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1830");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1830) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1840.is_present()) {
-      j.start_array("supportedBandCombinationList-v1840");
-      for (const auto& e1 : *supported_band_combination_list_v1840) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1840.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1840");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1840) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1860.is_present()) {
-      j.start_array("supportedBandCombinationList-v1860");
-      for (const auto& e1 : *supported_band_combination_list_v1860) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_ul_tx_switch_v1860.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1860");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1860) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
+    j.end_array();
   }
   j.end_obj();
 }
@@ -50441,7 +50437,7 @@ OCUDUASN_CODE rf_params_mrdc_s::pack(bit_ref& bref) const
   group_flags[20] |= supported_band_combination_list_ul_tx_switch_v1840.is_present();
   group_flags[21] |= supported_band_combination_list_v1860.is_present();
   group_flags[21] |= supported_band_combination_list_ul_tx_switch_v1860.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(supported_band_combination_list.size() > 0, 1));
   HANDLE_CODE(bref.pack(applied_freq_band_list_filt.size() > 0, 1));
 
@@ -50452,7 +50448,7 @@ OCUDUASN_CODE rf_params_mrdc_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_dyn_seq_of(bref, applied_freq_band_list_filt, 1, 1280));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -50765,7 +50761,8 @@ OCUDUASN_CODE rf_params_mrdc_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE rf_params_mrdc_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool supported_band_combination_list_present;
   HANDLE_CODE(bref.unpack(supported_band_combination_list_present, 1));
   bool applied_freq_band_list_filt_present;
@@ -51085,363 +51082,361 @@ void rf_params_mrdc_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (srs_switching_time_requested_present) {
-      j.write_str("srs-SwitchingTimeRequested", "true");
+  if (srs_switching_time_requested_present) {
+    j.write_str("srs-SwitchingTimeRequested", "true");
+  }
+  if (supported_band_combination_list_v1540.is_present()) {
+    j.start_array("supportedBandCombinationList-v1540");
+    for (const auto& e1 : *supported_band_combination_list_v1540) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1540.is_present()) {
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1550.is_present()) {
+    j.start_array("supportedBandCombinationList-v1550");
+    for (const auto& e1 : *supported_band_combination_list_v1550) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1560.is_present()) {
+    j.start_array("supportedBandCombinationList-v1560");
+    for (const auto& e1 : *supported_band_combination_list_v1560) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1570.is_present()) {
+    j.start_array("supportedBandCombinationList-v1570");
+    for (const auto& e1 : *supported_band_combination_list_v1570) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1580.is_present()) {
+    j.start_array("supportedBandCombinationList-v1580");
+    for (const auto& e1 : *supported_band_combination_list_v1580) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1590.is_present()) {
+    j.start_array("supportedBandCombinationList-v1590");
+    for (const auto& e1 : *supported_band_combination_list_v1590) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v15a0.is_present()) {
+    j.write_fieldname("supportedBandCombinationListNEDC-Only-v15a0");
+    j.start_obj();
+    if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1540.size() > 0) {
       j.start_array("supportedBandCombinationList-v1540");
-      for (const auto& e1 : *supported_band_combination_list_v1540) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1540) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_v1550.is_present()) {
-      j.start_array("supportedBandCombinationList-v1550");
-      for (const auto& e1 : *supported_band_combination_list_v1550) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1560.is_present()) {
+    if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1560.size() > 0) {
       j.start_array("supportedBandCombinationList-v1560");
-      for (const auto& e1 : *supported_band_combination_list_v1560) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1560) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_nedc_only.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1570.is_present()) {
+    if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1570.size() > 0) {
       j.start_array("supportedBandCombinationList-v1570");
-      for (const auto& e1 : *supported_band_combination_list_v1570) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1570) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_v1580.is_present()) {
+    if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1580.size() > 0) {
       j.start_array("supportedBandCombinationList-v1580");
-      for (const auto& e1 : *supported_band_combination_list_v1580) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1580) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_v1590.is_present()) {
+    if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1590.size() > 0) {
       j.start_array("supportedBandCombinationList-v1590");
-      for (const auto& e1 : *supported_band_combination_list_v1590) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1590) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_nedc_only_v15a0.is_present()) {
-      j.write_fieldname("supportedBandCombinationListNEDC-Only-v15a0");
-      j.start_obj();
-      if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1540.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1540");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1540) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1560.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1560");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1560) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1570.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1570");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1570) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1580.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1580");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1580) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      if (supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1590.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1590");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v15a0->supported_band_combination_list_v1590) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      j.end_obj();
+    j.end_obj();
+  }
+  if (supported_band_combination_list_v1610.is_present()) {
+    j.start_array("supportedBandCombinationList-v1610");
+    for (const auto& e1 : *supported_band_combination_list_v1610) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1610.is_present()) {
-      j.start_array("supportedBandCombinationList-v1610");
-      for (const auto& e1 : *supported_band_combination_list_v1610) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1610.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only-v1610");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only_v1610) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_nedc_only_v1610.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only-v1610");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only_v1610) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_r16.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-r16");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_r16) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_r16.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-r16");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_r16) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1630.is_present()) {
+    j.start_array("supportedBandCombinationList-v1630");
+    for (const auto& e1 : *supported_band_combination_list_v1630) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1630.is_present()) {
-      j.start_array("supportedBandCombinationList-v1630");
-      for (const auto& e1 : *supported_band_combination_list_v1630) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1630.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only-v1630");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only_v1630) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_nedc_only_v1630.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only-v1630");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only_v1630) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1630.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1630");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1630) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1630.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1630");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1630) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1640.is_present()) {
+    j.start_array("supportedBandCombinationList-v1640");
+    for (const auto& e1 : *supported_band_combination_list_v1640) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1640.is_present()) {
-      j.start_array("supportedBandCombinationList-v1640");
-      for (const auto& e1 : *supported_band_combination_list_v1640) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1640.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only-v1640");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only_v1640) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_nedc_only_v1640.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only-v1640");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only_v1640) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1640.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1640");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1640) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1640.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1640");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1640) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1670.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1670");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1670) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1670.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1670");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1670) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1700.is_present()) {
+    j.start_array("supportedBandCombinationList-v1700");
+    for (const auto& e1 : *supported_band_combination_list_v1700) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1700.is_present()) {
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1700.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1700");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1700) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1720.is_present()) {
+    j.start_array("supportedBandCombinationList-v1720");
+    for (const auto& e1 : *supported_band_combination_list_v1720) {
+      e1.to_json(j);
+    }
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1720.is_present()) {
+    j.write_fieldname("supportedBandCombinationListNEDC-Only-v1720");
+    j.start_obj();
+    if (supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1700.size() > 0) {
       j.start_array("supportedBandCombinationList-v1700");
-      for (const auto& e1 : *supported_band_combination_list_v1700) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1700) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_ul_tx_switch_v1700.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1700");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1700) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
-    if (supported_band_combination_list_v1720.is_present()) {
+    if (supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1720.size() > 0) {
       j.start_array("supportedBandCombinationList-v1720");
-      for (const auto& e1 : *supported_band_combination_list_v1720) {
+      for (const auto& e1 : supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1720) {
         e1.to_json(j);
       }
       j.end_array();
     }
-    if (supported_band_combination_list_nedc_only_v1720.is_present()) {
-      j.write_fieldname("supportedBandCombinationListNEDC-Only-v1720");
-      j.start_obj();
-      if (supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1700.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1700");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1700) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      if (supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1720.size() > 0) {
-        j.start_array("supportedBandCombinationList-v1720");
-        for (const auto& e1 : supported_band_combination_list_nedc_only_v1720->supported_band_combination_list_v1720) {
-          e1.to_json(j);
-        }
-        j.end_array();
-      }
-      j.end_obj();
+    j.end_obj();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1720.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1720");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1720) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1720.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1720");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1720) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1730.is_present()) {
+    j.start_array("supportedBandCombinationList-v1730");
+    for (const auto& e1 : *supported_band_combination_list_v1730) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1730.is_present()) {
-      j.start_array("supportedBandCombinationList-v1730");
-      for (const auto& e1 : *supported_band_combination_list_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1730.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only-v1730");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only_v1730) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_nedc_only_v1730.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only-v1730");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1730.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1730");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1730) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1730.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1730");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1730) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1740.is_present()) {
+    j.start_array("supportedBandCombinationList-v1740");
+    for (const auto& e1 : *supported_band_combination_list_v1740) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1740.is_present()) {
-      j.start_array("supportedBandCombinationList-v1740");
-      for (const auto& e1 : *supported_band_combination_list_v1740) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1740.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only-v1740");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only_v1740) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_nedc_only_v1740.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only-v1740");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only_v1740) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1740.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1740");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1740) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1740.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1740");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1740) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (dummy1.is_present()) {
+    j.start_array("dummy1");
+    for (const auto& e1 : *dummy1) {
+      e1.to_json(j);
     }
-    if (dummy1.is_present()) {
-      j.start_array("dummy1");
-      for (const auto& e1 : *dummy1) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (dummy2.is_present()) {
+    j.start_array("dummy2");
+    for (const auto& e1 : *dummy2) {
+      e1.to_json(j);
     }
-    if (dummy2.is_present()) {
-      j.start_array("dummy2");
-      for (const auto& e1 : *dummy2) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1780.is_present()) {
+    j.start_array("supportedBandCombinationList-v1780");
+    for (const auto& e1 : *supported_band_combination_list_v1780) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1780.is_present()) {
-      j.start_array("supportedBandCombinationList-v1780");
-      for (const auto& e1 : *supported_band_combination_list_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_nedc_only_v1780.is_present()) {
+    j.start_array("supportedBandCombinationListNEDC-Only-v1780");
+    for (const auto& e1 : *supported_band_combination_list_nedc_only_v1780) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_nedc_only_v1780.is_present()) {
-      j.start_array("supportedBandCombinationListNEDC-Only-v1780");
-      for (const auto& e1 : *supported_band_combination_list_nedc_only_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1780.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1780");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1780) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1780.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1780");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1780) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1790.is_present()) {
+    j.start_array("supportedBandCombinationList-v1790");
+    for (const auto& e1 : *supported_band_combination_list_v1790) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1790.is_present()) {
-      j.start_array("supportedBandCombinationList-v1790");
-      for (const auto& e1 : *supported_band_combination_list_v1790) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1790.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1790");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1790) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1790.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1790");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1790) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1800.is_present()) {
+    j.start_array("supportedBandCombinationList-v1800");
+    for (const auto& e1 : *supported_band_combination_list_v1800) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1800.is_present()) {
-      j.start_array("supportedBandCombinationList-v1800");
-      for (const auto& e1 : *supported_band_combination_list_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1800.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1800");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1800) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1800.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1800");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1800) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1830.is_present()) {
+    j.start_array("supportedBandCombinationList-v1830");
+    for (const auto& e1 : *supported_band_combination_list_v1830) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1830.is_present()) {
-      j.start_array("supportedBandCombinationList-v1830");
-      for (const auto& e1 : *supported_band_combination_list_v1830) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1830.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1830");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1830) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1830.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1830");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1830) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1840.is_present()) {
+    j.start_array("supportedBandCombinationList-v1840");
+    for (const auto& e1 : *supported_band_combination_list_v1840) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1840.is_present()) {
-      j.start_array("supportedBandCombinationList-v1840");
-      for (const auto& e1 : *supported_band_combination_list_v1840) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1840.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1840");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1840) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1840.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1840");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1840) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_v1860.is_present()) {
+    j.start_array("supportedBandCombinationList-v1860");
+    for (const auto& e1 : *supported_band_combination_list_v1860) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_v1860.is_present()) {
-      j.start_array("supportedBandCombinationList-v1860");
-      for (const auto& e1 : *supported_band_combination_list_v1860) {
-        e1.to_json(j);
-      }
-      j.end_array();
+    j.end_array();
+  }
+  if (supported_band_combination_list_ul_tx_switch_v1860.is_present()) {
+    j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1860");
+    for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1860) {
+      e1.to_json(j);
     }
-    if (supported_band_combination_list_ul_tx_switch_v1860.is_present()) {
-      j.start_array("supportedBandCombinationList-UplinkTxSwitch-v1860");
-      for (const auto& e1 : *supported_band_combination_list_ul_tx_switch_v1860) {
-        e1.to_json(j);
-      }
-      j.end_array();
-    }
+    j.end_array();
   }
   j.end_obj();
 }
@@ -51575,12 +51570,12 @@ OCUDUASN_CODE rlc_params_s::pack(bit_ref& bref) const
   group_flags[0] |= extended_t_status_prohibit_r16_present;
   group_flags[1] |= am_with_long_sn_red_cap_r17_present;
   group_flags[2] |= am_with_long_sn_ncr_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(am_with_short_sn_present, 1));
   HANDLE_CODE(bref.pack(um_with_short_sn_present, 1));
   HANDLE_CODE(bref.pack(um_with_long_sn_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -51604,7 +51599,8 @@ OCUDUASN_CODE rlc_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE rlc_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(am_with_short_sn_present, 1));
   HANDLE_CODE(bref.unpack(um_with_short_sn_present, 1));
   HANDLE_CODE(bref.unpack(um_with_long_sn_present, 1));
@@ -51641,19 +51637,17 @@ void rlc_params_s::to_json(json_writer& j) const
   if (um_with_long_sn_present) {
     j.write_str("um-WithLongSN", "supported");
   }
-  if (ext) {
-    if (extended_t_poll_retx_r16_present) {
-      j.write_str("extendedT-PollRetransmit-r16", "supported");
-    }
-    if (extended_t_status_prohibit_r16_present) {
-      j.write_str("extendedT-StatusProhibit-r16", "supported");
-    }
-    if (am_with_long_sn_red_cap_r17_present) {
-      j.write_str("am-WithLongSN-RedCap-r17", "supported");
-    }
-    if (am_with_long_sn_ncr_r18_present) {
-      j.write_str("am-WithLongSN-NCR-r18", "supported");
-    }
+  if (extended_t_poll_retx_r16_present) {
+    j.write_str("extendedT-PollRetransmit-r16", "supported");
+  }
+  if (extended_t_status_prohibit_r16_present) {
+    j.write_str("extendedT-StatusProhibit-r16", "supported");
+  }
+  if (am_with_long_sn_red_cap_r17_present) {
+    j.write_str("am-WithLongSN-RedCap-r17", "supported");
+  }
+  if (am_with_long_sn_ncr_r18_present) {
+    j.write_str("am-WithLongSN-NCR-r18", "supported");
   }
   j.end_obj();
 }
@@ -51669,7 +51663,8 @@ OCUDUASN_CODE rlc_params_sidelink_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE rlc_params_sidelink_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(am_with_long_sn_sidelink_r16_present, 1));
   HANDLE_CODE(bref.unpack(um_with_long_sn_sidelink_r16_present, 1));
 
@@ -51758,12 +51753,12 @@ OCUDUASN_CODE relay_params_r17_s::pack(bit_ref& bref) const
   group_flags[0] |= pdcp_dupl_mp_split_srb_r18_present;
   group_flags[0] |= directpath_rlf_recovery_via_srb1_r18_present;
   group_flags[0] |= split_drb_with_ul_both_direct_indirect_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(relay_ue_operation_l2_r17_present, 1));
   HANDLE_CODE(bref.pack(remote_ue_operation_l2_r17_present, 1));
   HANDLE_CODE(bref.pack(remote_ue_path_switch_to_idle_inactive_relay_r17_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -51789,7 +51784,8 @@ OCUDUASN_CODE relay_params_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE relay_params_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(relay_ue_operation_l2_r17_present, 1));
   HANDLE_CODE(bref.unpack(remote_ue_operation_l2_r17_present, 1));
   HANDLE_CODE(bref.unpack(remote_ue_path_switch_to_idle_inactive_relay_r17_present, 1));
@@ -51830,49 +51826,47 @@ void relay_params_r17_s::to_json(json_writer& j) const
   if (remote_ue_path_switch_to_idle_inactive_relay_r17_present) {
     j.write_str("remoteUE-PathSwitchToIdleInactiveRelay-r17", "supported");
   }
-  if (ext) {
-    if (relay_ue_u2_u_operation_l2_r18_present) {
-      j.write_str("relayUE-U2U-OperationL2-r18", "supported");
-    }
-    if (remote_ue_u2_u_operation_l2_r18_present) {
-      j.write_str("remoteUE-U2U-OperationL2-r18", "supported");
-    }
-    if (remote_ue_u2_n_path_switch_operation_l2_r18_present) {
-      j.write_str("remoteUE-U2N-PathSwitchOperationL2-r18", "supported");
-    }
-    if (multipath_remote_ue_pc5_l2_r18_present) {
-      j.write_str("multipathRemoteUE-PC5L2-r18", "supported");
-    }
-    if (multipath_relay_ue_n3_c_r18_present) {
-      j.write_str("multipathRelayUE-N3C-r18", "supported");
-    }
-    if (multipath_remote_ue_n3_c_r18_present) {
-      j.write_str("multipathRemoteUE-N3C-r18", "supported");
-    }
-    if (remote_ue_indirect_path_add_change_to_idle_inactive_relay_r18_present) {
-      j.write_str("remoteUE-IndirectPathAddChangeToIdleInactiveRelay-r18", "supported");
-    }
-    if (pdcp_dupl_more_than_one_uu_rlc_r18_present) {
-      j.write_str("pdcp-DuplicationMoreThanOneUuRLC-r18", "supported");
-    }
-    if (pdcp_ca_dupl_directpath_drb_r18_present) {
-      j.write_str("pdcp-CADuplicationDirectpath-DRB-r18", "supported");
-    }
-    if (pdcp_ca_dupl_directpath_srb_r18_present) {
-      j.write_str("pdcp-CADuplicationDirectpath-SRB-r18", "supported");
-    }
-    if (pdcp_dupl_mp_split_drb_r18_present) {
-      j.write_str("pdcp-DuplicationMP-SplitDRB-r18", "supported");
-    }
-    if (pdcp_dupl_mp_split_srb_r18_present) {
-      j.write_str("pdcp-DuplicationMP-SplitSRB-r18", "supported");
-    }
-    if (directpath_rlf_recovery_via_srb1_r18_present) {
-      j.write_str("directpathRLF-RecoveryViaSRB1-r18", "supported");
-    }
-    if (split_drb_with_ul_both_direct_indirect_r18_present) {
-      j.write_str("splitDRB-WithUL-BothDirectIndirect-r18", "supported");
-    }
+  if (relay_ue_u2_u_operation_l2_r18_present) {
+    j.write_str("relayUE-U2U-OperationL2-r18", "supported");
+  }
+  if (remote_ue_u2_u_operation_l2_r18_present) {
+    j.write_str("remoteUE-U2U-OperationL2-r18", "supported");
+  }
+  if (remote_ue_u2_n_path_switch_operation_l2_r18_present) {
+    j.write_str("remoteUE-U2N-PathSwitchOperationL2-r18", "supported");
+  }
+  if (multipath_remote_ue_pc5_l2_r18_present) {
+    j.write_str("multipathRemoteUE-PC5L2-r18", "supported");
+  }
+  if (multipath_relay_ue_n3_c_r18_present) {
+    j.write_str("multipathRelayUE-N3C-r18", "supported");
+  }
+  if (multipath_remote_ue_n3_c_r18_present) {
+    j.write_str("multipathRemoteUE-N3C-r18", "supported");
+  }
+  if (remote_ue_indirect_path_add_change_to_idle_inactive_relay_r18_present) {
+    j.write_str("remoteUE-IndirectPathAddChangeToIdleInactiveRelay-r18", "supported");
+  }
+  if (pdcp_dupl_more_than_one_uu_rlc_r18_present) {
+    j.write_str("pdcp-DuplicationMoreThanOneUuRLC-r18", "supported");
+  }
+  if (pdcp_ca_dupl_directpath_drb_r18_present) {
+    j.write_str("pdcp-CADuplicationDirectpath-DRB-r18", "supported");
+  }
+  if (pdcp_ca_dupl_directpath_srb_r18_present) {
+    j.write_str("pdcp-CADuplicationDirectpath-SRB-r18", "supported");
+  }
+  if (pdcp_dupl_mp_split_drb_r18_present) {
+    j.write_str("pdcp-DuplicationMP-SplitDRB-r18", "supported");
+  }
+  if (pdcp_dupl_mp_split_srb_r18_present) {
+    j.write_str("pdcp-DuplicationMP-SplitSRB-r18", "supported");
+  }
+  if (directpath_rlf_recovery_via_srb1_r18_present) {
+    j.write_str("directpathRLF-RecoveryViaSRB1-r18", "supported");
+  }
+  if (split_drb_with_ul_both_direct_indirect_r18_present) {
+    j.write_str("splitDRB-WithUL-BothDirectIndirect-r18", "supported");
   }
   j.end_obj();
 }
@@ -51885,10 +51879,10 @@ OCUDUASN_CODE sdap_params_s::pack(bit_ref& bref) const
   group_flags[0] |= sdap_hdr_iab_r16_present;
   group_flags[1] |= sdap_qos_ncr_r18_present;
   group_flags[1] |= sdap_hdr_ncr_r18_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(as_reflective_qos_present, 1));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -51908,7 +51902,8 @@ OCUDUASN_CODE sdap_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE sdap_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(as_reflective_qos_present, 1));
 
   if (ext) {
@@ -51934,19 +51929,17 @@ void sdap_params_s::to_json(json_writer& j) const
   if (as_reflective_qos_present) {
     j.write_str("as-ReflectiveQoS", "true");
   }
-  if (ext) {
-    if (sdap_qos_iab_r16_present) {
-      j.write_str("sdap-QOS-IAB-r16", "supported");
-    }
-    if (sdap_hdr_iab_r16_present) {
-      j.write_str("sdapHeaderIAB-r16", "supported");
-    }
-    if (sdap_qos_ncr_r18_present) {
-      j.write_str("sdap-QOS-NCR-r18", "supported");
-    }
-    if (sdap_hdr_ncr_r18_present) {
-      j.write_str("sdap-HeaderNCR-r18", "supported");
-    }
+  if (sdap_qos_iab_r16_present) {
+    j.write_str("sdap-QOS-IAB-r16", "supported");
+  }
+  if (sdap_hdr_iab_r16_present) {
+    j.write_str("sdapHeaderIAB-r16", "supported");
+  }
+  if (sdap_qos_ncr_r18_present) {
+    j.write_str("sdap-QOS-NCR-r18", "supported");
+  }
+  if (sdap_hdr_ncr_r18_present) {
+    j.write_str("sdap-HeaderNCR-r18", "supported");
   }
   j.end_obj();
 }
@@ -51990,7 +51983,7 @@ OCUDUASN_CODE sidelink_params_nr_r16_s::pack(bit_ref& bref) const
   group_flags[1] |= p0_olpc_sidelink_r17_present;
   group_flags[2] |= pdcp_params_sidelink_r18.is_present();
   group_flags[2] |= sl_prs_common_proc_cap_per_ue_r18.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(rlc_params_sidelink_r16_present, 1));
   HANDLE_CODE(bref.pack(mac_params_sidelink_r16_present, 1));
   HANDLE_CODE(bref.pack(fdd_add_ue_sidelink_cap_r16_present, 1));
@@ -52013,7 +52006,7 @@ OCUDUASN_CODE sidelink_params_nr_r16_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_dyn_seq_of(bref, supported_band_list_sidelink_r16, 1, 1024));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -52063,7 +52056,8 @@ OCUDUASN_CODE sidelink_params_nr_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE sidelink_params_nr_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(rlc_params_sidelink_r16_present, 1));
   HANDLE_CODE(bref.unpack(mac_params_sidelink_r16_present, 1));
   HANDLE_CODE(bref.unpack(fdd_add_ue_sidelink_cap_r16_present, 1));
@@ -52163,43 +52157,41 @@ void sidelink_params_nr_r16_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (relay_params_r17.is_present()) {
-      j.write_fieldname("relayParameters-r17");
-      relay_params_r17->to_json(j);
+  if (relay_params_r17.is_present()) {
+    j.write_fieldname("relayParameters-r17");
+    relay_params_r17->to_json(j);
+  }
+  if (p0_olpc_sidelink_r17_present) {
+    j.write_str("p0-OLPC-Sidelink-r17", "supported");
+  }
+  if (pdcp_params_sidelink_r18.is_present()) {
+    j.write_fieldname("pdcp-ParametersSidelink-r18");
+    pdcp_params_sidelink_r18->to_json(j);
+  }
+  if (sl_prs_common_proc_cap_per_ue_r18.is_present()) {
+    j.write_fieldname("sl-PRS-CommonProcCapabilityPerUE-r18");
+    j.start_obj();
+    j.write_fieldname("maxNumOfActiveSL-PRS-Resources-r18");
+    j.start_obj();
+    if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr1_r18_present) {
+      j.write_str("fr1-r18", sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr1_r18.to_string());
     }
-    if (p0_olpc_sidelink_r17_present) {
-      j.write_str("p0-OLPC-Sidelink-r17", "supported");
+    if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr2_r18_present) {
+      j.write_str("fr2-r18", sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr2_r18.to_string());
     }
-    if (pdcp_params_sidelink_r18.is_present()) {
-      j.write_fieldname("pdcp-ParametersSidelink-r18");
-      pdcp_params_sidelink_r18->to_json(j);
+    j.end_obj();
+    j.write_fieldname("maxNumOfSlotswithActiveSL-PRS-Resources-r18");
+    j.start_obj();
+    if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr1_r18_present) {
+      j.write_str("fr1-r18",
+                  sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr1_r18.to_string());
     }
-    if (sl_prs_common_proc_cap_per_ue_r18.is_present()) {
-      j.write_fieldname("sl-PRS-CommonProcCapabilityPerUE-r18");
-      j.start_obj();
-      j.write_fieldname("maxNumOfActiveSL-PRS-Resources-r18");
-      j.start_obj();
-      if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr1_r18_present) {
-        j.write_str("fr1-r18", sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr1_r18.to_string());
-      }
-      if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr2_r18_present) {
-        j.write_str("fr2-r18", sl_prs_common_proc_cap_per_ue_r18->max_num_of_active_sl_prs_res_r18.fr2_r18.to_string());
-      }
-      j.end_obj();
-      j.write_fieldname("maxNumOfSlotswithActiveSL-PRS-Resources-r18");
-      j.start_obj();
-      if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr1_r18_present) {
-        j.write_str("fr1-r18",
-                    sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr1_r18.to_string());
-      }
-      if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr2_r18_present) {
-        j.write_str("fr2-r18",
-                    sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr2_r18.to_string());
-      }
-      j.end_obj();
-      j.end_obj();
+    if (sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr2_r18_present) {
+      j.write_str("fr2-r18",
+                  sl_prs_common_proc_cap_per_ue_r18->max_num_of_slotswith_active_sl_prs_res_r18.fr2_r18.to_string());
     }
+    j.end_obj();
+    j.end_obj();
   }
   j.end_obj();
 }
@@ -52314,7 +52306,8 @@ OCUDUASN_CODE sidelink_params_eutra_r16_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE sidelink_params_eutra_r16_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool sl_params_eutra1_r16_present;
   HANDLE_CODE(bref.unpack(sl_params_eutra1_r16_present, 1));
   bool sl_params_eutra2_r16_present;
@@ -53127,7 +53120,8 @@ OCUDUASN_CODE ue_radio_paging_info_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ue_radio_paging_info_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool pei_subgrouping_support_band_list_r17_present;
   HANDLE_CODE(bref.unpack(pei_subgrouping_support_band_list_r17_present, 1));
 

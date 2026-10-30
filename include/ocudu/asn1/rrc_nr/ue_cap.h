@@ -281,7 +281,6 @@ struct aerial_params_r18_s {
   using sl_a2_x_service_r18_e_ = enumerated<sl_a2_x_service_r18_opts>;
 
   // member variables
-  bool                   ext                                                = false;
   bool                   aerial_ue_cap_r18_present                          = false;
   bool                   altitude_meas_r18_present                          = false;
   bool                   altitude_based_ssb_to_measure_r18_present          = false;
@@ -341,7 +340,6 @@ struct app_layer_meas_params_r17_s {
   using qoe_add_memory_meas_report_r18_e_ = enumerated<qoe_add_memory_meas_report_r18_opts>;
 
   // member variables
-  bool ext                                                = false;
   bool qoe_streaming_meas_report_r17_present              = false;
   bool qoe_mt_si_meas_report_r17_present                  = false;
   bool qoe_vr_meas_report_r17_present                     = false;
@@ -502,7 +500,6 @@ private:
 
 // CA-ParametersEUTRA ::= SEQUENCE
 struct ca_params_eutra_s {
-  bool                     ext                                              = false;
   bool                     multiple_timing_advance_present                  = false;
   bool                     simul_rx_tx_present                              = false;
   bool                     supported_naics_2_crs_ap_present                 = false;
@@ -531,7 +528,6 @@ struct ca_params_nr_s {
   using supported_num_tag_e_ = enumerated<supported_num_tag_opts>;
 
   // member variables
-  bool                 ext                                                    = false;
   bool                 dummy_present                                          = false;
   bool                 parallel_tx_srs_pucch_pusch_present                    = false;
   bool                 parallel_tx_prach_srs_pucch_pusch_present              = false;
@@ -573,7 +569,6 @@ struct mrdc_params_s {
   using intra_band_endc_support_e_ = enumerated<intra_band_endc_support_opts>;
 
   // member variables
-  bool                          ext                                 = false;
   bool                          single_ul_tx_present                = false;
   bool                          dyn_pwr_sharing_endc_present        = false;
   bool                          tdm_pattern_present                 = false;
@@ -1409,7 +1404,6 @@ struct band_combination_ul_tx_switch_r16_s {
   using ul_tx_switching_pusch_trans_coherence_r16_e_ = enumerated<ul_tx_switching_pusch_trans_coherence_r16_opts>;
 
   // member variables
-  bool                                  ext                                        = false;
   bool                                  band_combination_v1540_present             = false;
   bool                                  band_combination_v1560_present             = false;
   bool                                  band_combination_v1570_present             = false;
@@ -7298,7 +7292,6 @@ struct mimo_params_per_band_s {
   };
 
   // member variables
-  bool                                  ext                                                  = false;
   bool                                  tci_state_pdsch_present                              = false;
   bool                                  add_active_tci_state_pdcch_present                   = false;
   bool                                  pusch_trans_coherence_present                        = false;
@@ -7707,7 +7700,6 @@ struct fr2_2_access_params_per_band_r17_s {
   };
 
   // member variables
-  bool                                         ext                                                  = false;
   bool                                         dl_fr2_2_scs_120k_hz_r17_present                     = false;
   bool                                         ul_fr2_2_scs_120k_hz_r17_present                     = false;
   bool                                         init_access_ssb_120k_hz_r17_present                  = false;
@@ -7940,7 +7932,6 @@ struct pos_srs_rrc_inactive_outside_init_ul_bwp_r17_s {
       enumerated<max_num_of_semi_persistent_srs_pos_res_per_slot_r17_opts>;
 
   // member variables
-  bool ext                                                                     = false;
   bool max_srs_pos_bw_for_each_scs_within_cc_fr1_r17_present                   = false;
   bool max_srs_pos_bw_for_each_scs_within_cc_fr2_r17_present                   = false;
   bool max_num_of_srs_pos_res_sets_r17_present                                 = false;
@@ -8134,7 +8125,6 @@ struct prs_processing_cap_outside_m_gin_ppw_per_type_r17_s {
     using scs120_r17_e_ = enumerated<scs120_r17_opts>;
 
     // member variables
-    bool          ext                = false;
     bool          scs15_r17_present  = false;
     bool          scs30_r17_present  = false;
     bool          scs60_r17_present  = false;
@@ -8319,7 +8309,6 @@ struct dl_prs_meas_with_rx_fh_rrc_connected_r18_s {
   using num_of_overlapping_prb_r18_e_ = enumerated<num_of_overlapping_prb_r18_opts>;
 
   // member variables
-  bool                                  ext                                        = false;
   bool                                  max_prs_bw_across_all_hops_fr1_r18_present = false;
   bool                                  max_prs_bw_across_all_hops_fr2_r18_present = false;
   bool                                  max_fh_hops_r18_present                    = false;
@@ -8426,7 +8415,6 @@ struct pos_srs_tx_freq_hop_rrc_connected_r18_s {
   using max_srs_res_semipersistent_r18_e_ = enumerated<max_srs_res_semipersistent_r18_opts>;
 
   // member variables
-  bool                                           ext                                                 = false;
   bool                                           max_srs_bw_across_all_hops_fr1_r18_present          = false;
   bool                                           max_srs_bw_across_all_hops_fr2_r18_present          = false;
   bool                                           max_tx_fh_hops_r18_present                          = false;
@@ -8531,7 +8519,6 @@ struct pos_srs_tx_freq_hop_rrc_inactive_r18_s {
   using max_srs_res_semipersistent_r18_e_ = enumerated<max_srs_res_semipersistent_r18_opts>;
 
   // member variables
-  bool                                           ext                                                 = false;
   bool                                           max_srs_bw_across_all_hops_fr1_r18_present          = false;
   bool                                           max_srs_bw_across_all_hops_fr2_r18_present          = false;
   bool                                           max_tx_fh_hops_r18_present                          = false;
@@ -8664,7 +8651,6 @@ struct pos_srs_bwa_rrc_inactive_r18_s {
   using pwr_class_for_three_aggr_carriers_r18_e_ = enumerated<pwr_class_for_three_aggr_carriers_r18_opts>;
 
   // member variables
-  bool                                         ext                                           = false;
   bool                                         max_aggr_bw_two_carriers_fr1_r18_present      = false;
   bool                                         max_aggr_bw_two_carriers_fr2_r18_present      = false;
   bool                                         max_aggr_bw_three_carriers_fr1_r18_present    = false;
@@ -8813,7 +8799,6 @@ struct lower_msd_r18_s {
 
 // MAC-ParametersPerBand-r18 ::= SEQUENCE
 struct mac_params_per_band_r18_s {
-  bool ext                           = false;
   bool ptm_retx_r18_present          = false;
   bool ptm_retx_inactive_r18_present = false;
   // ...
@@ -10543,7 +10528,6 @@ struct band_nr_s {
   };
 
   // member variables
-  bool                   ext                                  = false;
   bool                   modified_mpr_behaviour_present       = false;
   bool                   mimo_params_per_band_present         = false;
   bool                   extended_cp_present                  = false;
@@ -11545,7 +11529,6 @@ struct band_sidelink_r16_s {
   };
 
   // member variables
-  bool                              ext                                          = false;
   bool                              sl_reception_r16_present                     = false;
   bool                              sl_tx_mode1_r16_present                      = false;
   bool                              sync_sidelink_r16_present                    = false;
@@ -12092,7 +12075,6 @@ struct e_red_cap_params_r18_s {
 
 // EUTRA-ParametersCommon ::= SEQUENCE
 struct eutra_params_common_s {
-  bool                ext                                 = false;
   bool                mfbi_eutra_present                  = false;
   bool                modified_mpr_behavior_eutra_present = false;
   bool                multi_ns_pmax_eutra_present         = false;
@@ -12112,7 +12094,6 @@ struct eutra_params_common_s {
 
 // EUTRA-ParametersXDD-Diff ::= SEQUENCE
 struct eutra_params_xdd_diff_s {
-  bool ext                              = false;
   bool rsrq_meas_wideband_eutra_present = false;
   // ...
 
@@ -12127,7 +12108,6 @@ struct eutra_params_s {
   using supported_band_list_eutra_l_ = dyn_array<uint16_t>;
 
   // member variables
-  bool                         ext                           = false;
   bool                         eutra_params_common_present   = false;
   bool                         eutra_params_xdd_diff_present = false;
   supported_band_list_eutra_l_ supported_band_list_eutra;
@@ -14145,7 +14125,6 @@ struct pos_srs_bwa_rrc_connected_r18_s {
   using max_aggr_res_semi_per_slot_r18_e_ = enumerated<max_aggr_res_semi_per_slot_r18_opts>;
 
   // member variables
-  bool                                         ext                                        = false;
   bool                                         max_aggr_bw_two_carriers_fr1_r18_present   = false;
   bool                                         max_aggr_bw_two_carriers_fr2_r18_present   = false;
   bool                                         max_aggr_bw_three_carriers_fr1_r18_present = false;
@@ -14292,7 +14271,6 @@ struct pos_srs_bwa_independent_ca_rrc_connected_r18_s {
   using pwr_class_for_three_aggr_carriers_r18_e_ = enumerated<pwr_class_for_three_aggr_carriers_r18_opts>;
 
   // member variables
-  bool                                         ext                                           = false;
   bool                                         max_aggr_bw_two_carriers_fr1_r18_present      = false;
   bool                                         max_aggr_bw_two_carriers_fr2_r18_present      = false;
   bool                                         max_aggr_bw_three_carriers_fr1_r18_present    = false;
@@ -15223,7 +15201,6 @@ struct feature_sets_s {
   using feature_sets_dl_v1860_l_        = dyn_array<feature_set_dl_v1860_s>;
 
   // member variables
-  bool                      ext = false;
   feature_sets_dl_l_        feature_sets_dl;
   feature_sets_dl_per_cc_l_ feature_sets_dl_per_cc;
   feature_sets_ul_l_        feature_sets_ul;
@@ -15367,7 +15344,6 @@ using freq_band_list_l = dyn_array<freq_band_info_c>;
 
 // GeneralParametersMRDC-XDD-Diff ::= SEQUENCE
 struct general_params_mrdc_xdd_diff_s {
-  bool ext                                    = false;
   bool split_srb_with_one_ul_path_present     = false;
   bool split_drb_with_ul_both_mcg_scg_present = false;
   bool srb3_present                           = false;
@@ -15438,7 +15414,6 @@ struct high_speed_params_v1700_s {
 
 // IMS-ParametersCommon ::= SEQUENCE
 struct ims_params_common_s {
-  bool ext                           = false;
   bool voice_over_eutra_5_gc_present = false;
   // ...
   // group 0
@@ -15454,7 +15429,6 @@ struct ims_params_common_s {
 
 // IMS-ParametersFRX-Diff ::= SEQUENCE
 struct ims_params_frx_diff_s {
-  bool ext                   = false;
   bool voice_over_nr_present = false;
   // ...
 
@@ -15466,7 +15440,6 @@ struct ims_params_frx_diff_s {
 
 // IMS-Parameters ::= SEQUENCE
 struct ims_params_s {
-  bool                  ext                         = false;
   bool                  ims_params_common_present   = false;
   bool                  ims_params_frx_diff_present = false;
   ims_params_common_s   ims_params_common;
@@ -15481,7 +15454,6 @@ struct ims_params_s {
 
 // IMS-ParametersFR2-2-r17 ::= SEQUENCE
 struct ims_params_fr2_2_r17_s {
-  bool ext                       = false;
   bool voice_over_nr_r17_present = false;
   // ...
 
@@ -15549,7 +15521,6 @@ struct utra_fdd_params_r16_s {
   using supported_band_list_utra_fdd_r16_l_ = dyn_array<supported_band_utra_fdd_r16_e>;
 
   // member variables
-  bool                                ext = false;
   supported_band_list_utra_fdd_r16_l_ supported_band_list_utra_fdd_r16;
   // ...
 
@@ -15561,7 +15532,6 @@ struct utra_fdd_params_r16_s {
 
 // InterRAT-Parameters ::= SEQUENCE
 struct inter_rat_params_s {
-  bool           ext           = false;
   bool           eutra_present = false;
   eutra_params_s eutra;
   // ...
@@ -15576,7 +15546,6 @@ struct inter_rat_params_s {
 
 // MAC-ParametersCommon ::= SEQUENCE
 struct mac_params_common_s {
-  bool ext                           = false;
   bool lcp_restrict_present          = false;
   bool dummy_present                 = false;
   bool lch_to_scell_restrict_present = false;
@@ -15631,7 +15600,6 @@ struct mac_params_common_s {
 
 // MAC-ParametersXDD-Diff ::= SEQUENCE
 struct mac_params_xdd_diff_s {
-  bool ext                          = false;
   bool skip_ul_tx_dyn_present       = false;
   bool lc_ch_sr_delay_timer_present = false;
   bool long_drx_cycle_present       = false;
@@ -15728,7 +15696,6 @@ struct mac_params_frx_diff_r16_s {
   };
 
   // member variables
-  bool                  ext                                            = false;
   bool                  direct_mcg_scell_activation_r16_present        = false;
   bool                  direct_mcg_scell_activation_resume_r16_present = false;
   bool                  direct_scg_scell_activation_r16_present        = false;
@@ -15805,7 +15772,6 @@ struct mac_params_fr2_2_r17_s {
   };
 
   // member variables
-  bool                  ext                                            = false;
   bool                  direct_mcg_scell_activation_r17_present        = false;
   bool                  direct_mcg_scell_activation_resume_r17_present = false;
   bool                  direct_scg_scell_activation_r17_present        = false;
@@ -15833,7 +15799,6 @@ struct mac_params_v1700_s {
 
 // MAC-ParametersSidelinkCommon-r16 ::= SEQUENCE
 struct mac_params_sidelink_common_r16_s {
-  bool ext                                      = false;
   bool lcp_restrict_sidelink_r16_present        = false;
   bool multiple_cfg_grants_sidelink_r16_present = false;
   // ...
@@ -15850,7 +15815,6 @@ struct mac_params_sidelink_common_r16_s {
 
 // MAC-ParametersSidelinkXDD-Diff-r16 ::= SEQUENCE
 struct mac_params_sidelink_xdd_diff_r16_s {
-  bool ext                                       = false;
   bool multiple_sr_cfgs_sidelink_r16_present     = false;
   bool lc_ch_sr_delay_timer_sidelink_r16_present = false;
   // ...
@@ -15863,7 +15827,6 @@ struct mac_params_sidelink_xdd_diff_r16_s {
 
 // MAC-ParametersSidelink-r16 ::= SEQUENCE
 struct mac_params_sidelink_r16_s {
-  bool                               ext                                      = false;
   bool                               mac_params_sidelink_common_r16_present   = false;
   bool                               mac_params_sidelink_xdd_diff_r16_present = false;
   mac_params_sidelink_common_r16_s   mac_params_sidelink_common_r16;
@@ -16022,7 +15985,6 @@ struct meas_and_mob_params_common_s {
   };
 
   // member variables
-  bool                ext                           = false;
   bool                supported_gap_pattern_present = false;
   bool                ssb_rlm_present               = false;
   bool                ssb_and_csi_rs_rlm_present    = false;
@@ -16145,7 +16107,6 @@ struct meas_and_mob_params_common_s {
 
 // MeasAndMobParametersXDD-Diff ::= SEQUENCE
 struct meas_and_mob_params_xdd_diff_s {
-  bool ext                                       = false;
   bool intra_and_inter_f_meas_and_report_present = false;
   bool event_a_meas_and_report_present           = false;
   // ...
@@ -16177,7 +16138,6 @@ struct meas_and_mob_params_frx_diff_s {
   using max_num_res_csi_rs_rlm_e_ = enumerated<max_num_res_csi_rs_rlm_opts>;
 
   // member variables
-  bool ext                                        = false;
   bool ss_sinr_meas_present                       = false;
   bool csi_rsrp_and_rsrq_meas_with_ssb_present    = false;
   bool csi_rsrp_and_rsrq_meas_without_ssb_present = false;
@@ -16231,7 +16191,6 @@ struct meas_and_mob_params_s {
 
 // MeasAndMobParametersFR2-2-r17 ::= SEQUENCE
 struct meas_and_mob_params_fr2_2_r17_s {
-  bool ext                                      = false;
   bool ho_inter_f_r17_present                   = false;
   bool ho_lte_epc_r17_present                   = false;
   bool ho_lte_5_gc_r17_present                  = false;
@@ -16480,7 +16439,6 @@ struct naics_cap_entry_s {
   using nof_aggr_prb_e_ = enumerated<nof_aggr_prb_opts>;
 
   // member variables
-  bool            ext                  = false;
   uint8_t         nof_naics_capable_cc = 1;
   nof_aggr_prb_e_ nof_aggr_prb;
   // ...
@@ -16913,7 +16871,6 @@ struct phy_params_common_s {
   };
 
   // member variables
-  bool                   ext                                         = false;
   bool                   csi_rs_cfra_for_ho_present                  = false;
   bool                   dyn_prb_bundling_dl_present                 = false;
   bool                   sp_csi_report_pucch_present                 = false;
@@ -17070,7 +17027,6 @@ struct phy_params_common_s {
 
 // Phy-ParametersXDD-Diff ::= SEQUENCE
 struct phy_params_xdd_diff_s {
-  bool ext                                   = false;
   bool dyn_sfi_present                       = false;
   bool two_pucch_f0_2_consec_symbols_present = false;
   bool two_different_tpc_loop_pusch_present  = false;
@@ -17136,7 +17092,6 @@ struct phy_params_frx_diff_s {
   };
 
   // member variables
-  bool                      ext                                              = false;
   bool                      dyn_sfi_present                                  = false;
   bool                      dummy1_present                                   = false;
   bool                      two_fl_dmrs_present                              = false;
@@ -17280,7 +17235,6 @@ struct phy_params_fr1_s {
   using delta_pwr_class_report_r18_e_ = enumerated<delta_pwr_class_report_r18_opts>;
 
   // member variables
-  bool                           ext                                      = false;
   bool                           pdcch_monitoring_single_occasion_present = false;
   bool                           scs_60k_hz_present                       = false;
   bool                           pdsch_256_qam_fr1_present                = false;
@@ -17357,7 +17311,6 @@ struct phy_params_fr2_s {
       enumerated<max_num_srs_pos_spatial_relations_all_serving_cells_r16_opts>;
 
   // member variables
-  bool                           ext                                 = false;
   bool                           dummy_present                       = false;
   bool                           pdsch_re_map_fr2_per_symbol_present = false;
   pdsch_re_map_fr2_per_symbol_e_ pdsch_re_map_fr2_per_symbol;
@@ -17429,7 +17382,6 @@ struct ue_nr_cap_add_frx_mode_s {
 
 // UE-BasedPerfMeas-Parameters-r16 ::= SEQUENCE
 struct ue_based_perf_meas_params_r16_s {
-  bool ext                                 = false;
   bool barometer_meas_report_r16_present   = false;
   bool imm_meas_bt_r16_present             = false;
   bool imm_meas_wlan_r16_present           = false;
@@ -17458,7 +17410,6 @@ struct ue_based_perf_meas_params_r16_s {
 
 // SON-Parameters-r16 ::= SEQUENCE
 struct son_params_r16_s {
-  bool ext                     = false;
   bool rach_report_r16_present = false;
   // ...
   // group 0
@@ -17608,7 +17559,6 @@ struct pdcp_params_s {
   };
 
   // member variables
-  bool                             ext                              = false;
   bool                             ul_only_rohc_profiles_present    = false;
   bool                             continue_rohc_context_present    = false;
   bool                             out_of_order_delivery_present    = false;
@@ -17666,7 +17616,6 @@ struct pdcp_params_mrdc_v1610_s {
 
 // PDCP-ParametersSidelink-r18 ::= SEQUENCE
 struct pdcp_params_sidelink_r18_s {
-  bool ext                                = false;
   bool pdcp_dupl_srb_sidelink_r18_present = false;
   bool pdcp_dupl_drb_sidelink_r18_present = false;
   // ...
@@ -17682,7 +17631,6 @@ struct phy_params_mrdc_s {
   using naics_cap_list_l_ = dyn_array<naics_cap_entry_s>;
 
   // member variables
-  bool              ext = false;
   naics_cap_list_l_ naics_cap_list;
   // ...
   // group 0
@@ -17705,7 +17653,6 @@ struct phy_params_shared_spec_ch_access_r16_s {
   };
 
   // member variables
-  bool                                           ext                                                  = false;
   bool                                           ss_sinr_meas_r16_present                             = false;
   bool                                           sp_csi_report_pucch_r16_present                      = false;
   bool                                           sp_csi_report_pusch_r16_present                      = false;
@@ -17734,7 +17681,6 @@ struct phy_params_shared_spec_ch_access_r16_s {
 
 // PowSav-ParametersCommon-r16 ::= SEQUENCE
 struct pow_sav_params_common_r16_s {
-  bool ext                               = false;
   bool drx_pref_r16_present              = false;
   bool max_cc_pref_r16_present           = false;
   bool release_pref_r16_present          = false;
@@ -17749,7 +17695,6 @@ struct pow_sav_params_common_r16_s {
 
 // PowSav-ParametersFRX-Diff-r16 ::= SEQUENCE
 struct pow_sav_params_frx_diff_r16_s {
-  bool ext                             = false;
   bool max_bw_pref_r16_present         = false;
   bool max_mimo_layer_pref_r16_present = false;
   // ...
@@ -17762,7 +17707,6 @@ struct pow_sav_params_frx_diff_r16_s {
 
 // PowSav-Parameters-r16 ::= SEQUENCE
 struct pow_sav_params_r16_s {
-  bool                          ext                                 = false;
   bool                          pow_sav_params_common_r16_present   = false;
   bool                          pow_sav_params_frx_diff_r16_present = false;
   pow_sav_params_common_r16_s   pow_sav_params_common_r16;
@@ -17777,7 +17721,6 @@ struct pow_sav_params_r16_s {
 
 // PowSav-ParametersFR2-2-r17 ::= SEQUENCE
 struct pow_sav_params_fr2_2_r17_s {
-  bool ext                             = false;
   bool max_bw_pref_r17_present         = false;
   bool max_mimo_layer_pref_r17_present = false;
   // ...
@@ -17790,7 +17733,6 @@ struct pow_sav_params_fr2_2_r17_s {
 
 // PowSav-Parameters-v1700 ::= SEQUENCE
 struct pow_sav_params_v1700_s {
-  bool                       ext                              = false;
   bool                       pow_sav_params_fr2_2_r17_present = false;
   pow_sav_params_fr2_2_r17_s pow_sav_params_fr2_2_r17;
   // ...
@@ -17810,7 +17752,6 @@ struct rf_params_s {
   };
 
   // member variables
-  bool                      ext = false;
   supported_band_list_nr_l_ supported_band_list_nr;
   band_combination_list_l   supported_band_combination_list;
   freq_band_list_l          applied_freq_band_list_filt;
@@ -17908,7 +17849,6 @@ struct rf_params_mrdc_s {
   };
 
   // member variables
-  bool                    ext = false;
   band_combination_list_l supported_band_combination_list;
   freq_band_list_l        applied_freq_band_list_filt;
   // ...
@@ -18019,7 +17959,6 @@ struct rf_params_mrdc_v16e0_s {
 
 // RLC-Parameters ::= SEQUENCE
 struct rlc_params_s {
-  bool ext                      = false;
   bool am_with_short_sn_present = false;
   bool um_with_short_sn_present = false;
   bool um_with_long_sn_present  = false;
@@ -18040,7 +17979,6 @@ struct rlc_params_s {
 
 // RLC-ParametersSidelink-r16 ::= SEQUENCE
 struct rlc_params_sidelink_r16_s {
-  bool ext                                  = false;
   bool am_with_long_sn_sidelink_r16_present = false;
   bool um_with_long_sn_sidelink_r16_present = false;
   // ...
@@ -18074,7 +18012,6 @@ struct red_cap_params_v1740_s {
 
 // RelayParameters-r17 ::= SEQUENCE
 struct relay_params_r17_s {
-  bool ext                                                      = false;
   bool relay_ue_operation_l2_r17_present                        = false;
   bool remote_ue_operation_l2_r17_present                       = false;
   bool remote_ue_path_switch_to_idle_inactive_relay_r17_present = false;
@@ -18103,7 +18040,6 @@ struct relay_params_r17_s {
 
 // SDAP-Parameters ::= SEQUENCE
 struct sdap_params_s {
-  bool ext                       = false;
   bool as_reflective_qos_present = false;
   // ...
   // group 0
@@ -18189,7 +18125,6 @@ struct sidelink_params_nr_r16_s {
   };
 
   // member variables
-  bool                                ext                                 = false;
   bool                                rlc_params_sidelink_r16_present     = false;
   bool                                mac_params_sidelink_r16_present     = false;
   bool                                fdd_add_ue_sidelink_cap_r16_present = false;
@@ -18219,7 +18154,6 @@ struct sidelink_params_eutra_r16_s {
   using supported_band_list_sidelink_eutra_r16_l_ = dyn_array<band_sidelink_eutra_r16_s>;
 
   // member variables
-  bool                                      ext = false;
   dyn_octstring                             sl_params_eutra1_r16;
   dyn_octstring                             sl_params_eutra2_r16;
   dyn_octstring                             sl_params_eutra3_r16;
@@ -18440,7 +18374,6 @@ struct ue_radio_paging_info_r17_s {
   using pei_subgrouping_support_band_list_r17_l_ = dyn_array<uint16_t>;
 
   // member variables
-  bool                                     ext = false;
   pei_subgrouping_support_band_list_r17_l_ pei_subgrouping_support_band_list_r17;
   // ...
 

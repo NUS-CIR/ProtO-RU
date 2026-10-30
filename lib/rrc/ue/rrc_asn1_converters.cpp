@@ -40,7 +40,6 @@ asn1::rrc_nr::pdcp_cfg_s ocudu::ocucp::pdcp_config_to_rrc_nr_asn1(const pdcp_con
   if (!pdcp_cfg.ciphering_required) {
     rrc_pdcp_cfg.ciphering_disabled_present = true;
     // This is an extension field.
-    rrc_pdcp_cfg.ext = true;
   }
 
   // Fill more than one RLC.

@@ -37175,7 +37175,8 @@ OCUDUASN_CODE private_msg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE private_msg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(private_ies.unpack(bref));
 
   if (ext) {

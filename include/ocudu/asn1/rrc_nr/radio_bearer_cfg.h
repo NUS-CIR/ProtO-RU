@@ -98,17 +98,14 @@ struct ethernet_hdr_compress_r16_s {
     using ehc_c_id_len_r16_e_ = enumerated<ehc_c_id_len_r16_opts>;
 
     // member variables
-    bool                ext = false;
     ehc_c_id_len_r16_e_ ehc_c_id_len_r16;
     // ...
   };
   struct ehc_dl_r16_s_ {
-    bool ext                             = false;
     bool drb_continue_ehc_dl_r16_present = false;
     // ...
   };
   struct ehc_ul_r16_s_ {
-    bool     ext                             = false;
     bool     drb_continue_ehc_ul_r16_present = false;
     uint16_t max_c_id_ehc_ul_r16             = 1;
     // ...
@@ -458,7 +455,6 @@ struct pdcp_cfg_s {
   };
 
   // member variables
-  bool                 ext                       = false;
   bool                 drb_present               = false;
   bool                 more_than_one_rlc_present = false;
   bool                 t_reordering_present      = false;
@@ -492,7 +488,6 @@ struct pdcp_cfg_s {
 
 // SRB-ToAddMod ::= SEQUENCE
 struct srb_to_add_mod_s {
-  bool       ext                      = false;
   bool       reestablish_pdcp_present = false;
   bool       discard_on_pdcp_present  = false;
   bool       pdcp_cfg_present         = false;
@@ -534,7 +529,6 @@ struct sdap_cfg_s {
   using mapped_qos_flows_to_release_l_ = dyn_array<uint8_t>;
 
   // member variables
-  bool                           ext         = false;
   uint16_t                       pdu_session = 0;
   sdap_hdr_dl_e_                 sdap_hdr_dl;
   sdap_hdr_ul_e_                 sdap_hdr_ul;
@@ -601,7 +595,6 @@ struct drb_to_add_mod_s {
   };
 
   // member variables
-  bool        ext                      = false;
   bool        cn_assoc_present         = false;
   bool        reestablish_pdcp_present = false;
   bool        recover_pdcp_present     = false;
@@ -639,7 +632,6 @@ using integrity_prot_algorithm_e = enumerated<integrity_prot_algorithm_opts, tru
 
 // SecurityAlgorithmConfig ::= SEQUENCE
 struct security_algorithm_cfg_s {
-  bool                       ext                              = false;
   bool                       integrity_prot_algorithm_present = false;
   ciphering_algorithm_e      ciphering_algorithm;
   integrity_prot_algorithm_e integrity_prot_algorithm;
@@ -661,7 +653,6 @@ struct security_cfg_s {
   using key_to_use_e_ = enumerated<key_to_use_opts>;
 
   // member variables
-  bool                     ext                            = false;
   bool                     security_algorithm_cfg_present = false;
   bool                     key_to_use_present             = false;
   security_algorithm_cfg_s security_algorithm_cfg;
@@ -737,7 +728,6 @@ struct tmgi_r17_s {
 
 // MRB-ToAddMod-r17 ::= SEQUENCE
 struct mrb_to_add_mod_r17_s {
-  bool       ext                          = false;
   bool       mbs_session_id_r17_present   = false;
   bool       mrb_id_new_r17_present       = false;
   bool       reestablish_pdcp_r17_present = false;
@@ -763,7 +753,6 @@ using mrb_to_release_list_r17_l = bounded_array<uint16_t, 32>;
 
 // RadioBearerConfig ::= SEQUENCE
 struct radio_bearer_cfg_s {
-  bool                  ext                     = false;
   bool                  srb3_to_release_present = false;
   bool                  security_cfg_present    = false;
   srb_to_add_mod_list_l srb_to_add_mod_list;

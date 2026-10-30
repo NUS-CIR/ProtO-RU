@@ -35,7 +35,6 @@ using a2_xpc5_flow_bit_rates_ext_ies_container = protocol_ext_container_empty_l;
 
 // A2XPC5FlowBitRates ::= SEQUENCE
 struct a2_xpc5_flow_bit_rates_s {
-  bool                                     ext                          = false;
   bool                                     ie_exts_present              = false;
   uint64_t                                 a2_xguaranteed_flow_bit_rate = 0;
   uint64_t                                 a2_xmax_flow_bit_rate        = 0;
@@ -65,7 +64,6 @@ using a2_xpc5_qos_flow_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // A2XPC5QoSFlowItem ::= SEQUENCE
 struct a2_xpc5_qos_flow_item_s {
-  bool                                    ext                            = false;
   bool                                    a2_xpc5_flow_bit_rates_present = false;
   bool                                    a2_xrange_present              = false;
   bool                                    ie_exts_present                = false;
@@ -91,7 +89,6 @@ using a2_xpc5_qos_params_ext_ies_container = protocol_ext_container_empty_l;
 
 // A2XPC5QoSParameters ::= SEQUENCE
 struct a2_xpc5_qos_params_s {
-  bool                                 ext                                  = false;
   bool                                 aa2_xpc5_link_aggr_bit_rates_present = false;
   bool                                 ie_exts_present                      = false;
   a2_xpc5_qos_flow_list_l              a2_xpc5_qos_flow_list;
@@ -112,7 +109,6 @@ using global_amf_region_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // GlobalAMF-Region-Information ::= SEQUENCE
 struct global_amf_region_info_s {
-  bool                                     ext             = false;
   bool                                     ie_exts_present = false;
   fixed_octstring<3, true>                 plmn_id;
   fixed_bitstring<8, false, true>          amf_region_id;
@@ -135,7 +131,6 @@ using as_security_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // AS-SecurityInformation ::= SEQUENCE
 struct as_security_info_s {
-  bool                               ext             = false;
   bool                               ie_exts_present = false;
   fixed_bitstring<256, false, true>  key_ng_ran_star;
   uint8_t                            ncc = 0;
@@ -199,7 +194,6 @@ struct non_dyn_5qi_descriptor_ext_ies_container {
 
 // NonDynamic5QIDescriptor ::= SEQUENCE
 struct non_dyn_5qi_descriptor_s {
-  bool                                     ext                           = false;
   bool                                     prio_level_qos_present        = false;
   bool                                     averaging_win_present         = false;
   bool                                     max_data_burst_volume_present = false;
@@ -224,7 +218,6 @@ using packet_error_rate_ext_ies_container = protocol_ext_container_empty_l;
 
 // PacketErrorRate ::= SEQUENCE
 struct packet_error_rate_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   uint8_t                             per_scalar      = 0;
   uint8_t                             per_exponent    = 0;
@@ -305,7 +298,6 @@ struct dyn_5qi_descriptor_s {
   using delay_crit_e_ = enumerated<delay_crit_opts, true>;
 
   // member variables
-  bool                                 ext                           = false;
   bool                                 five_qi_present               = false;
   bool                                 delay_crit_present            = false;
   bool                                 averaging_win_present         = false;
@@ -415,7 +407,6 @@ struct allocand_retention_prio_s {
   using pre_emption_vulnerability_e_ = enumerated<pre_emption_vulnerability_opts, true>;
 
   // member variables
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   uint8_t                                   prio_level      = 0;
   pre_emption_cap_e_                        pre_emption_cap;
@@ -465,7 +456,6 @@ struct alt_qos_para_set_item_ext_ies_o {
 
 // AlternativeQoSParaSetItem ::= SEQUENCE
 struct alt_qos_para_set_item_s {
-  bool                                                      ext                                 = false;
   bool                                                      guaranteed_flow_bit_rate_dl_present = false;
   bool                                                      guaranteed_flow_bit_rate_ul_present = false;
   bool                                                      packet_delay_budget_present         = false;
@@ -529,7 +519,6 @@ struct gbr_qos_flow_info_s {
   using notif_ctrl_e_ = enumerated<notif_ctrl_opts, true>;
 
   // member variables
-  bool                                                  ext                             = false;
   bool                                                  notif_ctrl_present              = false;
   bool                                                  max_packet_loss_rate_dl_present = false;
   bool                                                  max_packet_loss_rate_ul_present = false;
@@ -698,7 +687,6 @@ struct qos_flow_level_qos_params_s {
   using add_qos_flow_info_e_ = enumerated<add_qos_flow_info_opts, true>;
 
   // member variables
-  bool                                        ext                       = false;
   bool                                        gbr_qos_flow_info_present = false;
   bool                                        reflective_qos_present    = false;
   bool                                        add_qos_flow_info_present = false;
@@ -724,7 +712,6 @@ using mbs_qos_flows_to_add_item_ext_ies_container = protocol_ext_container_empty
 
 // MBS-QoSFlowsToAdd-Item ::= SEQUENCE
 struct mbs_qos_flows_to_add_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   uint8_t                                     mbs_qos_flow_id = 0;
   qos_flow_level_qos_params_s                 mbs_qos_flow_level_qos_params;
@@ -747,7 +734,6 @@ using nr_cgi_ext_ies_container = protocol_ext_container_empty_l;
 
 // NR-CGI ::= SEQUENCE
 struct nr_cgi_s {
-  bool                             ext            = false;
   bool                             ie_ext_present = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<36, false, true> nr_ci;
@@ -770,7 +756,6 @@ using mbs_service_area_tai_item_ext_ies_container = protocol_ext_container_empty
 
 // MBS-ServiceAreaTAI-Item ::= SEQUENCE
 struct mbs_service_area_tai_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   fixed_octstring<3, true>                    plmn_id;
   fixed_octstring<3, true>                    tac;
@@ -793,7 +778,6 @@ using mbs_service_area_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // MBS-ServiceAreaInformation ::= SEQUENCE
 struct mbs_service_area_info_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   mbs_service_area_cell_list_l            mbs_service_area_cell_list;
   mbs_service_area_tai_list_l             mbs_service_area_tai_list;
@@ -813,7 +797,6 @@ using mbs_service_area_info_item_ext_ies_container = protocol_ext_container_empt
 
 // MBS-ServiceAreaInformation-Item ::= SEQUENCE
 struct mbs_service_area_info_item_s {
-  bool                                         ext                 = false;
   bool                                         ie_exts_present     = false;
   uint32_t                                     mbs_area_session_id = 0;
   mbs_service_area_info_s                      mbs_service_area_info;
@@ -972,7 +955,6 @@ using mbs_mapand_data_forwarding_request_infofrom_source_item_ext_ies_container 
 
 // MBS-MappingandDataForwardingRequestInfofromSource-Item ::= SEQUENCE
 struct mbs_mapand_data_forwarding_request_infofrom_source_item_s {
-  bool                                                                      ext                       = false;
   bool                                                                      mrb_progress_info_present = false;
   bool                                                                      ie_exts_present           = false;
   uint16_t                                                                  mrb_id                    = 1;
@@ -999,7 +981,6 @@ using active_mbs_session_info_ext_ies_container = protocol_ext_container_empty_l
 
 // Active-MBS-SessionInformation ::= SEQUENCE
 struct active_mbs_session_info_s {
-  bool                                                 ext                      = false;
   bool                                                 mbs_service_area_present = false;
   bool                                                 ie_exts_present          = false;
   mbs_qos_flows_to_add_list_l                          mbs_qos_flows_to_add_list;
@@ -1029,7 +1010,6 @@ using csi_rs_mtc_neighbour_item_ext_ies_container = protocol_ext_container_empty
 
 // CSI-RS-MTC-Neighbour-Item ::= SEQUENCE
 struct csi_rs_mtc_neighbour_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   uint8_t                                     csi_rs_idx      = 0;
   csi_rs_mtc_neighbour_item_ext_ies_container ie_exts;
@@ -1051,7 +1031,6 @@ using csi_rs_neighbour_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // CSI-RS-Neighbour-Item ::= SEQUENCE
 struct csi_rs_neighbour_item_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   nr_cgi_s                                nr_cgi;
   csi_rs_mtc_neighbour_list_l             csi_rs_mtc_neighbour_list;
@@ -1082,7 +1061,6 @@ struct csi_rs_mtc_cfg_item_s {
   using csi_rs_status_e_ = enumerated<csi_rs_status_opts, true>;
 
   // member variables
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   uint8_t                               csi_rs_idx      = 0;
   csi_rs_status_e_                      csi_rs_status;
@@ -1106,7 +1084,6 @@ using add_meas_timing_cfg_item_ext_ies_container = protocol_ext_container_empty_
 
 // Additional-Measurement-Timing-Configuration-Item ::= SEQUENCE
 struct add_meas_timing_cfg_item_s {
-  bool                                       ext                     = false;
   bool                                       ie_exts_present         = false;
   uint8_t                                    add_meas_timing_cfg_idx = 0;
   csi_rs_mtc_cfg_list_l                      csi_rs_mtc_cfg_list;
@@ -1133,7 +1110,6 @@ using qos_map_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // QoS-Mapping-Information ::= SEQUENCE
 struct qos_map_info_s {
-  bool                             ext                = false;
   bool                             dscp_present       = false;
   bool                             flow_label_present = false;
   bool                             ie_exts_present    = false;
@@ -1182,7 +1158,6 @@ struct gtp_tunnel_transport_layer_info_ext_ies_o {
 
 // GTPtunnelTransportLayerInformation ::= SEQUENCE
 struct gtp_tunnel_transport_layer_info_s {
-  bool                                                                ext = false;
   bounded_bitstring<1, 160, true, true>                               tnl_address;
   fixed_octstring<4, true>                                            gtp_teid;
   protocol_ext_container_l<gtp_tunnel_transport_layer_info_ext_ies_o> ie_exts;
@@ -1252,7 +1227,6 @@ using add_pdcp_dupl_tnl_ext_ies_container = protocol_ext_container_empty_l;
 
 // Additional-PDCP-Duplication-TNL-Item ::= SEQUENCE
 struct add_pdcp_dupl_tnl_item_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   up_transport_layer_info_c           add_pdcp_dupl_up_tnl_info;
   add_pdcp_dupl_tnl_ext_ies_container ie_exts;
@@ -1301,7 +1275,6 @@ struct add_ul_ng_u_tnl_at_up_f_item_ext_ies_o {
 
 // Additional-UL-NG-U-TNLatUPF-Item ::= SEQUENCE
 struct add_ul_ng_u_tnl_at_up_f_item_s {
-  bool                                                             ext = false;
   up_transport_layer_info_c                                        add_ul_ng_u_tnl_at_up_f;
   protocol_ext_container_l<add_ul_ng_u_tnl_at_up_f_item_ext_ies_o> ie_exts;
   // ...
@@ -1322,7 +1295,6 @@ using qos_f_lows_accepted_to_be_forwarded_item_ext_ies_container = protocol_ext_
 
 // QoSFLowsAcceptedToBeForwarded-Item ::= SEQUENCE
 struct qos_f_lows_accepted_to_be_forwarded_item_s {
-  bool                                                       ext            = false;
   bool                                                       ie_ext_present = false;
   uint8_t                                                    qos_flow_id    = 0;
   qos_f_lows_accepted_to_be_forwarded_item_ext_ies_container ie_ext;
@@ -1344,7 +1316,6 @@ using data_forwarding_resp_drb_item_ext_ies_container = protocol_ext_container_e
 
 // DataForwardingResponseDRBItem ::= SEQUENCE
 struct data_forwarding_resp_drb_item_s {
-  bool                                            ext                          = false;
   bool                                            dl_forwarding_up_tnl_present = false;
   bool                                            ul_forwarding_up_tnl_present = false;
   bool                                            ie_ext_present               = false;
@@ -1405,7 +1376,6 @@ struct data_forwarding_info_from_target_ngran_node_ext_ies_o {
 
 // DataForwardingInfoFromTargetNGRANnode ::= SEQUENCE
 struct data_forwarding_info_from_target_ngran_node_s {
-  bool                                       ext                                               = false;
   bool                                       pdu_session_level_dl_data_forwarding_info_present = false;
   bool                                       pdu_session_level_ul_data_forwarding_info_present = false;
   qos_f_lows_accepted_to_be_forwarded_list_l qos_flows_accepted_for_data_forwarding_list;
@@ -1458,7 +1428,6 @@ struct pdu_session_res_change_confirm_info_sn_terminated_ext_ies_o {
 
 // PDUSessionResourceChangeConfirmInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_change_confirm_info_sn_terminated_s {
-  bool                                          ext                               = false;
   bool                                          dataforwardinginfo_target_present = false;
   data_forwarding_info_from_target_ngran_node_s dataforwardinginfo_target;
   protocol_ext_container_l<pdu_session_res_change_confirm_info_sn_terminated_ext_ies_o> ie_exts;
@@ -1479,7 +1448,6 @@ using add_listof_pdu_session_res_change_confirm_info_sn_terminated_item_ext_ies_
 
 // AdditionalListofPDUSessionResourceChangeConfirmInfo-SNterminated-Item ::= SEQUENCE
 struct add_listof_pdu_session_res_change_confirm_info_sn_terminated_item_s {
-  bool                                                ext             = false;
   bool                                                ie_exts_present = false;
   pdu_session_res_change_confirm_info_sn_terminated_s pdu_session_res_change_confirm_info_sn_terminated;
   add_listof_pdu_session_res_change_confirm_info_sn_terminated_item_ext_ies_container ie_exts;
@@ -1546,7 +1514,6 @@ using allowed_pni_npn_id_item_ext_ies_container = protocol_ext_container_empty_l
 
 // AllowedPNI-NPN-ID-Item ::= SEQUENCE
 struct allowed_pni_npn_id_item_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   fixed_octstring<3, true>                  plmn_id;
   pni_npn_restricted_info_e                 pni_npn_restricted_info;
@@ -1570,7 +1537,6 @@ using tai_sin_ao_i_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // TAIsinAoI-Item ::= SEQUENCE
 struct tai_sin_ao_i_item_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   fixed_octstring<3, true>            plmn_id;
   fixed_octstring<3, true>            tac;
@@ -1657,7 +1623,6 @@ using cellsin_ao_i_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // CellsinAoI-Item ::= SEQUENCE
 struct cellsin_ao_i_item_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   fixed_octstring<3, true>            plmn_id;
   ng_ran_cell_id_c                    ng_ran_cell_id;
@@ -1733,7 +1698,6 @@ using global_gnb_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // GlobalgNB-ID ::= SEQUENCE
 struct global_gnb_id_s {
-  bool                            ext             = false;
   bool                            ie_exts_present = false;
   fixed_octstring<3, true>        plmn_id;
   gnb_id_choice_c                 gnb_id;
@@ -1828,7 +1792,6 @@ using global_enb_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // GlobalngeNB-ID ::= SEQUENCE
 struct globalng_enb_id_s {
-  bool                            ext             = false;
   bool                            ie_exts_present = false;
   fixed_octstring<3, true>        plmn_id;
   enb_id_choice_c                 enb_id;
@@ -1913,7 +1876,6 @@ using global_ng_ran_nodesin_ao_i_item_ext_ies_container = protocol_ext_container
 
 // GlobalNG-RANNodesinAoI-Item ::= SEQUENCE
 struct global_ng_ran_nodesin_ao_i_item_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   global_ng_ran_node_id_c                           global_ng_ran_node_id;
   global_ng_ran_nodesin_ao_i_item_ext_ies_container ie_exts;
@@ -1935,7 +1897,6 @@ using area_of_interest_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // AreaOfInterest-Item ::= SEQUENCE
 struct area_of_interest_item_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   list_of_tai_sin_ao_i_l                  list_of_tai_sin_ao_i;
   list_of_cells_l                         list_of_cellsin_ao_i;
@@ -1960,7 +1921,6 @@ using e_utra_cgi_ext_ies_container = protocol_ext_container_empty_l;
 
 // E-UTRA-CGI ::= SEQUENCE
 struct e_utra_cgi_s {
-  bool                             ext            = false;
   bool                             ie_ext_present = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<28, false, true> e_utra_ci;
@@ -1983,7 +1943,6 @@ using cell_based_mdt_eutra_ext_ies_container = protocol_ext_container_empty_l;
 
 // CellBasedMDT-EUTRA ::= SEQUENCE
 struct cell_based_mdt_eutra_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   cell_id_listfor_mdt_eutra_l            cell_id_listfor_mdt_eutra;
   cell_based_mdt_eutra_ext_ies_container ie_exts;
@@ -2005,7 +1964,6 @@ using ta_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // TABasedMDT ::= SEQUENCE
 struct ta_based_mdt_s {
-  bool                           ext             = false;
   bool                           ie_exts_present = false;
   ta_listfor_mdt_l               ta_listfor_mdt;
   ta_based_mdt_ext_ies_container ie_exts;
@@ -2024,7 +1982,6 @@ using tai_for_mdt_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // TAIforMDT-Item ::= SEQUENCE
 struct tai_for_mdt_item_s {
-  bool                               ext             = false;
   bool                               ie_exts_present = false;
   fixed_octstring<3, true>           plmn_id;
   fixed_octstring<3, true>           tac;
@@ -2047,7 +2004,6 @@ using tai_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // TAIBasedMDT ::= SEQUENCE
 struct tai_based_mdt_s {
-  bool                            ext             = false;
   bool                            ie_exts_present = false;
   tai_listfor_mdt_l               tai_listfor_mdt;
   tai_based_mdt_ext_ies_container ie_exts;
@@ -2148,7 +2104,6 @@ using cell_based_mdt_nr_ext_ies_container = protocol_ext_container_empty_l;
 
 // CellBasedMDT-NR ::= SEQUENCE
 struct cell_based_mdt_nr_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   cell_id_listfor_mdt_nr_l            cell_id_listfor_mdt_nr;
   cell_based_mdt_nr_ext_ies_container ie_exts;
@@ -2167,7 +2122,6 @@ using cag_listfor_mdt_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // CAGListforMDTItem ::= SEQUENCE
 struct cag_listfor_mdt_item_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   fixed_octstring<3, true>               plmn_id;
   fixed_bitstring<32, false, true>       cag_id;
@@ -2190,7 +2144,6 @@ using pni_npn_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // PNI-NPNBasedMDT ::= SEQUENCE
 struct pni_npn_based_mdt_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   cag_listfor_mdt_l                   cag_listfor_mdt;
   pni_npn_based_mdt_ext_ies_container ie_exts;
@@ -2209,7 +2162,6 @@ using sn_pn_cell_idfor_mdt_item_ext_ies_container = protocol_ext_container_empty
 
 // SNPN-CellIdforMDT-Item ::= SEQUENCE
 struct sn_pn_cell_idfor_mdt_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   nr_cgi_s                                    nr_cgi;
   fixed_bitstring<44, false, true>            nid;
@@ -2232,7 +2184,6 @@ using sn_pn_cell_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNPN-CellBasedMDT ::= SEQUENCE
 struct sn_pn_cell_based_mdt_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   sn_pn_cell_id_listfor_mdt_l            sn_pn_cell_id_listfor_mdt;
   sn_pn_cell_based_mdt_ext_ies_container ie_exts;
@@ -2251,7 +2202,6 @@ using sn_pn_tai_for_mdt_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNPN-TAIforMDT-Item ::= SEQUENCE
 struct sn_pn_tai_for_mdt_item_s {
-  bool                                     ext             = false;
   bool                                     ie_exts_present = false;
   fixed_octstring<3, true>                 plmn_id;
   fixed_octstring<3, true>                 tac;
@@ -2275,7 +2225,6 @@ using sn_pn_tai_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNPN-TAIBasedMDT ::= SEQUENCE
 struct sn_pn_tai_based_mdt_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   sn_pn_tai_listfor_mdt_l               sn_pn_tai_listfor_mdt;
   sn_pn_tai_based_mdt_ext_ies_container ie_exts;
@@ -2294,7 +2243,6 @@ using sn_pn_for_mdt_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNPNforMDT-Item ::= SEQUENCE
 struct sn_pn_for_mdt_item_s {
-  bool                                 ext             = false;
   bool                                 ie_exts_present = false;
   fixed_octstring<3, true>             plmn_id;
   fixed_bitstring<44, false, true>     nid;
@@ -2317,7 +2265,6 @@ using sn_pn_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNPN-BasedMDT ::= SEQUENCE
 struct sn_pn_based_mdt_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   sn_pn_listfor_mdt_l               sn_pn_listfor_mdt;
   sn_pn_based_mdt_ext_ies_container ie_exts;
@@ -2517,7 +2464,6 @@ using nr_tx_bw_ext_ies_container = protocol_ext_container_empty_l;
 
 // NRTransmissionBandwidth ::= SEQUENCE
 struct nr_tx_bw_s {
-  bool                       ext             = false;
   bool                       ie_exts_present = false;
   nr_scs_e                   nr_scs;
   nr_nrb_e                   nr_nrb;
@@ -2537,7 +2483,6 @@ using nr_carrier_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // NRCarrierItem ::= SEQUENCE
 struct nr_carrier_item_s {
-  bool                              ext            = false;
   bool                              ie_ext_present = false;
   nr_scs_e                          carrier_scs;
   uint16_t                          offset_to_carrier = 0;
@@ -2615,7 +2560,6 @@ struct sul_info_ext_ies_container {
 
 // SUL-Information ::= SEQUENCE
 struct sul_info_s {
-  bool                       ext             = false;
   bool                       ie_exts_present = false;
   uint32_t                   sul_freq_info   = 0;
   nr_tx_bw_s                 sul_tx_bw;
@@ -2635,7 +2579,6 @@ using supported_sul_band_item_ext_ies_container = protocol_ext_container_empty_l
 
 // SupportedSULBandItem ::= SEQUENCE
 struct supported_sul_band_item_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   uint16_t                                  sul_band_item   = 1;
   supported_sul_band_item_ext_ies_container ie_exts;
@@ -2657,7 +2600,6 @@ using nr_freq_band_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // NRFrequencyBandItem ::= SEQUENCE
 struct nr_freq_band_item_s {
-  bool                                ext            = false;
   bool                                ie_ext_present = false;
   uint16_t                            nr_freq_band   = 1;
   supported_sul_band_list_l           supported_sul_band_list;
@@ -2709,7 +2651,6 @@ struct nr_freq_info_ext_ies_o {
 
 // NRFrequencyInfo ::= SEQUENCE
 struct nr_freq_info_s {
-  bool                                             ext              = false;
   bool                                             sul_info_present = false;
   uint32_t                                         nr_arfcn         = 0;
   sul_info_s                                       sul_info;
@@ -2733,7 +2674,6 @@ using area_scope_of_neigh_cells_item_ext_ies_container = protocol_ext_container_
 
 // AreaScopeOfNeighCellsItem ::= SEQUENCE
 struct area_scope_of_neigh_cells_item_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   nr_freq_info_s                                   nr_freq_info;
   pci_list_for_mdt_l                               pci_list_for_mdt;
@@ -2756,7 +2696,6 @@ using global_ng_ran_cell_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // GlobalNG-RANCell-ID ::= SEQUENCE
 struct global_ng_ran_cell_id_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   fixed_octstring<3, true>                plmn_id;
   ng_ran_cell_id_c                        ng_ran_cell_id;
@@ -2779,7 +2718,6 @@ using cell_based_qmc_ext_ies_container = protocol_ext_container_empty_l;
 
 // CellBasedQMC ::= SEQUENCE
 struct cell_based_qmc_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   cell_id_listfor_qmc_l            cell_id_listfor_qmc;
   cell_based_qmc_ext_ies_container ie_exts;
@@ -2801,7 +2739,6 @@ using ta_based_qmc_ext_ies_container = protocol_ext_container_empty_l;
 
 // TABasedQMC ::= SEQUENCE
 struct ta_based_qmc_s {
-  bool                           ext             = false;
   bool                           ie_exts_present = false;
   ta_listfor_qmc_l               ta_listfor_qmc;
   ta_based_qmc_ext_ies_container ie_exts;
@@ -2820,7 +2757,6 @@ using tai_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // TAI-Item ::= SEQUENCE
 struct tai_item_s {
-  bool                       ext             = false;
   bool                       ie_exts_present = false;
   fixed_octstring<3, true>   tac;
   fixed_octstring<3, true>   plmn_id;
@@ -2843,7 +2779,6 @@ using tai_based_qmc_ext_ies_container = protocol_ext_container_empty_l;
 
 // TAIBasedQMC ::= SEQUENCE
 struct tai_based_qmc_s {
-  bool                            ext             = false;
   bool                            ie_exts_present = false;
   tai_listfor_qmc_l               tai_listfor_qmc;
   tai_based_qmc_ext_ies_container ie_exts;
@@ -2865,7 +2800,6 @@ using plmn_area_based_qmc_ext_ies_container = protocol_ext_container_empty_l;
 
 // PLMNAreaBasedQMC ::= SEQUENCE
 struct plmn_area_based_qmc_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   plmn_listfor_qmc_l                    plmn_listfor_qmc;
   plmn_area_based_qmc_ext_ies_container ie_exts;
@@ -2983,7 +2917,6 @@ struct ran_paging_attempt_info_s {
   using next_paging_area_scope_e_ = enumerated<next_paging_area_scope_opts, true>;
 
   // member variables
-  bool                                      ext                            = false;
   bool                                      next_paging_area_scope_present = false;
   bool                                      ie_exts_present                = false;
   uint8_t                                   paging_attempt_count           = 1;
@@ -3005,7 +2938,6 @@ using npn_paging_assist_info_pni_npn_ext_ies_container = protocol_ext_container_
 
 // NPNPagingAssistanceInformation-PNI-NPN ::= SEQUENCE
 struct npn_paging_assist_info_pni_npn_s {
-  bool                                             ext            = false;
   bool                                             ie_ext_present = false;
   allowed_pni_npn_id_list_l                        allowed_pni_npn_id_list;
   npn_paging_assist_info_pni_npn_ext_ies_container ie_ext;
@@ -3104,7 +3036,6 @@ struct assist_data_for_ran_paging_ext_ies_o {
 
 // AssistanceDataForRANPaging ::= SEQUENCE
 struct assist_data_for_ran_paging_s {
-  bool                                                           ext                             = false;
   bool                                                           ran_paging_attempt_info_present = false;
   ran_paging_attempt_info_s                                      ran_paging_attempt_info;
   protocol_ext_container_l<assist_data_for_ran_paging_ext_ies_o> ie_exts;
@@ -3123,7 +3054,6 @@ using associated_qos_flow_info_item_ext_ies_container = protocol_ext_container_e
 
 // Associated-QoSFlowInfo-Item ::= SEQUENCE
 struct associated_qos_flow_info_item_s {
-  bool                                            ext                            = false;
   bool                                            ie_exts_present                = false;
   uint8_t                                         mbs_qos_flow_id                = 0;
   uint8_t                                         associated_unicast_qos_flow_id = 0;
@@ -3149,7 +3079,6 @@ using available_cell_list_ext_ies_container = protocol_ext_container_empty_l;
 
 // AvailableCellList ::= SEQUENCE
 struct available_cell_list_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   available_nr_cell_list_l              available_nr_cell_list;
   available_cell_list_ext_ies_container ie_exts;
@@ -3182,7 +3111,6 @@ struct available_rv_qo_e_metrics_s {
   using playout_delay_for_media_startup_e_ = enumerated<playout_delay_for_media_startup_opts, true>;
 
   // member variables
-  bool                                        ext                                         = false;
   bool                                        application_layer_buffer_level_list_present = false;
   bool                                        playout_delay_for_media_startup_present     = false;
   bool                                        ie_exts_present                             = false;
@@ -3204,7 +3132,6 @@ using average_packet_delay_ext_ies_container = protocol_ext_container_empty_l;
 
 // AveragePacketDelay ::= SEQUENCE
 struct average_packet_delay_s {
-  bool                                   ext                     = false;
   bool                                   ie_exts_present         = false;
   uint16_t                               ul_average_packet_delay = 0;
   uint16_t                               dl_average_packet_delay = 0;
@@ -3224,7 +3151,6 @@ using bap_ctrl_pdu_rlc_ch_item_ext_ies_container = protocol_ext_container_empty_
 
 // BAPControlPDURLCCH-Item ::= SEQUENCE
 struct bap_ctrl_pdu_rlc_ch_item_s {
-  bool                                       ext             = false;
   bool                                       ie_exts_present = false;
   fixed_bitstring<16, false, true>           bh_rlc_ch_id;
   fixed_bitstring<10, false, true>           nexthop_bap_address;
@@ -3247,7 +3173,6 @@ using bap_routing_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // BAPRoutingID ::= SEQUENCE
 struct bap_routing_id_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   fixed_bitstring<10, false, true> bap_address;
   fixed_bitstring<10, false, true> bap_path_id;
@@ -3267,7 +3192,6 @@ using bh_info_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // BHInfo-Item ::= SEQUENCE
 struct bh_info_item_s {
-  bool                           ext             = false;
   bool                           ie_exts_present = false;
   uint16_t                       bh_info_idx     = 1;
   bh_info_item_ext_ies_container ie_exts;
@@ -3292,7 +3216,6 @@ using bplmn_id_info_eutra_item_ext_ies_container = protocol_ext_container_empty_
 
 // BPLMN-ID-Info-EUTRA-Item ::= SEQUENCE
 struct bplmn_id_info_eutra_item_s {
-  bool                                       ext            = false;
   bool                                       ranac_present  = false;
   bool                                       ie_ext_present = false;
   broadcast_eutra_plmns_l                    broadcast_plmns;
@@ -3329,7 +3252,6 @@ using broadcast_n_id_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // BroadcastNID-Item ::= SEQUENCE
 struct broadcast_n_id_item_s {
-  bool                                  ext            = false;
   bool                                  ie_ext_present = false;
   fixed_bitstring<44, false, true>      nid;
   broadcast_n_id_item_ext_ies_container ie_ext;
@@ -3351,7 +3273,6 @@ using broadcast_sn_pn_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // BroadcastSNPNID ::= SEQUENCE
 struct broadcast_sn_pn_id_s {
-  bool                                 ext            = false;
   bool                                 ie_ext_present = false;
   fixed_octstring<3, true>             plmn_id;
   broadcast_n_id_list_l                broadcast_n_id_list;
@@ -3374,7 +3295,6 @@ using npn_broadcast_info_sn_pn_ext_ies_container = protocol_ext_container_empty_
 
 // NPN-Broadcast-Information-SNPN ::= SEQUENCE
 struct npn_broadcast_info_sn_pn_s {
-  bool                                       ext            = false;
   bool                                       ie_ext_present = false;
   broadcast_sn_pn_id_list_l                  broadcast_sn_pn_id_list;
   npn_broadcast_info_sn_pn_ext_ies_container ie_ext;
@@ -3393,7 +3313,6 @@ using broadcast_cag_id_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // BroadcastCAG-Identifier-Item ::= SEQUENCE
 struct broadcast_cag_id_item_s {
-  bool                                    ext            = false;
   bool                                    ie_ext_present = false;
   fixed_bitstring<32, false, true>        cag_id;
   broadcast_cag_id_item_ext_ies_container ie_ext;
@@ -3415,7 +3334,6 @@ using broadcast_pni_npn_id_info_item_ext_ies_container = protocol_ext_container_
 
 // BroadcastPNI-NPN-ID-Information-Item ::= SEQUENCE
 struct broadcast_pni_npn_id_info_item_s {
-  bool                                             ext            = false;
   bool                                             ie_ext_present = false;
   fixed_octstring<3, true>                         plmn_id;
   broadcast_cag_id_list_l                          broadcast_cag_id_list;
@@ -3438,7 +3356,6 @@ using npn_broadcast_info_pni_npn_ext_ies_container = protocol_ext_container_empt
 
 // NPN-Broadcast-Information-PNI-NPN ::= SEQUENCE
 struct npn_broadcast_info_pni_npn_s {
-  bool                                         ext            = false;
   bool                                         ie_ext_present = false;
   broadcast_pni_npn_id_info_l                  broadcast_pni_npn_id_info;
   npn_broadcast_info_pni_npn_ext_ies_container ie_ext;
@@ -3568,7 +3485,6 @@ struct bplmn_id_info_nr_item_ext_ies_container {
 
 // BPLMN-ID-Info-NR-Item ::= SEQUENCE
 struct bplmn_id_info_nr_item_s {
-  bool                                    ext            = false;
   bool                                    ranac_present  = false;
   bool                                    ie_ext_present = false;
   broadcast_plmns_l                       broadcast_plmns;
@@ -3640,7 +3556,6 @@ struct beam_meass_report_quant_s {
   using sinr_e_ = enumerated<sinr_opts, true>;
 
   // member variables
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   rsrp_e_                                   rsrp;
   rsrq_e_                                   rsrq;
@@ -3661,7 +3576,6 @@ using beam_meass_report_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // BeamMeasurementsReportConfiguration ::= SEQUENCE
 struct beam_meass_report_cfg_s {
-  bool                                    ext                                 = false;
   bool                                    beam_meass_report_quant_present     = false;
   bool                                    max_nrof_rs_idxes_to_report_present = false;
   bool                                    ie_exts_present                     = false;
@@ -3702,7 +3616,6 @@ struct bluetooth_meas_cfg_s {
   using bt_rssi_e_ = enumerated<bt_rssi_opts, true>;
 
   // member variables
-  bool                                 ext             = false;
   bool                                 bt_rssi_present = false;
   bool                                 ie_exts_present = false;
   bluetooth_meas_cfg_e                 bluetooth_meas_cfg;
@@ -3724,7 +3637,6 @@ using s_nssai_ext_ies_container = protocol_ext_container_empty_l;
 
 // S-NSSAI ::= SEQUENCE
 struct s_nssai_s {
-  bool                      ext             = false;
   bool                      sd_present      = false;
   bool                      ie_exts_present = false;
   fixed_octstring<1, true>  sst;
@@ -3748,7 +3660,6 @@ using npn_support_sn_pn_ext_ies_container = protocol_ext_container_empty_l;
 
 // NPN-Support-SNPN ::= SEQUENCE
 struct npn_support_sn_pn_s {
-  bool                                ext            = false;
   bool                                ie_ext_present = false;
   fixed_bitstring<44, false, true>    nid;
   npn_support_sn_pn_ext_ies_container ie_ext;
@@ -3823,7 +3734,6 @@ using tai_nsag_support_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // TAINSAGSupportItem ::= SEQUENCE
 struct tai_nsag_support_item_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   uint16_t                                nsag_id         = 0;
   extended_slice_support_list_l           nsag_slice_support_list;
@@ -3849,7 +3759,6 @@ using unavailable_cell_list_ext_ies_container = protocol_ext_container_empty_l;
 
 // UnavailableCellList ::= SEQUENCE
 struct unavailable_cell_list_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   unavailable_nr_cell_list_l              unavailable_nr_cell_list;
   unavailable_cell_list_ext_ies_container ie_exts;
@@ -3935,7 +3844,6 @@ using tai_slice_unavailable_cell_item_ext_ies_container = protocol_ext_container
 
 // TAISliceUnavailableCellItem ::= SEQUENCE
 struct tai_slice_unavailable_cell_item_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   s_nssai_s                                         snssai;
   slice_availability_list_c                         slice_availability_list;
@@ -4016,7 +3924,6 @@ struct broadcast_plmn_in_tai_support_item_ext_ies_container {
 
 // BroadcastPLMNinTAISupport-Item ::= SEQUENCE
 struct broadcast_plmn_in_tai_support_item_s {
-  bool                                                 ext            = false;
   bool                                                 ie_ext_present = false;
   fixed_octstring<3, true>                             plmn_id;
   slice_support_list_l                                 tai_slice_support_list;
@@ -4073,7 +3980,6 @@ struct qos_flows_admitted_item_ext_ies_o {
 
 // QoSFlowsAdmitted-Item ::= SEQUENCE
 struct qos_flows_admitted_item_s {
-  bool                                                        ext = false;
   uint8_t                                                     qfi = 0;
   protocol_ext_container_l<qos_flows_admitted_item_ext_ies_o> ie_ext;
   // ...
@@ -4311,7 +4217,6 @@ using qos_flowwith_cause_item_ext_ies_container = protocol_ext_container_empty_l
 
 // QoSFlowwithCause-Item ::= SEQUENCE
 struct qos_flowwith_cause_item_s {
-  bool                                      ext            = false;
   bool                                      cause_present  = false;
   bool                                      ie_ext_present = false;
   uint8_t                                   qfi            = 0;
@@ -4335,7 +4240,6 @@ using secondarydata_forwarding_info_from_target_item_ext_ies_container = protoco
 
 // SecondarydataForwardingInfoFromTarget-Item ::= SEQUENCE
 struct secondarydata_forwarding_info_from_target_item_s {
-  bool                                                             ext             = false;
   bool                                                             ie_exts_present = false;
   data_forwarding_info_from_target_ngran_node_s                    secondarydata_forwarding_info_from_target;
   secondarydata_forwarding_info_from_target_item_ext_ies_container ie_exts;
@@ -4395,7 +4299,6 @@ struct pdu_session_res_admitted_info_s {
   using dl_ng_u_tnl_info_unchanged_e_ = enumerated<dl_ng_u_tnl_info_unchanged_opts, true>;
 
   // member variables
-  bool                                                              ext                                      = false;
   bool                                                              dl_ng_u_tnl_info_unchanged_present       = false;
   bool                                                              data_forwarding_info_from_target_present = false;
   dl_ng_u_tnl_info_unchanged_e_                                     dl_ng_u_tnl_info_unchanged;
@@ -4418,7 +4321,6 @@ using pdu_session_res_admitted_item_ext_ies_container = protocol_ext_container_e
 
 // PDUSessionResourcesAdmitted-Item ::= SEQUENCE
 struct pdu_session_res_admitted_item_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   uint16_t                                        pdu_session_id  = 0;
   pdu_session_res_admitted_info_s                 pdu_session_res_admitted_info;
@@ -4441,7 +4343,6 @@ using cho_candidate_p_scells_item_ext_ies_container = protocol_ext_container_emp
 
 // CHO-Candidate-PSCells-Item ::= SEQUENCE
 struct cho_candidate_p_scells_item_s {
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   nr_cgi_s                                      pscell_id;
   unbounded_octstring<true>                     target2source_ng_ran_node_container;
@@ -4464,7 +4365,6 @@ using cho_target_sn_node_item_ext_ies_container = protocol_ext_container_empty_l
 
 // CHO-target-SN-node-Item ::= SEQUENCE
 struct cho_target_sn_node_item_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   global_ng_ran_node_id_c                   target_s_ng_ran_node_id;
   pdu_session_res_admitted_list_l           pdu_session_res_admitted_list;
@@ -4488,7 +4388,6 @@ using cho_cp_ac_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // CHO-CPAC-Information ::= SEQUENCE
 struct cho_cp_ac_info_s {
-  bool                             ext                       = false;
   bool                             cho_cp_ac_cfg_ind_present = false;
   bool                             ie_exts_present           = false;
   cho_cp_ac_cfg_ind_e              cho_cp_ac_cfg_ind;
@@ -4525,7 +4424,6 @@ using cho_execution_condition_item_ext_ies_container = protocol_ext_container_em
 
 // CHOExecutionCondition-Item ::= SEQUENCE
 struct cho_execution_condition_item_s {
-  bool                                           ext             = false;
   bool                                           ie_exts_present = false;
   unbounded_octstring<true>                      meas_obj_container;
   unbounded_octstring<true>                      report_cfg_container;
@@ -4548,7 +4446,6 @@ using cho_candidate_cell_item_ext_ies_container = protocol_ext_container_empty_l
 
 // CHOCandidateCell-Item ::= SEQUENCE
 struct cho_candidate_cell_item_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   global_ng_ran_cell_id_s                   cho_candidate_cell_id;
   cho_execution_condition_list_l            cho_execution_condition_list;
@@ -4571,7 +4468,6 @@ using cho_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // CHOConfiguration ::= SEQUENCE
 struct cho_cfg_s {
-  bool                      ext             = false;
   bool                      ie_exts_present = false;
   cho_candidate_cell_list_l cho_candidate_cell_list;
   cho_cfg_ext_ies_container ie_exts;
@@ -4590,7 +4486,6 @@ using cho_time_based_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // CHOTimeBasedInformation ::= SEQUENCE
 struct cho_time_based_info_s {
-  bool                                  ext              = false;
   bool                                  ie_exts_present  = false;
   uint64_t                              cho_ho_win_start = 0;
   uint16_t                              cho_ho_win_dur   = 1;
@@ -4701,7 +4596,6 @@ struct ch_oinfo_ack_ext_ies_o {
 
 // CHOinformation-Ack ::= SEQUENCE
 struct ch_oinfo_ack_s {
-  bool                                             ext                        = false;
   bool                                             max_ch_ooperations_present = false;
   target_cgi_c                                     requested_target_cell_global_id;
   uint8_t                                          max_ch_ooperations = 1;
@@ -4721,7 +4615,6 @@ using ch_oinfo_add_req_ext_ies_container = protocol_ext_container_empty_l;
 
 // CHOinformation-AddReq ::= SEQUENCE
 struct ch_oinfo_add_req_s {
-  bool                               ext                                       = false;
   bool                               cho_estimated_arrival_probability_present = false;
   bool                               ie_exts_present                           = false;
   global_ng_ran_node_id_c            source_m_ngran_node_id;
@@ -4743,7 +4636,6 @@ using ch_oinfo_add_req_ack_ext_ies_container = protocol_ext_container_empty_l;
 
 // CHOinformation-AddReqAck ::= SEQUENCE
 struct ch_oinfo_add_req_ack_s {
-  bool                                   ext              = false;
   bool                                   pcell_id_present = false;
   bool                                   ie_exts_present  = false;
   global_ng_ran_cell_id_s                pcell_id;
@@ -4771,7 +4663,6 @@ struct ch_oinfo_mod_req_s {
   using conditional_recfg_e_ = enumerated<conditional_recfg_opts, true>;
 
   // member variables
-  bool                               ext                                       = false;
   bool                               cho_estimated_arrival_probability_present = false;
   bool                               ie_exts_present                           = false;
   conditional_recfg_e_               conditional_recfg;
@@ -4846,7 +4737,6 @@ struct ch_oinfo_req_ext_ies_container {
 
 // CHOinformation-Req ::= SEQUENCE
 struct ch_oinfo_req_s {
-  bool                           ext                                       = false;
   bool                           target_ng_ran_node_ue_xnap_id_present     = false;
   bool                           cho_estimated_arrival_probability_present = false;
   bool                           ie_exts_present                           = false;
@@ -4879,7 +4769,6 @@ struct cn_type_restricts_for_equivalent_item_s {
   using cn_type_e_ = enumerated<cn_type_opts, true>;
 
   // member variables
-  bool                                                    ext             = false;
   bool                                                    ie_exts_present = false;
   fixed_octstring<3, true>                                plmn_id;
   cn_type_e_                                              cn_type;
@@ -4910,7 +4799,6 @@ using count_pdcp_sn12_ext_ies_container = protocol_ext_container_empty_l;
 
 // COUNT-PDCP-SN12 ::= SEQUENCE
 struct count_pdcp_sn12_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   uint16_t                          pdcp_sn12       = 0;
   uint32_t                          hfn_pdcp_sn12   = 0;
@@ -4930,7 +4818,6 @@ using count_pdcp_sn18_ext_ies_container = protocol_ext_container_empty_l;
 
 // COUNT-PDCP-SN18 ::= SEQUENCE
 struct count_pdcp_sn18_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   uint32_t                          pdcp_sn18       = 0;
   uint16_t                          hfn_pdcp_sn18   = 0;
@@ -4958,7 +4845,6 @@ using cp_ac_execution_condition_item_ext_ies_container = protocol_ext_container_
 
 // CPACExecutionCondition-Item ::= SEQUENCE
 struct cp_ac_execution_condition_item_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   unbounded_octstring<true>                        meas_obj_container;
   unbounded_octstring<true>                        report_cfg_container;
@@ -4981,7 +4867,6 @@ using cp_ac_candidate_cell_item_ext_ies_container = protocol_ext_container_empty
 
 // CPACCandidateCell-Item ::= SEQUENCE
 struct cp_ac_candidate_cell_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   global_ng_ran_cell_id_s                     cpac_candidate_cell_id;
   cp_ac_execution_condition_list_l            cpac_execution_condition_list;
@@ -5004,7 +4889,6 @@ using cp_ac_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // CPACConfiguration ::= SEQUENCE
 struct cp_ac_cfg_s {
-  bool                        ext             = false;
   bool                        ie_exts_present = false;
   cp_ac_candidate_cell_list_l cpac_candidate_cell_list;
   cp_ac_cfg_ext_ies_container ie_exts;
@@ -5023,7 +4907,6 @@ using cp_a_ccandidate_p_scells_item_ext_ies_container = protocol_ext_container_e
 
 // CPACcandidatePSCells-item ::= SEQUENCE
 struct cp_a_ccandidate_p_scells_item_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   nr_cgi_s                                        pscell_id;
   cp_a_ccandidate_p_scells_item_ext_ies_container ie_exts;
@@ -5053,7 +4936,6 @@ using cp_a_ccandidate_p_scells_wother_info_item_ext_ies_container = protocol_ext
 
 // CPACcandidatePSCells-wotherInfo-item ::= SEQUENCE
 struct cp_a_ccandidate_p_scells_wother_info_item_s {
-  bool                                                        ext                                        = false;
   bool                                                        s_cp_ac_complete_candidate_cfg_ind_present = false;
   bool                                                        ie_exts_present                            = false;
   nr_cgi_s                                                    pscell_id;
@@ -5104,7 +4986,6 @@ struct cp_ac_info_mod_required_ext_ies_o {
 
 // CPACInformationModRequired ::= SEQUENCE
 struct cp_ac_info_mod_required_s {
-  bool                                                        ext = false;
   cp_a_ccandidate_p_scells_list_l                             candidate_pscells;
   protocol_ext_container_l<cp_ac_info_mod_required_ext_ies_o> ie_exts;
   // ...
@@ -5149,7 +5030,6 @@ struct cp_a_info_ack_ext_ies_o {
 
 // CPAInformationAck ::= SEQUENCE
 struct cp_a_info_ack_s {
-  bool                                              ext = false;
   cp_a_ccandidate_p_scells_list_l                   candidate_pscells;
   protocol_ext_container_l<cp_a_info_ack_ext_ies_o> ie_exts;
   // ...
@@ -5167,7 +5047,6 @@ using s_cp_ac_security_cfg_item_ext_ies_container = protocol_ext_container_empty
 
 // S-CPAC-SecurityConfig-Item ::= SEQUENCE
 struct s_cp_ac_security_cfg_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   fixed_bitstring<256, false, true>           s_ng_ra_nnode_security_key;
   uint32_t                                    sk_counter = 0;
@@ -5190,7 +5069,6 @@ using s_cp_ac_multi_target_sn_item_ext_ies_container = protocol_ext_container_em
 
 // S-CPAC-MultiTargetSN-Item ::= SEQUENCE
 struct s_cp_ac_multi_target_sn_item_s {
-  bool                                           ext             = false;
   bool                                           ie_exts_present = false;
   global_ng_ran_node_id_c                        target_s_ng_ran_node_id;
   unbounded_octstring<true>                      recommended_candidate_p_scells;
@@ -5213,7 +5091,6 @@ using s_cp_ac_request_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // S-CPAC-Request-Info ::= SEQUENCE
 struct s_cp_ac_request_info_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   s_cp_ac_security_cfg_list_l            s_cp_ac_security_cfg_list;
   s_cp_ac_multi_target_sn_list_l         s_cp_ac_multi_target_sn_list;
@@ -5297,7 +5174,6 @@ struct cp_a_info_mod_req_ext_ies_container {
 
 // CPAInformationModReq ::= SEQUENCE
 struct cp_a_info_mod_req_s {
-  bool                                ext                                        = false;
   bool                                max_no_of_pscells_present                  = false;
   bool                                cpac_estimated_arrival_probability_present = false;
   bool                                ie_exts_present                            = false;
@@ -5346,7 +5222,6 @@ struct cp_a_info_mod_req_ack_ext_ies_o {
 
 // CPAInformationModReqAck ::= SEQUENCE
 struct cp_a_info_mod_req_ack_s {
-  bool                                                      ext = false;
   cp_a_ccandidate_p_scells_list_l                           candidate_pscells;
   protocol_ext_container_l<cp_a_info_mod_req_ack_ext_ies_o> ie_exts;
   // ...
@@ -5408,7 +5283,6 @@ struct cp_a_info_request_ext_ies_container {
 
 // CPAInformationRequest ::= SEQUENCE
 struct cp_a_info_request_s {
-  bool                                ext                                        = false;
   bool                                cpac_estimated_arrival_probability_present = false;
   bool                                ie_exts_present                            = false;
   uint8_t                             max_no_of_pscells                          = 1;
@@ -5464,7 +5338,6 @@ struct cp_c_target_sn_confirm_list_item_ext_ies_o {
 
 // CPC-target-SN-confirm-list-Item ::= SEQUENCE
 struct cp_c_target_sn_confirm_list_item_s {
-  bool                                                                 ext = false;
   global_ng_ran_node_id_c                                              target_s_ng_ran_node_id;
   cp_a_ccandidate_p_scells_list_l                                      candidate_pscells;
   protocol_ext_container_l<cp_c_target_sn_confirm_list_item_ext_ies_o> ie_exts;
@@ -5486,7 +5359,6 @@ using c_pci_nformation_upd_p_scells_item_ext_ies_container = protocol_ext_contai
 
 // CPCInformationUpdatePSCells-item ::= SEQUENCE
 struct c_pci_nformation_upd_p_scells_item_s {
-  bool                                                 ext             = false;
   bool                                                 ie_exts_present = false;
   nr_cgi_s                                             pscell_id;
   c_pci_nformation_upd_p_scells_item_ext_ies_container ie_exts;
@@ -5508,7 +5380,6 @@ using cp_c_target_sn_mod_item_ext_ies_container = protocol_ext_container_empty_l
 
 // CPC-target-SN-mod-item ::= SEQUENCE
 struct cp_c_target_sn_mod_item_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   global_ng_ran_node_id_c                   target_s_ng_ran_node_id;
   c_pci_nformation_upd_p_scells_list_l      candidate_pscells;
@@ -5539,7 +5410,6 @@ using cp_c_target_sn_required_list_item_ext_ies_container = protocol_ext_contain
 
 // CPC-target-SN-required-list-Item ::= SEQUENCE
 struct cp_c_target_sn_required_list_item_s {
-  bool                                                ext                                        = false;
   bool                                                cpac_estimated_arrival_probability_present = false;
   bool                                                ie_exts_present                            = false;
   global_ng_ran_node_id_c                             target_s_ng_ran_node_id;
@@ -5566,7 +5436,6 @@ using c_pci_nformation_confirm_ext_ies_container = protocol_ext_container_empty_
 
 // CPCInformationConfirm ::= SEQUENCE
 struct c_pci_nformation_confirm_s {
-  bool                                       ext             = false;
   bool                                       ie_exts_present = false;
   cp_c_target_sn_confirm_list_l              cpc_target_sn_confirm_list;
   c_pci_nformation_confirm_ext_ies_container ie_exts;
@@ -5620,7 +5489,6 @@ struct c_pci_nformation_required_ext_ies_o {
 
 // CPCInformationRequired ::= SEQUENCE
 struct c_pci_nformation_required_s {
-  bool                                                          ext = false;
   cp_c_target_sn_required_list_l                                cpc_target_sn_required_list;
   protocol_ext_container_l<c_pci_nformation_required_ext_ies_o> ie_exts;
   // ...
@@ -5638,7 +5506,6 @@ using c_pci_nformation_upd_ext_ies_container = protocol_ext_container_empty_l;
 
 // CPCInformationUpdate ::= SEQUENCE
 struct c_pci_nformation_upd_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   cp_c_target_sn_mod_list_l              cpc_target_sn_list;
   c_pci_nformation_upd_ext_ies_container ie_exts;
@@ -5767,7 +5634,6 @@ using candidate_relay_ue_info_item_ext_ies_container = protocol_ext_container_em
 
 // CandidateRelayUEInfoItem ::= SEQUENCE
 struct candidate_relay_ue_info_item_s {
-  bool                                           ext             = false;
   bool                                           ie_exts_present = false;
   fixed_bitstring<24, false, true>               candidate_relay_ue_id;
   candidate_relay_ue_info_item_ext_ies_container ie_exts;
@@ -5797,7 +5663,6 @@ using ssb_area_capacity_value_list_item_ext_ies_container = protocol_ext_contain
 
 // SSBAreaCapacityValue-List-Item ::= SEQUENCE
 struct ssb_area_capacity_value_list_item_s {
-  bool                                                ext                     = false;
   bool                                                ie_exts_present         = false;
   uint8_t                                             ssb_idx                 = 0;
   uint8_t                                             ssb_area_capacity_value = 0;
@@ -5820,7 +5685,6 @@ using capacity_value_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // CapacityValueInfo ::= SEQUENCE
 struct capacity_value_info_s {
-  bool                                  ext            = false;
   bool                                  ie_ext_present = false;
   uint8_t                               capacity_value = 0;
   ssb_area_capacity_value_list_l        ssb_area_capacity_value_list;
@@ -5986,7 +5850,6 @@ using cell_and_capacity_assist_info_eutra_ext_ies_container = protocol_ext_conta
 
 // CellAndCapacityAssistanceInfo-EUTRA ::= SEQUENCE
 struct cell_and_capacity_assist_info_eutra_s {
-  bool                                                  ext                            = false;
   bool                                                  max_cell_list_size_present     = false;
   bool                                                  cell_assist_info_eutra_present = false;
   bool                                                  ie_exts_present                = false;
@@ -6079,7 +5942,6 @@ using cell_and_capacity_assist_info_nr_ext_ies_container = protocol_ext_containe
 
 // CellAndCapacityAssistanceInfo-NR ::= SEQUENCE
 struct cell_and_capacity_assist_info_nr_s {
-  bool                                               ext                         = false;
   bool                                               max_cell_list_size_present  = false;
   bool                                               cell_assist_info_nr_present = false;
   bool                                               ie_exts_present             = false;
@@ -6101,7 +5963,6 @@ using predicted_trajectory_ngran_cell_info_ext_ies_container = protocol_ext_cont
 
 // PredictedTrajectoryNGRANCellInfo ::= SEQUENCE
 struct predicted_trajectory_ngran_cell_info_s {
-  bool                                                   ext                                     = false;
   bool                                                   predicted_time_ue_stays_in_cell_present = false;
   bool                                                   ie_exts_present                         = false;
   global_ng_ran_cell_id_s                                global_ng_ran_cell_id;
@@ -6177,7 +6038,6 @@ using predicted_ue_trajectory_item_ext_ies_container = protocol_ext_container_em
 
 // PredictedUETrajectory-Item ::= SEQUENCE
 struct predicted_ue_trajectory_item_s {
-  bool                                           ext             = false;
   bool                                           ie_exts_present = false;
   predicted_trajectory_cell_info_c               predictedtrajectory_cell_info;
   predicted_ue_trajectory_item_ext_ies_container ie_exts;
@@ -6251,7 +6111,6 @@ struct ng_enb_rr_status_ext_ies_container {
 
 // NG-eNB-RadioResourceStatus ::= SEQUENCE
 struct ng_enb_rr_status_s {
-  bool                               ext                  = false;
   bool                               ie_exts_present      = false;
   uint8_t                            dl_gbr_prb_usage     = 0;
   uint8_t                            ul_gbr_prb_usage     = 0;
@@ -6319,7 +6178,6 @@ struct ssb_area_rr_status_list_item_ext_ies_container {
 
 // SSBAreaRadioResourceStatus-List-Item ::= SEQUENCE
 struct ssb_area_rr_status_list_item_s {
-  bool                                           ext                            = false;
   bool                                           ie_exts_present                = false;
   uint8_t                                        ssb_idx                        = 0;
   uint8_t                                        ssb_area_dl_gbr_prb_usage      = 0;
@@ -6347,7 +6205,6 @@ using snssai_rr_status_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNSSAIRadioResourceStatus-Item ::= SEQUENCE
 struct snssai_rr_status_item_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   s_nssai_s                               snssai;
   uint8_t                                 slice_dl_gbr_prb_usage     = 0;
@@ -6375,7 +6232,6 @@ using slice_rr_status_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // SliceRadioResourceStatus-Item ::= SEQUENCE
 struct slice_rr_status_item_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   fixed_octstring<3, true>               plmn_id;
   snssai_rr_status_list_l                snssai_rr_status_list;
@@ -6398,7 +6254,6 @@ using mimo_prb_usage_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // MIMOPRBusageInformation ::= SEQUENCE
 struct mimo_prb_usage_info_s {
-  bool                                  ext                           = false;
   bool                                  ie_exts_present               = false;
   uint8_t                               dl_gbr_prb_usage_for_mimo     = 0;
   uint8_t                               ul_gbr_prb_usage_for_mimo     = 0;
@@ -6466,7 +6321,6 @@ struct gnb_rr_status_ext_ies_container {
 
 // GNB-RadioResourceStatus ::= SEQUENCE
 struct gnb_rr_status_s {
-  bool                            ext             = false;
   bool                            ie_exts_present = false;
   ssb_area_rr_status_list_l       ssb_area_rr_status_list;
   gnb_rr_status_ext_ies_container ie_exts;
@@ -6549,7 +6403,6 @@ using rrc_conns_ext_ies_container = protocol_ext_container_empty_l;
 
 // RRCConnections ::= SEQUENCE
 struct rrc_conns_s {
-  bool                        ext                               = false;
   bool                        ie_exts_present                   = false;
   uint32_t                    noof_rrc_conns                    = 1;
   uint8_t                     available_rrc_conn_capacity_value = 0;
@@ -6569,7 +6422,6 @@ using cell_info_result_for_data_collection_item_ext_ies_container = protocol_ext
 
 // CellInfoResultForDataCollection-Item ::= SEQUENCE
 struct cell_info_result_for_data_collection_item_s {
-  bool                                                        ext                                = false;
   bool                                                        predicted_rr_status_present        = false;
   bool                                                        predicted_numof_active_ues_present = false;
   bool                                                        predicted_rrc_conns_present        = false;
@@ -6594,7 +6446,6 @@ using cell_meas_fail_cause_item_ext_ies_container = protocol_ext_container_empty
 
 // CellMeasurementFailureCause-Item ::= SEQUENCE
 struct cell_meas_fail_cause_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   fixed_bitstring<32, false, true>            cellmeas_failed_report_characteristics;
   cause_c                                     cause;
@@ -6617,7 +6468,6 @@ using cell_meas_initiation_result_item_ext_ies_container = protocol_ext_containe
 
 // CellMeasurementInitiationResult-Item ::= SEQUENCE
 struct cell_meas_initiation_result_item_s {
-  bool                                               ext             = false;
   bool                                               ie_exts_present = false;
   global_ng_ran_cell_id_s                            cell_id;
   cell_meas_fail_cause_list_l                        cell_meas_fail_cause_list;
@@ -6640,7 +6490,6 @@ using tnl_capacity_ind_ext_ies_container = protocol_ext_container_empty_l;
 
 // TNLCapacityIndicator ::= SEQUENCE
 struct tnl_capacity_ind_s {
-  bool                               ext                       = false;
   bool                               ie_exts_present           = false;
   uint32_t                           dl_tnl_offered_capacity   = 1;
   uint16_t                           dl_tnl_available_capacity = 1;
@@ -6662,7 +6511,6 @@ using composite_available_capacity_ext_ies_container = protocol_ext_container_em
 
 // CompositeAvailableCapacity ::= SEQUENCE
 struct composite_available_capacity_s {
-  bool                                           ext                               = false;
   bool                                           cell_capacity_class_value_present = false;
   bool                                           ie_exts_present                   = false;
   uint16_t                                       cell_capacity_class_value         = 1;
@@ -6710,7 +6558,6 @@ struct composite_available_capacity_group_ext_ies_o {
 
 // CompositeAvailableCapacityGroup ::= SEQUENCE
 struct composite_available_capacity_group_s {
-  bool                                                                   ext = false;
   composite_available_capacity_s                                         composite_available_capacity_dl;
   composite_available_capacity_s                                         composite_available_capacity_ul;
   protocol_ext_container_l<composite_available_capacity_group_ext_ies_o> ie_exts;
@@ -6751,7 +6598,6 @@ using slice_available_capacity_item_ext_ies_container = protocol_ext_container_e
 
 // SliceAvailableCapacity-Item ::= SEQUENCE
 struct slice_available_capacity_item_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   fixed_octstring<3, true>                        plmn_id;
   snssai_available_capacity_list_l                snssai_available_capacity_list;
@@ -6774,7 +6620,6 @@ using rr_status_nr_u_ext_ies_container = protocol_ext_container_empty_l;
 
 // RadioResourceStatusNR-U ::= SEQUENCE
 struct rr_status_nr_u_s {
-  bool                             ext                = false;
   bool                             ie_exts_present    = false;
   uint8_t                          dl_total_prb_usage = 0;
   uint8_t                          ul_total_prb_usage = 0;
@@ -6844,7 +6689,6 @@ struct nr_u_ch_item_ext_ies_container {
 
 // NR-U-Channel-Item ::= SEQUENCE
 struct nr_u_ch_item_s {
-  bool                           ext                             = false;
   bool                           ie_ext_present                  = false;
   uint8_t                        nr_u_ch_id                      = 1;
   uint16_t                       ch_occupancy_time_percentage_dl = 0;
@@ -6895,7 +6739,6 @@ struct cell_meas_result_item_ext_ies_o {
 
 // CellMeasurementResult-Item ::= SEQUENCE
 struct cell_meas_result_item_s {
-  bool                                                      ext                                        = false;
   bool                                                      rr_status_present                          = false;
   bool                                                      tnl_capacity_ind_present                   = false;
   bool                                                      composite_available_capacity_group_present = false;
@@ -6930,7 +6773,6 @@ using global_cell_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // GlobalCell-ID ::= SEQUENCE
 struct global_cell_id_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   fixed_octstring<3, true>         plmn_id;
   cell_type_choice_c               cell_type;
@@ -6950,7 +6792,6 @@ using replacing_cells_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // ReplacingCells-Item ::= SEQUENCE
 struct replacing_cells_item_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   global_cell_id_s                       global_ng_ran_cell_id;
   replacing_cells_item_ext_ies_container ie_exts;
@@ -6972,7 +6813,6 @@ using cell_replacing_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // CellReplacingInfo ::= SEQUENCE
 struct cell_replacing_info_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   replacing_cells_l                     replacing_cells;
   cell_replacing_info_ext_ies_container ie_exts;
@@ -6991,7 +6831,6 @@ using ssb_to_report_list_item_ext_ies_container = protocol_ext_container_empty_l
 
 // SSBToReport-List-Item ::= SEQUENCE
 struct ssb_to_report_list_item_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   uint8_t                                   ssb_idx         = 0;
   ssb_to_report_list_item_ext_ies_container ie_exts;
@@ -7033,7 +6872,6 @@ using slice_to_report_list_item_ext_ies_container = protocol_ext_container_empty
 
 // SliceToReport-List-Item ::= SEQUENCE
 struct slice_to_report_list_item_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   fixed_octstring<3, true>                    plmn_id;
   snssai_list_l                               snssai_list;
@@ -7056,7 +6894,6 @@ using cell_to_report_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // CellToReport-Item ::= SEQUENCE
 struct cell_to_report_item_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   global_ng_ran_cell_id_s               cell_id;
   ssb_to_report_list_l                  ssb_to_report_list;
@@ -7080,7 +6917,6 @@ using cell_to_report_for_data_collection_item_ext_ies_container = protocol_ext_c
 
 // CellToReportForDataCollection-Item ::= SEQUENCE
 struct cell_to_report_for_data_collection_item_s {
-  bool                                                      ext             = false;
   bool                                                      ie_exts_present = false;
   global_ng_ran_cell_id_s                                   cell_id;
   cell_to_report_for_data_collection_item_ext_ies_container ie_exts;
@@ -7116,7 +6952,6 @@ struct clock_quality_acceptance_criteria_s {
   using traceableto_gnss_e_ = enumerated<traceableto_gnss_opts, true>;
 
   // member variables
-  bool                                                ext                           = false;
   bool                                                synchronisation_state_present = false;
   bool                                                traceableto_utc_present       = false;
   bool                                                traceableto_gnss_present      = false;
@@ -7202,7 +7037,6 @@ using clock_quality_report_ctrl_info_ext_ies_container = protocol_ext_container_
 
 // ClockQualityReportingControlInfo ::= SEQUENCE
 struct clock_quality_report_ctrl_info_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   clock_quality_detail_level_c                     clock_quality_detail_level;
   clock_quality_report_ctrl_info_ext_ies_container ie_exts;
@@ -7221,7 +7055,6 @@ using conditional_recfg_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // Conditional-Reconfig-Item ::= SEQUENCE
 struct conditional_recfg_item_s {
-  bool                                     ext               = false;
   bool                                     pscell_id_present = false;
   bool                                     ie_exts_present   = false;
   target_cgi_c                             pcell_id;
@@ -7261,7 +7094,6 @@ struct connect_support_s {
   using endc_support_e_ = enumerated<endc_support_opts, true>;
 
   // member variables
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   endc_support_e_                   endc_support;
   connect_support_ext_ies_container ie_exts;
@@ -7280,7 +7112,6 @@ using ssb_coverage_mod_list_item_ext_ies_container = protocol_ext_container_empt
 
 // SSB-Coverage-Modification-List-Item ::= SEQUENCE
 struct ssb_coverage_mod_list_item_s {
-  bool                                         ext                = false;
   bool                                         ie_ext_present     = false;
   uint8_t                                      ssb_idx            = 0;
   uint8_t                                      ssb_coverage_state = 0;
@@ -7340,7 +7171,6 @@ struct coverage_mod_list_item_ext_ies_o {
 
 // Coverage-Modification-List-Item ::= SEQUENCE
 struct coverage_mod_list_item_s {
-  bool                                                       ext                                = false;
   bool                                                       cell_deployment_status_ind_present = false;
   bool                                                       cell_replacing_info_present        = false;
   global_cell_id_s                                           global_ng_ran_cell_id;
@@ -7374,7 +7204,6 @@ using crit_diagnostics_ie_list_ext_ies_o = protocol_ext_empty_o;
 using crit_diagnostics_ie_list_ext_ies_container = protocol_ext_container_empty_l;
 
 struct crit_diagnostics_ie_list_item_s_ {
-  bool                                       ext             = false;
   bool                                       ie_exts_present = false;
   crit_e                                     ie_crit;
   uint32_t                                   ie_id = 0;
@@ -7398,7 +7227,6 @@ using crit_diagnostics_ext_ies_container = protocol_ext_container_empty_l;
 
 // CriticalityDiagnostics ::= SEQUENCE
 struct crit_diagnostics_s {
-  bool                               ext                 = false;
   bool                               proc_code_present   = false;
   bool                               trigger_msg_present = false;
   bool                               proc_crit_present   = false;
@@ -7447,7 +7275,6 @@ struct daps_request_info_s {
   using daps_ind_e_ = enumerated<daps_ind_opts, true>;
 
   // member variables
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   daps_ind_e_                         daps_ind;
   daps_request_info_ext_ies_container ie_exts;
@@ -7474,7 +7301,6 @@ struct daps_resp_info_item_s {
   using daps_resp_ind_e_ = enumerated<daps_resp_ind_opts, true>;
 
   // member variables
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   uint8_t                               drb_id          = 1;
   daps_resp_ind_e_                      daps_resp_ind;
@@ -7563,7 +7389,6 @@ using dl_f1_terminating_bh_info_ext_ies_container = protocol_ext_container_empty
 
 // DLF1Terminating-BHInfo ::= SEQUENCE
 struct dl_f1_terminating_bh_info_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   bap_routing_id_s                            egress_bap_routing_id;
   fixed_bitstring<16, false, true>            egress_bh_rlc_ch_id;
@@ -7591,7 +7416,6 @@ using dl_lbt_fail_info_list_item_ext_ies_container = protocol_ext_container_empt
 
 // DLLBTFailureInformationList-Item ::= SEQUENCE
 struct dl_lbt_fail_info_list_item_s {
-  bool                                         ext                      = false;
   bool                                         nof_dl_lbt_fails_present = false;
   bool                                         ie_exts_present          = false;
   uint64_t                                     ue_assistant_id          = 0;
@@ -7623,7 +7447,6 @@ using iab_qos_map_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // IAB-QoS-Mapping-Information ::= SEQUENCE
 struct iab_qos_map_info_s {
-  bool                               ext                = false;
   bool                               dscp_present       = false;
   bool                               flow_label_present = false;
   bool                               ie_exts_present    = false;
@@ -7645,7 +7468,6 @@ using dl_non_f1_terminating_bh_info_ext_ies_container = protocol_ext_container_e
 
 // DLNonF1Terminating-BHInfo ::= SEQUENCE
 struct dl_non_f1_terminating_bh_info_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   bap_routing_id_s                                ingress_bap_routing_id;
   fixed_bitstring<16, false, true>                ingress_bh_rlc_ch_id;
@@ -7681,7 +7503,6 @@ using drb_list_with_cause_item_ext_ies_container = protocol_ext_container_empty_
 
 // DRB-List-withCause-Item ::= SEQUENCE
 struct drb_list_with_cause_item_s {
-  bool                                       ext              = false;
   bool                                       rlc_mode_present = false;
   bool                                       ie_ext_present   = false;
   uint8_t                                    drb_id           = 1;
@@ -7706,7 +7527,6 @@ using drb_b_status_transfer12bits_sn_ext_ies_container = protocol_ext_container_
 
 // DRBBStatusTransfer12bitsSN ::= SEQUENCE
 struct drb_b_status_transfer12bits_sn_s {
-  bool                                             ext                               = false;
   bool                                             receive_statusof_pdcp_sdu_present = false;
   bool                                             ie_ext_present                    = false;
   bounded_bitstring<1, 2048, false, true>          receive_statusof_pdcp_sdu;
@@ -7727,7 +7547,6 @@ using drb_b_status_transfer18bits_sn_ext_ies_container = protocol_ext_container_
 
 // DRBBStatusTransfer18bitsSN ::= SEQUENCE
 struct drb_b_status_transfer18bits_sn_s {
-  bool                                             ext                               = false;
   bool                                             receive_statusof_pdcp_sdu_present = false;
   bool                                             ie_ext_present                    = false;
   bounded_bitstring<1, 131072, false, true>        receive_statusof_pdcp_sdu;
@@ -7825,7 +7644,6 @@ using qos_flow_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // QoSFlow-Item ::= SEQUENCE
 struct qos_flow_item_s {
-  bool                            ext                      = false;
   bool                            qos_flow_map_ind_present = false;
   bool                            ie_ext_present           = false;
   uint8_t                         qfi                      = 0;
@@ -7876,7 +7694,6 @@ struct drb_to_qos_flow_map_item_ext_ies_o {
 
 // DRBToQoSFlowMapping-Item ::= SEQUENCE
 struct drb_to_qos_flow_map_item_s {
-  bool                                                         ext              = false;
   bool                                                         rlc_mode_present = false;
   uint8_t                                                      drb_id           = 1;
   qos_flows_list_l                                             qos_flows_list;
@@ -7900,7 +7717,6 @@ using up_transport_params_item_ext_ies_container = protocol_ext_container_empty_
 
 // UPTransportParametersItem ::= SEQUENCE
 struct up_transport_params_item_s {
-  bool                                       ext            = false;
   bool                                       ie_ext_present = false;
   up_transport_layer_info_c                  up_tnl_info;
   uint8_t                                    cell_group_id = 0;
@@ -7950,7 +7766,6 @@ struct drbs_admitted_list_mod_confirm_sn_terminated_item_ext_ies_o {
 
 // DRBsAdmittedList-ModConfirm-SNterminated-Item ::= SEQUENCE
 struct drbs_admitted_list_mod_confirm_sn_terminated_item_s {
-  bool                                                                                  ext          = false;
   bool                                                                                  lcid_present = false;
   uint8_t                                                                               drb_id       = 1;
   up_transport_params_l                                                                 mn_dl_cg_up_tnl_info;
@@ -7975,7 +7790,6 @@ using qos_flows_mappedto_drb_setup_resp_m_nterminated_item_ext_ies_container = p
 
 // QoSFlowsMappedtoDRB-SetupResponse-MNterminated-Item ::= SEQUENCE
 struct qos_flows_mappedto_drb_setup_resp_m_nterminated_item_s {
-  bool                                                                   ext                      = false;
   bool                                                                   ie_exts_present          = false;
   uint8_t                                                                qos_flow_id              = 0;
   uint8_t                                                                current_qos_para_set_idx = 1;
@@ -8044,7 +7858,6 @@ struct drbs_admitted_list_mod_resp_m_nterminated_item_ext_ies_container {
 
 // DRBsAdmittedList-ModificationResponse-MNterminated-Item ::= SEQUENCE
 struct drbs_admitted_list_mod_resp_m_nterminated_item_s {
-  bool                                                             ext             = false;
   bool                                                             lcid_present    = false;
   bool                                                             ie_exts_present = false;
   uint8_t                                                          drb_id          = 1;
@@ -8115,7 +7928,6 @@ struct drbs_admitted_list_setup_resp_m_nterminated_item_ext_ies_container {
 
 // DRBsAdmittedList-SetupResponse-MNterminated-Item ::= SEQUENCE
 struct drbs_admitted_list_setup_resp_m_nterminated_item_s {
-  bool                                                               ext             = false;
   bool                                                               lcid_present    = false;
   bool                                                               ie_exts_present = false;
   uint8_t                                                            drb_id          = 1;
@@ -8142,7 +7954,6 @@ using drbs_subject_to_dl_discarding_item_ext_ies_container = protocol_ext_contai
 
 // DRBsSubjectToDLDiscarding-Item ::= SEQUENCE
 struct drbs_subject_to_dl_discarding_item_s {
-  bool                                                 ext            = false;
   bool                                                 ie_ext_present = false;
   uint8_t                                              drb_id         = 1;
   dl_count_choice_c                                    dl_count;
@@ -8165,7 +7976,6 @@ using drbs_subject_to_early_status_transfer_item_ext_ies_container = protocol_ex
 
 // DRBsSubjectToEarlyStatusTransfer-Item ::= SEQUENCE
 struct drbs_subject_to_early_status_transfer_item_s {
-  bool                                                         ext            = false;
   bool                                                         ie_ext_present = false;
   uint8_t                                                      drb_id         = 1;
   dl_count_choice_c                                            dl_count;
@@ -8215,7 +8025,6 @@ struct drbs_subject_to_status_transfer_item_ext_ies_o {
 
 // DRBsSubjectToStatusTransfer-Item ::= SEQUENCE
 struct drbs_subject_to_status_transfer_item_s {
-  bool                                                                     ext    = false;
   uint8_t                                                                  drb_id = 1;
   drb_b_status_transfer_choice_c                                           pdcp_status_transfer_ul;
   drb_b_status_transfer_choice_c                                           pdcp_status_transfer_dl;
@@ -8246,7 +8055,6 @@ using rlc_status_ext_ies_container = protocol_ext_container_empty_l;
 
 // RLC-Status ::= SEQUENCE
 struct rlc_status_s {
-  bool                         ext             = false;
   bool                         ie_exts_present = false;
   reest_ind_e                  reest_ind;
   rlc_status_ext_ies_container ie_exts;
@@ -8292,7 +8100,6 @@ struct drbs_to_be_modified_list_mod_rqd_m_nterminated_item_ext_ies_o {
 
 // DRBsToBeModified-List-ModRqd-MNterminated-Item ::= SEQUENCE
 struct drbs_to_be_modified_list_mod_rqd_m_nterminated_item_s {
-  bool                      ext                                     = false;
   bool                      secondary_sn_dl_scg_up_tnl_info_present = false;
   bool                      lcid_present                            = false;
   bool                      rlc_status_present                      = false;
@@ -8330,7 +8137,6 @@ using ul_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // ULConfiguration ::= SEQUENCE
 struct ul_cfg_s {
-  bool                     ext             = false;
   bool                     ie_exts_present = false;
   ul_ue_cfg_e              ul_pdcp;
   ul_cfg_ext_ies_container ie_exts;
@@ -8392,7 +8198,6 @@ struct qos_flows_modified_mappedto_drb_mod_rqd_sn_terminated_item_ext_ies_o {
 
 // QoSFlowsModifiedMappedtoDRB-ModRqd-SNterminated-Item ::= SEQUENCE
 struct qos_flows_modified_mappedto_drb_mod_rqd_sn_terminated_item_s {
-  bool                ext                                     = false;
   bool                mcg_requested_gbr_qos_flow_info_present = false;
   uint8_t             qos_flow_id                             = 0;
   gbr_qos_flow_info_s mcg_requested_gbr_qos_flow_info;
@@ -8425,7 +8230,6 @@ struct rlc_dupl_state_item_s {
   using dupl_state_e_ = enumerated<dupl_state_opts, true>;
 
   // member variables
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   dupl_state_e_                         dupl_state;
   rlc_dupl_state_item_ext_ies_container ie_exts;
@@ -8518,7 +8322,6 @@ struct drbs_to_be_modified_list_mod_rqd_sn_terminated_item_ext_ies_container {
 
 // DRBsToBeModified-List-ModRqd-SNterminated-Item ::= SEQUENCE
 struct drbs_to_be_modified_list_mod_rqd_sn_terminated_item_s {
-  bool                                                                  ext                     = false;
   bool                                                                  drb_qos_present         = false;
   bool                                                                  ul_cfg_present          = false;
   bool                                                                  pdcp_dupl_cfg_present   = false;
@@ -8580,7 +8383,6 @@ struct drbs_to_be_modified_list_modified_sn_terminated_item_ext_ies_o {
 
 // DRBsToBeModified-List-Modified-SNterminated-Item ::= SEQUENCE
 struct drbs_to_be_modified_list_modified_sn_terminated_item_s {
-  bool                  ext                = false;
   bool                  lcid_present       = false;
   bool                  rlc_status_present = false;
   uint8_t               drb_id             = 1;
@@ -8609,7 +8411,6 @@ using n6_jitter_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // N6JitterInformation ::= SEQUENCE
 struct n6_jitter_info_s {
-  bool                             ext                   = false;
   bool                             ie_exts_present       = false;
   int16_t                          n6_jitter_lower_bound = -127;
   int16_t                          n6_jitter_upper_bound = -127;
@@ -8679,7 +8480,6 @@ struct tsc_assist_info_ext_ies_container {
 
 // TSCAssistanceInformation ::= SEQUENCE
 struct tsc_assist_info_s {
-  bool                              ext            = false;
   bool                              ie_ext_present = false;
   uint32_t                          periodicity    = 0;
   unbounded_octstring<true>         burst_arrival_time;
@@ -8699,7 +8499,6 @@ using tsc_traffic_characteristics_ext_ies_container = protocol_ext_container_emp
 
 // TSCTrafficCharacteristics ::= SEQUENCE
 struct tsc_traffic_characteristics_s {
-  bool                                          ext                        = false;
   bool                                          tsc_assist_info_dl_present = false;
   bool                                          tsc_assist_info_ul_present = false;
   bool                                          ie_ext_present             = false;
@@ -8748,7 +8547,6 @@ struct qos_flows_mappedto_drb_setup_m_nterminated_item_ext_ies_o {
 
 // QoSFlowsMappedtoDRB-Setup-MNterminated-Item ::= SEQUENCE
 struct qos_flows_mappedto_drb_setup_m_nterminated_item_s {
-  bool                                                                                ext                      = false;
   bool                                                                                qos_flow_map_ind_present = false;
   uint8_t                                                                             qos_flow_id              = 0;
   qos_flow_level_qos_params_s                                                         qos_flow_level_qos_params;
@@ -8816,7 +8614,6 @@ struct drbs_to_be_modified_list_mod_m_nterminated_item_ext_ies_container {
 
 // DRBsToBeModifiedList-Modification-MNterminated-Item ::= SEQUENCE
 struct drbs_to_be_modified_list_mod_m_nterminated_item_s {
-  bool                                                              ext                     = false;
   bool                                                              drb_qos_present         = false;
   bool                                                              ul_cfg_present          = false;
   bool                                                              pdcp_dupl_cfg_present   = false;
@@ -8896,7 +8693,6 @@ struct qos_flows_mappedto_drb_setup_resp_sn_terminated_item_ext_ies_container {
 
 // QoSFlowsMappedtoDRB-SetupResponse-SNterminated-Item ::= SEQUENCE
 struct qos_flows_mappedto_drb_setup_resp_sn_terminated_item_s {
-  bool                ext                                     = false;
   bool                mcg_requested_gbr_qos_flow_info_present = false;
   bool                qos_flow_map_ind_present                = false;
   bool                ie_exts_present                         = false;
@@ -8987,7 +8783,6 @@ struct drbs_to_be_modified_list_mod_resp_sn_terminated_item_ext_ies_container {
 
 // DRBsToBeModifiedList-ModificationResponse-SNterminated-Item ::= SEQUENCE
 struct drbs_to_be_modified_list_mod_resp_sn_terminated_item_s {
-  bool                                              ext             = false;
   bool                                              drb_qos_present = false;
   bool                                              ie_exts_present = false;
   uint8_t                                           drb_id          = 1;
@@ -9033,7 +8828,6 @@ struct pdcp_sn_len_s {
   using dl_pdcp_sn_len_e_ = enumerated<dl_pdcp_sn_len_opts, true>;
 
   // member variables
-  bool                          ext            = false;
   bool                          ie_ext_present = false;
   ul_pdcp_sn_len_e_             ul_pdcp_sn_len;
   dl_pdcp_sn_len_e_             dl_pdcp_sn_len;
@@ -9080,7 +8874,6 @@ struct qos_flows_setup_mappedto_drb_mod_rqd_sn_terminated_item_ext_ies_o {
 
 // QoSFlowsSetupMappedtoDRB-ModRqd-SNterminated-Item ::= SEQUENCE
 struct qos_flows_setup_mappedto_drb_mod_rqd_sn_terminated_item_s {
-  bool                ext                                     = false;
   bool                mcg_requested_gbr_qos_flow_info_present = false;
   uint8_t             qos_flow_id                             = 0;
   gbr_qos_flow_info_s mcg_requested_gbr_qos_flow_info;
@@ -9149,7 +8942,6 @@ struct drbs_to_be_setup_list_mod_rqd_sn_terminated_item_ext_ies_container {
 
 // DRBsToBeSetup-List-ModRqd-SNterminated-Item ::= SEQUENCE
 struct drbs_to_be_setup_list_mod_rqd_sn_terminated_item_s {
-  bool                                                               ext                     = false;
   bool                                                               pdcp_sn_len_present     = false;
   bool                                                               dupl_activation_present = false;
   bool                                                               ul_cfg_present          = false;
@@ -9209,7 +9001,6 @@ struct drbs_to_be_setup_list_bearer_setup_complete_sn_terminated_item_ext_ies_o 
 
 // DRBsToBeSetupList-BearerSetupComplete-SNterminated-Item ::= SEQUENCE
 struct drbs_to_be_setup_list_bearer_setup_complete_sn_terminated_item_s {
-  bool                      ext    = false;
   uint8_t                   drb_id = 1;
   up_transport_layer_info_c mn_xn_u_tnl_infoat_m;
   protocol_ext_container_l<drbs_to_be_setup_list_bearer_setup_complete_sn_terminated_item_ext_ies_o> ie_exts;
@@ -9272,7 +9063,6 @@ struct drbs_to_be_setup_list_setup_m_nterminated_item_ext_ies_container {
 
 // DRBsToBeSetupList-Setup-MNterminated-Item ::= SEQUENCE
 struct drbs_to_be_setup_list_setup_m_nterminated_item_s {
-  bool                                                             ext                     = false;
   bool                                                             ul_cfg_present          = false;
   bool                                                             pdcp_sn_len_present     = false;
   bool                                                             dupl_activation_present = false;
@@ -9349,7 +9139,6 @@ struct drbs_to_be_setup_list_setup_resp_sn_terminated_item_ext_ies_container {
 
 // DRBsToBeSetupList-SetupResponse-SNterminated-Item ::= SEQUENCE
 struct drbs_to_be_setup_list_setup_resp_sn_terminated_item_s {
-  bool                                                                  ext                     = false;
   bool                                                                  pdcp_sn_len_present     = false;
   bool                                                                  ul_cfg_present          = false;
   bool                                                                  dupl_activation_present = false;
@@ -9424,7 +9213,6 @@ using explicit_format_ext_ies_container = protocol_ext_container_empty_l;
 
 // ExplicitFormat ::= SEQUENCE
 struct explicit_format_s {
-  bool                              ext                     = false;
   bool                              noof_dl_symbols_present = false;
   bool                              noof_ul_symbols_present = false;
   bool                              ie_exts_present         = false;
@@ -9447,7 +9235,6 @@ using implicit_format_ext_ies_container = protocol_ext_container_empty_l;
 
 // ImplicitFormat ::= SEQUENCE
 struct implicit_format_s {
-  bool                              ext                 = false;
   bool                              ie_exts_present     = false;
   uint8_t                           du_f_slotformat_idx = 0;
   implicit_format_ext_ies_container ie_exts;
@@ -9541,7 +9328,6 @@ using data_collection_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // DataCollectionID ::= SEQUENCE
 struct data_collection_id_s {
-  bool                                 ext                 = false;
   bool                                 ie_exts_present     = false;
   uint16_t                             ngran_node1_meas_id = 1;
   uint16_t                             ngran_node2_meas_id = 1;
@@ -9561,7 +9347,6 @@ using qos_flows_to_be_forwarded_item_ext_ies_container = protocol_ext_container_
 
 // QoSFlowsToBeForwarded-Item ::= SEQUENCE
 struct qos_flows_to_be_forwarded_item_s {
-  bool                                             ext            = false;
   bool                                             ie_ext_present = false;
   uint8_t                                          qos_flow_id    = 0;
   qos_flows_to_be_forwarded_item_ext_ies_container ie_ext;
@@ -9583,7 +9368,6 @@ using data_forwarding_info_from_target_e_utran_node_item_ext_ies_container = pro
 
 // DataForwardingInfoFromTargetE-UTRANnode-Item ::= SEQUENCE
 struct data_forwarding_info_from_target_e_utran_node_item_s {
-  bool                                                                 ext            = false;
   bool                                                                 ie_ext_present = false;
   up_transport_layer_info_c                                            dl_forwarding_up_tnl_info;
   qos_flows_to_be_forwarded_list_l                                     qos_flows_to_be_forwarded_list;
@@ -9608,7 +9392,6 @@ using data_forwarding_info_from_target_e_utran_node_ext_ies_container = protocol
 
 // DataForwardingInfoFromTargetE-UTRANnode ::= SEQUENCE
 struct data_forwarding_info_from_target_e_utran_node_s {
-  bool                                                            ext            = false;
   bool                                                            ie_ext_present = false;
   data_forwarding_info_from_target_e_utran_node_list_l            data_forwarding_info_from_target_e_utran_node_list;
   data_forwarding_info_from_target_e_utran_node_ext_ies_container ie_ext;
@@ -9627,7 +9410,6 @@ using shared_res_type_ul_only_sharing_ext_ies_container = protocol_ext_container
 
 // SharedResourceType-UL-OnlySharing ::= SEQUENCE
 struct shared_res_type_ul_only_sharing_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   bounded_bitstring<6, 17600, false, true>          ul_res_bitmap;
   shared_res_type_ul_only_sharing_ext_ies_container ie_exts;
@@ -9646,7 +9428,6 @@ using shared_res_type_ul_dl_sharing_ul_res_changed_ext_ies_container = protocol_
 
 // SharedResourceType-ULDL-Sharing-UL-ResourcesChanged ::= SEQUENCE
 struct shared_res_type_ul_dl_sharing_ul_res_changed_s {
-  bool                                                           ext             = false;
   bool                                                           ie_exts_present = false;
   bounded_bitstring<6, 17600, false, true>                       ul_res_bitmap;
   shared_res_type_ul_dl_sharing_ul_res_changed_ext_ies_container ie_exts;
@@ -9721,7 +9502,6 @@ using shared_res_type_ul_dl_sharing_dl_res_changed_ext_ies_container = protocol_
 
 // SharedResourceType-ULDL-Sharing-DL-ResourcesChanged ::= SEQUENCE
 struct shared_res_type_ul_dl_sharing_dl_res_changed_s {
-  bool                                                           ext             = false;
   bool                                                           ie_exts_present = false;
   bounded_bitstring<6, 17600, false, true>                       dl_res_bitmap;
   shared_res_type_ul_dl_sharing_dl_res_changed_ext_ies_container ie_exts;
@@ -9938,7 +9718,6 @@ struct reserved_sf_pattern_s {
   using sf_type_e_ = enumerated<sf_type_opts, true>;
 
   // member variables
-  bool                                    ext                           = false;
   bool                                    mbsfn_ctrl_region_len_present = false;
   bool                                    ie_ext_present                = false;
   sf_type_e_                              sf_type;
@@ -9960,7 +9739,6 @@ using data_traffic_res_ind_ext_ies_container = protocol_ext_container_empty_l;
 
 // DataTrafficResourceIndication ::= SEQUENCE
 struct data_traffic_res_ind_s {
-  bool                                   ext                         = false;
   bool                                   reserved_sf_pattern_present = false;
   bool                                   ie_ext_present              = false;
   uint16_t                               activation_sfn              = 0;
@@ -10051,7 +9829,6 @@ struct qos_f_lows_to_be_forwarded_item_ext_ies_container {
 
 // QoSFLowsToBeForwarded-Item ::= SEQUENCE
 struct qos_f_lows_to_be_forwarded_item_s {
-  bool                                              ext            = false;
   bool                                              ie_ext_present = false;
   uint8_t                                           qos_flow_id    = 0;
   dl_forwarding_e                                   dl_dataforwarding;
@@ -10075,7 +9852,6 @@ using dataforwardingand_offloading_infofrom_source_ext_ies_container = protocol_
 
 // DataforwardingandOffloadingInfofromSource ::= SEQUENCE
 struct dataforwardingand_offloading_infofrom_source_s {
-  bool                                                           ext            = false;
   bool                                                           ie_ext_present = false;
   qos_f_lows_to_be_forwarded_list_l                              qos_flows_to_be_forwarded;
   drb_to_qos_flow_map_list_l                                     source_drb_to_qos_flow_map;
@@ -10130,7 +9906,6 @@ using e_utra_res_coordination_info_ext_ies_container = protocol_ext_container_em
 
 // E-UTRA-ResourceCoordinationInfo ::= SEQUENCE
 struct e_utra_res_coordination_info_s {
-  bool                                           ext                                     = false;
   bool                                           dl_coordination_info_present            = false;
   bool                                           nr_cell_present                         = false;
   bool                                           e_utra_coordination_assist_info_present = false;
@@ -10167,7 +9942,6 @@ struct e_utraprach_cfg_s {
   using high_speed_flag_e_ = enumerated<high_speed_flag_opts, true>;
 
   // member variables
-  bool                              ext                   = false;
   bool                              prach_cfg_idx_present = false;
   bool                              ie_exts_present       = false;
   uint16_t                          root_seq_idx          = 0;
@@ -10336,7 +10110,6 @@ using eutra_paginge_drx_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // EUTRAPagingeDRXInformation ::= SEQUENCE
 struct eutra_paginge_drx_info_s {
-  bool                                     ext                          = false;
   bool                                     eutrapaging_time_win_present = false;
   bool                                     ie_exts_present              = false;
   eutra_paging_e_drx_cycle_e               eutrapaging_e_drx_cycle;
@@ -10365,7 +10138,6 @@ using sn_pn_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // SNPNIdentity ::= SEQUENCE
 struct sn_pn_id_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<44, false, true> nid;
@@ -10480,7 +10252,6 @@ using event_l1_ext_ies_container = protocol_ext_container_empty_l;
 
 // EventL1 ::= SEQUENCE
 struct event_l1_s {
-  bool                       ext             = false;
   bool                       ie_exts_present = false;
   meas_thres_l1_logged_mdt_c l1_thres;
   uint8_t                    hysteresis = 0;
@@ -10573,7 +10344,6 @@ using logged_event_triggered_cfg_ext_ies_container = protocol_ext_container_empt
 
 // LoggedEventTriggeredConfig ::= SEQUENCE
 struct logged_event_triggered_cfg_s {
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   event_type_trigger_c                         event_type_trigger;
   logged_event_triggered_cfg_ext_ies_container ie_exts;
@@ -10592,7 +10362,6 @@ using event_triggered_ext_ies_container = protocol_ext_container_empty_l;
 
 // EventTriggered ::= SEQUENCE
 struct event_triggered_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   logged_event_triggered_cfg_s      logged_event_triggered_cfg;
   event_triggered_ext_ies_container ie_exts;
@@ -10658,7 +10427,6 @@ using excess_packet_delay_thres_item_ext_ies_container = protocol_ext_container_
 
 // ExcessPacketDelayThresholdItem ::= SEQUENCE
 struct excess_packet_delay_thres_item_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   uint16_t                                         five_qi         = 0;
   excess_packet_delay_thres_value_e                excess_packet_delay_thres_value;
@@ -10699,7 +10467,6 @@ using expected_ue_activity_behaviour_ext_ies_container = protocol_ext_container_
 
 // ExpectedUEActivityBehaviour ::= SEQUENCE
 struct expected_ue_activity_behaviour_s {
-  bool                                             ext                                          = false;
   bool                                             expected_activity_period_present             = false;
   bool                                             expected_idle_period_present                 = false;
   bool                                             source_of_ue_activity_behaviour_info_present = false;
@@ -10731,7 +10498,6 @@ using expected_ue_moving_trajectory_item_ext_ies_container = protocol_ext_contai
 
 // ExpectedUEMovingTrajectoryItem ::= SEQUENCE
 struct expected_ue_moving_trajectory_item_s {
-  bool                                                 ext                         = false;
   bool                                                 time_stayed_in_cell_present = false;
   bool                                                 ie_exts_present             = false;
   global_ng_ran_cell_id_s                              ngran_cgi;
@@ -10755,7 +10521,6 @@ using expected_ue_behaviour_ext_ies_container = protocol_ext_container_empty_l;
 
 // ExpectedUEBehaviour ::= SEQUENCE
 struct expected_ue_behaviour_s {
-  bool                                    ext                                    = false;
   bool                                    expected_ue_activity_behaviour_present = false;
   bool                                    expected_ho_interv_present             = false;
   bool                                    expected_ue_mob_present                = false;
@@ -10780,7 +10545,6 @@ using gtp_tla_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // GTPTLA-Item ::= SEQUENCE
 struct gtp_tla_item_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   bounded_bitstring<1, 160, true, true> gtp_transport_layer_addresses;
   gtp_tla_item_ext_ies_container        ie_exts;
@@ -10802,7 +10566,6 @@ using ext_tla_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // ExtTLA-Item ::= SEQUENCE
 struct ext_tla_item_s {
-  bool                                  ext                = false;
   bool                                  ip_sec_tla_present = false;
   bool                                  ie_exts_present    = false;
   bounded_bitstring<1, 160, true, true> ip_sec_tla;
@@ -10826,7 +10589,6 @@ using extended_rat_restrict_info_ext_ies_container = protocol_ext_container_empt
 
 // ExtendedRATRestrictionInformation ::= SEQUENCE
 struct extended_rat_restrict_info_s {
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   fixed_bitstring<8, true, true>               primary_rat_restrict;
   fixed_bitstring<8, true, true>               secondary_rat_restrict;
@@ -10931,7 +10693,6 @@ using ul_f1_terminating_bh_info_ext_ies_container = protocol_ext_container_empty
 
 // ULF1Terminating-BHInfo ::= SEQUENCE
 struct ul_f1_terminating_bh_info_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   bap_routing_id_s                            ingress_bap_routing_id;
   fixed_bitstring<16, false, true>            ingress_bh_rlc_ch_id;
@@ -10951,7 +10712,6 @@ using f1_terminating_bh_info_item_ext_ies_container = protocol_ext_container_emp
 
 // F1TerminatingBHInformation-Item ::= SEQUENCE
 struct f1_terminating_bh_info_item_s {
-  bool                                          ext                               = false;
   bool                                          dl_f1_terminating_bh_info_present = false;
   bool                                          ul_f1_terminating_bh_info_present = false;
   bool                                          ie_ext_present                    = false;
@@ -10978,7 +10738,6 @@ using f1_terminating_topology_bh_info_ext_ies_container = protocol_ext_container
 
 // F1-TerminatingTopologyBHInformation ::= SEQUENCE
 struct f1_terminating_topology_bh_info_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   f1_terminating_bh_info_list_l                     f1_terminating_bh_info_list;
   f1_terminating_topology_bh_info_ext_ies_container ie_exts;
@@ -11125,7 +10884,6 @@ struct five_g_pro_se_authorized_ext_ies_container {
 
 // FiveGProSeAuthorized ::= SEQUENCE
 struct five_g_pro_se_authorized_s {
-  bool                                       ext                                                = false;
   bool                                       five_gpro_se_direct_discovery_present              = false;
   bool                                       five_gpro_se_direct_communication_present          = false;
   bool                                       five_gnr_pro_se_layer2_ue_to_network_relay_present = false;
@@ -11153,7 +10911,6 @@ using five_g_pro_se_pc5_flow_bit_rates_ext_ies_container = protocol_ext_containe
 
 // FiveGProSePC5FlowBitRates ::= SEQUENCE
 struct five_g_pro_se_pc5_flow_bit_rates_s {
-  bool                                               ext                                  = false;
   bool                                               ie_exts_present                      = false;
   uint64_t                                           five_gpro_seguaranteed_flow_bit_rate = 0;
   uint64_t                                           five_gpro_semax_flow_bit_rate        = 0;
@@ -11173,7 +10930,6 @@ using five_g_pro_se_pc5_qos_flow_item_ext_ies_container = protocol_ext_container
 
 // FiveGProSePC5QoSFlowItem ::= SEQUENCE
 struct five_g_pro_se_pc5_qos_flow_item_s {
-  bool                                              ext                                    = false;
   bool                                              five_gpro_sepc5_flow_bit_rates_present = false;
   bool                                              five_gpro_serange_present              = false;
   bool                                              ie_exts_present                        = false;
@@ -11199,7 +10955,6 @@ using five_g_pro_se_pc5_qos_params_ext_ies_container = protocol_ext_container_em
 
 // FiveGProSePC5QoSParameters ::= SEQUENCE
 struct five_g_pro_se_pc5_qos_params_s {
-  bool                                           ext                                         = false;
   bool                                           five_gpro_sepc5_link_aggr_bit_rates_present = false;
   bool                                           ie_exts_present                             = false;
   five_g_pro_se_pc5_qos_flow_list_l              five_g_pro_sepc5_qos_flow_list;
@@ -11246,7 +11001,6 @@ struct forbidden_area_item_s {
   using forbidden_tacs_l_ = dyn_array<fixed_octstring<3, true>>;
 
   // member variables
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   fixed_octstring<3, true>              plmn_id;
   forbidden_tacs_l_                     forbidden_tacs;
@@ -11293,7 +11047,6 @@ using freq_domain_slot_h_sn_acfg_list_item_ext_ies_container = protocol_ext_cont
 
 // FreqDomainSlotHSNAconfiguration-List-Item ::= SEQUENCE
 struct freq_domain_slot_h_sn_acfg_list_item_s {
-  bool                                                   ext                = false;
   bool                                                   hsn_a_dl_present   = false;
   bool                                                   hsn_a_ul_present   = false;
   bool                                                   hsn_a_flex_present = false;
@@ -11321,7 +11074,6 @@ using freq_domain_h_sn_acfg_list_item_ext_ies_container = protocol_ext_container
 
 // FreqDomainHSNAconfiguration-List-Item ::= SEQUENCE
 struct freq_domain_h_sn_acfg_list_item_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   uint8_t                                           rbset_idx       = 0;
   freq_domain_slot_h_sn_acfg_list_l                 freq_domain_slot_h_sn_acfg_list;
@@ -11507,7 +11259,6 @@ using full_and_short_i_rnti_profile_list_ext_ies_container = protocol_ext_contai
 
 // Full-and-Short-I-RNTI-Profile-List ::= SEQUENCE
 struct full_and_short_i_rnti_profile_list_s {
-  bool                                                 ext             = false;
   bool                                                 ie_exts_present = false;
   full_i_rnti_profile_list_c                           full_i_rnti_profile_list;
   short_i_rnti_profile_list_c                          short_i_rnti_profile_list;
@@ -11545,7 +11296,6 @@ using hs_nas_lot_cfg_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // HSNASlotConfigItem ::= SEQUENCE
 struct hs_nas_lot_cfg_item_s {
-  bool                                  ext                = false;
   bool                                  hsn_a_dl_present   = false;
   bool                                  hsn_a_ul_present   = false;
   bool                                  hsn_a_flex_present = false;
@@ -11582,7 +11332,6 @@ struct r_bset_cfg_s {
   using rbset_size_e_ = enumerated<rbset_size_opts>;
 
   // member variables
-  bool                         ext             = false;
   bool                         ie_exts_present = false;
   subcarrier_spacing_e         subcarrier_spacing;
   rbset_size_e_                rbset_size;
@@ -11623,7 +11372,6 @@ struct na_cell_res_cfg_item_s {
   using naflex_e_ = enumerated<naflex_opts, true>;
 
   // member variables
-  bool                                   ext             = false;
   bool                                   nadl_present    = false;
   bool                                   naul_present    = false;
   bool                                   naflex_present  = false;
@@ -11650,7 +11398,6 @@ using gnb_du_cell_res_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // GNB-DU-Cell-Resource-Configuration ::= SEQUENCE
 struct gnb_du_cell_res_cfg_s {
-  bool                                  ext                         = false;
   bool                                  du_f_tx_periodicity_present = false;
   bool                                  rbset_cfg_present           = false;
   bool                                  ie_exts_present             = false;
@@ -11678,7 +11425,6 @@ using guami_ext_ies_container = protocol_ext_container_empty_l;
 
 // GUAMI ::= SEQUENCE
 struct guami_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<8, false, true>  amf_region_id;
@@ -11772,7 +11518,6 @@ using iab_du_cell_res_cfg_fdd_info_ext_ies_container = protocol_ext_container_em
 
 // IAB-DU-Cell-Resource-Configuration-FDD-Info ::= SEQUENCE
 struct iab_du_cell_res_cfg_fdd_info_s {
-  bool                                           ext                  = false;
   bool                                           ul_freq_info_present = false;
   bool                                           dl_freq_info_present = false;
   bool                                           ul_tx_bw_present     = false;
@@ -11802,7 +11547,6 @@ using iab_du_cell_res_cfg_tdd_info_ext_ies_container = protocol_ext_container_em
 
 // IAB-DU-Cell-Resource-Configuration-TDD-Info ::= SEQUENCE
 struct iab_du_cell_res_cfg_tdd_info_s {
-  bool                                           ext               = false;
   bool                                           freq_info_present = false;
   bool                                           tx_bw_present     = false;
   bool                                           ie_exts_present   = false;
@@ -11893,7 +11637,6 @@ using iab_mt_cell_list_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // IAB-MT-Cell-List-Item ::= SEQUENCE
 struct iab_mt_cell_list_item_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   fixed_bitstring<36, false, true>        nr_cell_id;
   du_rx_mt_rx_e                           du_rx_mt_rx;
@@ -12015,7 +11758,6 @@ using iab_stc_info_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // IAB-STC-Info-Item ::= SEQUENCE
 struct iab_stc_info_item_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   uint32_t                            ssb_freq_info   = 0;
   ssb_subcarrier_spacing_e            ssb_subcarrier_spacing;
@@ -12041,7 +11783,6 @@ using iab_stc_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // IAB-STC-Info ::= SEQUENCE
 struct iab_stc_info_s {
-  bool                           ext             = false;
   bool                           ie_exts_present = false;
   iab_stc_info_list_l            iab_stc_info_list;
   iab_stc_info_ext_ies_container ie_exts;
@@ -12148,7 +11889,6 @@ using iab_tnl_address_to_rem_item_ext_ies_container = protocol_ext_container_emp
 
 // IABTNLAddressToRemove-Item ::= SEQUENCE
 struct iab_tnl_address_to_rem_item_s {
-  bool                                          ext            = false;
   bool                                          ie_ext_present = false;
   iab_tnl_address_c                             iab_tnl_address;
   iab_tnl_address_to_rem_item_ext_ies_container ie_ext;
@@ -12170,7 +11910,6 @@ using iab_tnl_address_request_ext_ies_container = protocol_ext_container_empty_l
 
 // IAB-TNL-Address-Request ::= SEQUENCE
 struct iab_tnl_address_request_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   iab_tnl_addresses_requested_s             iab_ip_v4_addresses_requested;
   iab_ip_v6_request_type_c                  iab_ip_v6_request_type;
@@ -12199,7 +11938,6 @@ using iab_allocated_tnl_address_item_ext_ies_container = protocol_ext_container_
 
 // IABAllocatedTNLAddress-Item ::= SEQUENCE
 struct iab_allocated_tnl_address_item_s {
-  bool                                             ext                                 = false;
   bool                                             iab_tnl_address_usage_present       = false;
   bool                                             associated_donor_du_address_present = false;
   bool                                             ie_exts_present                     = false;
@@ -12225,7 +11963,6 @@ using iab_tnl_address_resp_ext_ies_container = protocol_ext_container_empty_l;
 
 // IAB-TNL-Address-Response ::= SEQUENCE
 struct iab_tnl_address_resp_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   iab_allocated_tnl_address_list_l       iab_allocated_tnl_address_list;
   iab_tnl_address_resp_ext_ies_container ie_exts;
@@ -12252,7 +11989,6 @@ using mux_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // MultiplexingInfo ::= SEQUENCE
 struct mux_info_s {
-  bool                       ext             = false;
   bool                       ie_exts_present = false;
   iab_mt_cell_list_l         iab_mt_cell_list;
   mux_info_ext_ies_container ie_exts;
@@ -12271,7 +12007,6 @@ using iab_cell_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // IABCellInformation ::= SEQUENCE
 struct iab_cell_info_s {
-  bool                            ext                                   = false;
   bool                            iab_du_cell_res_cfg_mode_info_present = false;
   bool                            iab_stc_info_present                  = false;
   bool                            mux_info_present                      = false;
@@ -12310,7 +12045,6 @@ using iab_tnl_address_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // IABTNLAddress-Item ::= SEQUENCE
 struct iab_tnl_address_item_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   iab_tnl_address_c                      iab_tnl_address;
   iab_tnl_address_item_ext_ies_container ie_exts;
@@ -12415,7 +12149,6 @@ using m1_thres_event_a2_ext_ies_container = protocol_ext_container_empty_l;
 
 // M1ThresholdEventA2 ::= SEQUENCE
 struct m1_thres_event_a2_s {
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   meas_thres_a2_c                     meas_thres;
   m1_thres_event_a2_ext_ies_container ie_exts;
@@ -12497,7 +12230,6 @@ struct m1_periodic_report_ext_ies_o {
 
 // M1PeriodicReporting ::= SEQUENCE
 struct m1_periodic_report_s {
-  bool                                                   ext = false;
   report_interv_mdt_e                                    report_interv;
   report_amount_mdt_e                                    report_amount;
   protocol_ext_container_l<m1_periodic_report_ext_ies_o> ie_exts;
@@ -12562,7 +12294,6 @@ struct m1_cfg_ext_ies_container {
 
 // M1Configuration ::= SEQUENCE
 struct m1_cfg_s {
-  bool                     ext                       = false;
   bool                     m1thresevent_a2_present   = false;
   bool                     m1periodic_report_present = false;
   bool                     ie_exts_present           = false;
@@ -12642,7 +12373,6 @@ struct m4_cfg_ext_ies_o {
 
 // M4Configuration ::= SEQUENCE
 struct m4_cfg_s {
-  bool                                       ext = false;
   m4period_e                                 m4period;
   links_to_log_e                             m4_links_to_log;
   protocol_ext_container_l<m4_cfg_ext_ies_o> ie_exts;
@@ -12710,7 +12440,6 @@ struct m5_cfg_ext_ies_o {
 
 // M5Configuration ::= SEQUENCE
 struct m5_cfg_s {
-  bool                                       ext = false;
   m5period_e                                 m5period;
   links_to_log_e                             m5_links_to_log;
   protocol_ext_container_l<m5_cfg_ext_ies_o> ie_exts;
@@ -12812,7 +12541,6 @@ struct m6_cfg_ext_ies_container {
 
 // M6Configuration ::= SEQUENCE
 struct m6_cfg_s {
-  bool                     ext             = false;
   bool                     ie_exts_present = false;
   m6report_interv_e        m6report_interv;
   links_to_log_e           m6_links_to_log;
@@ -12871,7 +12599,6 @@ struct m7_cfg_ext_ies_o {
 
 // M7Configuration ::= SEQUENCE
 struct m7_cfg_s {
-  bool                                       ext      = false;
   uint8_t                                    m7period = 1;
   links_to_log_e                             m7_links_to_log;
   protocol_ext_container_l<m7_cfg_ext_ies_o> ie_exts;
@@ -12915,7 +12642,6 @@ struct wlan_meas_cfg_s {
   using wlan_rtt_e_ = enumerated<wlan_rtt_opts, true>;
 
   // member variables
-  bool                            ext               = false;
   bool                            wlan_rssi_present = false;
   bool                            wlan_rtt_present  = false;
   bool                            ie_exts_present   = false;
@@ -12967,7 +12693,6 @@ struct sensor_name_s {
   using ue_orientation_cfg_e_ = enumerated<ue_orientation_cfg_opts, true>;
 
   // member variables
-  bool                              ext                                  = false;
   bool                              uncompensated_barometric_cfg_present = false;
   bool                              ue_speed_cfg_present                 = false;
   bool                              ue_orientation_cfg_present           = false;
@@ -12994,7 +12719,6 @@ using sensor_meas_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // SensorMeasurementConfiguration ::= SEQUENCE
 struct sensor_meas_cfg_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   sensor_meas_cfg_e                 sensor_meas_cfg;
   sensor_meas_cfg_name_list_l       sensor_meas_cfg_name_list;
@@ -13014,7 +12738,6 @@ using immediate_mdt_nr_ext_ies_container = protocol_ext_container_empty_l;
 
 // ImmediateMDT-NR ::= SEQUENCE
 struct immediate_mdt_nr_s {
-  bool                               ext                        = false;
   bool                               m1_cfg_present             = false;
   bool                               m4_cfg_present             = false;
   bool                               m5_cfg_present             = false;
@@ -13150,7 +12873,6 @@ struct rrc_reestab_initiated_report_wo_ue_rlf_report_ext_ies_o {
 
 // RRCReestab-Initiated-Reporting-wo-UERLFReport ::= SEQUENCE
 struct rrc_reestab_initiated_report_wo_ue_rlf_report_s {
-  bool                                                                              ext = false;
   ng_ran_cell_pci_c                                                                 fail_cell_pci;
   global_ng_ran_cell_id_s                                                           reestab_cell_cgi;
   fixed_bitstring<16, false, true>                                                  c_rnti;
@@ -13171,7 +12893,6 @@ using ue_rlf_report_container_lte_ext_ext_ies_container = protocol_ext_container
 
 // UERLFReportContainerLTEExtension ::= SEQUENCE
 struct ue_rlf_report_container_lte_ext_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   unbounded_octstring<true>                         ue_rlf_report_container_lte;
   unbounded_octstring<true>                         ue_rlf_report_container_lte_extend_band;
@@ -13284,7 +13005,6 @@ using rrc_reestab_initiated_report_with_ue_rlf_report_ext_ies_container = protoc
 
 // RRCReestab-Initiated-Reporting-with-UERLFReport ::= SEQUENCE
 struct rrc_reestab_initiated_report_with_ue_rlf_report_s {
-  bool                                                              ext             = false;
   bool                                                              ie_exts_present = false;
   ue_rlf_report_container_c                                         ue_rlf_report_container;
   rrc_reestab_initiated_report_with_ue_rlf_report_ext_ies_container ie_exts;
@@ -13375,7 +13095,6 @@ using rrc_reestab_initiated_ext_ies_container = protocol_ext_container_empty_l;
 
 // RRCReestab-initiated ::= SEQUENCE
 struct rrc_reestab_initiated_s {
-  bool                                    ext             = false;
   bool                                    ie_exts_present = false;
   rrc_reestab_initiated_report_c          rrrc_reestab_initiated_report;
   rrc_reestab_initiated_ext_ies_container ie_exts;
@@ -13394,7 +13113,6 @@ using rrc_setup_initiated_report_with_ue_rlf_report_ext_ies_container = protocol
 
 // RRCSetup-Initiated-Reporting-with-UERLFReport ::= SEQUENCE
 struct rrc_setup_initiated_report_with_ue_rlf_report_s {
-  bool                                                            ext             = false;
   bool                                                            ie_exts_present = false;
   ue_rlf_report_container_c                                       ue_rlf_report_container;
   rrc_setup_initiated_report_with_ue_rlf_report_ext_ies_container ie_exts;
@@ -13468,7 +13186,6 @@ using rrc_setup_initiated_ext_ies_container = protocol_ext_container_empty_l;
 
 // RRCSetup-initiated ::= SEQUENCE
 struct rrc_setup_initiated_s {
-  bool                                  ext                             = false;
   bool                                  ue_rlf_report_container_present = false;
   bool                                  ie_exts_present                 = false;
   rrc_setup_initiated_report_c          rrrc_setup_initiated_report;
@@ -13593,7 +13310,6 @@ using symbol_alloc_in_slot_all_dl_ext_ies_container = protocol_ext_container_emp
 
 // SymbolAllocation-in-Slot-AllDL ::= SEQUENCE
 struct symbol_alloc_in_slot_all_dl_s {
-  bool                                          ext            = false;
   bool                                          ie_ext_present = false;
   symbol_alloc_in_slot_all_dl_ext_ies_container ie_ext;
   // ...
@@ -13611,7 +13327,6 @@ using symbol_alloc_in_slot_all_ul_ext_ies_container = protocol_ext_container_emp
 
 // SymbolAllocation-in-Slot-AllUL ::= SEQUENCE
 struct symbol_alloc_in_slot_all_ul_s {
-  bool                                          ext            = false;
   bool                                          ie_ext_present = false;
   symbol_alloc_in_slot_all_ul_ext_ies_container ie_ext;
   // ...
@@ -13656,7 +13371,6 @@ struct symbol_alloc_in_slot_both_dl_and_ul_ext_ies_o {
 
 // SymbolAllocation-in-Slot-BothDLandUL ::= SEQUENCE
 struct symbol_alloc_in_slot_both_dl_and_ul_s {
-  bool                                                                    ext              = false;
   uint8_t                                                                 numof_dl_symbols = 0;
   uint8_t                                                                 numof_ul_symbols = 0;
   protocol_ext_container_l<symbol_alloc_in_slot_both_dl_and_ul_ext_ies_o> ie_ext;
@@ -13754,7 +13468,6 @@ using slot_cfg_list_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // SlotConfiguration-List-Item ::= SEQUENCE
 struct slot_cfg_list_item_s {
-  bool                                 ext             = false;
   bool                                 ie_exts_present = false;
   uint16_t                             slot_idx        = 0;
   symbol_alloc_in_slot_c               symbol_alloc_in_slot;
@@ -13777,7 +13490,6 @@ using intended_tdd_dl_ul_cfg_nr_ext_ies_container = protocol_ext_container_empty
 
 // IntendedTDD-DL-ULConfiguration-NR ::= SEQUENCE
 struct intended_tdd_dl_ul_cfg_nr_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   nr_scs_e                                    nrscs;
   nr_cp_e                                     nr_cp;
@@ -13799,7 +13511,6 @@ using ltea2_x_services_authorized_ext_ies_container = protocol_ext_container_emp
 
 // LTEA2XServicesAuthorized ::= SEQUENCE
 struct ltea2_x_services_authorized_s {
-  bool                                          ext                       = false;
   bool                                          aerial_ue_present         = false;
   bool                                          aerial_ctrller_ue_present = false;
   bool                                          ie_exts_present           = false;
@@ -13821,7 +13532,6 @@ using lte_ue_sidelink_aggr_max_bit_rate_ext_ies_container = protocol_ext_contain
 
 // LTEUESidelinkAggregateMaximumBitRate ::= SEQUENCE
 struct lte_ue_sidelink_aggr_max_bit_rate_s {
-  bool                                                ext                           = false;
   bool                                                ie_exts_present               = false;
   uint64_t                                            ue_sidelink_aggr_max_bit_rate = 0;
   lte_ue_sidelink_aggr_max_bit_rate_ext_ies_container ie_exts;
@@ -13856,7 +13566,6 @@ using ltev2x_services_authorized_ext_ies_container = protocol_ext_container_empt
 
 // LTEV2XServicesAuthorized ::= SEQUENCE
 struct ltev2x_services_authorized_s {
-  bool                                         ext                   = false;
   bool                                         vehicle_ue_present    = false;
   bool                                         pedestrian_ue_present = false;
   bool                                         ie_exts_present       = false;
@@ -13964,7 +13673,6 @@ using last_visited_pscell_list_item_ext_ies_container = protocol_ext_container_e
 
 // LastVisitedPSCellList-Item ::= SEQUENCE
 struct last_visited_pscell_list_item_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   unbounded_octstring<true>                       last_visited_pscell_info;
   last_visited_pscell_list_item_ext_ies_container ie_exts;
@@ -14125,7 +13833,6 @@ struct location_report_info_ext_ies_o {
 
 // LocationReportingInformation ::= SEQUENCE
 struct location_report_info_s {
-  bool                                                     ext = false;
   event_type_e                                             event_type;
   report_area_e                                            report_area;
   area_of_interest_info_l                                  area_of_interest;
@@ -14179,7 +13886,6 @@ using periodical_ext_ies_container = protocol_ext_container_empty_l;
 
 // Periodical ::= SEQUENCE
 struct periodical_s {
-  bool                         ext             = false;
   bool                         ie_exts_present = false;
   periodical_ext_ies_container ie_exts;
   // ...
@@ -14288,7 +13994,6 @@ struct logged_mdt_nr_ext_ies_o {
 
 // LoggedMDT-NR ::= SEQUENCE
 struct logged_mdt_nr_s {
-  bool                                              ext                        = false;
   bool                                              bluetooth_meas_cfg_present = false;
   bool                                              wlan_meas_cfg_present      = false;
   bool                                              sensor_meas_cfg_present    = false;
@@ -14346,7 +14051,6 @@ using mbs_data_forwarding_resp_infofrom_target_item_ext_ies_container = protocol
 
 // MBS-DataForwardingResponseInfofromTarget-Item ::= SEQUENCE
 struct mbs_data_forwarding_resp_infofrom_target_item_s {
-  bool                                                            ext                       = false;
   bool                                                            mrb_progress_info_present = false;
   bool                                                            ie_exts_present           = false;
   uint16_t                                                        mrb_id                    = 1;
@@ -14371,7 +14075,6 @@ using mbs_session_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // MBS-Session-ID ::= SEQUENCE
 struct mbs_session_id_s {
-  bool                             ext             = false;
   bool                             nid_present     = false;
   bool                             ie_exts_present = false;
   fixed_octstring<6, true>         tmgi;
@@ -14392,7 +14095,6 @@ using mbs_session_associated_info_item_ext_ies_container = protocol_ext_containe
 
 // MBS-SessionAssociatedInformation-Item ::= SEQUENCE
 struct mbs_session_associated_info_item_s {
-  bool                                               ext             = false;
   bool                                               ie_exts_present = false;
   mbs_session_id_s                                   mbs_session_id;
   associated_qos_flow_info_list_l                    associated_qos_flow_info_list;
@@ -14442,7 +14144,6 @@ struct mbs_session_info_item_ext_ies_o {
 
 // MBS-SessionInformation-Item ::= SEQUENCE
 struct mbs_session_info_item_s {
-  bool                                                      ext                            = false;
   bool                                                      mbs_area_session_id_present    = false;
   bool                                                      active_mbs_sessio_info_present = false;
   mbs_session_id_s                                          mbs_session_id;
@@ -14467,7 +14168,6 @@ using mbs_session_info_resp_item_ext_ies_container = protocol_ext_container_empt
 
 // MBS-SessionInformationResponse-Item ::= SEQUENCE
 struct mbs_session_info_resp_item_s {
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   mbs_session_id_s                             mbs_session_id;
   mbs_data_forwarding_resp_infofrom_target_l   mbs_data_forwarding_resp_infofrom_target;
@@ -14574,7 +14274,6 @@ struct mbsfn_sf_info_e_utra_item_s {
   using radioframe_alloc_period_e_ = enumerated<radioframe_alloc_period_opts, true>;
 
   // member variables
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   radioframe_alloc_period_e_                  radioframe_alloc_period;
   uint8_t                                     radioframe_alloc_offset = 0;
@@ -14676,7 +14375,6 @@ using pni_npn_area_scopeof_mdt_ext_ies_container = protocol_ext_container_empty_
 
 // PNI-NPN-AreaScopeofMDT ::= SEQUENCE
 struct pni_npn_area_scopeof_mdt_s {
-  bool                                       ext             = false;
   bool                                       ie_exts_present = false;
   cag_listfor_mdt_l                          cag_listfor_mdt;
   pni_npn_area_scopeof_mdt_ext_ies_container ie_exts;
@@ -14722,7 +14420,6 @@ struct mdt_cfg_nr_ext_ies_o {
 
 // MDT-Configuration-NR ::= SEQUENCE
 struct mdt_cfg_nr_s {
-  bool                                           ext                          = false;
   bool                                           area_scope_of_mdt_nr_present = false;
   mdt_activation_e                               mdt_activation;
   area_scope_of_mdt_nr_c                         area_scope_of_mdt_nr;
@@ -14744,7 +14441,6 @@ using mdt_cfg_eutra_ext_ies_container = protocol_ext_container_empty_l;
 
 // MDT-Configuration-EUTRA ::= SEQUENCE
 struct mdt_cfg_eutra_s {
-  bool                            ext                             = false;
   bool                            area_scope_of_mdt_eutra_present = false;
   bool                            ie_exts_present                 = false;
   mdt_activation_e                mdt_activation;
@@ -14802,7 +14498,6 @@ struct mdt_cfg_ext_ies_o {
 
 // MDT-Configuration ::= SEQUENCE
 struct mdt_cfg_s {
-  bool                                        ext                   = false;
   bool                                        mdt_cfg_nr_present    = false;
   bool                                        mdt_cfg_eutra_present = false;
   mdt_cfg_nr_s                                mdt_cfg_nr;
@@ -14823,7 +14518,6 @@ using s_based_mdt_ext_ies_container = protocol_ext_container_empty_l;
 
 // S-BasedMDT ::= SEQUENCE
 struct s_based_mdt_s {
-  bool                          ext            = false;
   bool                          ie_ext_present = false;
   fixed_octstring<8, true>      ng_ran_trace_id;
   s_based_mdt_ext_ies_container ie_ext;
@@ -14908,7 +14602,6 @@ using rv_qo_e_cfg_ext_ies_container = protocol_ext_container_empty_l;
 
 // RVQoEConfig ::= SEQUENCE
 struct rv_qo_e_cfg_s {
-  bool                          ext                                        = false;
   bool                          available_ran_visible_qo_e_metrics_present = false;
   bool                          report_periodicity_present                 = false;
   bool                          ie_exts_present                            = false;
@@ -14966,7 +14659,6 @@ struct mn_to_sn_q_mcc_oord_request_list_item_s {
   using cfg_release_ind_e_ = enumerated<cfg_release_ind_opts, true>;
 
   // member variables
-  bool                                                    ext                                         = false;
   bool                                                    qoe_meas_cfg_app_layer_id_present           = false;
   bool                                                    meas_collection_entity_ip_address_present   = false;
   bool                                                    qo_e_report_path_request_present            = false;
@@ -15040,7 +14732,6 @@ struct mn_to_sn_q_mcc_oord_resp_list_item_s {
   using further_rv_qo_e_report_path_resp_e_ = enumerated<further_rv_qo_e_report_path_resp_opts, true>;
 
   // member variables
-  bool                                                 ext                                      = false;
   bool                                                 qoe_meas_cfg_app_layer_id_present        = false;
   bool                                                 qo_e_cfg_sending_path_present            = false;
   bool                                                 qo_e_report_path_resp_present            = false;
@@ -15084,7 +14775,6 @@ using nr_res_coordination_info_ext_ies_container = protocol_ext_container_empty_
 
 // NR-ResourceCoordinationInfo ::= SEQUENCE
 struct nr_res_coordination_info_s {
-  bool                                       ext                                 = false;
   bool                                       dl_coordination_info_present        = false;
   bool                                       e_utra_cell_present                 = false;
   bool                                       nr_coordination_assist_info_present = false;
@@ -15160,7 +14850,6 @@ using mr_dc_res_coordination_info_ext_ies_container = protocol_ext_container_emp
 
 // MR-DC-ResourceCoordinationInfo ::= SEQUENCE
 struct mr_dc_res_coordination_info_s {
-  bool                                          ext            = false;
   bool                                          ie_ext_present = false;
   ng_ran_node_res_coordination_info_c           ng_ran_node_res_coordination_info;
   mr_dc_res_coordination_info_ext_ies_container ie_ext;
@@ -15187,7 +14876,6 @@ using mt_sdt_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // MT-SDT-Information ::= SEQUENCE
 struct mt_sdt_info_s {
-  bool                          ext             = false;
   bool                          ie_exts_present = false;
   mt_sdt_ind_e                  mt_sdt_ind;
   uint32_t                      mt_sdt_data_size = 1;
@@ -15244,7 +14932,6 @@ struct max_ip_datarate_ext_ies_o {
 
 // MaximumIPdatarate ::= SEQUENCE
 struct max_ip_datarate_s {
-  bool                                                ext = false;
   max_ip_rate_e                                       max_ip_rate_ul;
   protocol_ext_container_l<max_ip_datarate_ext_ies_o> ie_exts;
   // ...
@@ -15265,7 +14952,6 @@ using measured_trajectory_ngran_cell_info_ext_ies_container = protocol_ext_conta
 
 // MeasuredTrajectoryNGRANCellInfo ::= SEQUENCE
 struct measured_trajectory_ngran_cell_info_s {
-  bool                                                  ext             = false;
   bool                                                  ie_exts_present = false;
   global_ng_ran_cell_id_s                               global_ng_ran_cell_id;
   uint16_t                                              time_ue_stays_in_cell = 0;
@@ -15340,7 +15026,6 @@ using measured_ue_trajectory_item_ext_ies_container = protocol_ext_container_emp
 
 // MeasuredUETrajectory-Item ::= SEQUENCE
 struct measured_ue_trajectory_item_s {
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   measured_trajectory_cell_info_c               measuredtrajectory_cell_info;
   measured_ue_trajectory_item_ext_ies_container ie_exts;
@@ -15362,7 +15047,6 @@ using msg_oversize_notif_ext_ies_container = protocol_ext_container_empty_l;
 
 // MessageOversizeNotification ::= SEQUENCE
 struct msg_oversize_notif_s {
-  bool                                 ext                = false;
   bool                                 ie_ext_present     = false;
   uint32_t                             max_cell_list_size = 1;
   msg_oversize_notif_ext_ies_container ie_ext;
@@ -15392,7 +15076,6 @@ using mobile_iab_cell_e = enumerated<mobile_iab_cell_opts, true>;
 
 // MobilityParametersInformation ::= SEQUENCE
 struct mob_params_info_s {
-  bool   ext               = false;
   int8_t ho_trigger_change = -20;
   // ...
 
@@ -15404,7 +15087,6 @@ struct mob_params_info_s {
 
 // MobilityParametersModificationRange ::= SEQUENCE
 struct mob_params_mod_range_s {
-  bool   ext                           = false;
   int8_t ho_trigger_change_lower_limit = -20;
   int8_t ho_trigger_change_upper_limit = -20;
   // ...
@@ -15449,7 +15131,6 @@ struct rat_restricts_item_ext_ies_o {
 
 // RAT-RestrictionsItem ::= SEQUENCE
 struct rat_restricts_item_s {
-  bool                                                   ext = false;
   fixed_octstring<3, true>                               plmn_id;
   fixed_bitstring<8, true, true>                         rat_restrict_info;
   protocol_ext_container_l<rat_restricts_item_ext_ies_o> ie_exts;
@@ -15475,7 +15156,6 @@ struct service_area_item_s {
   using not_allowed_tacs_service_area_l_ = bounded_array<fixed_octstring<3, true>, 16>;
 
   // member variables
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   fixed_octstring<3, true>            plmn_id;
   allowed_tacs_service_area_l_        allowed_tacs_service_area;
@@ -15526,7 +15206,6 @@ struct npn_mob_info_sn_pn_ext_ies_o {
 
 // NPNMobilityInformation-SNPN ::= SEQUENCE
 struct npn_mob_info_sn_pn_s {
-  bool                                                   ext = false;
   fixed_bitstring<44, false, true>                       serving_n_id;
   protocol_ext_container_l<npn_mob_info_sn_pn_ext_ies_o> ie_ext;
   // ...
@@ -15544,7 +15223,6 @@ using npn_mob_info_pni_npn_ext_ies_container = protocol_ext_container_empty_l;
 
 // NPNMobilityInformation-PNI-NPN ::= SEQUENCE
 struct npn_mob_info_pni_npn_s {
-  bool                                   ext            = false;
   bool                                   ie_ext_present = false;
   allowed_pni_npn_id_list_l              allowed_pni_npn_id_list;
   npn_mob_info_pni_npn_ext_ies_container ie_ext;
@@ -15689,7 +15367,6 @@ struct mob_restrict_list_s {
   using equivalent_plmns_l_ = bounded_array<fixed_octstring<3, true>, 15>;
 
   // member variables
-  bool                                ext             = false;
   bool                                ie_exts_present = false;
   fixed_octstring<3, true>            serving_plmn;
   equivalent_plmns_l_                 equivalent_plmns;
@@ -15733,7 +15410,6 @@ struct ne_dc_tdm_pattern_s {
   using sf_assign_e_ = enumerated<sf_assign_opts>;
 
   // member variables
-  bool                                ext            = false;
   bool                                ie_ext_present = false;
   sf_assign_e_                        sf_assign;
   uint8_t                             harq_offset = 0;
@@ -15756,7 +15432,6 @@ using ssb_offset_mod_range_ext_ies_container = protocol_ext_container_empty_l;
 
 // SSBOffsetModificationRange ::= SEQUENCE
 struct ssb_offset_mod_range_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   uint8_t                                ssb_idx         = 0;
   mob_params_mod_range_s                 ss_bobility_params_mod_range;
@@ -15798,7 +15473,6 @@ using nprach_cfg_fdd_ext_ies_container = protocol_ext_container_empty_l;
 
 // NPRACHConfiguration-FDD ::= SEQUENCE
 struct nprach_cfg_fdd_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   nprach_cp_len_e                  nprach_cp_len;
   unbounded_octstring<true>        anchor_carrier_nprach_cfg;
@@ -15822,7 +15496,6 @@ using non_anchor_carrier_freqlist_ext_ies_o = protocol_ext_empty_o;
 using non_anchor_carrier_freqlist_ext_ies_container = protocol_ext_container_empty_l;
 
 struct non_anchor_carrier_freqlist_item_s_ {
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   unbounded_octstring<true>                     non_anchor_carrier_frquency;
   non_anchor_carrier_freqlist_ext_ies_container ie_exts;
@@ -15844,7 +15517,6 @@ using nprach_cfg_tdd_ext_ies_container = protocol_ext_container_empty_l;
 
 // NPRACHConfiguration-TDD ::= SEQUENCE
 struct nprach_cfg_tdd_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   nprach_preamb_format_e           nprach_preamb_format;
   unbounded_octstring<true>        anchor_carrier_nprach_cfg_tdd;
@@ -15930,7 +15602,6 @@ struct nprach_cfg_s {
   };
 
   // member variables
-  bool                         ext             = false;
   bool                         ie_exts_present = false;
   fdd_or_tdd_c_                fdd_or_tdd;
   nprach_cfg_ext_ies_container ie_exts;
@@ -15949,7 +15620,6 @@ using nr_u_ch_info_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // NR-U-ChannelInfo-Item ::= SEQUENCE
 struct nr_u_ch_info_item_s {
-  bool                                ext            = false;
   bool                                ie_ext_present = false;
   uint8_t                             nr_u_ch_id     = 1;
   uint32_t                            nr_arfcn       = 0;
@@ -15973,7 +15643,6 @@ using nr_a2_x_services_authorized_ext_ies_container = protocol_ext_container_emp
 
 // NRA2XServicesAuthorized ::= SEQUENCE
 struct nr_a2_x_services_authorized_s {
-  bool                                          ext                       = false;
   bool                                          aerial_ue_present         = false;
   bool                                          aerial_ctrller_ue_present = false;
   bool                                          ie_exts_present           = false;
@@ -16047,7 +15716,6 @@ struct nr_mode_info_fdd_ext_ies_container {
 
 // NRModeInfoFDD ::= SEQUENCE
 struct nr_mode_info_fdd_s {
-  bool                               ext            = false;
   bool                               ie_ext_present = false;
   nr_freq_info_s                     ul_nr_freq_info;
   nr_freq_info_s                     dl_nr_freq_info;
@@ -16069,7 +15737,6 @@ using tx_bw_asymmetric_ext_ies_container = protocol_ext_container_empty_l;
 
 // Transmission-Bandwidth-asymmetric ::= SEQUENCE
 struct tx_bw_asymmetric_s {
-  bool                               ext             = false;
   bool                               ie_exts_present = false;
   nr_tx_bw_s                         ul_tx_bw;
   nr_tx_bw_s                         dl_tx_bw;
@@ -16152,7 +15819,6 @@ struct nr_mode_info_tdd_ext_ies_container {
 
 // NRModeInfoTDD ::= SEQUENCE
 struct nr_mode_info_tdd_s {
-  bool                               ext            = false;
   bool                               ie_ext_present = false;
   nr_freq_info_s                     nr_freq_info;
   nr_tx_bw_s                         nr_transmisson_bw;
@@ -16236,7 +15902,6 @@ using nrppa_positioning_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // NRPPaPositioningInformation ::= SEQUENCE
 struct nrppa_positioning_info_s {
-  bool                                     ext            = false;
   bool                                     ie_ext_present = false;
   unbounded_octstring<true>                routing_id;
   uint16_t                                 nrppa_transaction_id = 0;
@@ -16393,7 +16058,6 @@ using nr_paging_longe_drx_infofor_rrc_inactive_ext_ies_container = protocol_ext_
 
 // NRPagingLongeDRXInformationforRRCINACTIVE ::= SEQUENCE
 struct nr_paging_longe_drx_infofor_rrc_inactive_s {
-  bool                                                       ext             = false;
   bool                                                       ie_exts_present = false;
   nr_paging_long_e_drx_cycle_inactive_e                      nr_paging_long_e_drx_cycle_inactive;
   nr_paging_time_win_inactive_e                              nr_paging_time_win_inactive;
@@ -16413,7 +16077,6 @@ using nr_paginge_drx_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // NRPagingeDRXInformation ::= SEQUENCE
 struct nr_paginge_drx_info_s {
-  bool                                  ext                        = false;
   bool                                  nr_paging_time_win_present = false;
   bool                                  ie_exts_present            = false;
   nr_paging_e_drx_cycle_e               nr_paging_e_drx_cycle;
@@ -16434,7 +16097,6 @@ using nr_paginge_drx_infofor_rrc_inactive_ext_ies_container = protocol_ext_conta
 
 // NRPagingeDRXInformationforRRCINACTIVE ::= SEQUENCE
 struct nr_paginge_drx_infofor_rrc_inactive_s {
-  bool                                                  ext             = false;
   bool                                                  ie_exts_present = false;
   nr_paging_e_drx_cycle_inactive_e                      nr_paging_e_drx_cycle_inactive;
   nr_paginge_drx_infofor_rrc_inactive_ext_ies_container ie_exts;
@@ -16453,7 +16115,6 @@ using nr_ue_sidelink_aggr_max_bit_rate_ext_ies_container = protocol_ext_containe
 
 // NRUESidelinkAggregateMaximumBitRate ::= SEQUENCE
 struct nr_ue_sidelink_aggr_max_bit_rate_s {
-  bool                                               ext                           = false;
   bool                                               ie_exts_present               = false;
   uint64_t                                           ue_sidelink_aggr_max_bit_rate = 0;
   nr_ue_sidelink_aggr_max_bit_rate_ext_ies_container ie_exts;
@@ -16472,7 +16133,6 @@ using nr_v2x_services_authorized_ext_ies_container = protocol_ext_container_empt
 
 // NRV2XServicesAuthorized ::= SEQUENCE
 struct nr_v2x_services_authorized_s {
-  bool                                         ext                   = false;
   bool                                         vehicle_ue_present    = false;
   bool                                         pedestrian_ue_present = false;
   bool                                         ie_exts_present       = false;
@@ -16494,7 +16154,6 @@ using neighbour_ng_ran_node_item_ext_ies_container = protocol_ext_container_empt
 
 // Neighbour-NG-RAN-Node-Item ::= SEQUENCE
 struct neighbour_ng_ran_node_item_s {
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   global_ng_ran_node_id_c                      global_ng_ran_node_id;
   local_ng_ran_node_id_c                       local_ng_ran_node_id;
@@ -16517,7 +16176,6 @@ using neighbour_info_e_utra_item_ext_ies_container = protocol_ext_container_empt
 
 // NeighbourInformation-E-UTRA-Item ::= SEQUENCE
 struct neighbour_info_e_utra_item_s {
-  bool                                         ext             = false;
   bool                                         ranac_present   = false;
   bool                                         ie_exts_present = false;
   uint16_t                                     e_utra_pci      = 0;
@@ -16544,7 +16202,6 @@ using neighbour_info_nr_mode_fdd_info_ext_ies_container = protocol_ext_container
 
 // NeighbourInformation-NR-ModeFDDInfo ::= SEQUENCE
 struct neighbour_info_nr_mode_fdd_info_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   nr_freq_info_s                                    ul_nr_freq_info;
   nr_freq_info_s                                    dl_nr_fequ_info;
@@ -16564,7 +16221,6 @@ using neighbour_info_nr_mode_tdd_info_ext_ies_container = protocol_ext_container
 
 // NeighbourInformation-NR-ModeTDDInfo ::= SEQUENCE
 struct neighbour_info_nr_mode_tdd_info_s {
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   nr_freq_info_s                                    nr_freq_info;
   neighbour_info_nr_mode_tdd_info_ext_ies_container ie_exts;
@@ -16677,7 +16333,6 @@ struct neighbour_info_nr_item_ext_ies_o {
 
 // NeighbourInformation-NR-Item ::= SEQUENCE
 struct neighbour_info_nr_item_s {
-  bool                                                       ext           = false;
   bool                                                       ranac_present = false;
   uint16_t                                                   nr_pci        = 0;
   nr_cgi_s                                                   nr_cgi;
@@ -16713,7 +16368,6 @@ using node_associated_info_result_ext_ies_container = protocol_ext_container_emp
 
 // NodeAssociatedInfoResult ::= SEQUENCE
 struct node_associated_info_result_s {
-  bool                                          ext                 = false;
   bool                                          energy_cost_present = false;
   bool                                          ie_exts_present     = false;
   uint16_t                                      energy_cost         = 0;
@@ -16733,7 +16387,6 @@ using node_meas_initiation_result_item_ext_ies_container = protocol_ext_containe
 
 // NodeMeasurementInitiationResult-Item ::= SEQUENCE
 struct node_meas_initiation_result_item_s {
-  bool                                               ext             = false;
   bool                                               ie_exts_present = false;
   fixed_bitstring<32, false, true>                   nodemeas_failed_report_characteristics;
   cause_c                                            cause;
@@ -16756,7 +16409,6 @@ using ul_non_f1_terminating_bh_info_ext_ies_container = protocol_ext_container_e
 
 // ULNonF1Terminating-BHInfo ::= SEQUENCE
 struct ul_non_f1_terminating_bh_info_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   bap_routing_id_s                                egress_bap_routing_id;
   fixed_bitstring<16, false, true>                egress_bh_rlc_ch_id;
@@ -16777,7 +16429,6 @@ using non_f1_terminating_bh_info_item_ext_ies_container = protocol_ext_container
 
 // NonF1TerminatingBHInformation-Item ::= SEQUENCE
 struct non_f1_terminating_bh_info_item_s {
-  bool                                              ext                                   = false;
   bool                                              dl_non_f1_terminating_bh_info_present = false;
   bool                                              ul_non_f1_terminating_bh_info_present = false;
   bool                                              ie_ext_present                        = false;
@@ -16803,7 +16454,6 @@ using non_f1_terminating_topology_bh_info_ext_ies_container = protocol_ext_conta
 
 // Non-F1-TerminatingTopologyBHInformation ::= SEQUENCE
 struct non_f1_terminating_topology_bh_info_s {
-  bool                                                  ext             = false;
   bool                                                  ie_exts_present = false;
   non_f1_terminating_bh_info_list_l                     non_f1_terminating_bh_info_list;
   bap_ctrl_pdu_rlc_ch_list_l                            bap_ctrl_pdu_rlc_ch_list;
@@ -16949,7 +16599,6 @@ using pc5_flow_bit_rates_ext_ies_container = protocol_ext_container_empty_l;
 
 // PC5FlowBitRates ::= SEQUENCE
 struct pc5_flow_bit_rates_s {
-  bool                                 ext                      = false;
   bool                                 ie_exts_present          = false;
   uint64_t                             guaranteed_flow_bit_rate = 0;
   uint64_t                             max_flow_bit_rate        = 0;
@@ -16969,7 +16618,6 @@ using pc5_qos_flow_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // PC5QoSFlowItem ::= SEQUENCE
 struct pc5_qos_flow_item_s {
-  bool                                ext                        = false;
   bool                                pc5_flow_bit_rates_present = false;
   bool                                range_present              = false;
   bool                                ie_exts_present            = false;
@@ -16995,7 +16643,6 @@ using pc5_qos_params_ext_ies_container = protocol_ext_container_empty_l;
 
 // PC5QoSParameters ::= SEQUENCE
 struct pc5_qos_params_s {
-  bool                             ext                             = false;
   bool                             pc5_link_aggr_bit_rates_present = false;
   bool                             ie_exts_present                 = false;
   pc5_qos_flow_list_l              pc5_qos_flow_list;
@@ -17095,7 +16742,6 @@ using pdu_session_list_with_cause_item_ext_ies_container = protocol_ext_containe
 
 // PDUSession-List-withCause-Item ::= SEQUENCE
 struct pdu_session_list_with_cause_item_s {
-  bool                                               ext            = false;
   bool                                               cause_present  = false;
   bool                                               ie_ext_present = false;
   uint16_t                                           pdu_session_id = 0;
@@ -17146,7 +16792,6 @@ struct pdu_session_list_with_data_forwarding_from_target_item_ext_ies_o {
 
 // PDUSession-List-withDataForwardingFromTarget-Item ::= SEQUENCE
 struct pdu_session_list_with_data_forwarding_from_target_item_s {
-  bool                                                                                       ext            = false;
   uint16_t                                                                                   pdu_session_id = 0;
   data_forwarding_info_from_target_ngran_node_s                                              dataforwardinginfo_target;
   protocol_ext_container_l<pdu_session_list_with_data_forwarding_from_target_item_ext_ies_o> ie_ext;
@@ -17197,7 +16842,6 @@ struct pdu_session_list_with_data_forwarding_request_item_ext_ies_o {
 
 // PDUSession-List-withDataForwardingRequest-Item ::= SEQUENCE
 struct pdu_session_list_with_data_forwarding_request_item_s {
-  bool                                           ext                                    = false;
   bool                                           dataforwarding_infofrom_source_present = false;
   uint16_t                                       pdu_session_id                         = 0;
   dataforwardingand_offloading_infofrom_source_s dataforwarding_infofrom_source;
@@ -17222,7 +16866,6 @@ using pdu_session_aggr_max_bit_rate_ext_ies_container = protocol_ext_container_e
 
 // PDUSessionAggregateMaximumBitRate ::= SEQUENCE
 struct pdu_session_aggr_max_bit_rate_s {
-  bool                                            ext             = false;
   bool                                            ie_exts_present = false;
   uint64_t                                        dl_session_ambr = 0;
   uint64_t                                        ul_session_ambr = 0;
@@ -17245,7 +16888,6 @@ struct pdu_session_res_bearer_setup_complete_info_sn_terminated_s {
   using drbs_to_be_setup_list_l_ = dyn_array<drbs_to_be_setup_list_bearer_setup_complete_sn_terminated_item_s>;
 
   // member variables
-  bool                                                                       ext             = false;
   bool                                                                       ie_exts_present = false;
   drbs_to_be_setup_list_l_                                                   drbs_to_be_setup_list;
   pdu_session_res_bearer_setup_complete_info_sn_terminated_ext_ies_container ie_exts;
@@ -17264,7 +16906,6 @@ using pdu_session_res_change_confirm_info_m_nterminated_ext_ies_container = prot
 
 // PDUSessionResourceChangeConfirmInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_change_confirm_info_m_nterminated_s {
-  bool                                                                ext             = false;
   bool                                                                ie_exts_present = false;
   pdu_session_res_change_confirm_info_m_nterminated_ext_ies_container ie_exts;
   // ...
@@ -17282,7 +16923,6 @@ using pdu_session_res_change_required_info_m_nterminated_ext_ies_container = pro
 
 // PDUSessionResourceChangeRequiredInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_change_required_info_m_nterminated_s {
-  bool                                                                 ext             = false;
   bool                                                                 ie_exts_present = false;
   pdu_session_res_change_required_info_m_nterminated_ext_ies_container ie_exts;
   // ...
@@ -17300,7 +16940,6 @@ using pdu_session_res_change_required_info_sn_terminated_ext_ies_container = pro
 
 // PDUSessionResourceChangeRequiredInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_change_required_info_sn_terminated_s {
-  bool                                                                 ext                                   = false;
   bool                                                                 dataforwardinginfofrom_source_present = false;
   bool                                                                 ie_exts_present                       = false;
   dataforwardingand_offloading_infofrom_source_s                       dataforwardinginfofrom_source;
@@ -17320,7 +16959,6 @@ using pdu_session_res_mod_confirm_info_m_nterminated_ext_ies_container = protoco
 
 // PDUSessionResourceModConfirmInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_mod_confirm_info_m_nterminated_s {
-  bool                                                             ext             = false;
   bool                                                             ie_exts_present = false;
   pdu_session_res_mod_confirm_info_m_nterminated_ext_ies_container ie_exts;
   // ...
@@ -17365,7 +17003,6 @@ struct pdu_session_res_mod_confirm_info_sn_terminated_ext_ies_o {
 
 // PDUSessionResourceModConfirmInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_mod_confirm_info_sn_terminated_s {
-  bool                                           ext                               = false;
   bool                                           ul_ng_u_tnl_at_up_f_present       = false;
   bool                                           dataforwardinginfo_target_present = false;
   up_transport_layer_info_c                      ul_ng_u_tnl_at_up_f;
@@ -17388,7 +17025,6 @@ using pdu_session_res_mod_rqd_info_m_nterminated_ext_ies_container = protocol_ex
 
 // PDUSessionResourceModRqdInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_mod_rqd_info_m_nterminated_s {
-  bool                                                         ext             = false;
   bool                                                         ie_exts_present = false;
   drbs_to_be_modified_list_mod_rqd_m_nterminated_l             drbs_to_be_modified;
   drb_list_with_cause_l                                        drbs_to_be_released;
@@ -17408,7 +17044,6 @@ using pdu_session_res_mod_rqd_info_sn_terminated_ext_ies_container = protocol_ex
 
 // PDUSessionResourceModRqdInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_mod_rqd_info_sn_terminated_s {
-  bool                                                         ext                                   = false;
   bool                                                         dl_ng_u_tnl_at_ng_ran_present         = false;
   bool                                                         dataforwardinginfofrom_source_present = false;
   bool                                                         ie_exts_present                       = false;
@@ -17442,7 +17077,6 @@ using pdu_session_res_mod_info_m_nterminated_ext_ies_container = protocol_ext_co
 
 // PDUSessionResourceModificationInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_mod_info_m_nterminated_s {
-  bool                                                     ext             = false;
   bool                                                     ie_exts_present = false;
   pdu_session_type_e                                       pdu_session_type;
   drbs_to_be_setup_list_setup_m_nterminated_l              drbs_to_be_setup;
@@ -17516,7 +17150,6 @@ struct qos_flows_to_be_setup_list_setup_sn_terminated_item_ext_ies_container {
 
 // QoSFlowsToBeSetup-List-Setup-SNterminated-Item ::= SEQUENCE
 struct qos_flows_to_be_setup_list_setup_sn_terminated_item_s {
-  bool                                                                  ext                               = false;
   bool                                                                  offered_gbr_qos_flow_info_present = false;
   bool                                                                  ie_exts_present                   = false;
   uint8_t                                                               qfi                               = 0;
@@ -17587,7 +17220,6 @@ struct qos_flows_to_be_setup_list_modified_sn_terminated_item_ext_ies_container 
 
 // QoSFlowsToBeSetup-List-Modified-SNterminated-Item ::= SEQUENCE
 struct qos_flows_to_be_setup_list_modified_sn_terminated_item_s {
-  bool                                                                     ext                               = false;
   bool                                                                     qos_flow_level_qos_params_present = false;
   bool                                                                     offered_gbr_qos_flow_info_present = false;
   bool                                                                     qos_flow_map_ind_present          = false;
@@ -17631,7 +17263,6 @@ struct security_ind_s {
   using confidentiality_protection_ind_e_ = enumerated<confidentiality_protection_ind_opts, true>;
 
   // member variables
-  bool                              ext                     = false;
   bool                              max_ip_datarate_present = false;
   bool                              ie_exts_present         = false;
   integrity_protection_ind_e_       integrity_protection_ind;
@@ -17721,7 +17352,6 @@ struct pdu_session_res_mod_info_sn_terminated_ext_ies_container {
 
 // PDUSessionResourceModificationInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_mod_info_sn_terminated_s {
-  bool                                                     ext                                   = false;
   bool                                                     ul_ng_u_tnl_at_up_f_present           = false;
   bool                                                     pdu_session_network_instance_present  = false;
   bool                                                     dataforwardinginfofrom_source_present = false;
@@ -17750,7 +17380,6 @@ using pdu_session_res_mod_resp_info_m_nterminated_ext_ies_container = protocol_e
 
 // PDUSessionResourceModificationResponseInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_mod_resp_info_m_nterminated_s {
-  bool                                                          ext             = false;
   bool                                                          ie_exts_present = false;
   drbs_admitted_list_mod_resp_m_nterminated_l                   drbs_admitted_list;
   drb_list_l                                                    drbs_released_list;
@@ -17785,7 +17414,6 @@ struct security_result_s {
   using confidentiality_protection_result_e_ = enumerated<confidentiality_protection_result_opts, true>;
 
   // member variables
-  bool                                 ext             = false;
   bool                                 ie_exts_present = false;
   integrity_protection_result_e_       integrity_protection_result;
   confidentiality_protection_result_e_ confidentiality_protection_result;
@@ -17853,7 +17481,6 @@ struct pdu_session_res_mod_resp_info_sn_terminated_ext_ies_container {
 
 // PDUSessionResourceModificationResponseInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_mod_resp_info_sn_terminated_s {
-  bool                                                          ext                                   = false;
   bool                                                          dl_ng_u_tnl_at_ng_ran_present         = false;
   bool                                                          dataforwardinginfo_target_present     = false;
   bool                                                          dataforwardinginfofrom_source_present = false;
@@ -17882,7 +17509,6 @@ using volume_timed_report_item_ext_ies_container = protocol_ext_container_empty_
 
 // VolumeTimedReport-Item ::= SEQUENCE
 struct volume_timed_report_item_s {
-  bool                                       ext             = false;
   bool                                       ie_exts_present = false;
   fixed_octstring<4, true>                   start_time_stamp;
   fixed_octstring<4, true>                   end_time_stamp;
@@ -17915,7 +17541,6 @@ struct pdu_session_usage_report_s {
   using rat_type_e_ = enumerated<rat_type_opts, true, 2>;
 
   // member variables
-  bool                                       ext             = false;
   bool                                       ie_exts_present = false;
   rat_type_e_                                rat_type;
   volume_timed_report_list_l                 pdu_session_timed_report_list;
@@ -17943,7 +17568,6 @@ struct qos_flows_usage_report_item_s {
   using rat_type_e_ = enumerated<rat_type_opts, true, 2>;
 
   // member variables
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   uint8_t                                       qos_flow_id     = 0;
   rat_type_e_                                   rat_type;
@@ -17967,7 +17591,6 @@ using secondary_rat_usage_info_ext_ies_container = protocol_ext_container_empty_
 
 // SecondaryRATUsageInformation ::= SEQUENCE
 struct secondary_rat_usage_info_s {
-  bool                                       ext                              = false;
   bool                                       pdu_session_usage_report_present = false;
   bool                                       ie_ext_present                   = false;
   pdu_session_usage_report_s                 pdu_session_usage_report;
@@ -17988,7 +17611,6 @@ using pdu_session_res_secondary_rat_usage_item_ext_ies_container = protocol_ext_
 
 // PDUSessionResourceSecondaryRATUsageItem ::= SEQUENCE
 struct pdu_session_res_secondary_rat_usage_item_s {
-  bool                                                       ext             = false;
   bool                                                       ie_exts_present = false;
   uint16_t                                                   pdu_session_id  = 0;
   secondary_rat_usage_info_s                                 secondary_rat_usage_info;
@@ -18011,7 +17633,6 @@ using pdu_session_res_setup_info_m_nterminated_ext_ies_container = protocol_ext_
 
 // PDUSessionResourceSetupInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_setup_info_m_nterminated_s {
-  bool                                                       ext             = false;
   bool                                                       ie_exts_present = false;
   pdu_session_type_e                                         pdu_session_type;
   drbs_to_be_setup_list_setup_m_nterminated_l                drbs_to_be_setup;
@@ -18078,7 +17699,6 @@ struct redundant_pdu_session_info_ext_ies_o {
 
 // RedundantPDUSessionInformation ::= SEQUENCE
 struct redundant_pdu_session_info_s {
-  bool                                                           ext = false;
   r_sn_e                                                         rsn;
   protocol_ext_container_l<redundant_pdu_session_info_ext_ies_o> ie_exts;
   // ...
@@ -18174,7 +17794,6 @@ struct pdu_session_res_setup_info_sn_terminated_ext_ies_container {
 
 // PDUSessionResourceSetupInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_setup_info_sn_terminated_s {
-  bool                                                       ext                                   = false;
   bool                                                       pdu_session_network_instance_present  = false;
   bool                                                       dataforwardinginfofrom_source_present = false;
   bool                                                       security_ind_present                  = false;
@@ -18228,7 +17847,6 @@ struct pdu_session_res_setup_resp_info_m_nterminated_ext_ies_o {
 
 // PDUSessionResourceSetupResponseInfo-MNterminated ::= SEQUENCE
 struct pdu_session_res_setup_resp_info_m_nterminated_s {
-  bool                                                                              ext = false;
   drbs_admitted_list_setup_resp_m_nterminated_l                                     drbs_admitted_list;
   protocol_ext_container_l<pdu_session_res_setup_resp_info_m_nterminated_ext_ies_o> ie_exts;
   // ...
@@ -18304,7 +17922,6 @@ struct pdu_session_res_setup_resp_info_sn_terminated_ext_ies_container {
 
 // PDUSessionResourceSetupResponseInfo-SNterminated ::= SEQUENCE
 struct pdu_session_res_setup_resp_info_sn_terminated_s {
-  bool                                                            ext                               = false;
   bool                                                            dataforwardinginfo_target_present = false;
   bool                                                            security_result_present           = false;
   bool                                                            ie_exts_present                   = false;
@@ -18329,7 +17946,6 @@ using pdu_session_res_not_admitted_item_item_ext_ies_container = protocol_ext_co
 
 // PDUSessionResourcesNotAdmitted-Item ::= SEQUENCE
 struct pdu_session_res_not_admitted_item_s {
-  bool                                                     ext            = false;
   bool                                                     cause_present  = false;
   bool                                                     ie_ext_present = false;
   uint16_t                                                 pdu_session_id = 0;
@@ -18406,7 +18022,6 @@ struct qos_flows_to_be_setup_item_ext_ies_container {
 
 // QoSFlowsToBeSetup-Item ::= SEQUENCE
 struct qos_flows_to_be_setup_item_s {
-  bool                                         ext             = false;
   bool                                         erab_id_present = false;
   bool                                         ie_ext_present  = false;
   uint8_t                                      qfi             = 0;
@@ -18504,7 +18119,6 @@ struct pdu_session_res_to_be_setup_item_ext_ies_container {
 
 // PDUSessionResourcesToBeSetup-Item ::= SEQUENCE
 struct pdu_session_res_to_be_setup_item_s {
-  bool                                               ext                                   = false;
   bool                                               pdu_session_ambr_present              = false;
   bool                                               source_dl_ng_u_tnl_info_present       = false;
   bool                                               security_ind_present                  = false;
@@ -18548,7 +18162,6 @@ using pdu_sessions_list_to_be_released_up_error_item_ext_ies_container = protoco
 
 // PDUSessionsListToBeReleased-UPError-Item ::= SEQUENCE
 struct pdu_sessions_list_to_be_released_up_error_item_s {
-  bool                                                             ext            = false;
   bool                                                             ie_ext_present = false;
   uint16_t                                                         pdu_session_id = 0;
   user_plane_error_ind_e                                           user_plane_error_ind;
@@ -18579,7 +18192,6 @@ using pe_ip_sassist_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // PEIPSassistanceInformation ::= SEQUENCE
 struct pe_ip_sassist_info_s {
-  bool                                 ext             = false;
   bool                                 ie_exts_present = false;
   uint8_t                              cnsubgroup_id   = 0;
   pe_ip_sassist_info_ext_ies_container ie_exts;
@@ -18661,7 +18273,6 @@ using pos_partial_ue_context_info_ext_ies_container = protocol_ext_container_emp
 
 // PosPartialUEContextInfo ::= SEQUENCE
 struct pos_partial_ue_context_info_s {
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   unbounded_octstring<true>                     requested_srs_tx_characteristics;
   pos_partial_ue_context_info_ext_ies_container ie_exts;
@@ -18680,7 +18291,6 @@ using positioning_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // PositioningInformation ::= SEQUENCE
 struct positioning_info_s {
-  bool                               ext            = false;
   bool                               ie_ext_present = false;
   unbounded_octstring<true>          requested_srs_tx_characteristics;
   unbounded_octstring<true>          routing_id;
@@ -18709,7 +18319,6 @@ using protected_e_utra_footprint_time_pattern_ext_ies_container = protocol_ext_c
 
 // ProtectedE-UTRAFootprintTimePattern ::= SEQUENCE
 struct protected_e_utra_footprint_time_pattern_s {
-  bool                                                      ext                                 = false;
   bool                                                      ie_exts_present                     = false;
   uint16_t                                                  protected_footprint_timeperiodicity = 1;
   uint8_t                                                   protected_footrpint_start_time      = 1;
@@ -18737,7 +18346,6 @@ struct protected_e_utra_res_item_s {
   using res_type_e_ = enumerated<res_type_opts, true>;
 
   // member variables
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   res_type_e_                                 res_type;
   fixed_bitstring<84, true, true>             intra_prb_protected_res_footprint;
@@ -18762,7 +18370,6 @@ using protected_e_utra_res_ind_ext_ies_container = protocol_ext_container_empty_
 
 // ProtectedE-UTRAResourceIndication ::= SEQUENCE
 struct protected_e_utra_res_ind_s {
-  bool                                       ext                           = false;
   bool                                       mbsfn_ctrl_region_len_present = false;
   bool                                       ie_exts_present               = false;
   uint16_t                                   activation_sfn                = 0;
@@ -18822,7 +18429,6 @@ struct qo_erv_qo_e_report_paths_s {
   using rv_qo_e_report_path_e_ = enumerated<rv_qo_e_report_path_opts, true>;
 
   // member variables
-  bool                                       ext                         = false;
   bool                                       qo_e_report_path_present    = false;
   bool                                       rv_qo_e_report_path_present = false;
   bool                                       ie_exts_present             = false;
@@ -18894,7 +18500,6 @@ struct ue_app_layer_meas_cfg_info_ext_ies_container {
 
 // UEAppLayerMeasConfigInfo ::= SEQUENCE
 struct ue_app_layer_meas_cfg_info_s {
-  bool                                         ext                                       = false;
   bool                                         qoe_meas_cfg_app_layer_id_present         = false;
   bool                                         qoe_meas_status_present                   = false;
   bool                                         mdt_align_info_present                    = false;
@@ -18928,7 +18533,6 @@ using ue_app_layer_meas_info_item_ext_ies_container = protocol_ext_container_emp
 
 // UEAppLayerMeasInfo-Item ::= SEQUENCE
 struct ue_app_layer_meas_info_item_s {
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   ue_app_layer_meas_cfg_info_s                  ue_app_layer_meas_cfg_info;
   ue_app_layer_meas_info_item_ext_ies_container ie_exts;
@@ -18950,7 +18554,6 @@ using q_mcc_onfig_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // QMCConfigInfo ::= SEQUENCE
 struct q_mcc_onfig_info_s {
-  bool                               ext             = false;
   bool                               ie_exts_present = false;
   ue_app_layer_meas_info_list_l      ue_app_layer_meas_info_list;
   q_mcc_onfig_info_ext_ies_container ie_exts;
@@ -19005,7 +18608,6 @@ struct sn_to_mn_q_mcc_oord_request_list_item_s {
   using cfg_release_ind_e_ = enumerated<cfg_release_ind_opts, true>;
 
   // member variables
-  bool                                                    ext                                         = false;
   bool                                                    meas_collection_entity_ip_address_present   = false;
   bool                                                    qo_e_report_path_request_present            = false;
   bool                                                    rv_qo_e_report_path_request_present         = false;
@@ -19043,7 +18645,6 @@ using q_mcc_oordination_request_ext_ies_container = protocol_ext_container_empty
 
 // QMCCoordinationRequest ::= SEQUENCE
 struct q_mcc_oordination_request_s {
-  bool                                        ext             = false;
   bool                                        ie_exts_present = false;
   mn_to_sn_q_mcc_oord_request_list_l          mn_to_sn_q_mcc_oord_request_list;
   sn_to_mn_q_mcc_oord_request_list_l          sn_to_mn_q_mcc_oord_request_list;
@@ -19091,7 +18692,6 @@ struct sn_to_mn_q_mcc_oord_resp_list_item_s {
   using further_rv_qo_e_report_path_resp_e_ = enumerated<further_rv_qo_e_report_path_resp_opts, true>;
 
   // member variables
-  bool                                                 ext                                      = false;
   bool                                                 qo_e_report_path_resp_present            = false;
   bool                                                 rv_qo_e_report_path_resp_present         = false;
   bool                                                 further_rv_qo_e_interest_resp_present    = false;
@@ -19123,7 +18723,6 @@ using q_mcc_oordination_resp_ext_ies_container = protocol_ext_container_empty_l;
 
 // QMCCoordinationResponse ::= SEQUENCE
 struct q_mcc_oordination_resp_s {
-  bool                                     ext             = false;
   bool                                     ie_exts_present = false;
   mn_to_sn_q_mcc_oord_resp_list_l          mn_to_sn_q_mcc_oord_resp_list;
   sn_to_mn_q_mcc_oord_resp_list_l          sn_to_mn_q_mcc_oord_resp_list;
@@ -19180,7 +18779,6 @@ struct qos_flow_notify_item_s {
   using notif_info_e_ = enumerated<notif_info_opts, true>;
 
   // member variables
-  bool                                                             ext         = false;
   uint8_t                                                          qos_flow_id = 0;
   notif_info_e_                                                    notif_info;
   protocol_ext_container_l<qos_flow_notif_ctrl_ind_info_ext_ies_o> ie_exts;
@@ -19202,7 +18800,6 @@ using ran_area_id_ext_ies_container = protocol_ext_container_empty_l;
 
 // RANAreaID ::= SEQUENCE
 struct ran_area_id_s {
-  bool                          ext             = false;
   bool                          ranac_present   = false;
   bool                          ie_exts_present = false;
   fixed_octstring<3, true>      tac;
@@ -19293,7 +18890,6 @@ using ran_paging_area_ext_ies_container = protocol_ext_container_empty_l;
 
 // RANPagingArea ::= SEQUENCE
 struct ran_paging_area_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   fixed_octstring<3, true>          plmn_id;
   ran_paging_area_choice_c          ran_paging_area_choice;
@@ -19367,7 +18963,6 @@ struct ra_report_list_item_ext_ies_container {
 
 // RAReportList-Item ::= SEQUENCE
 struct ra_report_list_item_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   unbounded_octstring<true>             ra_report;
   ra_report_list_item_ext_ies_container ie_exts;
@@ -19405,7 +19000,6 @@ using rspp_flow_bit_rates_ext_ies_container = protocol_ext_container_empty_l;
 
 // RSPPFlowBitRates ::= SEQUENCE
 struct rspp_flow_bit_rates_s {
-  bool                                  ext                      = false;
   bool                                  ie_exts_present          = false;
   uint64_t                              guaranteed_flow_bit_rate = 0;
   uint64_t                              max_flow_bit_rate        = 0;
@@ -19425,7 +19019,6 @@ using rspp_qos_flow_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // RSPPQoSFlowItem ::= SEQUENCE
 struct rspp_qos_flow_item_s {
-  bool                                 ext                         = false;
   bool                                 rspp_flow_bit_rates_present = false;
   bool                                 range_present               = false;
   bool                                 ie_exts_present             = false;
@@ -19451,7 +19044,6 @@ using rspp_transport_qos_params_ext_ies_container = protocol_ext_container_empty
 
 // RSPP-transport-QoS-parameters ::= SEQUENCE
 struct rspp_transport_qos_params_s {
-  bool                                        ext                              = false;
   bool                                        rspp_link_aggr_bit_rates_present = false;
   bool                                        ie_exts_present                  = false;
   rspp_qos_flow_list_l                        rspp_qos_flow_list;
@@ -19472,7 +19064,6 @@ using ra_report_ind_list_item_ext_ies_container = protocol_ext_container_empty_l
 
 // RaReportIndicationList-Item ::= SEQUENCE
 struct ra_report_ind_list_item_s {
-  bool                                      ext                      = false;
   bool                                      ie_exts_present          = false;
   uint64_t                                  m_ng_ran_node_ue_xnap_id = 0;
   ra_report_ind_list_item_ext_ies_container ie_exts;
@@ -19546,7 +19137,6 @@ using reset_request_partial_release_item_ext_ies_container = protocol_ext_contai
 
 // ResetRequestPartialReleaseItem ::= SEQUENCE
 struct reset_request_partial_release_item_s {
-  bool                                                 ext                             = false;
   bool                                                 ng_ran_node1_ue_xnap_id_present = false;
   bool                                                 ng_ran_node2_ue_xnap_id_present = false;
   bool                                                 ie_exts_present                 = false;
@@ -19571,7 +19161,6 @@ using reset_request_type_info_full_ext_ies_container = protocol_ext_container_em
 
 // ResetRequestTypeInfo-Full ::= SEQUENCE
 struct reset_request_type_info_full_s {
-  bool                                           ext            = false;
   bool                                           ie_ext_present = false;
   reset_request_type_info_full_ext_ies_container ie_ext;
   // ...
@@ -19589,7 +19178,6 @@ using reset_request_type_info_partial_ext_ies_container = protocol_ext_container
 
 // ResetRequestTypeInfo-Partial ::= SEQUENCE
 struct reset_request_type_info_partial_s {
-  bool                                              ext            = false;
   bool                                              ie_ext_present = false;
   reset_request_partial_release_list_l              ue_contexts_to_be_released_list;
   reset_request_type_info_partial_ext_ies_container ie_ext;
@@ -19675,7 +19263,6 @@ using reset_resp_partial_release_item_ext_ies_container = protocol_ext_container
 
 // ResetResponsePartialReleaseItem ::= SEQUENCE
 struct reset_resp_partial_release_item_s {
-  bool                                              ext                             = false;
   bool                                              ng_ran_node1_ue_xnap_id_present = false;
   bool                                              ng_ran_node2_ue_xnap_id_present = false;
   bool                                              ie_exts_present                 = false;
@@ -19700,7 +19287,6 @@ using reset_resp_type_info_full_ext_ies_container = protocol_ext_container_empty
 
 // ResetResponseTypeInfo-Full ::= SEQUENCE
 struct reset_resp_type_info_full_s {
-  bool                                        ext            = false;
   bool                                        ie_ext_present = false;
   reset_resp_type_info_full_ext_ies_container ie_ext;
   // ...
@@ -19718,7 +19304,6 @@ using reset_resp_type_info_partial_ext_ies_container = protocol_ext_container_em
 
 // ResetResponseTypeInfo-Partial ::= SEQUENCE
 struct reset_resp_type_info_partial_s {
-  bool                                           ext            = false;
   bool                                           ie_ext_present = false;
   reset_resp_partial_release_list_l              ue_contexts_admitted_to_be_released_list;
   reset_resp_type_info_partial_ext_ies_container ie_ext;
@@ -19844,7 +19429,6 @@ using scg_ue_history_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // SCGUEHistoryInformation ::= SEQUENCE
 struct scg_ue_history_info_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   last_visited_pscell_list_l            last_visited_pscell_list;
   scg_ue_history_info_ext_ies_container ie_exts;
@@ -19871,7 +19455,6 @@ using sdt_drbs_to_be_setup_list_item_ext_ies_container = protocol_ext_container_
 
 // SDT-DRBsToBeSetupList-Item ::= SEQUENCE
 struct sdt_drbs_to_be_setup_list_item_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   uint8_t                                          drb_id          = 1;
   up_transport_layer_info_c                        ul_tnl_info;
@@ -19900,7 +19483,6 @@ using sdt_srbs_to_be_setup_list_item_ext_ies_container = protocol_ext_container_
 
 // SDT-SRBsToBeSetupList-Item ::= SEQUENCE
 struct sdt_srbs_to_be_setup_list_item_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   uint8_t                                          srb_id          = 0;
   unbounded_octstring<true>                        srb_rlc_bearer_cfg;
@@ -19939,7 +19521,6 @@ using sdt_data_forwarding_drb_list_item_ext_ies_container = protocol_ext_contain
 
 // SDTDataForwardingDRBList-Item ::= SEQUENCE
 struct sdt_data_forwarding_drb_list_item_s {
-  bool                                                ext                 = false;
   bool                                                dl_tnl_info_present = false;
   bool                                                ie_exts_present     = false;
   uint8_t                                             drb_id              = 1;
@@ -19971,7 +19552,6 @@ using sdt_partial_ue_context_info_ext_ies_container = protocol_ext_container_emp
 
 // SDTPartialUEContextInfo ::= SEQUENCE
 struct sdt_partial_ue_context_info_s {
-  bool                                          ext             = false;
   bool                                          ie_exts_present = false;
   sdt_drbs_to_be_setup_list_l                   drbs_to_be_setup;
   sdt_srbs_to_be_setup_list_l                   srbs_to_be_setup;
@@ -19991,7 +19571,6 @@ using sdt_support_request_ext_ies_container = protocol_ext_container_empty_l;
 
 // SDTSupportRequest ::= SEQUENCE
 struct sdt_support_request_s {
-  bool                                  ext                        = false;
   bool                                  sdt_assistant_info_present = false;
   bool                                  ie_exts_present            = false;
   sdt_ind_e                             sdtind;
@@ -20012,7 +19591,6 @@ using sfn_offset_ext_ies_container = protocol_ext_container_empty_l;
 
 // SFN-Offset ::= SEQUENCE
 struct sfn_offset_s {
-  bool                             ext             = false;
   bool                             ie_exts_present = false;
   fixed_bitstring<24, false, true> sfn_time_offset;
   sfn_offset_ext_ies_container     ie_exts;
@@ -20157,7 +19735,6 @@ using ssb_offset_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // SSBOffsetInformation ::= SEQUENCE
 struct ssb_offset_info_s {
-  bool                              ext             = false;
   bool                              ie_exts_present = false;
   uint8_t                           ssb_idx         = 0;
   mob_params_info_s                 ssb_trigger_offset;
@@ -20177,7 +19754,6 @@ using ssb_offsets_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // SSBOffsets-Item ::= SEQUENCE
 struct ssb_offsets_item_s {
-  bool                               ext                              = false;
   bool                               ng_ran_node1_ssb_offsets_present = false;
   bool                               ie_exts_present                  = false;
   ssb_offset_info_s                  ng_ran_node1_ssb_offsets;
@@ -20209,7 +19785,6 @@ struct semipersistent_positioning_info_s {
   using srs_tx_type_e_ = enumerated<srs_tx_type_opts, true>;
 
   // member variables
-  bool                                              ext             = false;
   bool                                              ie_exts_present = false;
   srs_tx_type_e_                                    srs_tx_type;
   unbounded_octstring<true>                         srs_res_set_id;
@@ -20266,7 +19841,6 @@ using served_cell_info_e_utra_per_bplmn_ext_ies_container = protocol_ext_contain
 
 // ServedCellInformation-E-UTRA-perBPLMN ::= SEQUENCE
 struct served_cell_info_e_utra_per_bplmn_s {
-  bool                                                ext             = false;
   bool                                                ie_exts_present = false;
   fixed_octstring<3, true>                            plmn_id;
   served_cell_info_e_utra_per_bplmn_ext_ies_container ie_exts;
@@ -20329,7 +19903,6 @@ struct served_cell_info_e_utra_fdd_info_ext_ies_container {
 
 // ServedCellInformation-E-UTRA-FDDInfo ::= SEQUENCE
 struct served_cell_info_e_utra_fdd_info_s {
-  bool                                               ext             = false;
   bool                                               ie_exts_present = false;
   uint32_t                                           ul_earfcn       = 0;
   uint32_t                                           dl_earfcn       = 0;
@@ -20361,7 +19934,6 @@ using special_sf_info_e_utra_ext_ies_container = protocol_ext_container_empty_l;
 
 // SpecialSubframeInfo-E-UTRA ::= SEQUENCE
 struct special_sf_info_e_utra_s {
-  bool                                     ext             = false;
   bool                                     ie_exts_present = false;
   special_sf_patterns_e_utra_e             special_sf_pattern;
   cp_e_utra_dl_e                           cp_dl;
@@ -20436,7 +20008,6 @@ struct served_cell_info_e_utra_tdd_info_s {
   using sf_assignmnet_e_ = enumerated<sf_assignmnet_opts, true>;
 
   // member variables
-  bool                                               ext             = false;
   bool                                               ie_exts_present = false;
   uint32_t                                           earfcn          = 0;
   e_utra_tx_bw_e                                     e_utra_tx_bw;
@@ -20584,7 +20155,6 @@ struct served_cell_info_e_utra_s {
   using bw_reduced_si_e_ = enumerated<bw_reduced_si_opts, true>;
 
   // member variables
-  bool                                      ext                              = false;
   bool                                      ranac_present                    = false;
   bool                                      numof_ant_ports_present          = false;
   bool                                      prach_cfg_present                = false;
@@ -20745,7 +20315,6 @@ struct served_cell_info_nr_ext_ies_container {
 
 // ServedCellInformation-NR ::= SEQUENCE
 struct served_cell_info_nr_s {
-  bool                                  ext             = false;
   bool                                  ranac_present   = false;
   bool                                  ie_exts_present = false;
   uint16_t                              nr_pci          = 0;
@@ -20780,7 +20349,6 @@ struct served_cell_specific_info_req_nr_item_s {
   using add_mtc_list_request_ind_e_ = enumerated<add_mtc_list_request_ind_opts, true>;
 
   // member variables
-  bool                                                    ext                              = false;
   bool                                                    add_mtc_list_request_ind_present = false;
   bool                                                    ie_exts_present                  = false;
   nr_cgi_s                                                nr_cgi;
@@ -20831,7 +20399,6 @@ struct served_cells_e_utra_item_ext_ies_o {
 
 // ServedCells-E-UTRA-Item ::= SEQUENCE
 struct served_cells_e_utra_item_s {
-  bool                                                         ext = false;
   served_cell_info_e_utra_s                                    served_cell_info_e_utra;
   neighbour_info_nr_l                                          neighbour_info_nr;
   neighbour_info_e_utra_l                                      neighbour_info_e_utra;
@@ -20881,7 +20448,6 @@ struct served_cells_nr_item_ext_ies_o {
 
 // ServedCells-NR-Item ::= SEQUENCE
 struct served_cells_nr_item_s {
-  bool                                                     ext = false;
   served_cell_info_nr_s                                    served_cell_info_nr;
   neighbour_info_nr_l                                      neighbour_info_nr;
   neighbour_info_e_utra_l                                  neighbour_info_e_utra;
@@ -20907,7 +20473,6 @@ struct served_cells_to_modify_e_utra_item_s {
   using deactivation_ind_e_ = enumerated<deactivation_ind_opts, true>;
 
   // member variables
-  bool                                                                   ext                      = false;
   bool                                                                   deactivation_ind_present = false;
   e_utra_cgi_s                                                           old_ecgi;
   served_cell_info_e_utra_s                                              served_cell_info_e_utra;
@@ -20938,7 +20503,6 @@ struct served_cells_to_modify_nr_item_s {
   using deactivation_ind_e_ = enumerated<deactivation_ind_opts, true>;
 
   // member variables
-  bool                                             ext                      = false;
   bool                                             deactivation_ind_present = false;
   bool                                             ie_exts_present          = false;
   nr_cgi_s                                         old_nr_cgi;
@@ -20968,7 +20532,6 @@ struct served_cells_to_upd_e_utra_s {
   using served_cells_to_delete_e_utra_l_ = dyn_array<e_utra_cgi_s>;
 
   // member variables
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   served_cells_e_utra_l                        served_cells_to_add_e_utra;
   served_cells_to_modify_e_utra_l              served_cells_to_modify_e_utra;
@@ -20992,7 +20555,6 @@ struct served_cells_to_upd_nr_s {
   using served_cells_to_delete_nr_l_ = dyn_array<nr_cgi_s>;
 
   // member variables
-  bool                                     ext             = false;
   bool                                     ie_exts_present = false;
   served_cells_nr_l                        served_cells_to_add_nr;
   served_cells_to_modify_nr_l              served_cells_to_modify_nr;
@@ -21021,7 +20583,6 @@ using successful_ho_report_list_item_ext_ies_container = protocol_ext_container_
 
 // SuccessfulHOReportList-Item ::= SEQUENCE
 struct successful_ho_report_list_item_s {
-  bool                                             ext             = false;
   bool                                             ie_exts_present = false;
   unbounded_octstring<true>                        successful_ho_report;
   successful_ho_report_list_item_ext_ies_container ie_exts;
@@ -21043,7 +20604,6 @@ using successful_pscell_change_report_list_item_ext_ies_container = protocol_ext
 
 // SuccessfulPSCellChangeReportList-Item ::= SEQUENCE
 struct successful_pscell_change_report_list_item_s {
-  bool                                                        ext                 = false;
   bool                                                        sn_mob_info_present = false;
   bool                                                        ie_exts_present     = false;
   unbounded_octstring<true>                                   successful_pscell_change_report;
@@ -21070,7 +20630,6 @@ struct tai_support_item_s {
   using broadcast_plmns_l_ = dyn_array<broadcast_plmn_in_tai_support_item_s>;
 
   // member variables
-  bool                               ext             = false;
   bool                               ie_exts_present = false;
   fixed_octstring<3, true>           tac;
   broadcast_plmns_l_                 broadcast_plmns;
@@ -21114,7 +20673,6 @@ using tnl_a_setup_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // TNLA-Setup-Item ::= SEQUENCE
 struct tnl_a_setup_item_s {
-  bool                               ext             = false;
   bool                               ie_exts_present = false;
   cp_transport_layer_info_c          tnl_assoc_transport_layer_address;
   tnl_a_setup_item_ext_ies_container ie_exts;
@@ -21207,7 +20765,6 @@ using tnl_cfg_info_ext_ies_container = protocol_ext_container_empty_l;
 
 // TNLConfigurationInfo ::= SEQUENCE
 struct tnl_cfg_info_s {
-  bool                           ext             = false;
   bool                           ie_exts_present = false;
   ext_tlas_l                     extended_up_transport_layer_addresses_to_add;
   ext_tlas_l                     extended_up_transport_layer_addresses_to_rem;
@@ -21282,7 +20839,6 @@ struct time_sync_assist_info_s {
   using time_distribution_ind_e_ = enumerated<time_distribution_ind_opts, true>;
 
   // member variables
-  bool                                                      ext                               = false;
   bool                                                      uu_time_sync_error_budget_present = false;
   time_distribution_ind_e_                                  time_distribution_ind;
   uint32_t                                                  uu_time_sync_error_budget = 0;
@@ -21373,7 +20929,6 @@ struct trace_activation_ext_ies_container {
 
 // TraceActivation ::= SEQUENCE
 struct trace_activation_s {
-  bool                                  ext            = false;
   bool                                  ie_ext_present = false;
   fixed_octstring<8, true>              ng_ran_trace_id;
   fixed_bitstring<8, false, true>       interfaces_to_trace;
@@ -21462,7 +21017,6 @@ using traffic_to_be_release_item_ext_ies_container = protocol_ext_container_empt
 
 // TrafficToBeRelease-Item ::= SEQUENCE
 struct traffic_to_be_release_item_s {
-  bool                                         ext            = false;
   bool                                         ie_ext_present = false;
   uint16_t                                     traffic_idx    = 1;
   bh_info_list_l                               bh_info_list;
@@ -21549,7 +21103,6 @@ using traffic_to_be_release_info_ext_ies_container = protocol_ext_container_empt
 
 // TrafficToBeReleaseInformation ::= SEQUENCE
 struct traffic_to_be_release_info_s {
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   traffic_release_type_c                       release_type;
   traffic_to_be_release_info_ext_ies_container ie_exts;
@@ -21568,7 +21121,6 @@ using ue_aggr_max_bit_rate_ext_ies_container = protocol_ext_container_empty_l;
 
 // UEAggregateMaximumBitRate ::= SEQUENCE
 struct ue_aggr_max_bit_rate_s {
-  bool                                   ext            = false;
   bool                                   ie_ext_present = false;
   uint64_t                               dl_ue_ambr     = 0;
   uint64_t                               ul_ue_ambr     = 0;
@@ -21617,7 +21169,6 @@ struct ue_performance_ext_ies_o {
 
 // UEPerformance ::= SEQUENCE
 struct ue_performance_s {
-  bool                                               ext                               = false;
   bool                                               dl_ue_average_throughput_present  = false;
   bool                                               ul_ue_average_throughput_present  = false;
   bool                                               ue_average_packet_delay_present   = false;
@@ -21642,7 +21193,6 @@ using ue_associated_info_result_item_ext_ies_container = protocol_ext_container_
 
 // UEAssociatedInfoResult-Item ::= SEQUENCE
 struct ue_associated_info_result_item_s {
-  bool                                             ext                    = false;
   bool                                             ue_performance_present = false;
   bool                                             ie_exts_present        = false;
   uint64_t                                         ue_assistant_id        = 0;
@@ -21667,7 +21217,6 @@ using ue_context_id_for_rrc_resume_ext_ies_container = protocol_ext_container_em
 
 // UEContextIDforRRCResume ::= SEQUENCE
 struct ue_context_id_for_rrc_resume_s {
-  bool                                           ext            = false;
   bool                                           ie_ext_present = false;
   i_rnti_c                                       i_rnti;
   fixed_bitstring<16, false, true>               allocated_c_rnti;
@@ -21688,7 +21237,6 @@ using ue_context_id_for_rrc_reest_ext_ies_container = protocol_ext_container_emp
 
 // UEContextIDforRRCReestablishment ::= SEQUENCE
 struct ue_context_id_for_rrc_reest_s {
-  bool                                          ext            = false;
   bool                                          ie_ext_present = false;
   fixed_bitstring<16, false, true>              c_rnti;
   ng_ran_cell_pci_c                             fail_cell_pci;
@@ -21775,7 +21323,6 @@ using ue_security_cap_ext_ies_container = protocol_ext_container_empty_l;
 
 // UESecurityCapabilities ::= SEQUENCE
 struct ue_security_cap_s {
-  bool                              ext            = false;
   bool                              ie_ext_present = false;
   fixed_bitstring<16, true, true>   nr_encyption_algorithms;
   fixed_bitstring<16, true, true>   nr_integrity_protection_algorithms;
@@ -21797,7 +21344,6 @@ using ue_slice_max_bit_rate_item_ext_ies_container = protocol_ext_container_empt
 
 // UESliceMaximumBitRate-Item ::= SEQUENCE
 struct ue_slice_max_bit_rate_item_s {
-  bool                                         ext             = false;
   bool                                         ie_exts_present = false;
   s_nssai_s                                    s_nssai;
   uint64_t                                     dl_ue_slice_mbr = 0;
@@ -21924,7 +21470,6 @@ struct ue_context_info_retr_ue_ctxt_resp_ext_ies_container {
 
 // UEContextInfoRetrUECtxtResp ::= SEQUENCE
 struct ue_context_info_retr_ue_ctxt_resp_s {
-  bool                                                ext                              = false;
   bool                                                mob_restrict_list_present        = false;
   bool                                                idx_to_rat_freq_sel_prio_present = false;
   bool                                                ie_ext_present                   = false;
@@ -22082,7 +21627,6 @@ using ue_id_idx_list_mbs_group_paging_item_ext_ies_container = protocol_ext_cont
 
 // UEIdentityIndexList-MBSGroupPaging-Item ::= SEQUENCE
 struct ue_id_idx_list_mbs_group_paging_item_s {
-  bool                                                   ext                = false;
   bool                                                   paging_drx_present = false;
   bool                                                   ie_ext_present     = false;
   ue_id_idx_list_mbs_group_paging_value_c                ue_id_idx_list_mbs_group_paging_value;
@@ -22161,7 +21705,6 @@ using ue_performance_collection_cfg_ext_ies_container = protocol_ext_container_e
 
 // UEPerformanceCollectionConfiguration ::= SEQUENCE
 struct ue_performance_collection_cfg_s {
-  bool                                            ext                                    = false;
   bool                                            ie_exts_present                        = false;
   uint16_t                                        collection_time_dur_for_ue_performance = 1;
   ue_performance_collection_cfg_ext_ies_container ie_exts;
@@ -22233,7 +21776,6 @@ using ue_radio_cap_for_paging_ext_ies_container = protocol_ext_container_empty_l
 
 // UERadioCapabilityForPaging ::= SEQUENCE
 struct ue_radio_cap_for_paging_s {
-  bool                                      ext             = false;
   bool                                      ie_exts_present = false;
   unbounded_octstring<true>                 ue_radio_cap_for_paging_of_nr;
   unbounded_octstring<true>                 ue_radio_cap_for_paging_of_eutra;
@@ -22253,7 +21795,6 @@ using ue_trajectory_collection_cfg_ext_ies_container = protocol_ext_container_em
 
 // UETrajectoryCollectionConfiguration ::= SEQUENCE
 struct ue_trajectory_collection_cfg_s {
-  bool                                           ext                                   = false;
   bool                                           nof_visited_cells_present             = false;
   bool                                           ie_exts_present                       = false;
   uint16_t                                       collection_time_dur_for_ue_trajectory = 1;
@@ -22282,7 +21823,6 @@ using user_plane_fail_ind_ext_ies_container = protocol_ext_container_empty_l;
 
 // UserPlaneFailureIndication ::= SEQUENCE
 struct user_plane_fail_ind_s {
-  bool                                  ext             = false;
   bool                                  ie_exts_present = false;
   user_plane_fail_type_e                user_plane_fail_type;
   up_transport_layer_info_c             dl_ng_u_tnl_at_ng_ran;
@@ -22364,7 +21904,6 @@ struct xn_u_address_infoper_pdu_session_item_ext_ies_container {
 
 // XnUAddressInfoperPDUSession-Item ::= SEQUENCE
 struct xn_u_address_infoper_pdu_session_item_s {
-  bool                                          ext                                                 = false;
   bool                                          data_forwarding_info_from_target_ngran_node_present = false;
   bool                                          pdu_session_res_setup_complete_info_sn_term_present = false;
   bool                                          ie_ext_present                                      = false;

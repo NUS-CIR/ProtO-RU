@@ -51,15 +51,12 @@ TEST(allowed_harq_mode_converter_test, an_unset_mode_is_not_packed)
   const ul_specific_params ul_params = generate_ul_specific_params(std::nullopt);
 
   EXPECT_FALSE(ul_params.allowed_harq_mode_r17_present);
-  EXPECT_FALSE(ul_params.ext) << "the extension group carries nothing";
 }
 
-/// TS 38.331 places allowedHARQ-mode in an extension group, which has to be marked present for it to be packed.
+/// TS 38.331 places allowedHARQ-mode in an extension group.
 TEST(allowed_harq_mode_converter_test, mode_a_is_packed_in_the_extension_group)
 {
   const ul_specific_params ul_params = generate_ul_specific_params(ul_harq_mode::mode_a);
-
-  ASSERT_TRUE(ul_params.ext);
   ASSERT_TRUE(ul_params.allowed_harq_mode_r17_present);
   EXPECT_EQ(ul_params.allowed_harq_mode_r17.value, ul_specific_params::allowed_harq_mode_r17_opts::harq_mode_a);
 }
@@ -67,8 +64,6 @@ TEST(allowed_harq_mode_converter_test, mode_a_is_packed_in_the_extension_group)
 TEST(allowed_harq_mode_converter_test, mode_b_is_packed_in_the_extension_group)
 {
   const ul_specific_params ul_params = generate_ul_specific_params(ul_harq_mode::mode_b);
-
-  ASSERT_TRUE(ul_params.ext);
   ASSERT_TRUE(ul_params.allowed_harq_mode_r17_present);
   EXPECT_EQ(ul_params.allowed_harq_mode_r17.value, ul_specific_params::allowed_harq_mode_r17_opts::harq_mode_b);
 }

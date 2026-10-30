@@ -365,7 +365,6 @@ TEST(srs_sib19_ntn_test, make_asn1_rrc_cell_sib19_all_r18_fields)
   EXPECT_EQ(sib19_decoded.ntn_neigh_cell_cfg_list_r17.size(), 1);
 
   // Verify extension group 1 is enabled
-  EXPECT_TRUE(sib19_decoded.ext);
 }
 
 TEST(srs_sib19_ntn_test, max_ncells_supported)

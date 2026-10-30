@@ -302,9 +302,6 @@ class elementary_procedure_option
   ProtocolIEs protocol_ies;
 
 public:
-  bool ext = false;
-  // ...
-
   ProtocolIEs*       operator->() { return &protocol_ies; }
   const ProtocolIEs* operator->() const { return &protocol_ies; }
   ProtocolIEs&       operator*() { return protocol_ies; }
@@ -313,14 +310,21 @@ public:
   // sequence methods
   OCUDUASN_CODE pack(bit_ref& bref) const
   {
-    bref.pack(ext, 1);
+    // No extension addition is defined.
+    HANDLE_CODE(bref.pack(false, 1));
     HANDLE_CODE(protocol_ies.pack(bref));
     return OCUDUASN_SUCCESS;
   }
   OCUDUASN_CODE unpack(cbit_ref& bref)
   {
-    bref.unpack(ext, 1);
+    bool ext;
+    HANDLE_CODE(bref.unpack(ext, 1));
     HANDLE_CODE(protocol_ies.unpack(bref));
+    if (ext) {
+      // Skip extension additions unknown to this version.
+      ext_groups_unpacker unknown_ext_unpacker(bref, true);
+      HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
+    }
     return OCUDUASN_SUCCESS;
   }
   void to_json(json_writer& j) const

@@ -63,7 +63,6 @@ struct aperiodic_srs_s {
   using aperiodic_e_ = enumerated<aperiodic_opts, true>;
 
   // member variables
-  bool                                              ext                     = false;
   bool                                              srs_res_trigger_present = false;
   aperiodic_e_                                      aperiodic;
   srs_res_trigger_s                                 srs_res_trigger;
@@ -1276,7 +1275,6 @@ using otdoa_info_type_item_ext_ies_container = protocol_ext_container_empty_l;
 
 // OTDOA-Information-Type-Item ::= SEQUENCE
 struct otdoa_info_type_item_s {
-  bool                                   ext             = false;
   bool                                   ie_exts_present = false;
   otdoa_info_item_e                      otdoa_info_item;
   otdoa_info_type_item_ext_ies_container ie_exts;
@@ -1724,7 +1722,6 @@ struct semipersistent_srs_ext_ies_container {
 
 // SemipersistentSRS ::= SEQUENCE
 struct semipersistent_srs_s {
-  bool                                 ext             = false;
   bool                                 ie_exts_present = false;
   uint8_t                              srs_res_set_id  = 0;
   semipersistent_srs_ext_ies_container ie_exts;
@@ -2266,7 +2263,6 @@ using private_msg_ies_container = private_ie_container_empty_l;
 
 // PrivateMessage ::= SEQUENCE
 struct private_msg_s {
-  bool                      ext = false;
   private_msg_ies_container private_ies;
   // ...
 

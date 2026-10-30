@@ -185,7 +185,8 @@ OCUDUASN_CODE paging_record_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE paging_record_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(access_type_present, 1));
 
   HANDLE_CODE(ue_id.unpack(bref));

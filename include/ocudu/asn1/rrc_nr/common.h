@@ -909,7 +909,6 @@ struct spatial_relation_info_pdc_r17_s {
   };
 
   // member variables
-  bool       ext = false;
   ref_sig_c_ ref_sig;
   // ...
 
@@ -1031,16 +1030,13 @@ struct srs_res_s {
   using group_or_seq_hop_e_ = enumerated<group_or_seq_hop_opts>;
   struct res_type_c_ {
     struct aperiodic_s_ {
-      bool ext = false;
       // ...
     };
     struct semi_persistent_s_ {
-      bool                         ext = false;
       srs_periodicity_and_offset_c periodicity_and_offset_sp;
       // ...
     };
     struct periodic_s_ {
-      bool                         ext = false;
       srs_periodicity_and_offset_c periodicity_and_offset_p;
       // ...
     };
@@ -1407,7 +1403,6 @@ struct srs_res_s {
   };
 
   // member variables
-  bool                        ext                           = false;
   bool                        ptrs_port_idx_present         = false;
   bool                        spatial_relation_info_present = false;
   uint8_t                     srs_res_id                    = 0;

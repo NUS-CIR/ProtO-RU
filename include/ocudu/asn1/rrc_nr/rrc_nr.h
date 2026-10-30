@@ -47,7 +47,6 @@ struct area_validity_ta_cfg_r18_s {
 
 // SRS-PosConfigPerULCarrier-r18 ::= SEQUENCE
 struct srs_pos_cfg_per_ul_carrier_r18_s {
-  bool                   ext                              = false;
   bool                   scs_specific_carrier_r18_present = false;
   bool                   bwp_r18_present                  = false;
   uint32_t               freq_info_r18                    = 0;
@@ -67,7 +66,6 @@ struct srs_pos_rrc_inactive_agg_bw_add_carriers_r18_s {
   using aggr_pos_srs_carrier_list_r18_l_ = dyn_array<srs_pos_cfg_per_ul_carrier_r18_s>;
 
   // member variables
-  bool                             ext = false;
   aggr_pos_srs_carrier_list_r18_l_ aggr_pos_srs_carrier_list_r18;
   // ...
 
@@ -90,7 +88,6 @@ struct srs_pos_rrc_inactive_validity_area_cfg_r18_s {
   using srs_pos_cfg_validity_area_ext_v1830_l_ = bounded_array<fixed_bitstring<36>, 16>;
 
   // member variables
-  bool                             ext                              = false;
   bool                             srs_pos_cfg_n_ul_r18_present     = false;
   bool                             srs_pos_cfg_sul_r18_present      = false;
   bool                             bwp_n_ul_r18_present             = false;
@@ -123,7 +120,6 @@ using srs_pos_rrc_inactive_validity_area_pre_cfg_list_r18_l = dyn_array<srs_pos_
 
 // AS-Config ::= SEQUENCE
 struct as_cfg_s {
-  bool          ext = false;
   dyn_octstring rrc_recfg;
   // ...
   // group 0
@@ -222,7 +218,6 @@ struct cfg_restrict_info_daps_v1640_s {
 
 // AS-Context ::= SEQUENCE
 struct as_context_s {
-  bool                    ext                       = false;
   bool                    reest_info_present        = false;
   bool                    cfg_restrict_info_present = false;
   reest_info_s            reest_info;
@@ -400,7 +395,6 @@ struct cg_candidate_list_s {
 
 // ConfigRestrictModReqSCG ::= SEQUENCE
 struct cfg_restrict_mod_req_scg_s {
-  bool                       ext                         = false;
   bool                       requested_bc_mrdc_present   = false;
   bool                       requested_p_max_fr1_present = false;
   band_combination_info_sn_s requested_bc_mrdc;
@@ -443,7 +437,6 @@ struct meas_cfg_sn_s {
   using measured_frequencies_sn_l_ = dyn_array<nr_freq_info_s>;
 
   // member variables
-  bool                       ext = false;
   measured_frequencies_sn_l_ measured_frequencies_sn;
   // ...
 
@@ -468,7 +461,6 @@ struct ph_ul_carrier_scg_s {
   using ph_type1or3_e_ = enumerated<ph_type1or3_opts>;
 
   // member variables
-  bool           ext = false;
   ph_type1or3_e_ ph_type1or3;
   // ...
 
@@ -480,7 +472,6 @@ struct ph_ul_carrier_scg_s {
 
 // PH-InfoSCG ::= SEQUENCE
 struct ph_info_scg_s {
-  bool                ext                         = false;
   bool                ph_supplementary_ul_present = false;
   uint8_t             serv_cell_idx               = 0;
   ph_ul_carrier_scg_s ph_ul;
@@ -823,7 +814,6 @@ struct cand_pscell_execution_condition_info_r18_s {
   using cand_pscell_exec_cond_report_cfg_nr_r18_l_ = dyn_array<report_cfg_nr_s>;
 
   // member variables
-  bool                                       ext = false;
   cand_pscell_exec_cond_report_cfg_nr_r18_l_ cand_pscell_exec_cond_report_cfg_nr_r18;
   // ...
 
@@ -1015,7 +1005,6 @@ struct rrm_cfg_s {
   using ue_inactive_time_e_ = enumerated<ue_inactive_time_opts>;
 
   // member variables
-  bool                   ext                      = false;
   bool                   ue_inactive_time_present = false;
   ue_inactive_time_e_    ue_inactive_time;
   meas_result_list2_nr_l candidate_cell_info_list;
@@ -1139,7 +1128,6 @@ struct meas_timing_s {
   };
 
   // member variables
-  bool               ext                     = false;
   bool               freq_and_timing_present = false;
   freq_and_timing_s_ freq_and_timing;
   // ...
@@ -1784,7 +1772,6 @@ using band_combination_list_v17b0_l = dyn_array<band_combination_v17b0_s>;
 
 // BandNR-v16c0 ::= SEQUENCE
 struct band_nr_v16c0_s {
-  bool ext                               = false;
   bool pusch_repeat_type_a_v16c0_present = false;
   // ...
 
@@ -2114,7 +2101,6 @@ struct mimo_params_per_band_v17b0_s {
 
 // BandNR-v17b0 ::= SEQUENCE
 struct band_nr_v17b0_s {
-  bool                         ext                                = false;
   bool                         mimo_params_per_band_v17b0_present = false;
   mimo_params_per_band_v17b0_s mimo_params_per_band_v17b0;
   // ...
@@ -2318,7 +2304,6 @@ struct early_ul_sync_cfg_r18_s {
   using ltm_restricted_set_cfg_r18_e_ = enumerated<ltm_restricted_set_cfg_r18_opts>;
 
   // member variables
-  bool                           ext                                      = false;
   bool                           ssb_per_rach_occasion_r18_present        = false;
   bool                           prach_root_seq_idx_r18_present           = false;
   bool                           ltm_prach_subcarrier_spacing_r18_present = false;
@@ -2621,7 +2606,6 @@ struct mrb_rlc_cfg_broadcast_r17_s {
 
 // MRB-InfoBroadcast-r17 ::= SEQUENCE
 struct mrb_info_broadcast_r17_s {
-  bool                         ext = false;
   mrb_pdcp_cfg_broadcast_r17_s pdcp_cfg_r17;
   mrb_rlc_cfg_broadcast_r17_s  rlc_cfg_r17;
   // ...
@@ -2807,7 +2791,6 @@ struct mrb_rlc_cfg_multicast_r18_s {
 
 // MRB-InfoMulticast-r18 ::= SEQUENCE
 struct mrb_info_multicast_r18_s {
-  bool                         ext = false;
   mrb_pdcp_cfg_multicast_r18_s pdcp_cfg_r18;
   mrb_rlc_cfg_multicast_r18_s  rlc_cfg_r18;
   // ...
@@ -2823,7 +2806,6 @@ using mrb_list_multicast_r18_l = dyn_array<mrb_info_multicast_r18_s>;
 
 // MBS-SessionInfoMulticast-r18 ::= SEQUENCE
 struct mbs_session_info_multicast_r18_s {
-  bool                     ext                              = false;
   bool                     g_rnti_r18_present               = false;
   bool                     mtch_sched_info_r18_present      = false;
   bool                     mtch_neighbour_cell_r18_present  = false;
@@ -3200,7 +3182,6 @@ struct meas_and_mob_params_v15t0_s {
 
 // MeasResultSCG-Failure ::= SEQUENCE
 struct meas_result_scg_fail_s {
-  bool                   ext = false;
   meas_result_list2_nr_l meas_result_per_mo_list;
   // ...
   // group 0
@@ -3509,7 +3490,6 @@ struct sdt_mac_phy_cg_cfg_r17_s {
   using cg_mt_sdt_max_dur_to_next_cg_occasion_r18_e_ = enumerated<cg_mt_sdt_max_dur_to_next_cg_occasion_r18_opts>;
 
   // member variables
-  bool                                            ext                                  = false;
   bool                                            cg_sdt_cfg_init_bwp_n_ul_r17_present = false;
   bool                                            cg_sdt_cfg_init_bwp_sul_r17_present  = false;
   bool                                            cg_sdt_cfg_init_bwp_dl_r17_present   = false;
@@ -3625,7 +3605,6 @@ struct ue_timers_and_consts_remote_ue_r17_s {
   using t319_remote_ue_r17_e_ = enumerated<t319_remote_ue_r17_opts>;
 
   // member variables
-  bool                  ext                        = false;
   bool                  t300_remote_ue_r17_present = false;
   bool                  t301_remote_ue_r17_present = false;
   bool                  t319_remote_ue_r17_present = false;
@@ -3677,7 +3656,6 @@ struct sib12_ies_r16_s {
   using t400_u2_u_r18_e_ = enumerated<t400_u2_u_r18_opts>;
 
   // member variables
-  bool                   ext = false;
   sl_cfg_common_nr_r16_s sl_cfg_common_nr_r16;
   dyn_octstring          late_non_crit_ext;
   // ...
@@ -3943,7 +3921,6 @@ struct sib17_ies_r17_s {
   using validity_dur_r17_e_ = enumerated<validity_dur_r17_opts>;
 
   // member variables
-  bool                   ext                      = false;
   bool                   validity_dur_r17_present = false;
   trs_res_set_cfg_r17_l_ trs_res_set_cfg_r17;
   validity_dur_r17_e_    validity_dur_r17;
@@ -4198,7 +4175,6 @@ struct sib17bis_ies_r18_s {
   using validity_dur_r18_e_ = enumerated<validity_dur_r18_opts>;
 
   // member variables
-  bool                   ext                      = false;
   bool                   validity_dur_r18_present = false;
   trs_res_set_cfg_r18_l_ trs_res_set_cfg_r18;
   validity_dur_r18_e_    validity_dur_r18;
@@ -4217,7 +4193,6 @@ struct sl_pos_cfg_common_nr_r18_s {
   using sl_pos_freq_info_list_ext_v1880_l_ = dyn_array<sl_freq_cfg_common_ext_v16k0_s>;
 
   // member variables
-  bool                                 ext                                = false;
   bool                                 sl_pos_ue_sel_cfg_r18_present      = false;
   bool                                 sl_pos_meas_cfg_common_r18_present = false;
   bool                                 sl_pos_offset_dfn_r18_present      = false;
@@ -4240,7 +4215,6 @@ struct sl_pos_cfg_common_nr_r18_s {
 
 // SIB23-IEs-r18 ::= SEQUENCE
 struct sib23_ies_r18_s {
-  bool                       ext = false;
   sl_pos_cfg_common_nr_r18_s sl_pos_cfg_common_nr_r18;
   dyn_octstring              late_non_crit_ext;
   // ...
@@ -4285,7 +4259,6 @@ struct srs_pos_rrc_inactive_cfg_r17_s {
 
 // SRS-PosRRC-InactiveEnhancedConfig-r18 ::= SEQUENCE
 struct srs_pos_rrc_inactive_enhanced_cfg_r18_s {
-  bool ext                                                         = false;
   bool srs_pos_rrc_inactive_agg_bw_cfg_list_r18_present            = false;
   bool srs_pos_tx_hop_r18_present                                  = false;
   bool srs_pos_rrc_inactive_validity_area_pre_cfg_list_r18_present = false;
@@ -4328,7 +4301,6 @@ struct ue_cap_request_filt_common_s {
   };
 
   // member variables
-  bool            ext                  = false;
   bool            mrdc_request_present = false;
   mrdc_request_s_ mrdc_request;
   // ...
@@ -4583,7 +4555,6 @@ struct ue_cap_enquiry_v1560_ies_s {
 
 // SL-AccessInfo-L2U2N-r17 ::= SEQUENCE
 struct sl_access_info_l2_u2_n_r17_s {
-  bool                       ext = false;
   cell_access_related_info_s cell_access_related_info_r17;
   sl_serving_cell_info_r17_s sl_serving_cell_info_r17;
   // ...

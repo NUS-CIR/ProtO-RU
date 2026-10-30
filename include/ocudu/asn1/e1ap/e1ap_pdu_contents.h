@@ -3537,7 +3537,6 @@ struct supported_plmns_ext_ies_container {
 
 // SupportedPLMNs-Item ::= SEQUENCE
 struct supported_plmns_item_s {
-  bool                              ext                             = false;
   bool                              qos_params_support_list_present = false;
   bool                              ie_exts_present                 = false;
   fixed_octstring<3, true>          plmn_id;
@@ -5342,7 +5341,6 @@ using private_msg_ies_container = private_ie_container_empty_l;
 
 // PrivateMessage ::= SEQUENCE
 struct private_msg_s {
-  bool                      ext = false;
   private_msg_ies_container private_ies;
   // ...
 

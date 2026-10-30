@@ -32,7 +32,6 @@ struct plmn_id_info_s {
   using tracking_area_list_r17_l_ = bounded_array<fixed_bitstring<24>, 12>;
 
   // member variables
-  bool                      ext           = false;
   bool                      tac_present   = false;
   bool                      ranac_present = false;
   plmn_id_list_l_           plmn_id_list;
@@ -148,7 +147,6 @@ struct npn_id_info_r16_s {
   using cell_reserved_for_oper_r16_e_ = enumerated<cell_reserved_for_oper_r16_opts>;
 
   // member variables
-  bool                          ext                     = false;
   bool                          ranac_r16_present       = false;
   bool                          iab_support_r16_present = false;
   npn_id_list_r16_l_            npn_id_list_r16;
@@ -683,7 +681,6 @@ struct sib2_s {
     };
 
     // member variables
-    bool                      ext                                        = false;
     bool                      nrof_ss_blocks_to_average_present          = false;
     bool                      abs_thresh_ss_blocks_consolidation_present = false;
     bool                      range_to_best_cell_present                 = false;
@@ -696,7 +693,6 @@ struct sib2_s {
     // ...
   };
   struct cell_resel_serving_freq_info_s_ {
-    bool                  ext                          = false;
     bool                  s_non_intra_search_p_present = false;
     bool                  s_non_intra_search_q_present = false;
     bool                  thresh_serving_low_q_present = false;
@@ -710,7 +706,6 @@ struct sib2_s {
     // ...
   };
   struct intra_freq_cell_resel_info_s_ {
-    bool                          ext                      = false;
     bool                          q_rx_lev_min_sul_present = false;
     bool                          q_qual_min_present       = false;
     bool                          s_intra_search_q_present = false;
@@ -864,7 +859,6 @@ struct sib2_s {
   };
 
   // member variables
-  bool                            ext = false;
   cell_resel_info_common_s_       cell_resel_info_common;
   cell_resel_serving_freq_info_s_ cell_resel_serving_freq_info;
   intra_freq_cell_resel_info_s_   intra_freq_cell_resel_info;
@@ -884,7 +878,6 @@ struct sib2_s {
 
 // IntraFreqNeighCellInfo ::= SEQUENCE
 struct intra_freq_neigh_cell_info_s {
-  bool             ext                                  = false;
   bool             q_rx_lev_min_offset_cell_present     = false;
   bool             q_rx_lev_min_offset_cell_sul_present = false;
   bool             q_qual_min_offset_cell_present       = false;
@@ -1000,7 +993,6 @@ struct sib3_s {
   using intra_freq_cag_cell_list_r16_l_ = dyn_array<intra_freq_cag_cell_list_per_plmn_r16_s>;
 
   // member variables
-  bool                            ext = false;
   intra_freq_neigh_cell_list_l    intra_freq_neigh_cell_list;
   intra_freq_excluded_cell_list_l intra_freq_excluded_cell_list;
   dyn_octstring                   late_non_crit_ext;
@@ -1023,7 +1015,6 @@ struct sib3_s {
 
 // InterFreqNeighCellInfo ::= SEQUENCE
 struct inter_freq_neigh_cell_info_s {
-  bool             ext                                  = false;
   bool             q_rx_lev_min_offset_cell_present     = false;
   bool             q_rx_lev_min_offset_cell_sul_present = false;
   bool             q_qual_min_offset_cell_present       = false;
@@ -1054,7 +1045,6 @@ struct inter_freq_carrier_freq_info_s {
   };
 
   // member variables
-  bool                            ext                                        = false;
   bool                            nrof_ss_blocks_to_average_present          = false;
   bool                            abs_thresh_ss_blocks_consolidation_present = false;
   bool                            smtc_present                               = false;
@@ -1258,7 +1248,6 @@ using inter_freq_carrier_freq_list_v1800_l = dyn_array<inter_freq_carrier_freq_i
 
 // SIB4 ::= SEQUENCE
 struct sib4_s {
-  bool                           ext = false;
   inter_freq_carrier_freq_list_l inter_freq_carrier_freq_list;
   dyn_octstring                  late_non_crit_ext;
   // ...
@@ -1522,7 +1511,6 @@ using carrier_freq_list_eutra_v1800_l = dyn_array<carrier_freq_eutra_v1800_s>;
 
 // SIB5 ::= SEQUENCE
 struct sib5_s {
-  bool                        ext                      = false;
   bool                        t_resel_eutra_sf_present = false;
   carrier_freq_list_eutra_l   carrier_freq_list_eutra;
   uint8_t                     t_resel_eutra = 0;
@@ -1545,7 +1533,6 @@ struct sib5_s {
 
 // SIB6 ::= SEQUENCE
 struct sib6_s {
-  bool                ext = false;
   fixed_bitstring<16> msg_id;
   fixed_bitstring<16> serial_num;
   fixed_octstring<2>  warning_type;
@@ -1568,7 +1555,6 @@ struct sib7_s {
   using warning_msg_segment_type_e_ = enumerated<warning_msg_segment_type_opts>;
 
   // member variables
-  bool                        ext                        = false;
   bool                        data_coding_scheme_present = false;
   fixed_bitstring<16>         msg_id;
   fixed_bitstring<16>         serial_num;
@@ -1595,7 +1581,6 @@ struct sib8_s {
   using warning_msg_segment_type_e_ = enumerated<warning_msg_segment_type_opts>;
 
   // member variables
-  bool                        ext                        = false;
   bool                        data_coding_scheme_present = false;
   fixed_bitstring<16>         msg_id;
   fixed_bitstring<16>         serial_num;
@@ -1654,7 +1639,6 @@ struct sib9_s {
   };
 
   // member variables
-  bool          ext               = false;
   bool          time_info_present = false;
   time_info_s_  time_info;
   dyn_octstring late_non_crit_ext;
@@ -1686,7 +1670,6 @@ using hrnn_list_r16_l = dyn_array<hrnn_r16_s>;
 
 // SIB10-r16 ::= SEQUENCE
 struct sib10_r16_s {
-  bool            ext = false;
   hrnn_list_r16_l hrnn_list_r16;
   dyn_octstring   late_non_crit_ext;
   // ...
@@ -1749,7 +1732,6 @@ struct meas_idle_carrier_nr_r16_s {
   };
 
   // member variables
-  bool                        ext                            = false;
   bool                        quality_thres_r16_present      = false;
   bool                        ssb_meas_cfg_r16_present       = false;
   bool                        beam_meas_cfg_idle_r16_present = false;
@@ -1788,7 +1770,6 @@ struct meas_idle_carrier_eutra_r16_s {
   };
 
   // member variables
-  bool                           ext                             = false;
   bool                           quality_thres_eutra_r16_present = false;
   uint32_t                       carrier_freq_eutra_r16          = 0;
   eutra_allowed_meas_bw_e        allowed_meas_bw_r16;
@@ -1805,7 +1786,6 @@ struct meas_idle_carrier_eutra_r16_s {
 
 // MeasReselectionCarrierNR-r18 ::= SEQUENCE
 struct meas_resel_carrier_nr_r18_s {
-  bool     ext              = false;
   uint32_t carrier_freq_r18 = 0;
   // ...
 
@@ -1834,7 +1814,6 @@ struct meas_idle_cfg_sib_r16_s {
   using meas_resel_carrier_list_nr_less_than5_m_hz_r18_l_ = dyn_array<meas_resel_carrier_nr_r18_s>;
 
   // member variables
-  bool                                ext = false;
   meas_idle_carrier_list_nr_r16_l_    meas_idle_carrier_list_nr_r16;
   meas_idle_carrier_list_eutra_r16_l_ meas_idle_carrier_list_eutra_r16;
   // ...
@@ -1855,7 +1834,6 @@ struct meas_idle_cfg_sib_r16_s {
 
 // SIB11-r16 ::= SEQUENCE
 struct sib11_r16_s {
-  bool                    ext                           = false;
   bool                    meas_idle_cfg_sib_r16_present = false;
   meas_idle_cfg_sib_r16_s meas_idle_cfg_sib_r16;
   dyn_octstring           late_non_crit_ext;
@@ -1889,7 +1867,6 @@ struct sib12_r16_s {
 
 // SIB13-r16 ::= SEQUENCE
 struct sib13_r16_s {
-  bool          ext = false;
   dyn_octstring sl_v2x_cfg_common_r16;
   dyn_octstring dummy;
   dyn_octstring tdd_cfg_r16;
@@ -1904,7 +1881,6 @@ struct sib13_r16_s {
 
 // SIB14-r16 ::= SEQUENCE
 struct sib14_r16_s {
-  bool          ext = false;
   dyn_octstring sl_v2x_cfg_common_ext_r16;
   dyn_octstring late_non_crit_ext;
   // ...
@@ -1921,7 +1897,6 @@ struct sib15_r17_s {
   using applicable_disaster_info_list_r17_l_        = dyn_array<applicable_disaster_info_r17_c>;
 
   // member variables
-  bool                                        ext = false;
   common_plmns_with_disaster_condition_r17_l_ common_plmns_with_disaster_condition_r17;
   applicable_disaster_info_list_r17_l_        applicable_disaster_info_list_r17;
   dyn_octstring                               late_non_crit_ext;
@@ -2033,7 +2008,6 @@ using freq_prio_list_slicing_r17_l = dyn_array<freq_prio_slicing_r17_s>;
 
 // SIB16-r17 ::= SEQUENCE
 struct sib16_r17_s {
-  bool                         ext = false;
   freq_prio_list_slicing_r17_l freq_prio_list_slicing_r17;
   dyn_octstring                late_non_crit_ext;
   // ...
@@ -2095,7 +2069,6 @@ struct sib18_r17_s {
   using gins_per_sn_pn_list_r17_l_ = dyn_array<gi_ns_per_sn_pn_r17_s>;
 
   // member variables
-  bool                       ext = false;
   gin_elem_list_r17_l_       gin_elem_list_r17;
   gins_per_sn_pn_list_r17_l_ gins_per_sn_pn_list_r17;
   dyn_octstring              late_non_crit_ext;
@@ -2236,7 +2209,6 @@ struct ntn_cfg_r17_s {
   using ntn_polarization_ul_r17_e_ = enumerated<ntn_polarization_ul_r17_opts>;
 
   // member variables
-  bool                            ext                                  = false;
   bool                            epoch_time_r17_present               = false;
   bool                            ntn_ul_sync_validity_dur_r17_present = false;
   bool                            cell_specific_koffset_r17_present    = false;
@@ -2308,7 +2280,6 @@ struct sat_switch_with_re_sync_r18_s {
 
 // SIB19-r17 ::= SEQUENCE
 struct sib19_r17_s {
-  bool                          ext                         = false;
   bool                          ntn_cfg_r17_present         = false;
   bool                          t_service_r17_present       = false;
   bool                          distance_thresh_r17_present = false;
@@ -2639,7 +2610,6 @@ struct cfr_cfg_mcch_mtch_r17_s {
 
 // SIB20-r17 ::= SEQUENCE
 struct sib20_r17_s {
-  bool                    ext                           = false;
   bool                    cfr_cfg_mcch_mtch_r17_present = false;
   mcch_cfg_r17_s          mcch_cfg_r17;
   cfr_cfg_mcch_mtch_r17_s cfr_cfg_mcch_mtch_r17;
@@ -2674,7 +2644,6 @@ using mbs_fsai_inter_freq_list_r17_l = dyn_array<mbs_fsai_inter_freq_r17_s>;
 
 // SIB21-r17 ::= SEQUENCE
 struct sib21_r17_s {
-  bool                           ext = false;
   mbs_fsai_list_r17_l            mbs_fsai_intra_freq_r17;
   mbs_fsai_inter_freq_list_r17_l mbs_fsai_inter_freq_list_r17;
   dyn_octstring                  late_non_crit_ext;
@@ -2688,7 +2657,6 @@ struct sib21_r17_s {
 
 // SIB22-r18 ::= SEQUENCE
 struct sib22_r18_s {
-  bool                          ext                               = false;
   bool                          atg_cfg_r18_present               = false;
   bool                          hs_atg_cell_resel_set_r18_present = false;
   atg_cfg_r18_s                 atg_cfg_r18;
@@ -2724,7 +2692,6 @@ struct sib23_r18_s {
 
 // SIB24-r18 ::= SEQUENCE
 struct sib24_r18_s {
-  bool                    ext                            = false;
   bool                    multicast_mcch_cfg_r18_present = false;
   bool                    cfr_cfg_mcch_mtch_r18_present  = false;
   mcch_cfg_r17_s          multicast_mcch_cfg_r18;
@@ -2755,7 +2722,6 @@ using coverage_area_info_list_r18_l = dyn_array<coverage_area_info_r18_s>;
 
 // SIB25-r18 ::= SEQUENCE
 struct sib25_r18_s {
-  bool                          ext = false;
   coverage_area_info_list_r18_l coverage_area_info_list_r18;
   dyn_octstring                 late_non_crit_ext;
   // ...
@@ -3157,7 +3123,6 @@ struct sys_info_ies_s {
 
 // SIBpos-r16 ::= SEQUENCE
 struct sib_pos_r16_s {
-  bool          ext = false;
   dyn_octstring assist_data_sib_elem_r16;
   dyn_octstring late_non_crit_ext;
   // ...
@@ -3995,7 +3960,6 @@ struct cell_access_related_info_s {
   using snpn_access_info_list_r17_l_ = dyn_array<sn_pn_access_info_r17_s>;
 
   // member variables
-  bool                ext                                 = false;
   bool                cell_reserved_for_other_use_present = false;
   plmn_id_info_list_l plmn_id_info_list;
   // ...
@@ -4180,7 +4144,6 @@ struct si_sched_info_s {
   using si_win_len_e_ = enumerated<si_win_len_opts>;
 
   // member variables
-  bool                ext                        = false;
   bool                si_request_cfg_present     = false;
   bool                si_request_cfg_sul_present = false;
   bool                sys_info_area_id_present   = false;
@@ -4257,7 +4220,6 @@ struct ue_timers_and_consts_s {
   using t319_e_ = enumerated<t319_opts>;
 
   // member variables
-  bool    ext = false;
   t300_e_ t300;
   t301_e_ t301;
   t310_e_ t310;
@@ -4405,7 +4367,6 @@ struct gnss_id_r16_s {
   using gnss_id_r16_e_ = enumerated<gnss_id_r16_opts, true, 1>;
 
   // member variables
-  bool           ext = false;
   gnss_id_r16_e_ gnss_id_r16;
   // ...
 
@@ -4425,7 +4386,6 @@ struct sbas_id_r16_s {
   using sbas_id_r16_e_ = enumerated<sbas_id_r16_opts, true>;
 
   // member variables
-  bool           ext = false;
   sbas_id_r16_e_ sbas_id_r16;
   // ...
 
@@ -4520,7 +4480,6 @@ struct pos_sched_info_r16_s {
   using pos_si_broadcast_status_r16_e_ = enumerated<pos_si_broadcast_status_r16_opts>;
 
   // member variables
-  bool                           ext                           = false;
   bool                           offset_to_si_used_r16_present = false;
   pos_si_periodicity_r16_e_      pos_si_periodicity_r16;
   pos_si_broadcast_status_r16_e_ pos_si_broadcast_status_r16;
@@ -4565,7 +4524,6 @@ struct si_request_cfg_repeat_r18_s {
   using si_request_res_repeat_num8_r18_l_ = dyn_array<si_request_res_repeat_r18_s>;
 
   // member variables
-  bool                              ext                           = false;
   bool                              rach_occasions_si_r18_present = false;
   rach_occasions_si_r18_s_          rach_occasions_si_r18;
   si_request_res_repeat_num2_r18_l_ si_request_res_repeat_num2_r18;
@@ -4584,7 +4542,6 @@ struct pos_si_sched_info_r16_s {
   using pos_sched_info_list_r16_l_ = dyn_array<pos_sched_info_r16_s>;
 
   // member variables
-  bool                       ext                                = false;
   bool                       pos_si_request_cfg_r16_present     = false;
   bool                       pos_si_request_cfg_sul_r16_present = false;
   pos_sched_info_list_r16_l_ pos_sched_info_list_r16;
@@ -4736,7 +4693,6 @@ struct red_cap_cfg_common_sib_r17_s {
   };
 
   // member variables
-  bool                       ext                                     = false;
   bool                       half_duplex_red_cap_allowed_r17_present = false;
   bool                       cell_barred_red_cap_r17_present         = false;
   cell_barred_red_cap_r17_s_ cell_barred_red_cap_r17;

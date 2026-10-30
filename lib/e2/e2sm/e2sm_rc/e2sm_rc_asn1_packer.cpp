@@ -133,8 +133,6 @@ asn1::unbounded_octstring<true> e2sm_rc_asn1_packer::pack_ran_function_descripti
   ran_function_desc.ran_function_name.ran_function_short_name.from_string(short_name.c_str());
   ran_function_desc.ran_function_name.ran_function_e2sm_o_id.from_string(oid.c_str());
   ran_function_desc.ran_function_name.ran_function_description.from_string(func_description.c_str());
-  ran_function_desc.ext = false;
-
   for (auto const& x : control_services) {
     ran_function_desc.ran_function_definition_ctrl_present = true;
     e2sm_control_service*               control_service    = x.second;

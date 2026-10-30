@@ -84,7 +84,6 @@ private:
 
 // PagingRecord ::= SEQUENCE
 struct paging_record_s {
-  bool           ext                 = false;
   bool           access_type_present = false;
   paging_ue_id_c ue_id;
   // ...

@@ -522,7 +522,6 @@ asn1::rrc_nr::sib1_s ocudu::test_helpers::create_sib1(const plmn_identity& plmn,
     plmn_info.tac.from_number(7);
   } else {
     // TS 38.331: trackingAreaList replaces trackingAreaCode; it sits in an extension group.
-    plmn_info.ext = true;
     plmn_info.tracking_area_list_r17.set_present();
     for (tac_t tac : tac_list) {
       asn1::fixed_bitstring<24> asn1_tac;

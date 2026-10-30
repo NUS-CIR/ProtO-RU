@@ -345,7 +345,6 @@ static asn1::rrc_nr::plmn_id_info_s make_asn1_plmn_id_info(const plmn_identity& 
     // NTN cells only. TS 38.331: trackingAreaList replaces trackingAreaCode; leave tac absent.
     asn1_plmn_info.tac_present = false;
     // The field sits in an extension group, only packed when the extension marker is set.
-    asn1_plmn_info.ext = true;
     asn1_plmn_info.tracking_area_list_r17.set_present();
     for (tac_t entry : tac_list) {
       asn1::fixed_bitstring<24> asn1_tac;

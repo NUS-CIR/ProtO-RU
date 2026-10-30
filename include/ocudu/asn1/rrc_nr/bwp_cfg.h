@@ -108,16 +108,13 @@ struct srs_pos_res_set_r16_s {
       using aperiodic_srs_res_trigger_list_r16_l_ = bounded_array<uint8_t, 3>;
 
       // member variables
-      bool                                  ext = false;
       aperiodic_srs_res_trigger_list_r16_l_ aperiodic_srs_res_trigger_list_r16;
       // ...
     };
     struct semi_persistent_r16_s_ {
-      bool ext = false;
       // ...
     };
     struct periodic_r16_s_ {
-      bool ext = false;
       // ...
     };
     struct types_opts {
@@ -239,7 +236,6 @@ struct srs_pos_res_set_r16_s {
   };
 
   // member variables
-  bool                       ext                             = false;
   bool                       alpha_r16_present               = false;
   bool                       p0_r16_present                  = false;
   bool                       pathloss_ref_rs_pos_r16_present = false;
@@ -791,7 +787,6 @@ private:
 struct slot_offset_for_remaining_hops_r18_s {
   struct slot_offset_remaining_hops_r18_c_ {
     struct aperiodic_r18_s_ {
-      bool    ext                        = false;
       bool    slot_offset_r18_present    = false;
       bool    start_position_r18_present = false;
       uint8_t slot_offset_r18            = 1;
@@ -799,7 +794,6 @@ struct slot_offset_for_remaining_hops_r18_s {
       // ...
     };
     struct semi_persistent_r18_s_ {
-      bool                                 ext                                       = false;
       bool                                 periodicity_and_offset_sp_r18_present     = false;
       bool                                 periodicity_and_offset_sp_ext_r18_present = false;
       bool                                 start_position_r18_present                = false;
@@ -809,7 +803,6 @@ struct slot_offset_for_remaining_hops_r18_s {
       // ...
     };
     struct periodic_r18_s_ {
-      bool                                 ext                                      = false;
       bool                                 periodicity_and_offset_p_r18_present     = false;
       bool                                 periodicity_and_offset_p_ext_r18_present = false;
       bool                                 start_position_r18_present               = false;
@@ -899,7 +892,6 @@ struct tx_hop_cfg_r18_s {
   using slot_offset_for_remaining_hops_list_r18_l_ = dyn_array<slot_offset_for_remaining_hops_r18_s>;
 
   // member variables
-  bool                                       ext = false;
   overlap_value_r18_e_                       overlap_value_r18;
   uint8_t                                    nof_hops_r18 = 1;
   slot_offset_for_remaining_hops_list_r18_l_ slot_offset_for_remaining_hops_list_r18;
@@ -1001,7 +993,6 @@ struct srs_pos_res_r16_s {
     nrof_symbols_r16_e_ nrof_symbols_r16;
   };
   struct freq_hop_r16_s_ {
-    bool    ext       = false;
     uint8_t c_srs_r16 = 0;
     // ...
   };
@@ -1013,7 +1004,6 @@ struct srs_pos_res_r16_s {
   using group_or_seq_hop_r16_e_ = enumerated<group_or_seq_hop_r16_opts>;
   struct res_type_r16_c_ {
     struct aperiodic_r16_s_ {
-      bool    ext                     = false;
       bool    slot_offset_r16_present = false;
       uint8_t slot_offset_r16         = 1;
       // ...
@@ -1029,7 +1019,6 @@ struct srs_pos_res_r16_s {
       using srs_pos_periodic_cfg_hyper_sfn_idx_r18_e_ = enumerated<srs_pos_periodic_cfg_hyper_sfn_idx_r18_opts>;
 
       // member variables
-      bool                             ext = false;
       srs_periodicity_and_offset_r16_c periodicity_and_offset_sp_r16;
       // ...
       // group 0
@@ -1054,7 +1043,6 @@ struct srs_pos_res_r16_s {
       using srs_pos_periodic_cfg_hyper_sfn_idx_r18_e_ = enumerated<srs_pos_periodic_cfg_hyper_sfn_idx_r18_opts>;
 
       // member variables
-      bool                             ext = false;
       srs_periodicity_and_offset_r16_c periodicity_and_offset_p_r16;
       // ...
       // group 0
@@ -1128,7 +1116,6 @@ struct srs_pos_res_r16_s {
   };
 
   // member variables
-  bool                                ext                                   = false;
   bool                                spatial_relation_info_pos_r16_present = false;
   uint8_t                             srs_pos_res_id_r16                    = 0;
   tx_comb_r16_c_                      tx_comb_r16;
@@ -1221,7 +1208,6 @@ struct rach_cfg_generic_s {
   using ra_resp_win_v1700_e_ = enumerated<ra_resp_win_v1700_opts>;
 
   // member variables
-  bool                ext           = false;
   uint16_t            prach_cfg_idx = 0;
   msg1_fdm_e_         msg1_fdm;
   uint16_t            msg1_freq_start           = 0;
@@ -1272,7 +1258,6 @@ struct ra_prioritization_s {
   using scaling_factor_bi_e_ = enumerated<scaling_factor_bi_opts>;
 
   // member variables
-  bool                       ext                       = false;
   bool                       scaling_factor_bi_present = false;
   pwr_ramp_step_high_prio_e_ pwr_ramp_step_high_prio;
   scaling_factor_bi_e_       scaling_factor_bi;
@@ -1289,7 +1274,6 @@ struct ra_prioritization_slice_info_r17_s {
   using nsag_id_list_r17_l_ = bounded_array<fixed_bitstring<8>, 8>;
 
   // member variables
-  bool                ext = false;
   nsag_id_list_r17_l_ nsag_id_list_r17;
   ra_prioritization_s ra_prioritization_r17;
   // ...
@@ -1305,7 +1289,6 @@ using ra_prioritization_slice_info_list_r17_l = dyn_array<ra_prioritization_slic
 
 // RA-PrioritizationForSlicing-r17 ::= SEQUENCE
 struct ra_prioritization_for_slicing_r17_s {
-  bool                                    ext = false;
   ra_prioritization_slice_info_list_r17_l ra_prioritization_slice_info_list_r17;
   // ...
 
@@ -1400,7 +1383,6 @@ struct msg_a_pusch_res_r16_s {
   using msg_a_alpha_r16_e_ = enumerated<msg_a_alpha_r16_opts>;
 
   // member variables
-  bool                          ext                                            = false;
   bool                          msg_a_pusch_time_domain_alloc_r16_present      = false;
   bool                          start_symbol_and_len_msg_a_po_r16_present      = false;
   bool                          map_type_msg_a_pusch_r16_present               = false;
@@ -1524,7 +1506,6 @@ struct feature_combination_preambs_r17_s {
   using msg1_repeat_time_offset_ro_group_r18_e_ = enumerated<msg1_repeat_time_offset_ro_group_r18_opts>;
 
   // member variables
-  bool                      ext                                  = false;
   bool                      ssb_shared_ro_mask_idx_r17_present   = false;
   bool                      group_bcfg_r17_present               = false;
   bool                      separate_msg_a_pusch_cfg_r17_present = false;
@@ -1875,7 +1856,6 @@ struct rach_cfg_common_s {
   using feature_combination_preambs_list_r17_l_ = dyn_array<feature_combination_preambs_r17_s>;
 
   // member variables
-  bool                                            ext                                                  = false;
   bool                                            total_nof_ra_preambs_present                         = false;
   bool                                            ssb_per_rach_occasion_and_cb_preambs_per_ssb_present = false;
   bool                                            group_bcfg_present                                   = false;
@@ -1951,7 +1931,6 @@ struct rach_cfg_generic_two_step_ra_r16_s {
   using msg_b_resp_win_v1700_e_ = enumerated<msg_b_resp_win_v1700_opts>;
 
   // member variables
-  bool                              ext                                         = false;
   bool                              msg_a_prach_cfg_idx_r16_present             = false;
   bool                              msg_a_ro_fdm_r16_present                    = false;
   bool                              msg_a_ro_freq_start_r16_present             = false;
@@ -2289,7 +2268,6 @@ struct rach_cfg_common_two_step_ra_r16_s {
   using feature_combination_preambs_list_r17_l_ = dyn_array<feature_combination_preambs_r17_s>;
 
   // member variables
-  bool                               ext                                                            = false;
   bool                               msg_a_total_nof_ra_preambs_r16_present                         = false;
   bool                               msg_a_ssb_per_rach_occasion_and_cb_preambs_per_ssb_r16_present = false;
   bool                               msg_a_cb_preambs_per_ssb_per_shared_ro_r16_present             = false;
@@ -2342,7 +2320,6 @@ struct msg_a_cfg_common_r16_s {
 
 // AdditionalRACH-Config-r17 ::= SEQUENCE
 struct add_rach_cfg_r17_s {
-  bool                   ext                          = false;
   bool                   rach_cfg_common_r17_present  = false;
   bool                   msg_a_cfg_common_r17_present = false;
   rach_cfg_common_s      rach_cfg_common_r17;
@@ -2370,7 +2347,6 @@ struct advanced_receiver_mu_mimo_r18_s {
   using mcs_table_r18_e_ = enumerated<mcs_table_r18_opts>;
 
   // member variables
-  bool             ext                                      = false;
   bool             precoding_and_res_alloc_r18_present      = false;
   bool             pdsch_time_domain_alloc_r18_present      = false;
   bool             mcs_table_r18_present                    = false;
@@ -2412,7 +2388,6 @@ struct pdsch_time_domain_res_alloc_r16_s {
   using repeat_num_v1730_e_ = enumerated<repeat_num_v1730_opts>;
 
   // member variables
-  bool              ext                    = false;
   bool              k0_r16_present         = false;
   bool              repeat_num_r16_present = false;
   uint8_t           k0_r16                 = 0;
@@ -2597,7 +2572,6 @@ struct rate_match_pattern_s {
       };
 
       // member variables
-      bool                       ext                             = false;
       bool                       periodicity_and_pattern_present = false;
       fixed_bitstring<275>       res_blocks;
       symbols_in_res_block_c_    symbols_in_res_block;
@@ -2659,7 +2633,6 @@ struct rate_match_pattern_s {
   using dummy_e_ = enumerated<dummy_opts>;
 
   // member variables
-  bool                 ext                        = false;
   bool                 subcarrier_spacing_present = false;
   uint8_t              rate_match_pattern_id      = 0;
   pattern_type_c_      pattern_type;
@@ -2753,7 +2726,6 @@ struct coreset_s {
   using apply_indicated_tci_state_r18_e_ = enumerated<apply_indicated_tci_state_r18_opts>;
 
   // member variables
-  bool                                ext                              = false;
   bool                                tci_present_in_dci_present       = false;
   bool                                pdcch_dmrs_scrambling_id_present = false;
   uint8_t                             coreset_id                       = 0;
@@ -3040,7 +3012,6 @@ struct search_space_s {
   struct search_space_type_c_ {
     struct common_s_ {
       struct dci_format0_0_and_format1_0_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format2_0_s_ {
@@ -3100,16 +3071,13 @@ struct search_space_s {
         };
 
         // member variables
-        bool                   ext = false;
         nrof_candidates_sfi_s_ nrof_candidates_sfi;
         // ...
       };
       struct dci_format2_1_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format2_2_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format2_3_s_ {
@@ -3131,7 +3099,6 @@ struct search_space_s {
         using dummy2_e_ = enumerated<dummy2_opts>;
 
         // member variables
-        bool      ext            = false;
         bool      dummy1_present = false;
         dummy1_e_ dummy1;
         dummy2_e_ dummy2;
@@ -3194,7 +3161,6 @@ struct search_space_s {
       using dci_formats_sl_prs_r18_e_ = enumerated<dci_formats_sl_prs_r18_opts>;
 
       // member variables
-      bool           ext = false;
       dci_formats_e_ dci_formats;
       // ...
       // group 0
@@ -3343,7 +3309,6 @@ struct search_space_ext_r16_s {
         };
 
         // member variables
-        bool                      ext = false;
         nrof_candidates_ci_r16_s_ nrof_candidates_ci_r16;
         // ...
       };
@@ -3404,17 +3369,14 @@ struct search_space_ext_r16_s {
         };
 
         // member variables
-        bool                       ext = false;
         nrof_candidates_iab_r16_s_ nrof_candidates_iab_r16;
         // ...
       };
       struct dci_format2_6_r16_s_ {
-        bool ext = false;
         // ...
       };
 
       // member variables
-      bool                 ext                       = false;
       bool                 dci_format2_4_r16_present = false;
       bool                 dci_format2_5_r16_present = false;
       bool                 dci_format2_6_r16_present = false;
@@ -3594,19 +3556,15 @@ struct search_space_ext_v1700_s {
   struct search_space_type_r17_s_ {
     struct common_r17_s_ {
       struct dci_format4_0_r17_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format4_1_r17_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format4_2_r17_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format4_1_and_format4_2_r17_s_ {
-        bool ext = false;
         // ...
       };
       struct dci_format2_7_r17_s_ {
@@ -3646,7 +3604,6 @@ struct search_space_ext_v1700_s {
         };
 
         // member variables
-        bool                       ext = false;
         nrof_candidates_pei_r17_s_ nrof_candidates_pei_r17;
         // ...
       };
@@ -3693,12 +3650,10 @@ struct search_space_ext_v1800_s {
   struct search_space_type_r18_c_ {
     struct common_r18_s_ {
       struct dci_format2_9_r18_s_ {
-        bool ext = false;
         // ...
       };
 
       // member variables
-      bool                 ext                       = false;
       bool                 dci_format2_9_r18_present = false;
       dci_format2_9_r18_s_ dci_format2_9_r18;
       // ...
@@ -3712,7 +3667,6 @@ struct search_space_ext_v1800_s {
       using dci_formats_mc_r18_e_ = enumerated<dci_formats_mc_r18_opts>;
 
       // member variables
-      bool                  ext                        = false;
       bool                  dci_formats_mc_r18_present = false;
       dci_formats_mc_r18_e_ dci_formats_mc_r18;
       // ...
@@ -4276,7 +4230,6 @@ struct pdcch_cfg_common_s {
   using common_search_space_list_ext_r18_l_ = dyn_array<search_space_ext_v1800_s>;
 
   // member variables
-  bool                        ext                                 = false;
   bool                        coreset_zero_present                = false;
   bool                        common_coreset_present              = false;
   bool                        search_space_zero_present           = false;
@@ -4349,7 +4302,6 @@ using pdsch_time_domain_res_alloc_list_l = dyn_array<pdsch_time_domain_res_alloc
 
 // PDSCH-ConfigCommon ::= SEQUENCE
 struct pdsch_cfg_common_s {
-  bool                               ext = false;
   pdsch_time_domain_res_alloc_list_l pdsch_time_domain_alloc_list;
   // ...
 
@@ -4361,7 +4313,6 @@ struct pdsch_cfg_common_s {
 
 // BWP-DownlinkCommon ::= SEQUENCE
 struct bwp_dl_common_s {
-  bool                                ext                      = false;
   bool                                pdcch_cfg_common_present = false;
   bool                                pdsch_cfg_common_present = false;
   bwp_s                               generic_params;
@@ -4401,7 +4352,6 @@ using pusch_time_domain_res_alloc_list_l = dyn_array<pusch_time_domain_res_alloc
 
 // PUSCH-ConfigCommon ::= SEQUENCE
 struct pusch_cfg_common_s {
-  bool                               ext                                           = false;
   bool                               group_hop_enabled_transform_precoding_present = false;
   bool                               msg3_delta_preamb_present                     = false;
   bool                               p0_nominal_with_grant_present                 = false;
@@ -4440,7 +4390,6 @@ struct pucch_cfg_common_s {
   using add_prb_offset_r17_e_ = enumerated<add_prb_offset_r17_opts>;
 
   // member variables
-  bool               ext                      = false;
   bool               pucch_res_common_present = false;
   bool               hop_id_present           = false;
   bool               p0_nominal_present       = false;
@@ -4566,7 +4515,6 @@ struct rach_cfg_two_ta_r18_s {
   using two_ta_restricted_set_cfg_r18_e_ = enumerated<two_ta_restricted_set_cfg_r18_opts>;
 
   // member variables
-  bool                         ext                                 = false;
   bool                         ssb_per_rach_occasion_r18_present   = false;
   bool                         msg1_subcarrier_spacing_r18_present = false;
   uint8_t                      add_pci_and_rach_idx_r18            = 1;
@@ -4601,7 +4549,6 @@ struct bwp_ul_common_s {
   using preamb_trans_max_msg1_repeat_r18_e_ = enumerated<preamb_trans_max_msg1_repeat_r18_opts>;
 
   // member variables
-  bool                                ext                      = false;
   bool                                rach_cfg_common_present  = false;
   bool                                pusch_cfg_common_present = false;
   bool                                pucch_cfg_common_present = false;
@@ -4645,7 +4592,6 @@ struct bfr_csi_rs_res_s {
   using ra_occasion_list_l_ = dyn_array<uint16_t>;
 
   // member variables
-  bool                ext                   = false;
   bool                ra_preamb_idx_present = false;
   uint8_t             csi_rs                = 0;
   ra_occasion_list_l_ ra_occasion_list;
@@ -4660,7 +4606,6 @@ struct bfr_csi_rs_res_s {
 
 // BFR-SSB-Resource ::= SEQUENCE
 struct bfr_ssb_res_s {
-  bool    ext           = false;
   uint8_t ssb           = 0;
   uint8_t ra_preamb_idx = 0;
   // ...
@@ -4695,7 +4640,6 @@ struct dl_preemption_s {
   using int_cfg_per_serving_cell_l_ = dyn_array<int_cfg_per_serving_cell_s>;
 
   // member variables
-  bool                        ext      = false;
   uint32_t                    int_rnti = 0;
   time_freq_set_e_            time_freq_set;
   uint8_t                     dci_payload_size = 0;
@@ -4710,7 +4654,6 @@ struct dl_preemption_s {
 
 // PUSCH-TPC-CommandConfig ::= SEQUENCE
 struct pusch_tpc_cmd_cfg_s {
-  bool    ext                 = false;
   bool    tpc_idx_present     = false;
   bool    tpc_idx_sul_present = false;
   bool    target_cell_present = false;
@@ -4727,7 +4670,6 @@ struct pusch_tpc_cmd_cfg_s {
 
 // PUCCH-TPC-CommandConfig ::= SEQUENCE
 struct pucch_tpc_cmd_cfg_s {
-  bool    ext                         = false;
   bool    tpc_idx_pcell_present       = false;
   bool    tpc_idx_pucch_scell_present = false;
   uint8_t tpc_idx_pcell               = 1;
@@ -4747,7 +4689,6 @@ struct pucch_tpc_cmd_cfg_s {
 
 // SRS-TPC-CommandConfig ::= SEQUENCE
 struct srs_tpc_cmd_cfg_s {
-  bool    ext                            = false;
   bool    start_bit_of_format2_3_present = false;
   bool    field_type_format2_3_present   = false;
   uint8_t start_bit_of_format2_3         = 1;
@@ -4792,7 +4733,6 @@ struct ci_cfg_per_serving_cell_r16_s {
     using time_granularity_for_ci_r16_e_ = enumerated<time_granularity_for_ci_r16_opts>;
 
     // member variables
-    bool                           ext                         = false;
     bool                           time_dur_for_ci_r16_present = false;
     time_dur_for_ci_r16_e_         time_dur_for_ci_r16;
     time_granularity_for_ci_r16_e_ time_granularity_for_ci_r16;
@@ -4821,7 +4761,6 @@ struct ul_cancellation_r16_s {
   using ci_cfg_per_serving_cell_r16_l_ = dyn_array<ci_cfg_per_serving_cell_r16_s>;
 
   // member variables
-  bool                           ext                         = false;
   uint32_t                       ci_rnti_r16                 = 0;
   uint8_t                        dci_payload_size_for_ci_r16 = 0;
   ci_cfg_per_serving_cell_r16_l_ ci_cfg_per_serving_cell_r16;
@@ -4886,7 +4825,6 @@ struct pdcch_cfg_s {
   using search_spaces_to_add_mod_list_ext_v1800_l_ = dyn_array<search_space_ext_v1800_s>;
 
   // member variables
-  bool                                 ext                   = false;
   bool                                 dl_preemption_present = false;
   bool                                 tpc_pusch_present     = false;
   bool                                 tpc_pucch_present     = false;
@@ -4946,7 +4884,6 @@ struct ptrs_dl_cfg_s {
   using max_nrof_ports_r16_e_ = enumerated<max_nrof_ports_r16_opts>;
 
   // member variables
-  bool               ext                     = false;
   bool               freq_density_present    = false;
   bool               time_density_present    = false;
   bool               epre_ratio_present      = false;
@@ -4978,7 +4915,6 @@ struct dmrs_dl_cfg_s {
   using dmrs_add_position_e_ = enumerated<dmrs_add_position_opts>;
 
   // member variables
-  bool                           ext                       = false;
   bool                           dmrs_type_present         = false;
   bool                           dmrs_add_position_present = false;
   bool                           max_len_present           = false;
@@ -5059,7 +4995,6 @@ struct qcl_info_s {
   using qcl_type_e_ = enumerated<qcl_type_opts>;
 
   // member variables
-  bool        ext            = false;
   bool        cell_present   = false;
   bool        bwp_id_present = false;
   uint8_t     cell           = 0;
@@ -5086,7 +5021,6 @@ struct tci_state_s {
   using tag_id_ptr_r18_e_ = enumerated<tag_id_ptr_r18_opts>;
 
   // member variables
-  bool       ext               = false;
   bool       qcl_type2_present = false;
   uint8_t    tci_state_id      = 0;
   qcl_info_s qcl_type1;
@@ -5163,7 +5097,6 @@ using rate_match_pattern_group_l = dyn_array<rate_match_pattern_group_item_c_>;
 
 // CSI-FrequencyOccupation ::= SEQUENCE
 struct csi_freq_occupation_s {
-  bool     ext      = false;
   uint16_t start_rb = 0;
   uint16_t nrof_rbs = 24;
   // ...
@@ -5309,7 +5242,6 @@ struct csi_rs_res_map_s {
   };
 
   // member variables
-  bool                  ext                                       = false;
   bool                  first_ofdm_symbol_in_time_domain2_present = false;
   freq_domain_alloc_c_  freq_domain_alloc;
   nrof_ports_e_         nrof_ports;
@@ -5516,7 +5448,6 @@ private:
 
 // ZP-CSI-RS-Resource ::= SEQUENCE
 struct zp_csi_rs_res_s {
-  bool                             ext                            = false;
   bool                             periodicity_and_offset_present = false;
   uint8_t                          zp_csi_rs_res_id               = 0;
   csi_rs_res_map_s                 res_map;
@@ -5534,7 +5465,6 @@ struct zp_csi_rs_res_set_s {
   using zp_csi_rs_res_id_list_l_ = bounded_array<uint8_t, 16>;
 
   // member variables
-  bool                     ext                  = false;
   uint8_t                  zp_csi_rs_res_set_id = 0;
   zp_csi_rs_res_id_list_l_ zp_csi_rs_res_id_list;
   // ...
@@ -5671,7 +5601,6 @@ struct multi_pdsch_tdra_r17_s {
   using pdsch_tdra_list_r17_l_ = dyn_array<pdsch_time_domain_res_alloc_r16_s>;
 
   // member variables
-  bool                   ext = false;
   pdsch_tdra_list_r17_l_ pdsch_tdra_list_r17;
   // ...
 
@@ -6097,7 +6026,6 @@ struct pdsch_cfg_s {
   using xoverhead_multicast_r17_e_ = enumerated<xoverhead_multicast_r17_opts>;
 
   // member variables
-  bool                                                              ext                                      = false;
   bool                                                              data_scrambling_id_pdsch_present         = false;
   bool                                                              dmrs_dl_for_pdsch_map_type_a_present     = false;
   bool                                                              dmrs_dl_for_pdsch_map_type_b_present     = false;
@@ -6244,7 +6172,6 @@ struct sps_cfg_s {
   using pdsch_aggregation_factor_r16_e_ = enumerated<pdsch_aggregation_factor_r16_opts>;
 
   // member variables
-  bool           ext                 = false;
   bool           n1_pucch_an_present = false;
   bool           mcs_table_present   = false;
   periodicity_e_ periodicity;
@@ -6338,7 +6265,6 @@ struct radio_link_monitoring_rs_s {
   };
 
   // member variables
-  bool             ext                         = false;
   uint8_t          radio_link_monitoring_rs_id = 0;
   purpose_e_       purpose;
   detection_res_c_ detection_res;
@@ -6402,7 +6328,6 @@ struct beam_link_monitoring_rs_r17_s {
   };
 
   // member variables
-  bool                 ext                            = false;
   uint8_t              beam_link_monitoring_rs_id_r17 = 0;
   detection_res_r17_c_ detection_res_r17;
   // ...
@@ -6435,7 +6360,6 @@ struct beam_fail_detection_set_r17_s {
   using beam_fail_detection_timer_r17_e_ = enumerated<beam_fail_detection_timer_r17_opts>;
 
   // member variables
-  bool                                ext                                      = false;
   bool                                beam_fail_instance_max_count_r17_present = false;
   bool                                beam_fail_detection_timer_r17_present    = false;
   bfd_res_to_add_mod_list_r17_l_      bfd_res_to_add_mod_list_r17;
@@ -6487,7 +6411,6 @@ struct radio_link_monitoring_cfg_s {
   using beam_fail_detection_timer_e_ = enumerated<beam_fail_detection_timer_opts>;
 
   // member variables
-  bool                                  ext                                  = false;
   bool                                  beam_fail_instance_max_count_present = false;
   bool                                  beam_fail_detection_timer_present    = false;
   fail_detection_res_to_add_mod_list_l_ fail_detection_res_to_add_mod_list;
@@ -6584,7 +6507,6 @@ struct beam_fail_recovery_rs_cfg_r16_s {
   using candidate_beam_rs_list2_r17_l_ = dyn_array<candidate_beam_rs_r16_s>;
 
   // member variables
-  bool                          ext                        = false;
   bool                          rsrp_thres_bfr_r16_present = false;
   uint8_t                       rsrp_thres_bfr_r16         = 0;
   candidate_beam_rs_list_r16_l_ candidate_beam_rs_list_r16;
@@ -7693,7 +7615,6 @@ struct non_cell_defining_ssb_r17_s {
   using ssb_time_offset_r17_e_ = enumerated<ssb_time_offset_r17_opts>;
 
   // member variables
-  bool                   ext                         = false;
   bool                   ssb_periodicity_r17_present = false;
   bool                   ssb_time_offset_r17_present = false;
   uint32_t               absolute_freq_ssb_r17       = 0;
@@ -7729,7 +7650,6 @@ struct tci_in_dci_r18_s {
 
 // BWP-DownlinkDedicated ::= SEQUENCE
 struct bwp_dl_ded_s {
-  bool                                         ext                               = false;
   bool                                         pdcch_cfg_present                 = false;
   bool                                         pdsch_cfg_present                 = false;
   bool                                         sps_cfg_present                   = false;
@@ -7769,7 +7689,6 @@ struct bwp_dl_ded_s {
 
 // BWP-Downlink ::= SEQUENCE
 struct bwp_dl_s {
-  bool            ext                = false;
   bool            bwp_common_present = false;
   bool            bwp_ded_present    = false;
   uint8_t         bwp_id             = 0;
@@ -7785,7 +7704,6 @@ struct bwp_dl_s {
 
 // BWP-DownlinkDedicatedSDT-r17 ::= SEQUENCE
 struct bwp_dl_ded_sdt_r17_s {
-  bool                         ext                   = false;
   bool                         pdcch_cfg_r17_present = false;
   bool                         pdsch_cfg_r17_present = false;
   setup_release_c<pdcch_cfg_s> pdcch_cfg_r17;
@@ -8465,7 +8383,6 @@ struct pucch_pwr_ctrl_s {
   using pathloss_ref_rss_l_ = dyn_array<pucch_pathloss_ref_rs_s>;
 
   // member variables
-  bool                ext                                    = false;
   bool                delta_f_pucch_f0_present               = false;
   bool                delta_f_pucch_f1_present               = false;
   bool                delta_f_pucch_f2_present               = false;
@@ -8646,7 +8563,6 @@ struct pucch_res_ext_v1610_s {
   using apply_indicated_tci_state_r18_e_ = enumerated<apply_indicated_tci_state_r18_opts>;
 
   // member variables
-  bool                   ext                         = false;
   bool                   interlace_alloc_r16_present = false;
   bool                   format_v1610_present        = false;
   interlace_alloc_r16_s_ interlace_alloc_r16;
@@ -8680,7 +8596,6 @@ using dl_data_to_ul_ack_dci_1_2_r16_l = bounded_array<uint8_t, 8>;
 
 // PUCCH-SpatialRelationInfoExt-r16 ::= SEQUENCE
 struct pucch_spatial_relation_info_ext_r16_s {
-  bool    ext                                          = false;
   bool    pucch_spatial_relation_info_id_v1610_present = false;
   bool    pucch_pathloss_ref_rs_id_v1610_present       = false;
   uint8_t pucch_spatial_relation_info_id_v1610         = 9;
@@ -8734,7 +8649,6 @@ struct sched_request_res_cfg_ext_v1610_s {
   using phy_prio_idx_r16_e_ = enumerated<phy_prio_idx_r16_opts>;
 
   // member variables
-  bool                ext                      = false;
   bool                phy_prio_idx_r16_present = false;
   phy_prio_idx_r16_e_ phy_prio_idx_r16;
   // ...
@@ -8747,7 +8661,6 @@ struct sched_request_res_cfg_ext_v1610_s {
 
 // PUCCH-FormatConfigExt-r17 ::= SEQUENCE
 struct pucch_format_cfg_ext_r17_s {
-  bool                  ext                          = false;
   bool                  max_code_rate_lp_r17_present = false;
   pucch_max_code_rate_e max_code_rate_lp_r17;
   // ...
@@ -8879,7 +8792,6 @@ struct dmrs_bundling_pucch_cfg_r17_s {
   using pucch_freq_hop_interv_r17_e_ = enumerated<pucch_freq_hop_interv_r17_opts>;
 
   // member variables
-  bool                         ext                                   = false;
   bool                         pucch_dmrs_bundling_r17_present       = false;
   bool                         pucch_time_domain_win_len_r17_present = false;
   bool                         pucch_win_restart_r17_present         = false;
@@ -8995,7 +8907,6 @@ struct pucch_cfg_s {
   using sched_request_res_to_add_mod_list_ext_v1700_l_ = dyn_array<sched_request_res_cfg_ext_v1700_s>;
 
   // member variables
-  bool                                     ext                    = false;
   bool                                     format1_present        = false;
   bool                                     format2_present        = false;
   bool                                     format3_present        = false;
@@ -9122,7 +9033,6 @@ struct ptrs_ul_cfg_s {
   using max_nrof_ports_sdm_r18_e_ = enumerated<max_nrof_ports_sdm_r18_opts>;
 
   // member variables
-  bool                           ext                                 = false;
   bool                           transform_precoder_disabled_present = false;
   bool                           transform_precoder_enabled_present  = false;
   transform_precoder_disabled_s_ transform_precoder_disabled;
@@ -9162,7 +9072,6 @@ struct dmrs_ul_cfg_s {
   };
   using dmrs_add_position_e_ = enumerated<dmrs_add_position_opts>;
   struct transform_precoding_disabled_s_ {
-    bool     ext                    = false;
     bool     scrambling_id0_present = false;
     bool     scrambling_id1_present = false;
     uint32_t scrambling_id0         = 0;
@@ -9177,7 +9086,6 @@ struct dmrs_ul_cfg_s {
     void          to_json(json_writer& j) const;
   };
   struct transform_precoding_enabled_s_ {
-    bool     ext                   = false;
     bool     npusch_id_present     = false;
     bool     seq_group_hop_present = false;
     bool     seq_hop_present       = false;
@@ -9193,7 +9101,6 @@ struct dmrs_ul_cfg_s {
   };
 
   // member variables
-  bool                            ext                                  = false;
   bool                            dmrs_type_present                    = false;
   bool                            dmrs_add_position_present            = false;
   bool                            phase_tracking_rs_present            = false;
@@ -9616,7 +9523,6 @@ struct pusch_alloc_r16_s {
   using nof_slots_t_bo_ms_r17_e_ = enumerated<nof_slots_t_bo_ms_r17_opts>;
 
   // member variables
-  bool               ext                              = false;
   bool               map_type_r16_present             = false;
   bool               start_symbol_and_len_r16_present = false;
   bool               start_symbol_r16_present         = false;
@@ -9647,7 +9553,6 @@ struct pusch_time_domain_res_alloc_r16_s {
   using pusch_alloc_list_r16_l_ = dyn_array<pusch_alloc_r16_s>;
 
   // member variables
-  bool                    ext            = false;
   bool                    k2_r16_present = false;
   uint8_t                 k2_r16         = 0;
   pusch_alloc_list_r16_l_ pusch_alloc_list_r16;
@@ -9824,7 +9729,6 @@ struct invalid_symbol_pattern_r16_s {
   };
 
   // member variables
-  bool                           ext                                 = false;
   bool                           periodicity_and_pattern_r16_present = false;
   symbols_r16_c_                 symbols_r16;
   periodicity_and_pattern_r16_c_ periodicity_and_pattern_r16;
@@ -9902,7 +9806,6 @@ struct p0_pusch_set_r16_s {
   using p0_list_r16_l_ = bounded_array<int8_t, 2>;
 
   // member variables
-  bool           ext                 = false;
   uint8_t        p0_pusch_set_id_r16 = 0;
   p0_list_r16_l_ p0_list_r16;
   // ...
@@ -9942,7 +9845,6 @@ struct pusch_pwr_ctrl_v1610_s {
   using dummy_l_                              = dyn_array<dummy_pathloss_ref_rs_v1710_s>;
 
   // member variables
-  bool                                              ext                    = false;
   bool                                              olpc_param_set_present = false;
   pathloss_ref_rs_to_add_mod_list_size_ext_v1610_l_ pathloss_ref_rs_to_add_mod_list_size_ext_v1610;
   pathloss_ref_rs_to_release_list_size_ext_v1610_l_ pathloss_ref_rs_to_release_list_size_ext_v1610;
@@ -10138,7 +10040,6 @@ struct dmrs_bundling_pusch_cfg_r17_s {
   using pusch_freq_hop_interv_r17_e_ = enumerated<pusch_freq_hop_interv_r17_opts>;
 
   // member variables
-  bool                         ext                                   = false;
   bool                         pusch_dmrs_bundling_r17_present       = false;
   bool                         pusch_time_domain_win_len_r17_present = false;
   bool                         pusch_win_restart_r17_present         = false;
@@ -10535,7 +10436,6 @@ struct pusch_cfg_s {
   using apply_indicated_tci_state_r18_e_ = enumerated<apply_indicated_tci_state_r18_opts>;
 
   // member variables
-  bool                                                              ext                                  = false;
   bool                                                              data_scrambling_id_pusch_present     = false;
   bool                                                              tx_cfg_present                       = false;
   bool                                                              dmrs_ul_for_pusch_map_type_a_present = false;
@@ -10993,7 +10893,6 @@ struct cg_rrc_cfg_r18_s {
   };
 
   // member variables
-  bool                        ext                               = false;
   bool                        cg_rrc_retx_timer_r18_present     = false;
   bool                        cg_rrc_rsrp_thres_ssb_r18_present = false;
   bool                        rrc_ssb_subset_r18_present        = false;
@@ -11375,7 +11274,6 @@ struct cfg_grant_cfg_s {
     using apply_indicated_tci_state_r18_e_ = enumerated<apply_indicated_tci_state_r18_opts>;
 
     // member variables
-    bool                ext                          = false;
     bool                dmrs_seq_initization_present = false;
     bool                srs_res_ind_present          = false;
     bool                freq_hop_offset_present      = false;
@@ -11489,14 +11387,12 @@ struct cfg_grant_cfg_s {
   };
   using rep_k_v1710_e_ = enumerated<rep_k_v1710_opts>;
   struct uto_uci_cfg_r18_s_ {
-    bool    ext                      = false;
     uint8_t nrof_bits_in_uto_uci_r18 = 3;
     uint8_t beta_offset_uto_uci_r18  = 0;
     // ...
   };
 
   // member variables
-  bool                               ext                                  = false;
   bool                               freq_hop_present                     = false;
   bool                               mcs_table_present                    = false;
   bool                               mcs_table_transform_precoder_present = false;
@@ -11671,7 +11567,6 @@ struct srs_res_set_s {
       using aperiodic_srs_res_trigger_list_l_ = bounded_array<uint8_t, 2>;
 
       // member variables
-      bool    ext                       = false;
       bool    csi_rs_present            = false;
       bool    slot_offset_present       = false;
       uint8_t aperiodic_srs_res_trigger = 1;
@@ -11687,13 +11582,11 @@ struct srs_res_set_s {
       void          to_json(json_writer& j) const;
     };
     struct semi_persistent_s_ {
-      bool    ext                       = false;
       bool    associated_csi_rs_present = false;
       uint8_t associated_csi_rs         = 0;
       // ...
     };
     struct periodic_s_ {
-      bool    ext                       = false;
       bool    associated_csi_rs_present = false;
       uint8_t associated_csi_rs         = 0;
       // ...
@@ -11779,7 +11672,6 @@ struct srs_res_set_s {
   using apply_indicated_tci_state_r18_e_ = enumerated<apply_indicated_tci_state_r18_opts>;
 
   // member variables
-  bool                              ext                                    = false;
   bool                              alpha_present                          = false;
   bool                              p0_present                             = false;
   bool                              pathloss_ref_rs_present                = false;
@@ -11823,7 +11715,6 @@ struct srs_cfg_s {
   using srs_pos_res_to_add_mod_list_r16_l_         = dyn_array<srs_pos_res_r16_s>;
 
   // member variables
-  bool                           ext                      = false;
   bool                           tpc_accumulation_present = false;
   srs_res_set_to_release_list_l_ srs_res_set_to_release_list;
   srs_res_set_to_add_mod_list_l_ srs_res_set_to_add_mod_list;
@@ -11925,7 +11816,6 @@ struct beam_fail_recovery_cfg_s {
   using beam_fail_recovery_timer_e_ = enumerated<beam_fail_recovery_timer_opts>;
 
   // member variables
-  bool                        ext                              = false;
   bool                        root_seq_idx_bfr_present         = false;
   bool                        rach_cfg_bfr_present             = false;
   bool                        rsrp_thres_ssb_present           = false;
@@ -11982,7 +11872,6 @@ struct lbt_fail_recovery_cfg_r16_s {
   using lbt_fail_detection_timer_r16_e_ = enumerated<lbt_fail_detection_timer_r16_opts>;
 
   // member variables
-  bool                               ext = false;
   lbt_fail_instance_max_count_r16_e_ lbt_fail_instance_max_count_r16;
   lbt_fail_detection_timer_r16_e_    lbt_fail_detection_timer_r16;
   // ...
@@ -12077,7 +11966,6 @@ struct tci_ul_state_r17_s {
   using tag_id_ptr_r18_e_ = enumerated<tag_id_ptr_r18_opts>;
 
   // member variables
-  bool           ext                            = false;
   bool           serving_cell_id_r17_present    = false;
   bool           bwp_id_r17_present             = false;
   bool           add_pci_r17_present            = false;
@@ -12226,7 +12114,6 @@ struct bwp_ul_ded_s {
   using pathloss_ref_rs_to_release_list_r17_l_ = dyn_array<uint8_t>;
 
   // member variables
-  bool                                      ext                            = false;
   bool                                      pucch_cfg_present              = false;
   bool                                      pusch_cfg_present              = false;
   bool                                      cfg_grant_cfg_present          = false;
@@ -12271,7 +12158,6 @@ struct bwp_ul_ded_s {
 
 // BWP-Uplink ::= SEQUENCE
 struct bwp_ul_s {
-  bool            ext                = false;
   bool            bwp_common_present = false;
   bool            bwp_ded_present    = false;
   uint8_t         bwp_id             = 0;
@@ -12287,7 +12173,6 @@ struct bwp_ul_s {
 
 // BWP-UplinkDedicatedSDT-r17 ::= SEQUENCE
 struct bwp_ul_ded_sdt_r17_s {
-  bool                                ext                   = false;
   bool                                pusch_cfg_r17_present = false;
   setup_release_c<pusch_cfg_s>        pusch_cfg_r17;
   cfg_grant_cfg_to_add_mod_list_r16_l cfg_grant_cfg_to_add_mod_list_r17;

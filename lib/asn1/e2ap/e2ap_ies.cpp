@@ -94,7 +94,8 @@ OCUDUASN_CODE cause_service_layer_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE cause_service_layer_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(service_layer_cause.unpack(bref));
 
   if (ext) {
@@ -372,7 +373,8 @@ OCUDUASN_CODE ric_request_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_request_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ric_requestor_id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
   HANDLE_CODE(unpack_integer(ric_instance_id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
 
@@ -409,7 +411,8 @@ OCUDUASN_CODE crit_diagnostics_ie_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE crit_diagnostics_ie_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ie_crit.unpack(bref));
   HANDLE_CODE(unpack_integer(ie_id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
   HANDLE_CODE(type_of_error.unpack(bref));
@@ -459,7 +462,8 @@ OCUDUASN_CODE crit_diagnostics_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE crit_diagnostics_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(proc_code_present, 1));
   HANDLE_CODE(bref.unpack(trigger_msg_present, 1));
   HANDLE_CODE(bref.unpack(proc_crit_present, 1));
@@ -526,7 +530,8 @@ OCUDUASN_CODE e2node_component_cfg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_cfg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(e2node_component_request_part.unpack(bref));
   HANDLE_CODE(e2node_component_resp_part.unpack(bref));
 
@@ -559,7 +564,8 @@ OCUDUASN_CODE e2node_component_cfg_ack_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_cfg_ack_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(fail_cause_present, 1));
 
   HANDLE_CODE(upd_outcome.unpack(bref));
@@ -600,7 +606,8 @@ OCUDUASN_CODE e2node_component_interface_ng_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_ng_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(amf_name.unpack(bref));
 
   if (ext) {
@@ -658,7 +665,8 @@ OCUDUASN_CODE global_gnb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_gnb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(gnb_id.unpack(bref));
 
@@ -848,7 +856,8 @@ OCUDUASN_CODE globalng_enb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE globalng_enb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(enb_id.unpack(bref));
 
@@ -1013,7 +1022,8 @@ OCUDUASN_CODE e2node_component_interface_xn_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_xn_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(global_ng_ran_node_id.unpack(bref));
 
   if (ext) {
@@ -1040,7 +1050,8 @@ OCUDUASN_CODE e2node_component_interface_e1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_e1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(gnb_cu_up_id, bref, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
   if (ext) {
@@ -1066,7 +1077,8 @@ OCUDUASN_CODE e2node_component_interface_f1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_f1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(gnb_du_id, bref, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
   if (ext) {
@@ -1092,7 +1104,8 @@ OCUDUASN_CODE e2node_component_interface_w1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_w1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ng_enb_du_id, bref, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
   if (ext) {
@@ -1118,7 +1131,8 @@ OCUDUASN_CODE e2node_component_interface_s1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_s1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(mme_name.unpack(bref));
 
   if (ext) {
@@ -1335,7 +1349,8 @@ OCUDUASN_CODE global_enb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_enb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(enb_id.unpack(bref));
 
@@ -1396,7 +1411,8 @@ OCUDUASN_CODE globalen_gnb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE globalen_gnb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(gnb_id.unpack(bref));
 
@@ -1433,7 +1449,8 @@ OCUDUASN_CODE e2node_component_interface_x2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2node_component_interface_x2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(global_enb_id_present, 1));
   HANDLE_CODE(bref.unpack(global_en_gnb_id_present, 1));
 
@@ -1771,7 +1788,8 @@ OCUDUASN_CODE global_e2node_gnb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_e2node_gnb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(global_en_gnb_id_present, 1));
   HANDLE_CODE(bref.unpack(gnb_cu_up_id_present, 1));
   HANDLE_CODE(bref.unpack(gnb_du_id_present, 1));
@@ -1830,7 +1848,8 @@ OCUDUASN_CODE global_e2node_en_gnb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_e2node_en_gnb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(en_gnb_cu_up_id_present, 1));
   HANDLE_CODE(bref.unpack(en_gnb_du_id_present, 1));
 
@@ -1881,7 +1900,8 @@ OCUDUASN_CODE global_e2node_ng_enb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_e2node_ng_enb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(global_enb_id_present, 1));
   HANDLE_CODE(bref.unpack(ng_enb_du_id_present, 1));
 
@@ -1924,7 +1944,8 @@ OCUDUASN_CODE global_e2node_enb_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_e2node_enb_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(global_enb_id.unpack(bref));
 
   if (ext) {
@@ -2142,7 +2163,8 @@ OCUDUASN_CODE global_ric_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE global_ric_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(ric_id.unpack(bref));
 
@@ -2220,7 +2242,8 @@ OCUDUASN_CODE ric_load_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_load_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(load_status_present, 1));
   HANDLE_CODE(bref.unpack(load_estimate_present, 1));
 
@@ -2292,7 +2315,8 @@ OCUDUASN_CODE ric_service_load_confirm_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_service_load_confirm_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_service_report_load_confirm_present, 1));
   HANDLE_CODE(bref.unpack(ric_service_insert_load_confirm_present, 1));
   HANDLE_CODE(bref.unpack(ric_service_ctrl_load_confirm_present, 1));
@@ -2372,7 +2396,8 @@ OCUDUASN_CODE ric_service_load_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_service_load_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_service_report_load_info_present, 1));
   HANDLE_CODE(bref.unpack(ric_service_insert_load_info_present, 1));
   HANDLE_CODE(bref.unpack(ric_service_ctrl_load_info_present, 1));
@@ -2457,7 +2482,8 @@ OCUDUASN_CODE ric_service_load_request_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_service_load_request_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_service_report_load_request_present, 1));
   HANDLE_CODE(bref.unpack(ric_service_insert_load_request_present, 1));
   HANDLE_CODE(bref.unpack(ric_service_ctrl_load_request_present, 1));
@@ -2521,7 +2547,8 @@ OCUDUASN_CODE ric_sub_audit_flag_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_sub_audit_flag_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(listed_records_only_present, 1));
 
   if (listed_records_only_present) {
@@ -2584,7 +2611,8 @@ OCUDUASN_CODE ric_subsequent_action_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_subsequent_action_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_subsequent_action_type.unpack(bref));
   HANDLE_CODE(ric_time_to_wait.unpack(bref));
 
@@ -2655,7 +2683,8 @@ OCUDUASN_CODE tnl_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE tnl_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(tnl_port_present, 1));
 
   HANDLE_CODE(tnl_address.unpack(bref));

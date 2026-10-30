@@ -61,8 +61,7 @@ fill_asn1_pdu_session_resource_release_response(asn1::ngap::pdu_session_res_rele
     asn1::ngap::pdu_session_res_release_resp_transfer_s res_release_resp_transfer;
 
     if (cu_cp_pdu_session_res_released_item.resp_transfer.secondary_rat_usage_info.has_value()) {
-      const auto& ocudu_rat_usage   = *cu_cp_pdu_session_res_released_item.resp_transfer.secondary_rat_usage_info;
-      res_release_resp_transfer.ext = true;
+      const auto& ocudu_rat_usage = *cu_cp_pdu_session_res_released_item.resp_transfer.secondary_rat_usage_info;
       res_release_resp_transfer.ie_exts_present                          = true;
       res_release_resp_transfer.ie_exts.secondary_rat_usage_info_present = true;
       secondary_rat_usage_info_s& asn1_rat_resp = res_release_resp_transfer.ie_exts.secondary_rat_usage_info;
@@ -112,7 +111,6 @@ fill_asn1_pdu_session_resource_release_response(asn1::ngap::pdu_session_res_rele
       }
 
     } else {
-      res_release_resp_transfer.ext = false;
     }
 
     // Pack PDU session resource release response transfer container.

@@ -18,11 +18,11 @@ OCUDUASN_CODE add_supported_format_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ric_ctrl_outcome_format_type_present;
   group_flags[1] |= ric_ctrl_action_id_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_unconstrained_integer(bref, ric_ctrl_hdr_format_type, false, true));
   HANDLE_CODE(pack_unconstrained_integer(bref, ric_ctrl_msg_format_type, false, true));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -40,7 +40,8 @@ OCUDUASN_CODE add_supported_format_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE add_supported_format_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(ric_ctrl_hdr_format_type, bref, false, true));
   HANDLE_CODE(unpack_unconstrained_integer(ric_ctrl_msg_format_type, bref, false, true));
 
@@ -66,13 +67,11 @@ void add_supported_format_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ric-ControlHeaderFormat-Type", ric_ctrl_hdr_format_type);
   j.write_int("ric-ControlMessageFormat-Type", ric_ctrl_msg_format_type);
-  if (ext) {
-    if (ric_ctrl_outcome_format_type_present) {
-      j.write_int("ric-ControlOutcomeFormat-Type", ric_ctrl_outcome_format_type);
-    }
-    if (ric_ctrl_action_id_present) {
-      j.write_int("ric-ControlAction-ID", ric_ctrl_action_id);
-    }
+  if (ric_ctrl_outcome_format_type_present) {
+    j.write_int("ric-ControlOutcomeFormat-Type", ric_ctrl_outcome_format_type);
+  }
+  if (ric_ctrl_action_id_present) {
+    j.write_int("ric-ControlAction-ID", ric_ctrl_action_id);
   }
   j.end_obj();
 }
@@ -88,7 +87,8 @@ OCUDUASN_CODE ran_param_testing_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_testing_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_type.unpack(bref));
 
@@ -238,7 +238,8 @@ OCUDUASN_CODE ran_param_testing_item_choice_list_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_testing_item_choice_list_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_param_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -268,7 +269,8 @@ OCUDUASN_CODE ran_param_testing_item_choice_structure_s::pack(bit_ref& bref) con
 }
 OCUDUASN_CODE ran_param_testing_item_choice_structure_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_param_structure, bref, 1, 65535, true));
 
   if (ext) {
@@ -533,7 +535,8 @@ OCUDUASN_CODE ran_param_testing_item_choice_elem_true_s::pack(bit_ref& bref) con
 }
 OCUDUASN_CODE ran_param_testing_item_choice_elem_true_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ran_param_value.unpack(bref));
 
   if (ext) {
@@ -706,7 +709,8 @@ OCUDUASN_CODE ran_param_testing_item_choice_elem_false_s::pack(bit_ref& bref) co
 }
 OCUDUASN_CODE ran_param_testing_item_choice_elem_false_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_value_present, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
@@ -754,7 +758,8 @@ OCUDUASN_CODE event_trigger_ue_info_item_choice_individual_s::pack(bit_ref& bref
 }
 OCUDUASN_CODE event_trigger_ue_info_item_choice_individual_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_param_testing_present;
   HANDLE_CODE(bref.unpack(ran_param_testing_present, 1));
 
@@ -794,7 +799,8 @@ OCUDUASN_CODE event_trigger_ue_info_item_choice_group_s::pack(bit_ref& bref) con
 }
 OCUDUASN_CODE event_trigger_ue_info_item_choice_group_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_param_testing, bref, 1, 255, true));
 
   if (ext) {
@@ -829,7 +835,8 @@ OCUDUASN_CODE ue_query_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ue_query_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_param_testing_present;
   HANDLE_CODE(bref.unpack(ran_param_testing_present, 1));
 
@@ -875,7 +882,8 @@ OCUDUASN_CODE associated_ue_info_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE associated_ue_info_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
   HANDLE_CODE(unpack_integer(ue_filt_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -1077,7 +1085,8 @@ OCUDUASN_CODE associated_ue_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE associated_ue_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(associated_ue_info_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -1192,7 +1201,8 @@ OCUDUASN_CODE ran_param_definition_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_definition_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ran_param_definition_choice.unpack(bref));
 
   if (ext) {
@@ -1225,7 +1235,8 @@ OCUDUASN_CODE ran_param_definition_choice_list_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_definition_choice_list_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_definition_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -1262,7 +1273,8 @@ OCUDUASN_CODE ran_param_definition_choice_list_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_definition_choice_list_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_param_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -1298,7 +1310,8 @@ OCUDUASN_CODE ran_param_definition_choice_structure_item_s::pack(bit_ref& bref) 
 }
 OCUDUASN_CODE ran_param_definition_choice_structure_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_definition_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -1335,7 +1348,8 @@ OCUDUASN_CODE ran_param_definition_choice_structure_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_definition_choice_structure_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_param_structure, bref, 1, 65535, true));
 
   if (ext) {
@@ -1360,11 +1374,11 @@ OCUDUASN_CODE call_process_breakpoint_ran_param_item_s::pack(bit_ref& bref) cons
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1377,7 +1391,8 @@ OCUDUASN_CODE call_process_breakpoint_ran_param_item_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE call_process_breakpoint_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -1398,11 +1413,9 @@ void call_process_breakpoint_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -1455,11 +1468,11 @@ OCUDUASN_CODE cell_identif_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1472,7 +1485,8 @@ OCUDUASN_CODE cell_identif_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE cell_identif_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -1493,11 +1507,9 @@ void cell_identif_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -1507,11 +1519,11 @@ OCUDUASN_CODE ctrl_action_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1524,7 +1536,8 @@ OCUDUASN_CODE ctrl_action_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ctrl_action_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -1545,11 +1558,9 @@ void ctrl_action_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -1559,11 +1570,11 @@ OCUDUASN_CODE ctrl_outcome_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1576,7 +1587,8 @@ OCUDUASN_CODE ctrl_outcome_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ctrl_outcome_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -1597,11 +1609,9 @@ void ctrl_outcome_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -1611,10 +1621,10 @@ OCUDUASN_CODE e2sm_rc_action_definition_format1_item_s::pack(bit_ref& bref) cons
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1627,7 +1637,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format1_item_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format1_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
   if (ext) {
@@ -1646,11 +1657,9 @@ void e2sm_rc_action_definition_format1_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -1665,7 +1674,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_to_be_reported_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -1695,7 +1705,8 @@ OCUDUASN_CODE ran_param_value_type_choice_elem_true_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_value_type_choice_elem_true_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ran_param_value.unpack(bref));
 
   if (ext) {
@@ -1726,7 +1737,8 @@ OCUDUASN_CODE ran_param_value_type_choice_elem_false_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE ran_param_value_type_choice_elem_false_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_value_present, 1));
 
   if (ran_param_value_present) {
@@ -1882,7 +1894,8 @@ OCUDUASN_CODE ran_param_structure_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_structure_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -1915,7 +1928,8 @@ OCUDUASN_CODE ran_param_structure_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_structure_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool seq_of_ran_params_present;
   HANDLE_CODE(bref.unpack(seq_of_ran_params_present, 1));
 
@@ -1952,7 +1966,8 @@ OCUDUASN_CODE ran_param_value_type_choice_structure_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_value_type_choice_structure_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ran_param_structure.unpack(bref));
 
   if (ext) {
@@ -1979,7 +1994,8 @@ OCUDUASN_CODE ran_param_list_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_list_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(list_of_ran_param, bref, 1, 65535, true));
 
   if (ext) {
@@ -2009,7 +2025,8 @@ OCUDUASN_CODE ran_param_value_type_choice_list_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_param_value_type_choice_list_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ran_param_list.unpack(bref));
 
   if (ext) {
@@ -2037,7 +2054,8 @@ OCUDUASN_CODE ric_policy_action_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_policy_action_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -2061,7 +2079,7 @@ OCUDUASN_CODE ric_policy_action_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ric_policy_decision_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ran_params_list.size() > 0, 1));
 
   HANDLE_CODE(pack_integer(bref, ric_policy_action_id, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -2069,7 +2087,7 @@ OCUDUASN_CODE ric_policy_action_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_dyn_seq_of(bref, ran_params_list, 1, 65535, true));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -2082,7 +2100,8 @@ OCUDUASN_CODE ric_policy_action_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ric_policy_action_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_params_list_present;
   HANDLE_CODE(bref.unpack(ran_params_list_present, 1));
 
@@ -2114,10 +2133,8 @@ void ric_policy_action_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (ric_policy_decision_present) {
-      j.write_str("ric-PolicyDecision", ric_policy_decision.to_string());
-    }
+  if (ric_policy_decision_present) {
+    j.write_str("ric-PolicyDecision", ric_policy_decision.to_string());
   }
   j.end_obj();
 }
@@ -2133,7 +2150,7 @@ OCUDUASN_CODE e2sm_rc_action_definition_format2_item_s::pack(bit_ref& bref) cons
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ric_policy_condition_id_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ric_policy_condition_definition.size() > 0, 1));
 
   HANDLE_CODE(ric_policy_action.pack(bref));
@@ -2141,7 +2158,7 @@ OCUDUASN_CODE e2sm_rc_action_definition_format2_item_s::pack(bit_ref& bref) cons
     HANDLE_CODE(pack_dyn_seq_of(bref, ric_policy_condition_definition, 1, 255, true));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -2154,7 +2171,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format2_item_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format2_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ric_policy_condition_definition_present;
   HANDLE_CODE(bref.unpack(ric_policy_condition_definition_present, 1));
 
@@ -2187,10 +2205,8 @@ void e2sm_rc_action_definition_format2_item_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (ric_policy_condition_id_present) {
-      j.write_int("ric-PolicyConditionID", ric_policy_condition_id);
-    }
+  if (ric_policy_condition_id_present) {
+    j.write_int("ric-PolicyConditionID", ric_policy_condition_id);
   }
   j.end_obj();
 }
@@ -2205,7 +2221,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_policy_conditions_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -2230,10 +2247,10 @@ OCUDUASN_CODE e2sm_rc_action_definition_format3_item_s::pack(bit_ref& bref) cons
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -2246,7 +2263,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format3_item_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format3_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
   if (ext) {
@@ -2265,11 +2283,9 @@ void e2sm_rc_action_definition_format3_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -2290,7 +2306,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ue_id_present, 1));
 
   HANDLE_CODE(unpack_integer(ric_insert_ind_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -2326,10 +2343,10 @@ OCUDUASN_CODE e2sm_rc_action_definition_format4_ranp_item_s::pack(bit_ref& bref)
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -2342,7 +2359,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format4_ranp_item_s::pack(bit_ref& bref)
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format4_ranp_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
   if (ext) {
@@ -2361,11 +2379,9 @@ void e2sm_rc_action_definition_format4_ranp_item_s::to_json(json_writer& j) cons
 {
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -2381,7 +2397,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format4_ind_item_s::pack(bit_ref& bref) 
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format4_ind_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ric_insert_ind_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_insert_ind_list, bref, 1, 65535, true));
 
@@ -2414,7 +2431,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format4_style_item_s::pack(bit_ref& bref
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format4_style_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(requested_insert_style_type, bref, false, true));
   HANDLE_CODE(unpack_dyn_seq_of(ric_insert_ind_list, bref, 1, 63, true));
 
@@ -2451,7 +2469,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_format4_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_action_definition_format4_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ue_id_present, 1));
 
   HANDLE_CODE(unpack_dyn_seq_of(ric_insert_style_list, bref, 1, 63, true));
@@ -2491,7 +2510,8 @@ OCUDUASN_CODE e2sm_rc_action_definition_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_action_definition_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(ric_style_type, bref, false, true));
   HANDLE_CODE(ric_action_definition_formats.unpack(bref));
 
@@ -2724,7 +2744,8 @@ OCUDUASN_CODE e2sm_rc_call_process_id_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_call_process_id_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ric_call_process_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
 
   if (ext) {
@@ -2750,7 +2771,8 @@ OCUDUASN_CODE e2sm_rc_call_process_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_call_process_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_call_process_id_formats.unpack(bref));
 
   if (ext) {
@@ -2820,7 +2842,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_hdr_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_hdr_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_ctrl_decision_present, 1));
 
   HANDLE_CODE(ue_id.unpack(bref));
@@ -2873,7 +2896,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_hdr_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_hdr_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ue_id_present, 1));
   HANDLE_CODE(bref.unpack(ric_ctrl_decision_present, 1));
 
@@ -2925,7 +2949,8 @@ OCUDUASN_CODE ue_group_definition_id_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ue_group_definition_id_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -2962,7 +2987,8 @@ OCUDUASN_CODE ue_group_definition_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ue_group_definition_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ue_group_definition_id_list, bref, 1, 255, true));
 
   if (ext) {
@@ -2995,7 +3021,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_hdr_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_hdr_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ue_group_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
   HANDLE_CODE(ue_group_definition.unpack(bref));
   HANDLE_CODE(unpack_unconstrained_integer(ric_style_type, bref, false, true));
@@ -3035,7 +3062,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_hdr_format4_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_hdr_format4_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_ctrl_decision_present, 1));
 
   HANDLE_CODE(partial_ue_id.unpack(bref));
@@ -3080,7 +3108,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_hdr_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_hdr_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_ctrl_hdr_formats.unpack(bref));
 
   if (ext) {
@@ -3311,7 +3340,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format1_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format1_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -3340,7 +3370,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 0, 65535, true));
 
   if (ext) {
@@ -3371,7 +3402,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format2_ctrl_action_item_s::pack(bit_ref& bref) c
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format2_ctrl_action_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ric_ctrl_action_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
   HANDLE_CODE(ran_p_list.unpack(bref));
 
@@ -3401,7 +3433,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format2_style_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format2_style_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(indicated_ctrl_style_type, bref, false, true));
   HANDLE_CODE(unpack_dyn_seq_of(ric_ctrl_action_list, bref, 1, 63, true));
 
@@ -3433,7 +3466,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_ctrl_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -3464,7 +3498,8 @@ OCUDUASN_CODE entity_specific_ran_p_ctrl_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE entity_specific_ran_p_ctrl_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -3495,7 +3530,8 @@ OCUDUASN_CODE e2sm_rc_entity_filt_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_entity_filt_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(entity_filt_id, bref, (uint16_t)1u, (uint16_t)255u, true, true));
   HANDLE_CODE(unpack_dyn_seq_of(entity_filt_definition, bref, 1, 255, true));
   HANDLE_CODE(unpack_dyn_seq_of(entity_specific_ctrl_ran_p_list, bref, 1, 65535, true));
@@ -3534,7 +3570,8 @@ OCUDUASN_CODE entity_agnostic_ran_p_ctrl_params_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE entity_agnostic_ran_p_ctrl_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -3571,7 +3608,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(list_of_entity_filts_present, 1));
   HANDLE_CODE(bref.unpack(entity_agnostic_ctrl_ran_p_list_present, 1));
 
@@ -3623,7 +3661,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format4_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format4_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_definition_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -3658,7 +3697,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format4_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_format4_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 0, 65535, true));
 
   if (ext) {
@@ -3690,7 +3730,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_msg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_ctrl_msg_formats.unpack(bref));
 
   if (ext) {
@@ -3948,7 +3989,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format1_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format1_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value.unpack(bref));
 
@@ -3977,7 +4019,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 0, 255, true));
 
   if (ext) {
@@ -4008,7 +4051,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_ranp_item_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_ranp_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value.unpack(bref));
 
@@ -4038,7 +4082,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_ctrl_outcome_item_s::pack(bit_ref& br
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_ctrl_outcome_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ric_ctrl_action_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 1, 65535, true));
 
@@ -4071,7 +4116,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_style_item_s::pack(bit_ref& bref) con
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_style_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(indicated_ctrl_style_type, bref, false, true));
   HANDLE_CODE(unpack_dyn_seq_of(ric_ctrl_outcome_list, bref, 1, 63, true));
 
@@ -4103,7 +4149,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_ctrl_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -4134,7 +4181,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format3_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format3_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -4163,7 +4211,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 0, 255, true));
 
   if (ext) {
@@ -4193,7 +4242,8 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ctrl_outcome_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_ctrl_outcome_formats.unpack(bref));
 
   if (ext) {
@@ -4402,7 +4452,8 @@ OCUDUASN_CODE msg_type_choice_ni_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE msg_type_choice_ni_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ni_id_present, 1));
   HANDLE_CODE(bref.unpack(ni_msg_present, 1));
 
@@ -4445,7 +4496,8 @@ OCUDUASN_CODE msg_type_choice_rrc_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE msg_type_choice_rrc_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(rrc_msg.unpack(bref));
 
   if (ext) {
@@ -4614,7 +4666,8 @@ OCUDUASN_CODE event_trigger_ue_info_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE event_trigger_ue_info_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
   HANDLE_CODE(unpack_integer(event_trigger_ue_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -4788,7 +4841,8 @@ OCUDUASN_CODE event_trigger_ue_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE event_trigger_ue_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ue_info_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -4823,7 +4877,8 @@ OCUDUASN_CODE event_trigger_ue_event_info_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE event_trigger_ue_event_info_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
   HANDLE_CODE(unpack_integer(ue_event_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -4857,7 +4912,8 @@ OCUDUASN_CODE event_trigger_ue_event_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE event_trigger_ue_event_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ue_event_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -4905,7 +4961,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format1_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format1_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(msg_direction_present, 1));
   HANDLE_CODE(bref.unpack(associated_ue_info_present, 1));
   HANDLE_CODE(bref.unpack(associated_ue_event_present, 1));
@@ -4976,7 +5033,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(global_associated_ue_info_present, 1));
 
   HANDLE_CODE(unpack_dyn_seq_of(msg_list, bref, 1, 65535, true));
@@ -5025,7 +5083,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool associated_e2_node_info_present;
   HANDLE_CODE(bref.unpack(associated_e2_node_info_present, 1));
   HANDLE_CODE(bref.unpack(associated_ue_info_present, 1));
@@ -5074,7 +5133,8 @@ OCUDUASN_CODE event_trigger_cell_info_item_choice_individual_s::pack(bit_ref& br
 }
 OCUDUASN_CODE event_trigger_cell_info_item_choice_individual_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(cell_global_id.unpack(bref));
 
   if (ext) {
@@ -5101,7 +5161,8 @@ OCUDUASN_CODE event_trigger_cell_info_item_choice_group_s::pack(bit_ref& bref) c
 }
 OCUDUASN_CODE event_trigger_cell_info_item_choice_group_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_param_testing, bref, 1, 255, true));
 
   if (ext) {
@@ -5137,7 +5198,8 @@ OCUDUASN_CODE event_trigger_cell_info_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE event_trigger_cell_info_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
   HANDLE_CODE(unpack_integer(event_trigger_cell_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -5311,7 +5373,8 @@ OCUDUASN_CODE event_trigger_cell_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE event_trigger_cell_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(cell_info_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -5351,7 +5414,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format3_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format3_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(associated_cell_info_present, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
@@ -5395,7 +5459,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(e2_node_info_change_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -5437,7 +5502,8 @@ OCUDUASN_CODE trigger_type_choice_rrc_state_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_rrc_state_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
   HANDLE_CODE(state_changed_to.unpack(bref));
@@ -5471,7 +5537,8 @@ OCUDUASN_CODE trigger_type_choice_rrc_state_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_rrc_state_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(rrc_state_list, bref, 1, 8, true));
 
   if (ext) {
@@ -5501,7 +5568,8 @@ OCUDUASN_CODE trigger_type_choice_ue_id_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_ue_id_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ue_id_change_id, bref, (uint16_t)1u, (uint16_t)512u, true, true));
 
   if (ext) {
@@ -5527,7 +5595,8 @@ OCUDUASN_CODE trigger_type_choice_l2state_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_l2state_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(associated_l2variables, bref, 1, 255, true));
 
   if (ext) {
@@ -5557,7 +5626,8 @@ OCUDUASN_CODE trigger_type_choice_ue_context_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_ue_context_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(associated_ue_ctxt_variables, bref, 1, 255, true));
 
   if (ext) {
@@ -5587,7 +5657,8 @@ OCUDUASN_CODE trigger_type_choice_mim_oand_b_fcfg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_mim_oand_b_fcfg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(mim_otrans_mode_state.unpack(bref));
 
   if (ext) {
@@ -5651,7 +5722,8 @@ OCUDUASN_CODE trigger_type_choice_l2_ma_csch_chg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE trigger_type_choice_l2_ma_csch_chg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(l2_ma_csch_chg_type.unpack(bref));
 
   if (ext) {
@@ -5913,7 +5985,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format4_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format4_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(associated_ue_info_present, 1));
   HANDLE_CODE(bref.unpack(lc_or_present, 1));
 
@@ -5958,7 +6031,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_format4_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_format4_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ue_info_change_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -5988,7 +6062,8 @@ OCUDUASN_CODE e2sm_rc_event_trigger_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_event_trigger_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_event_trigger_formats.unpack(bref));
 
   if (ext) {
@@ -6235,7 +6310,8 @@ OCUDUASN_CODE e2sm_rc_ind_hdr_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_hdr_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_event_trigger_condition_id_present, 1));
 
   if (ric_event_trigger_condition_id_present) {
@@ -6269,7 +6345,8 @@ OCUDUASN_CODE e2sm_rc_ind_hdr_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_hdr_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ue_id.unpack(bref));
   HANDLE_CODE(unpack_unconstrained_integer(ric_insert_style_type, bref, false, true));
   HANDLE_CODE(unpack_integer(ric_insert_ind_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -6308,7 +6385,8 @@ OCUDUASN_CODE e2sm_rc_ind_hdr_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_hdr_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ric_event_trigger_condition_id_present, 1));
   HANDLE_CODE(bref.unpack(ue_id_present, 1));
 
@@ -6348,7 +6426,8 @@ OCUDUASN_CODE e2sm_rc_ind_hdr_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_hdr_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_ind_hdr_formats.unpack(bref));
 
   if (ext) {
@@ -6547,7 +6626,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format1_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format1_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -6576,7 +6656,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_reported_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -6607,7 +6688,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format2_ran_param_item_s::pack(bit_ref& bref) cons
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format2_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -6637,7 +6719,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format2_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format2_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ue_id.unpack(bref));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 1, 65535, true));
 
@@ -6670,7 +6753,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ue_param_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -6707,7 +6791,8 @@ OCUDUASN_CODE neighbour_cell_item_choice_nr_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE neighbour_cell_item_choice_nr_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(nr_cgi.unpack(bref));
   HANDLE_CODE(unpack_integer(nr_pci, bref, (uint16_t)0u, (uint16_t)1007u, false, true));
   HANDLE_CODE(five_gs_tac.unpack(bref));
@@ -6773,7 +6858,8 @@ OCUDUASN_CODE neighbour_cell_item_choice_e_utra_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE neighbour_cell_item_choice_e_utra_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(eutra_cgi.unpack(bref));
   HANDLE_CODE(unpack_integer(eutra_pci, bref, (uint16_t)0u, (uint16_t)503u, true, true));
   HANDLE_CODE(unpack_integer(eutra_arfcn, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
@@ -6962,7 +7048,8 @@ OCUDUASN_CODE neighbour_relation_info_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE neighbour_relation_info_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(serving_cell_pci.unpack(bref));
   HANDLE_CODE(serving_cell_arfcn.unpack(bref));
   HANDLE_CODE(unpack_dyn_seq_of(neighbour_cell_list, bref, 1, 65535, true));
@@ -7000,7 +7087,8 @@ OCUDUASN_CODE serving_cell_cfg_common_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE serving_cell_cfg_common_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ssb_positions_in_burst.unpack(bref));
   HANDLE_CODE(ssb_periodicity.unpack(bref));
   HANDLE_CODE(ssb_subcarrier_spacing.unpack(bref));
@@ -7048,7 +7136,7 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format3_item_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= mib.size() > 0;
   group_flags[1] |= serving_cell_cfg_common.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(cell_context_info.size() > 0, 1));
   HANDLE_CODE(bref.pack(cell_deleted_present, 1));
   HANDLE_CODE(bref.pack(neighbour_relation_table_present, 1));
@@ -7064,7 +7152,7 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format3_item_s::pack(bit_ref& bref) const
     HANDLE_CODE(neighbour_relation_table.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -7082,7 +7170,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format3_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format3_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool cell_context_info_present;
   HANDLE_CODE(bref.unpack(cell_context_info_present, 1));
   HANDLE_CODE(bref.unpack(cell_deleted_present, 1));
@@ -7130,14 +7219,12 @@ void e2sm_rc_ind_msg_format3_item_s::to_json(json_writer& j) const
     j.write_fieldname("neighbourRelation-Table");
     neighbour_relation_table.to_json(j);
   }
-  if (ext) {
-    if (mib.size() > 0) {
-      j.write_str("mib", mib.to_string());
-    }
-    if (serving_cell_cfg_common.is_present()) {
-      j.write_fieldname("servingCellConfigCommon");
-      serving_cell_cfg_common->to_json(j);
-    }
+  if (mib.size() > 0) {
+    j.write_str("mib", mib.to_string());
+  }
+  if (serving_cell_cfg_common.is_present()) {
+    j.write_fieldname("servingCellConfigCommon");
+    serving_cell_cfg_common->to_json(j);
   }
   j.end_obj();
 }
@@ -7152,7 +7239,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format3_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format3_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(cell_info_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -7183,7 +7271,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format5_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format5_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -7212,7 +7301,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format5_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format5_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_requested_list, bref, 0, 65535, true));
 
   if (ext) {
@@ -7243,7 +7333,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format6_ranp_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format6_ranp_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_value_type.unpack(bref));
 
@@ -7273,7 +7364,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format6_ind_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format6_ind_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ric_insert_ind_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_insert_ind_list, bref, 0, 65535, true));
 
@@ -7306,7 +7398,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format6_style_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format6_style_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(indicated_insert_style_type, bref, false, true));
   HANDLE_CODE(unpack_dyn_seq_of(ric_insert_ind_list, bref, 1, 63, true));
 
@@ -7338,7 +7431,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format6_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_format6_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_insert_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -7370,7 +7464,8 @@ OCUDUASN_CODE e2sm_rc_ind_msg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ind_msg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_ind_msg_formats.unpack(bref));
 
   if (ext) {
@@ -7654,7 +7749,8 @@ OCUDUASN_CODE e2sm_rc_query_definition_format1_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_definition_format1_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_definition_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -7689,7 +7785,8 @@ OCUDUASN_CODE e2sm_rc_query_definition_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_definition_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ran_p_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -7719,7 +7816,8 @@ OCUDUASN_CODE e2sm_rc_query_definition_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_definition_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_query_definition_formats.unpack(bref));
 
   if (ext) {
@@ -7791,7 +7889,8 @@ OCUDUASN_CODE e2sm_rc_query_hdr_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_hdr_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool associated_e2_node_info_present;
   HANDLE_CODE(bref.unpack(associated_e2_node_info_present, 1));
   HANDLE_CODE(bref.unpack(associated_ue_info_present, 1));
@@ -7838,7 +7937,8 @@ OCUDUASN_CODE e2sm_rc_query_hdr_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_hdr_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_query_hdr_formats.unpack(bref));
 
   if (ext) {
@@ -7906,7 +8006,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_params_s::pack(bit_ref& bref) c
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_value_type_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -7936,7 +8037,7 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_cell_s::pack(bit_ref& bref) con
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= serving_cell_cfg_common.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(neighbour_relation_table_present, 1));
 
   HANDLE_CODE(cell_global_id.pack(bref));
@@ -7945,7 +8046,7 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_cell_s::pack(bit_ref& bref) con
     HANDLE_CODE(neighbour_relation_table.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -7958,7 +8059,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_cell_s::pack(bit_ref& bref) con
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_cell_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(neighbour_relation_table_present, 1));
 
   HANDLE_CODE(cell_global_id.unpack(bref));
@@ -7993,11 +8095,9 @@ void e2sm_rc_query_outcome_format1_item_cell_s::to_json(json_writer& j) const
     j.write_fieldname("neighbourRelation-Table");
     neighbour_relation_table.to_json(j);
   }
-  if (ext) {
-    if (serving_cell_cfg_common.is_present()) {
-      j.write_fieldname("servingCellConfigCommon");
-      serving_cell_cfg_common->to_json(j);
-    }
+  if (serving_cell_cfg_common.is_present()) {
+    j.write_fieldname("servingCellConfigCommon");
+    serving_cell_cfg_common->to_json(j);
   }
   j.end_obj();
 }
@@ -8012,7 +8112,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format1_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_format1_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(cell_info_list, bref, 1, 65535, true));
 
   if (ext) {
@@ -8047,7 +8148,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format2_item_params_s::pack(bit_ref& bref) c
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_format2_item_params_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_value_type_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -8088,7 +8190,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format2_item_ue_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_format2_item_ue_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ue_filt_id_present, 1));
 
   HANDLE_CODE(ue_id.unpack(bref));
@@ -8129,7 +8232,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format2_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_format2_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ue_info_list, bref, 0, 65535, true));
 
   if (ext) {
@@ -8159,7 +8263,8 @@ OCUDUASN_CODE e2sm_rc_query_outcome_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_query_outcome_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ric_query_outcome_formats.unpack(bref));
 
   if (ext) {
@@ -8330,7 +8435,8 @@ OCUDUASN_CODE ran_function_definition_event_trigger_style_item_s::pack(bit_ref& 
 }
 OCUDUASN_CODE ran_function_definition_event_trigger_style_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_unconstrained_integer(ric_event_trigger_style_type, bref, false, true));
   HANDLE_CODE(ric_event_trigger_style_name.unpack(bref));
   HANDLE_CODE(unpack_unconstrained_integer(ric_event_trigger_format_type, bref, false, true));
@@ -8355,11 +8461,11 @@ OCUDUASN_CODE l2_params_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -8372,7 +8478,8 @@ OCUDUASN_CODE l2_params_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE l2_params_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -8393,11 +8500,9 @@ void l2_params_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -8418,7 +8523,8 @@ OCUDUASN_CODE ran_function_definition_event_trigger_breakpoint_item_s::pack(bit_
 }
 OCUDUASN_CODE ran_function_definition_event_trigger_breakpoint_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_call_process_breakpoint_params_list_present;
   HANDLE_CODE(bref.unpack(ran_call_process_breakpoint_params_list_present, 1));
 
@@ -8461,7 +8567,8 @@ OCUDUASN_CODE ran_function_definition_event_trigger_call_process_item_s::pack(bi
 }
 OCUDUASN_CODE ran_function_definition_event_trigger_call_process_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(call_process_type_id, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
   HANDLE_CODE(call_process_type_name.unpack(bref));
   HANDLE_CODE(unpack_dyn_seq_of(call_process_breakpoints_list, bref, 1, 65535, true));
@@ -8490,11 +8597,11 @@ OCUDUASN_CODE ue_identif_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -8507,7 +8614,8 @@ OCUDUASN_CODE ue_identif_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ue_identif_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -8528,11 +8636,9 @@ void ue_identif_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -8564,7 +8670,8 @@ OCUDUASN_CODE ran_function_definition_event_trigger_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_event_trigger_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_l2_params_list_present;
   HANDLE_CODE(bref.unpack(ran_l2_params_list_present, 1));
   bool ran_call_process_types_list_present;
@@ -8638,11 +8745,11 @@ OCUDUASN_CODE report_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -8655,7 +8762,8 @@ OCUDUASN_CODE report_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE report_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -8676,11 +8784,9 @@ void report_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -8705,7 +8811,8 @@ OCUDUASN_CODE ran_function_definition_report_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_report_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_report_params_list_present;
   HANDLE_CODE(bref.unpack(ran_report_params_list_present, 1));
 
@@ -8754,7 +8861,8 @@ OCUDUASN_CODE ran_function_definition_report_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_report_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_report_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -8779,11 +8887,11 @@ OCUDUASN_CODE insert_ind_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -8796,7 +8904,8 @@ OCUDUASN_CODE insert_ind_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE insert_ind_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -8817,11 +8926,9 @@ void insert_ind_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -8842,7 +8949,8 @@ OCUDUASN_CODE ran_function_definition_insert_ind_item_s::pack(bit_ref& bref) con
 }
 OCUDUASN_CODE ran_function_definition_insert_ind_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_insert_ind_params_list_present;
   HANDLE_CODE(bref.unpack(ran_insert_ind_params_list_present, 1));
 
@@ -8894,7 +9002,8 @@ OCUDUASN_CODE ran_function_definition_insert_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_insert_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ric_insert_ind_list_present;
   HANDLE_CODE(bref.unpack(ric_insert_ind_list_present, 1));
 
@@ -8945,7 +9054,8 @@ OCUDUASN_CODE ran_function_definition_insert_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_insert_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_insert_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -8970,7 +9080,7 @@ OCUDUASN_CODE ran_function_definition_ctrl_action_item_s::pack(bit_ref& bref) co
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ue_group_ctrl_action_supported_present;
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ran_ctrl_action_params_list.size() > 0, 1));
 
   HANDLE_CODE(pack_integer(bref, ric_ctrl_action_id, (uint32_t)1u, (uint32_t)65535u, true, true));
@@ -8979,7 +9089,7 @@ OCUDUASN_CODE ran_function_definition_ctrl_action_item_s::pack(bit_ref& bref) co
     HANDLE_CODE(pack_dyn_seq_of(bref, ran_ctrl_action_params_list, 1, 65535, true));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -8992,7 +9102,8 @@ OCUDUASN_CODE ran_function_definition_ctrl_action_item_s::pack(bit_ref& bref) co
 }
 OCUDUASN_CODE ran_function_definition_ctrl_action_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_ctrl_action_params_list_present;
   HANDLE_CODE(bref.unpack(ran_ctrl_action_params_list_present, 1));
 
@@ -9026,10 +9137,8 @@ void ran_function_definition_ctrl_action_item_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (ue_group_ctrl_action_supported_present) {
-      j.write_str("ueGroup-ControlAction-Supported", ue_group_ctrl_action_supported.to_string());
-    }
+  if (ue_group_ctrl_action_supported_present) {
+    j.write_str("ueGroup-ControlAction-Supported", ue_group_ctrl_action_supported.to_string());
   }
   j.end_obj();
 }
@@ -9046,7 +9155,7 @@ OCUDUASN_CODE ran_function_definition_ctrl_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= list_of_add_supported_formats.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ric_ctrl_action_list.size() > 0, 1));
   HANDLE_CODE(bref.pack(ric_call_process_id_format_type_present, 1));
   HANDLE_CODE(bref.pack(ran_ctrl_outcome_params_list.size() > 0, 1));
@@ -9066,7 +9175,7 @@ OCUDUASN_CODE ran_function_definition_ctrl_item_s::pack(bit_ref& bref) const
     HANDLE_CODE(pack_dyn_seq_of(bref, ran_ctrl_outcome_params_list, 1, 255, true));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -9079,7 +9188,8 @@ OCUDUASN_CODE ran_function_definition_ctrl_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_ctrl_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ric_ctrl_action_list_present;
   HANDLE_CODE(bref.unpack(ric_ctrl_action_list_present, 1));
   HANDLE_CODE(bref.unpack(ric_call_process_id_format_type_present, 1));
@@ -9138,14 +9248,12 @@ void ran_function_definition_ctrl_item_s::to_json(json_writer& j) const
     }
     j.end_array();
   }
-  if (ext) {
-    if (list_of_add_supported_formats.is_present()) {
-      j.start_array("listOfAdditionalSupportedFormats");
-      for (const auto& e1 : *list_of_add_supported_formats) {
-        e1.to_json(j);
-      }
-      j.end_array();
+  if (list_of_add_supported_formats.is_present()) {
+    j.start_array("listOfAdditionalSupportedFormats");
+    for (const auto& e1 : *list_of_add_supported_formats) {
+      e1.to_json(j);
     }
+    j.end_array();
   }
   j.end_obj();
 }
@@ -9160,7 +9268,8 @@ OCUDUASN_CODE ran_function_definition_ctrl_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_ctrl_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_ctrl_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -9185,11 +9294,11 @@ OCUDUASN_CODE policy_action_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -9202,7 +9311,8 @@ OCUDUASN_CODE policy_action_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE policy_action_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -9223,11 +9333,9 @@ void policy_action_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -9237,11 +9345,11 @@ OCUDUASN_CODE policy_condition_ran_param_item_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_param_definition.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(pack_integer(bref, ran_param_id, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.pack(bref));
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -9254,7 +9362,8 @@ OCUDUASN_CODE policy_condition_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE policy_condition_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
   HANDLE_CODE(ran_param_name.unpack(bref));
 
@@ -9275,11 +9384,9 @@ void policy_condition_ran_param_item_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
-  if (ext) {
-    if (ran_param_definition.is_present()) {
-      j.write_fieldname("ranParameter-Definition");
-      ran_param_definition->to_json(j);
-    }
+  if (ran_param_definition.is_present()) {
+    j.write_fieldname("ranParameter-Definition");
+    ran_param_definition->to_json(j);
   }
   j.end_obj();
 }
@@ -9305,7 +9412,8 @@ OCUDUASN_CODE ran_function_definition_policy_action_item_s::pack(bit_ref& bref) 
 }
 OCUDUASN_CODE ran_function_definition_policy_action_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_policy_action_params_list_present;
   HANDLE_CODE(bref.unpack(ran_policy_action_params_list_present, 1));
   bool ran_policy_condition_params_list_present;
@@ -9367,7 +9475,8 @@ OCUDUASN_CODE ran_function_definition_policy_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_policy_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ric_policy_action_list_present;
   HANDLE_CODE(bref.unpack(ric_policy_action_list_present, 1));
 
@@ -9410,7 +9519,8 @@ OCUDUASN_CODE ran_function_definition_policy_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_policy_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_policy_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -9446,7 +9556,8 @@ OCUDUASN_CODE query_ran_param_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE query_ran_param_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_param_definition_present, 1));
 
   HANDLE_CODE(unpack_integer(ran_param_id, bref, (uint64_t)1u, (uint64_t)4294967295u, true, true));
@@ -9492,7 +9603,8 @@ OCUDUASN_CODE ran_function_definition_query_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_query_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool ran_query_params_list_present;
   HANDLE_CODE(bref.unpack(ran_query_params_list_present, 1));
 
@@ -9539,7 +9651,8 @@ OCUDUASN_CODE ran_function_definition_query_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE ran_function_definition_query_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(unpack_dyn_seq_of(ric_query_style_list, bref, 1, 63, true));
 
   if (ext) {
@@ -9564,7 +9677,7 @@ OCUDUASN_CODE e2sm_rc_ran_function_definition_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= ran_function_definition_query.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ran_function_definition_event_trigger_present, 1));
   HANDLE_CODE(bref.pack(ran_function_definition_report_present, 1));
   HANDLE_CODE(bref.pack(ran_function_definition_insert_present, 1));
@@ -9588,7 +9701,7 @@ OCUDUASN_CODE e2sm_rc_ran_function_definition_s::pack(bit_ref& bref) const
     HANDLE_CODE(ran_function_definition_policy.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -9601,7 +9714,8 @@ OCUDUASN_CODE e2sm_rc_ran_function_definition_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE e2sm_rc_ran_function_definition_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ran_function_definition_event_trigger_present, 1));
   HANDLE_CODE(bref.unpack(ran_function_definition_report_present, 1));
   HANDLE_CODE(bref.unpack(ran_function_definition_insert_present, 1));
@@ -9662,11 +9776,9 @@ void e2sm_rc_ran_function_definition_s::to_json(json_writer& j) const
     j.write_fieldname("ranFunctionDefinition-Policy");
     ran_function_definition_policy.to_json(j);
   }
-  if (ext) {
-    if (ran_function_definition_query.is_present()) {
-      j.write_fieldname("ranFunctionDefinition-Query");
-      ran_function_definition_query->to_json(j);
-    }
+  if (ran_function_definition_query.is_present()) {
+    j.write_fieldname("ranFunctionDefinition-Query");
+    ran_function_definition_query->to_json(j);
   }
   j.end_obj();
 }

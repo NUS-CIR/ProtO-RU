@@ -35,7 +35,6 @@ struct ran_param_value_type_choice_list_s;
 
 // AdditionalSupportedFormat ::= SEQUENCE
 struct add_supported_format_s {
-  bool    ext                      = false;
   int64_t ric_ctrl_hdr_format_type = 0;
   int64_t ric_ctrl_msg_format_type = 0;
   // ...
@@ -126,7 +125,6 @@ struct ran_param_testing_item_s {
   };
 
   // member variables
-  bool              ext          = false;
   uint64_t          ran_param_id = 1;
   ran_param_type_c_ ran_param_type;
   // ...
@@ -142,7 +140,6 @@ using ran_param_testing_list_l = dyn_array<ran_param_testing_item_s>;
 
 // RANParameter-Testing-Item-Choice-List ::= SEQUENCE
 struct ran_param_testing_item_choice_list_s {
-  bool                     ext = false;
   ran_param_testing_list_l ran_param_list;
   // ...
 
@@ -157,7 +154,6 @@ using ran_param_testing_structure_l = dyn_array<ran_param_testing_item_s>;
 
 // RANParameter-Testing-Item-Choice-Structure ::= SEQUENCE
 struct ran_param_testing_item_choice_structure_s {
-  bool                          ext = false;
   ran_param_testing_structure_l ran_param_structure;
   // ...
 
@@ -276,7 +272,6 @@ private:
 
 // RANParameter-Testing-Item-Choice-ElementTrue ::= SEQUENCE
 struct ran_param_testing_item_choice_elem_true_s {
-  bool              ext = false;
   ran_param_value_c ran_param_value;
   // ...
 
@@ -360,7 +355,6 @@ using lc_or_e2sm_rc_ies_e = enumerated<lc_or_e2sm_rc_ies_opts, true>;
 
 // RANParameter-Testing-Item-Choice-ElementFalse ::= SEQUENCE
 struct ran_param_testing_item_choice_elem_false_s {
-  bool                          ext                     = false;
   bool                          ran_param_value_present = false;
   bool                          lc_or_present           = false;
   ran_param_testing_condition_c ran_param_test_condition;
@@ -379,7 +373,6 @@ using ran_param_testing_l = dyn_array<ran_param_testing_item_s>;
 
 // EventTrigger-UE-Info-Item-Choice-Individual ::= SEQUENCE
 struct event_trigger_ue_info_item_choice_individual_s {
-  bool                ext = false;
   ue_id_c             ue_id;
   ran_param_testing_l ran_param_testing;
   // ...
@@ -392,7 +385,6 @@ struct event_trigger_ue_info_item_choice_individual_s {
 
 // EventTrigger-UE-Info-Item-Choice-Group ::= SEQUENCE
 struct event_trigger_ue_info_item_choice_group_s {
-  bool                ext = false;
   ran_param_testing_l ran_param_testing;
   // ...
 
@@ -404,7 +396,6 @@ struct event_trigger_ue_info_item_choice_group_s {
 
 // UEQuery ::= SEQUENCE
 struct ue_query_s {
-  bool                ext = false;
   partial_ue_id_s     partial_ue_id;
   ran_param_testing_l ran_param_testing;
   // ...
@@ -481,7 +472,6 @@ struct associated_ue_info_item_s {
   };
 
   // member variables
-  bool                ext           = false;
   bool                lc_or_present = false;
   uint32_t            ue_filt_id    = 1;
   ue_type_c_          ue_type;
@@ -499,7 +489,6 @@ struct associated_ue_info_s {
   using associated_ue_info_list_l_ = dyn_array<associated_ue_info_item_s>;
 
   // member variables
-  bool                       ext = false;
   associated_ue_info_list_l_ associated_ue_info_list;
   // ...
 
@@ -556,7 +545,6 @@ private:
 
 // RANParameter-Definition ::= SEQUENCE
 struct ran_param_definition_s {
-  bool                          ext = false;
   ran_param_definition_choice_c ran_param_definition_choice;
   // ...
 
@@ -568,7 +556,6 @@ struct ran_param_definition_s {
 
 // RANParameter-Definition-Choice-LIST-Item ::= SEQUENCE
 struct ran_param_definition_choice_list_item_s {
-  bool                                 ext                          = false;
   bool                                 ran_param_definition_present = false;
   uint64_t                             ran_param_id                 = 1;
   printable_string<1, 150, true, true> ran_param_name;
@@ -586,7 +573,6 @@ struct ran_param_definition_choice_list_s {
   using ran_param_list_l_ = dyn_array<ran_param_definition_choice_list_item_s>;
 
   // member variables
-  bool              ext = false;
   ran_param_list_l_ ran_param_list;
   // ...
 
@@ -598,7 +584,6 @@ struct ran_param_definition_choice_list_s {
 
 // RANParameter-Definition-Choice-STRUCTURE-Item ::= SEQUENCE
 struct ran_param_definition_choice_structure_item_s {
-  bool                                 ext                          = false;
   bool                                 ran_param_definition_present = false;
   uint64_t                             ran_param_id                 = 1;
   printable_string<1, 150, true, true> ran_param_name;
@@ -616,7 +601,6 @@ struct ran_param_definition_choice_structure_s {
   using ran_param_structure_l_ = dyn_array<ran_param_definition_choice_structure_item_s>;
 
   // member variables
-  bool                   ext = false;
   ran_param_structure_l_ ran_param_structure;
   // ...
 
@@ -628,7 +612,6 @@ struct ran_param_definition_choice_structure_s {
 
 // CallProcessBreakpoint-RANParameter-Item ::= SEQUENCE
 struct call_process_breakpoint_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -695,7 +678,6 @@ using cause_ri_cservice_e = enumerated<cause_ri_cservice_opts, true>;
 
 // CellIdentification-RANParameter-Item ::= SEQUENCE
 struct cell_identif_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -709,7 +691,6 @@ struct cell_identif_ran_param_item_s {
 
 // ControlAction-RANParameter-Item ::= SEQUENCE
 struct ctrl_action_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -723,7 +704,6 @@ struct ctrl_action_ran_param_item_s {
 
 // ControlOutcome-RANParameter-Item ::= SEQUENCE
 struct ctrl_outcome_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -737,7 +717,6 @@ struct ctrl_outcome_ran_param_item_s {
 
 // E2SM-RC-ActionDefinition-Format1-Item ::= SEQUENCE
 struct e2sm_rc_action_definition_format1_item_s {
-  bool     ext          = false;
   uint64_t ran_param_id = 1;
   // ...
   copy_ptr<ran_param_definition_s> ran_param_definition;
@@ -753,7 +732,6 @@ struct e2sm_rc_action_definition_format1_s {
   using ran_p_to_be_reported_list_l_ = dyn_array<e2sm_rc_action_definition_format1_item_s>;
 
   // member variables
-  bool                         ext = false;
   ran_p_to_be_reported_list_l_ ran_p_to_be_reported_list;
   // ...
 
@@ -765,7 +743,6 @@ struct e2sm_rc_action_definition_format1_s {
 
 // RANParameter-ValueType-Choice-ElementTrue ::= SEQUENCE
 struct ran_param_value_type_choice_elem_true_s {
-  bool              ext = false;
   ran_param_value_c ran_param_value;
   // ...
 
@@ -777,7 +754,6 @@ struct ran_param_value_type_choice_elem_true_s {
 
 // RANParameter-ValueType-Choice-ElementFalse ::= SEQUENCE
 struct ran_param_value_type_choice_elem_false_s {
-  bool              ext                     = false;
   bool              ran_param_value_present = false;
   ran_param_value_c ran_param_value;
   // ...
@@ -864,7 +840,6 @@ private:
 
 // RANParameter-STRUCTURE-Item ::= SEQUENCE
 struct ran_param_structure_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -880,7 +855,6 @@ struct ran_param_structure_s {
   using seq_of_ran_params_l_ = dyn_array<ran_param_structure_item_s>;
 
   // member variables
-  bool                 ext = false;
   seq_of_ran_params_l_ seq_of_ran_params;
   // ...
 
@@ -892,7 +866,6 @@ struct ran_param_structure_s {
 
 // RANParameter-ValueType-Choice-Structure ::= SEQUENCE
 struct ran_param_value_type_choice_structure_s {
-  bool                  ext = false;
   ran_param_structure_s ran_param_structure;
   // ...
 
@@ -907,7 +880,6 @@ struct ran_param_list_s {
   using list_of_ran_param_l_ = dyn_array<ran_param_structure_s>;
 
   // member variables
-  bool                 ext = false;
   list_of_ran_param_l_ list_of_ran_param;
   // ...
 
@@ -919,7 +891,6 @@ struct ran_param_list_s {
 
 // RANParameter-ValueType-Choice-List ::= SEQUENCE
 struct ran_param_value_type_choice_list_s {
-  bool             ext = false;
   ran_param_list_s ran_param_list;
   // ...
 
@@ -931,7 +902,6 @@ struct ran_param_value_type_choice_list_s {
 
 // RIC-PolicyAction-RANParameter-Item ::= SEQUENCE
 struct ric_policy_action_ran_param_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -953,7 +923,6 @@ struct ric_policy_action_s {
   using ric_policy_decision_e_ = enumerated<ric_policy_decision_opts, true>;
 
   // member variables
-  bool               ext                  = false;
   uint32_t           ric_policy_action_id = 1;
   ran_params_list_l_ ran_params_list;
   // ...
@@ -968,7 +937,6 @@ struct ric_policy_action_s {
 
 // E2SM-RC-ActionDefinition-Format2-Item ::= SEQUENCE
 struct e2sm_rc_action_definition_format2_item_s {
-  bool                ext = false;
   ric_policy_action_s ric_policy_action;
   ran_param_testing_l ric_policy_condition_definition;
   // ...
@@ -986,7 +954,6 @@ struct e2sm_rc_action_definition_format2_s {
   using ric_policy_conditions_list_l_ = dyn_array<e2sm_rc_action_definition_format2_item_s>;
 
   // member variables
-  bool                          ext = false;
   ric_policy_conditions_list_l_ ric_policy_conditions_list;
   // ...
 
@@ -998,7 +965,6 @@ struct e2sm_rc_action_definition_format2_s {
 
 // E2SM-RC-ActionDefinition-Format3-Item ::= SEQUENCE
 struct e2sm_rc_action_definition_format3_item_s {
-  bool     ext          = false;
   uint64_t ran_param_id = 1;
   // ...
   copy_ptr<ran_param_definition_s> ran_param_definition;
@@ -1014,7 +980,6 @@ struct e2sm_rc_action_definition_format3_s {
   using ran_p_insert_ind_list_l_ = dyn_array<e2sm_rc_action_definition_format3_item_s>;
 
   // member variables
-  bool                     ext               = false;
   bool                     ue_id_present     = false;
   uint32_t                 ric_insert_ind_id = 1;
   ran_p_insert_ind_list_l_ ran_p_insert_ind_list;
@@ -1029,7 +994,6 @@ struct e2sm_rc_action_definition_format3_s {
 
 // E2SM-RC-ActionDefinition-Format4-RANP-Item ::= SEQUENCE
 struct e2sm_rc_action_definition_format4_ranp_item_s {
-  bool     ext          = false;
   uint64_t ran_param_id = 1;
   // ...
   copy_ptr<ran_param_definition_s> ran_param_definition;
@@ -1045,7 +1009,6 @@ struct e2sm_rc_action_definition_format4_ind_item_s {
   using ran_p_insert_ind_list_l_ = dyn_array<e2sm_rc_action_definition_format4_ranp_item_s>;
 
   // member variables
-  bool                     ext               = false;
   uint32_t                 ric_insert_ind_id = 1;
   ran_p_insert_ind_list_l_ ran_p_insert_ind_list;
   // ...
@@ -1061,7 +1024,6 @@ struct e2sm_rc_action_definition_format4_style_item_s {
   using ric_insert_ind_list_l_ = dyn_array<e2sm_rc_action_definition_format4_ind_item_s>;
 
   // member variables
-  bool                   ext                         = false;
   int64_t                requested_insert_style_type = 0;
   ric_insert_ind_list_l_ ric_insert_ind_list;
   // ...
@@ -1077,7 +1039,6 @@ struct e2sm_rc_action_definition_format4_s {
   using ric_insert_style_list_l_ = dyn_array<e2sm_rc_action_definition_format4_style_item_s>;
 
   // member variables
-  bool                     ext           = false;
   bool                     ue_id_present = false;
   ric_insert_style_list_l_ ric_insert_style_list;
   ue_id_c                  ue_id;
@@ -1176,7 +1137,6 @@ struct e2sm_rc_action_definition_s {
   };
 
   // member variables
-  bool                             ext            = false;
   int64_t                          ric_style_type = 0;
   ric_action_definition_formats_c_ ric_action_definition_formats;
   // ...
@@ -1189,7 +1149,6 @@ struct e2sm_rc_action_definition_s {
 
 // E2SM-RC-CallProcessID-Format1 ::= SEQUENCE
 struct e2sm_rc_call_process_id_format1_s {
-  bool     ext                 = false;
   uint64_t ric_call_process_id = 1;
   // ...
 
@@ -1225,7 +1184,6 @@ struct e2sm_rc_call_process_id_s {
   };
 
   // member variables
-  bool                           ext = false;
   ric_call_process_id_formats_c_ ric_call_process_id_formats;
   // ...
 
@@ -1245,7 +1203,6 @@ struct e2sm_rc_ctrl_hdr_format1_s {
   using ric_ctrl_decision_e_ = enumerated<ric_ctrl_decision_opts, true>;
 
   // member variables
-  bool                 ext                       = false;
   bool                 ric_ctrl_decision_present = false;
   ue_id_c              ue_id;
   int64_t              ric_style_type     = 0;
@@ -1269,7 +1226,6 @@ struct e2sm_rc_ctrl_hdr_format2_s {
   using ric_ctrl_decision_e_ = enumerated<ric_ctrl_decision_opts, true>;
 
   // member variables
-  bool                 ext                       = false;
   bool                 ue_id_present             = false;
   bool                 ric_ctrl_decision_present = false;
   ue_id_c              ue_id;
@@ -1284,7 +1240,6 @@ struct e2sm_rc_ctrl_hdr_format2_s {
 
 // UEGroupDefinitionIdentifier-Item ::= SEQUENCE
 struct ue_group_definition_id_item_s {
-  bool                   ext           = false;
   bool                   lc_or_present = false;
   uint64_t               ran_param_id  = 1;
   ran_param_value_type_c ran_param_value_type;
@@ -1302,7 +1257,6 @@ struct ue_group_definition_s {
   using ue_group_definition_id_list_l_ = dyn_array<ue_group_definition_id_item_s>;
 
   // member variables
-  bool                           ext = false;
   ue_group_definition_id_list_l_ ue_group_definition_id_list;
   // ...
 
@@ -1314,7 +1268,6 @@ struct ue_group_definition_s {
 
 // E2SM-RC-ControlHeader-Format3 ::= SEQUENCE
 struct e2sm_rc_ctrl_hdr_format3_s {
-  bool                  ext         = false;
   uint32_t              ue_group_id = 1;
   ue_group_definition_s ue_group_definition;
   int64_t               ric_style_type     = 0;
@@ -1337,7 +1290,6 @@ struct e2sm_rc_ctrl_hdr_format4_s {
   using ric_ctrl_decision_e_ = enumerated<ric_ctrl_decision_opts, true>;
 
   // member variables
-  bool                 ext                       = false;
   bool                 ric_ctrl_decision_present = false;
   partial_ue_id_s      partial_ue_id;
   int64_t              ric_style_type     = 0;
@@ -1431,7 +1383,6 @@ struct e2sm_rc_ctrl_hdr_s {
   };
 
   // member variables
-  bool                    ext = false;
   ric_ctrl_hdr_formats_c_ ric_ctrl_hdr_formats;
   // ...
 
@@ -1443,7 +1394,6 @@ struct e2sm_rc_ctrl_hdr_s {
 
 // E2SM-RC-ControlMessage-Format1-Item ::= SEQUENCE
 struct e2sm_rc_ctrl_msg_format1_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -1459,7 +1409,6 @@ struct e2sm_rc_ctrl_msg_format1_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_ctrl_msg_format1_item_s>;
 
   // member variables
-  bool          ext = false;
   ran_p_list_l_ ran_p_list;
   // ...
 
@@ -1471,7 +1420,6 @@ struct e2sm_rc_ctrl_msg_format1_s {
 
 // E2SM-RC-ControlMessage-Format2-ControlAction-Item ::= SEQUENCE
 struct e2sm_rc_ctrl_msg_format2_ctrl_action_item_s {
-  bool                       ext                = false;
   uint32_t                   ric_ctrl_action_id = 1;
   e2sm_rc_ctrl_msg_format1_s ran_p_list;
   // ...
@@ -1487,7 +1435,6 @@ struct e2sm_rc_ctrl_msg_format2_style_item_s {
   using ric_ctrl_action_list_l_ = dyn_array<e2sm_rc_ctrl_msg_format2_ctrl_action_item_s>;
 
   // member variables
-  bool                    ext                       = false;
   int64_t                 indicated_ctrl_style_type = 0;
   ric_ctrl_action_list_l_ ric_ctrl_action_list;
   // ...
@@ -1503,7 +1450,6 @@ struct e2sm_rc_ctrl_msg_format2_s {
   using ric_ctrl_style_list_l_ = dyn_array<e2sm_rc_ctrl_msg_format2_style_item_s>;
 
   // member variables
-  bool                   ext = false;
   ric_ctrl_style_list_l_ ric_ctrl_style_list;
   // ...
 
@@ -1515,7 +1461,6 @@ struct e2sm_rc_ctrl_msg_format2_s {
 
 // EntitySpecific-ranP-ControlParameters ::= SEQUENCE
 struct entity_specific_ran_p_ctrl_params_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -1531,7 +1476,6 @@ struct e2sm_rc_entity_filt_s {
   using entity_specific_ctrl_ran_p_list_l_ = dyn_array<entity_specific_ran_p_ctrl_params_s>;
 
   // member variables
-  bool                               ext            = false;
   uint16_t                           entity_filt_id = 1;
   ran_param_testing_l                entity_filt_definition;
   entity_specific_ctrl_ran_p_list_l_ entity_specific_ctrl_ran_p_list;
@@ -1545,7 +1489,6 @@ struct e2sm_rc_entity_filt_s {
 
 // EntityAgnostic-ranP-ControlParameters ::= SEQUENCE
 struct entity_agnostic_ran_p_ctrl_params_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -1562,7 +1505,6 @@ struct e2sm_rc_ctrl_msg_format3_s {
   using entity_agnostic_ctrl_ran_p_list_l_ = dyn_array<entity_agnostic_ran_p_ctrl_params_s>;
 
   // member variables
-  bool                               ext                                     = false;
   bool                               list_of_entity_filts_present            = false;
   bool                               entity_agnostic_ctrl_ran_p_list_present = false;
   list_of_entity_filts_l_            list_of_entity_filts;
@@ -1577,7 +1519,6 @@ struct e2sm_rc_ctrl_msg_format3_s {
 
 // E2SM-RC-ControlMessage-Format4-Item ::= SEQUENCE
 struct e2sm_rc_ctrl_msg_format4_item_s {
-  bool                   ext                          = false;
   bool                   ran_param_definition_present = false;
   uint64_t               ran_param_id                 = 1;
   ran_param_definition_s ran_param_definition;
@@ -1594,7 +1535,6 @@ struct e2sm_rc_ctrl_msg_format4_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_ctrl_msg_format4_item_s>;
 
   // member variables
-  bool          ext = false;
   ran_p_list_l_ ran_p_list;
   // ...
 
@@ -1692,7 +1632,6 @@ struct e2sm_rc_ctrl_msg_s {
   };
 
   // member variables
-  bool                    ext = false;
   ric_ctrl_msg_formats_c_ ric_ctrl_msg_formats;
   // ...
 
@@ -1704,7 +1643,6 @@ struct e2sm_rc_ctrl_msg_s {
 
 // E2SM-RC-ControlOutcome-Format1-Item ::= SEQUENCE
 struct e2sm_rc_ctrl_outcome_format1_item_s {
-  bool              ext          = false;
   uint64_t          ran_param_id = 1;
   ran_param_value_c ran_param_value;
   // ...
@@ -1720,7 +1658,6 @@ struct e2sm_rc_ctrl_outcome_format1_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_ctrl_outcome_format1_item_s>;
 
   // member variables
-  bool          ext = false;
   ran_p_list_l_ ran_p_list;
   // ...
 
@@ -1732,7 +1669,6 @@ struct e2sm_rc_ctrl_outcome_format1_s {
 
 // E2SM-RC-ControlOutcome-Format2-RANP-Item ::= SEQUENCE
 struct e2sm_rc_ctrl_outcome_format2_ranp_item_s {
-  bool              ext          = false;
   uint64_t          ran_param_id = 1;
   ran_param_value_c ran_param_value;
   // ...
@@ -1748,7 +1684,6 @@ struct e2sm_rc_ctrl_outcome_format2_ctrl_outcome_item_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_ctrl_outcome_format2_ranp_item_s>;
 
   // member variables
-  bool          ext                = false;
   uint32_t      ric_ctrl_action_id = 1;
   ran_p_list_l_ ran_p_list;
   // ...
@@ -1764,7 +1699,6 @@ struct e2sm_rc_ctrl_outcome_format2_style_item_s {
   using ric_ctrl_outcome_list_l_ = dyn_array<e2sm_rc_ctrl_outcome_format2_ctrl_outcome_item_s>;
 
   // member variables
-  bool                     ext                       = false;
   int64_t                  indicated_ctrl_style_type = 0;
   ric_ctrl_outcome_list_l_ ric_ctrl_outcome_list;
   // ...
@@ -1780,7 +1714,6 @@ struct e2sm_rc_ctrl_outcome_format2_s {
   using ric_ctrl_style_list_l_ = dyn_array<e2sm_rc_ctrl_outcome_format2_style_item_s>;
 
   // member variables
-  bool                   ext = false;
   ric_ctrl_style_list_l_ ric_ctrl_style_list;
   // ...
 
@@ -1792,7 +1725,6 @@ struct e2sm_rc_ctrl_outcome_format2_s {
 
 // E2SM-RC-ControlOutcome-Format3-Item ::= SEQUENCE
 struct e2sm_rc_ctrl_outcome_format3_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -1808,7 +1740,6 @@ struct e2sm_rc_ctrl_outcome_format3_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_ctrl_outcome_format3_item_s>;
 
   // member variables
-  bool          ext = false;
   ran_p_list_l_ ran_p_list;
   // ...
 
@@ -1883,7 +1814,6 @@ struct e2sm_rc_ctrl_outcome_s {
   };
 
   // member variables
-  bool                        ext = false;
   ric_ctrl_outcome_formats_c_ ric_ctrl_outcome_formats;
   // ...
 
@@ -1895,7 +1825,6 @@ struct e2sm_rc_ctrl_outcome_s {
 
 // MessageType-Choice-NI ::= SEQUENCE
 struct msg_type_choice_ni_s {
-  bool               ext            = false;
   bool               ni_id_present  = false;
   bool               ni_msg_present = false;
   interface_type_e   ni_type;
@@ -1911,7 +1840,6 @@ struct msg_type_choice_ni_s {
 
 // MessageType-Choice-RRC ::= SEQUENCE
 struct msg_type_choice_rrc_s {
-  bool         ext = false;
   rrc_msg_id_s rrc_msg;
   // ...
 
@@ -2023,7 +1951,6 @@ struct event_trigger_ue_info_item_s {
   };
 
   // member variables
-  bool                ext                 = false;
   bool                lc_or_present       = false;
   uint32_t            event_trigger_ue_id = 1;
   ue_type_c_          ue_type;
@@ -2041,7 +1968,6 @@ struct event_trigger_ue_info_s {
   using ue_info_list_l_ = dyn_array<event_trigger_ue_info_item_s>;
 
   // member variables
-  bool            ext = false;
   ue_info_list_l_ ue_info_list;
   // ...
 
@@ -2053,7 +1979,6 @@ struct event_trigger_ue_info_s {
 
 // EventTrigger-UEevent-Info-Item ::= SEQUENCE
 struct event_trigger_ue_event_info_item_s {
-  bool                ext           = false;
   bool                lc_or_present = false;
   uint32_t            ue_event_id   = 1;
   lc_or_e2sm_rc_ies_e lc_or;
@@ -2070,7 +1995,6 @@ struct event_trigger_ue_event_info_s {
   using ue_event_list_l_ = dyn_array<event_trigger_ue_event_info_item_s>;
 
   // member variables
-  bool             ext = false;
   ue_event_list_l_ ue_event_list;
   // ...
 
@@ -2090,7 +2014,6 @@ struct e2sm_rc_event_trigger_format1_item_s {
   using msg_direction_e_ = enumerated<msg_direction_opts, true>;
 
   // member variables
-  bool                          ext                            = false;
   bool                          msg_direction_present          = false;
   bool                          associated_ue_info_present     = false;
   bool                          associated_ue_event_present    = false;
@@ -2114,7 +2037,6 @@ struct e2sm_rc_event_trigger_format1_s {
   using msg_list_l_ = dyn_array<e2sm_rc_event_trigger_format1_item_s>;
 
   // member variables
-  bool                    ext                               = false;
   bool                    global_associated_ue_info_present = false;
   msg_list_l_             msg_list;
   event_trigger_ue_info_s global_associated_ue_info;
@@ -2128,7 +2050,6 @@ struct e2sm_rc_event_trigger_format1_s {
 
 // E2SM-RC-EventTrigger-Format2 ::= SEQUENCE
 struct e2sm_rc_event_trigger_format2_s {
-  bool                    ext                            = false;
   bool                    associated_ue_info_present     = false;
   uint32_t                ric_call_process_type_id       = 1;
   uint32_t                ric_call_process_breakpoint_id = 1;
@@ -2144,7 +2065,6 @@ struct e2sm_rc_event_trigger_format2_s {
 
 // EventTrigger-Cell-Info-Item-Choice-Individual ::= SEQUENCE
 struct event_trigger_cell_info_item_choice_individual_s {
-  bool  ext = false;
   cgi_c cell_global_id;
   // ...
 
@@ -2156,7 +2076,6 @@ struct event_trigger_cell_info_item_choice_individual_s {
 
 // EventTrigger-Cell-Info-Item-Choice-Group ::= SEQUENCE
 struct event_trigger_cell_info_item_choice_group_s {
-  bool                ext = false;
   ran_param_testing_l ran_param_testing;
   // ...
 
@@ -2218,7 +2137,6 @@ struct event_trigger_cell_info_item_s {
   };
 
   // member variables
-  bool                ext                   = false;
   bool                lc_or_present         = false;
   uint32_t            event_trigger_cell_id = 1;
   cell_type_c_        cell_type;
@@ -2236,7 +2154,6 @@ struct event_trigger_cell_info_s {
   using cell_info_list_l_ = dyn_array<event_trigger_cell_info_item_s>;
 
   // member variables
-  bool              ext = false;
   cell_info_list_l_ cell_info_list;
   // ...
 
@@ -2248,7 +2165,6 @@ struct event_trigger_cell_info_s {
 
 // E2SM-RC-EventTrigger-Format3-Item ::= SEQUENCE
 struct e2sm_rc_event_trigger_format3_item_s {
-  bool                      ext                            = false;
   bool                      associated_cell_info_present   = false;
   bool                      lc_or_present                  = false;
   uint32_t                  ric_event_trigger_condition_id = 1;
@@ -2268,7 +2184,6 @@ struct e2sm_rc_event_trigger_format3_s {
   using e2_node_info_change_list_l_ = dyn_array<e2sm_rc_event_trigger_format3_item_s>;
 
   // member variables
-  bool                        ext = false;
   e2_node_info_change_list_l_ e2_node_info_change_list;
   // ...
 
@@ -2288,7 +2203,6 @@ using rrc_state_e = enumerated<rrc_state_opts, true>;
 
 // TriggerType-Choice-RRCstate-Item ::= SEQUENCE
 struct trigger_type_choice_rrc_state_item_s {
-  bool                ext           = false;
   bool                lc_or_present = false;
   rrc_state_e         state_changed_to;
   lc_or_e2sm_rc_ies_e lc_or;
@@ -2305,7 +2219,6 @@ struct trigger_type_choice_rrc_state_s {
   using rrc_state_list_l_ = dyn_array<trigger_type_choice_rrc_state_item_s>;
 
   // member variables
-  bool              ext = false;
   rrc_state_list_l_ rrc_state_list;
   // ...
 
@@ -2317,7 +2230,6 @@ struct trigger_type_choice_rrc_state_s {
 
 // TriggerType-Choice-UEID ::= SEQUENCE
 struct trigger_type_choice_ue_id_s {
-  bool     ext             = false;
   uint16_t ue_id_change_id = 1;
   // ...
 
@@ -2329,7 +2241,6 @@ struct trigger_type_choice_ue_id_s {
 
 // TriggerType-Choice-L2state ::= SEQUENCE
 struct trigger_type_choice_l2state_s {
-  bool                ext = false;
   ran_param_testing_l associated_l2variables;
   // ...
 
@@ -2341,7 +2252,6 @@ struct trigger_type_choice_l2state_s {
 
 // TriggerType-Choice-UEcontext ::= SEQUENCE
 struct trigger_type_choice_ue_context_s {
-  bool                ext = false;
   ran_param_testing_l associated_ue_ctxt_variables;
   // ...
 
@@ -2361,7 +2271,6 @@ struct trigger_type_choice_mim_oand_b_fcfg_s {
   using mim_otrans_mode_state_e_ = enumerated<mim_otrans_mode_state_opts, true>;
 
   // member variables
-  bool                     ext = false;
   mim_otrans_mode_state_e_ mim_otrans_mode_state;
   // ...
 
@@ -2395,7 +2304,6 @@ private:
 
 // TriggerType-Choice-L2MACschChg ::= SEQUENCE
 struct trigger_type_choice_l2_ma_csch_chg_s {
-  bool                         ext = false;
   l2_ma_csch_chg_type_choice_c l2_ma_csch_chg_type;
   // ...
 
@@ -2503,7 +2411,6 @@ private:
 
 // E2SM-RC-EventTrigger-Format4-Item ::= SEQUENCE
 struct e2sm_rc_event_trigger_format4_item_s {
-  bool                    ext                            = false;
   bool                    associated_ue_info_present     = false;
   bool                    lc_or_present                  = false;
   uint32_t                ric_event_trigger_condition_id = 1;
@@ -2523,7 +2430,6 @@ struct e2sm_rc_event_trigger_format4_s {
   using ue_info_change_list_l_ = dyn_array<e2sm_rc_event_trigger_format4_item_s>;
 
   // member variables
-  bool                   ext = false;
   ue_info_change_list_l_ ue_info_change_list;
   // ...
 
@@ -2622,7 +2528,6 @@ struct e2sm_rc_event_trigger_s {
   };
 
   // member variables
-  bool                         ext = false;
   ric_event_trigger_formats_c_ ric_event_trigger_formats;
   // ...
 
@@ -2634,7 +2539,6 @@ struct e2sm_rc_event_trigger_s {
 
 // E2SM-RC-IndicationHeader-Format1 ::= SEQUENCE
 struct e2sm_rc_ind_hdr_format1_s {
-  bool     ext                                    = false;
   bool     ric_event_trigger_condition_id_present = false;
   uint32_t ric_event_trigger_condition_id         = 1;
   // ...
@@ -2647,7 +2551,6 @@ struct e2sm_rc_ind_hdr_format1_s {
 
 // E2SM-RC-IndicationHeader-Format2 ::= SEQUENCE
 struct e2sm_rc_ind_hdr_format2_s {
-  bool     ext = false;
   ue_id_c  ue_id;
   int64_t  ric_insert_style_type = 0;
   uint32_t ric_insert_ind_id     = 1;
@@ -2661,7 +2564,6 @@ struct e2sm_rc_ind_hdr_format2_s {
 
 // E2SM-RC-IndicationHeader-Format3 ::= SEQUENCE
 struct e2sm_rc_ind_hdr_format3_s {
-  bool     ext                                    = false;
   bool     ric_event_trigger_condition_id_present = false;
   bool     ue_id_present                          = false;
   uint32_t ric_event_trigger_condition_id         = 1;
@@ -2739,7 +2641,6 @@ struct e2sm_rc_ind_hdr_s {
   };
 
   // member variables
-  bool                   ext = false;
   ric_ind_hdr_formats_c_ ric_ind_hdr_formats;
   // ...
 
@@ -2751,7 +2652,6 @@ struct e2sm_rc_ind_hdr_s {
 
 // E2SM-RC-IndicationMessage-Format1-Item ::= SEQUENCE
 struct e2sm_rc_ind_msg_format1_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -2767,7 +2667,6 @@ struct e2sm_rc_ind_msg_format1_s {
   using ran_p_reported_list_l_ = dyn_array<e2sm_rc_ind_msg_format1_item_s>;
 
   // member variables
-  bool                   ext = false;
   ran_p_reported_list_l_ ran_p_reported_list;
   // ...
 
@@ -2779,7 +2678,6 @@ struct e2sm_rc_ind_msg_format1_s {
 
 // E2SM-RC-IndicationMessage-Format2-RANParameter-Item ::= SEQUENCE
 struct e2sm_rc_ind_msg_format2_ran_param_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -2795,7 +2693,6 @@ struct e2sm_rc_ind_msg_format2_item_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_ind_msg_format2_ran_param_item_s>;
 
   // member variables
-  bool          ext = false;
   ue_id_c       ue_id;
   ran_p_list_l_ ran_p_list;
   // ...
@@ -2811,7 +2708,6 @@ struct e2sm_rc_ind_msg_format2_s {
   using ue_param_list_l_ = dyn_array<e2sm_rc_ind_msg_format2_item_s>;
 
   // member variables
-  bool             ext = false;
   ue_param_list_l_ ue_param_list;
   // ...
 
@@ -2843,7 +2739,6 @@ struct neighbour_cell_item_choice_nr_s {
   using ho_validated_e_ = enumerated<ho_validated_opts, true>;
 
   // member variables
-  bool                     ext = false;
   nr_cgi_s                 nr_cgi;
   uint16_t                 nr_pci = 0;
   fixed_octstring<3, true> five_gs_tac;
@@ -2876,7 +2771,6 @@ struct neighbour_cell_item_choice_e_utra_s {
   using ho_validated_e_ = enumerated<ho_validated_opts, true>;
 
   // member variables
-  bool                     ext = false;
   eutra_cgi_s              eutra_cgi;
   uint16_t                 eutra_pci   = 0;
   uint32_t                 eutra_arfcn = 0;
@@ -2947,7 +2841,6 @@ using neighbour_cell_list_l = dyn_array<neighbour_cell_item_c>;
 
 // NeighbourRelation-Info ::= SEQUENCE
 struct neighbour_relation_info_s {
-  bool                  ext = false;
   serving_cell_pci_c    serving_cell_pci;
   serving_cell_arfcn_c  serving_cell_arfcn;
   neighbour_cell_list_l neighbour_cell_list;
@@ -2979,7 +2872,6 @@ struct serving_cell_cfg_common_s {
   using ssb_subcarrier_spacing_e_ = enumerated<ssb_subcarrier_spacing_opts, true>;
 
   // member variables
-  bool                      ext = false;
   unbounded_octstring<true> ssb_positions_in_burst;
   ssb_periodicity_e_        ssb_periodicity;
   ssb_subcarrier_spacing_e_ ssb_subcarrier_spacing;
@@ -2993,7 +2885,6 @@ struct serving_cell_cfg_common_s {
 
 // E2SM-RC-IndicationMessage-Format3-Item ::= SEQUENCE
 struct e2sm_rc_ind_msg_format3_item_s {
-  bool                      ext                              = false;
   bool                      cell_deleted_present             = false;
   bool                      neighbour_relation_table_present = false;
   cgi_c                     cell_global_id;
@@ -3015,7 +2906,6 @@ struct e2sm_rc_ind_msg_format3_s {
   using cell_info_list_l_ = dyn_array<e2sm_rc_ind_msg_format3_item_s>;
 
   // member variables
-  bool              ext = false;
   cell_info_list_l_ cell_info_list;
   // ...
 
@@ -3027,7 +2917,6 @@ struct e2sm_rc_ind_msg_format3_s {
 
 // E2SM-RC-IndicationMessage-Format5-Item ::= SEQUENCE
 struct e2sm_rc_ind_msg_format5_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -3043,7 +2932,6 @@ struct e2sm_rc_ind_msg_format5_s {
   using ran_p_requested_list_l_ = dyn_array<e2sm_rc_ind_msg_format5_item_s>;
 
   // member variables
-  bool                    ext = false;
   ran_p_requested_list_l_ ran_p_requested_list;
   // ...
 
@@ -3055,7 +2943,6 @@ struct e2sm_rc_ind_msg_format5_s {
 
 // E2SM-RC-IndicationMessage-Format6-RANP-Item ::= SEQUENCE
 struct e2sm_rc_ind_msg_format6_ranp_item_s {
-  bool                   ext          = false;
   uint64_t               ran_param_id = 1;
   ran_param_value_type_c ran_param_value_type;
   // ...
@@ -3071,7 +2958,6 @@ struct e2sm_rc_ind_msg_format6_ind_item_s {
   using ran_p_insert_ind_list_l_ = dyn_array<e2sm_rc_ind_msg_format6_ranp_item_s>;
 
   // member variables
-  bool                     ext               = false;
   uint32_t                 ric_insert_ind_id = 1;
   ran_p_insert_ind_list_l_ ran_p_insert_ind_list;
   // ...
@@ -3087,7 +2973,6 @@ struct e2sm_rc_ind_msg_format6_style_item_s {
   using ric_insert_ind_list_l_ = dyn_array<e2sm_rc_ind_msg_format6_ind_item_s>;
 
   // member variables
-  bool                   ext                         = false;
   int64_t                indicated_insert_style_type = 0;
   ric_insert_ind_list_l_ ric_insert_ind_list;
   // ...
@@ -3103,7 +2988,6 @@ struct e2sm_rc_ind_msg_format6_s {
   using ric_insert_style_list_l_ = dyn_array<e2sm_rc_ind_msg_format6_style_item_s>;
 
   // member variables
-  bool                     ext = false;
   ric_insert_style_list_l_ ric_insert_style_list;
   // ...
 
@@ -3215,7 +3099,6 @@ struct e2sm_rc_ind_msg_s {
   };
 
   // member variables
-  bool                   ext = false;
   ric_ind_msg_formats_c_ ric_ind_msg_formats;
   // ...
 
@@ -3227,7 +3110,6 @@ struct e2sm_rc_ind_msg_s {
 
 // E2SM-RC-QueryDefinition-Format1-Item ::= SEQUENCE
 struct e2sm_rc_query_definition_format1_item_s {
-  bool                   ext                          = false;
   bool                   ran_param_definition_present = false;
   uint64_t               ran_param_id                 = 1;
   ran_param_definition_s ran_param_definition;
@@ -3244,7 +3126,6 @@ struct e2sm_rc_query_definition_format1_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_query_definition_format1_item_s>;
 
   // member variables
-  bool          ext = false;
   ran_p_list_l_ ran_p_list;
   // ...
 
@@ -3280,7 +3161,6 @@ struct e2sm_rc_query_definition_s {
   };
 
   // member variables
-  bool                            ext = false;
   ric_query_definition_formats_c_ ric_query_definition_formats;
   // ...
 
@@ -3292,7 +3172,6 @@ struct e2sm_rc_query_definition_s {
 
 // E2SM-RC-QueryHeader-Format1 ::= SEQUENCE
 struct e2sm_rc_query_hdr_format1_s {
-  bool                 ext                        = false;
   bool                 associated_ue_info_present = false;
   int64_t              ric_style_type             = 0;
   ran_param_testing_l  associated_e2_node_info;
@@ -3331,7 +3210,6 @@ struct e2sm_rc_query_hdr_s {
   };
 
   // member variables
-  bool                     ext = false;
   ric_query_hdr_formats_c_ ric_query_hdr_formats;
   // ...
 
@@ -3343,7 +3221,6 @@ struct e2sm_rc_query_hdr_s {
 
 // E2SM-RC-QueryOutcome-Format1-ItemParameters ::= SEQUENCE
 struct e2sm_rc_query_outcome_format1_item_params_s {
-  bool                   ext                          = false;
   bool                   ran_param_value_type_present = false;
   uint64_t               ran_param_id                 = 1;
   ran_param_value_type_c ran_param_value_type;
@@ -3360,7 +3237,6 @@ struct e2sm_rc_query_outcome_format1_item_cell_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_query_outcome_format1_item_params_s>;
 
   // member variables
-  bool                      ext                              = false;
   bool                      neighbour_relation_table_present = false;
   cgi_c                     cell_global_id;
   ran_p_list_l_             ran_p_list;
@@ -3379,7 +3255,6 @@ struct e2sm_rc_query_outcome_format1_s {
   using cell_info_list_l_ = dyn_array<e2sm_rc_query_outcome_format1_item_cell_s>;
 
   // member variables
-  bool              ext = false;
   cell_info_list_l_ cell_info_list;
   // ...
 
@@ -3391,7 +3266,6 @@ struct e2sm_rc_query_outcome_format1_s {
 
 // E2SM-RC-QueryOutcome-Format2-ItemParameters ::= SEQUENCE
 struct e2sm_rc_query_outcome_format2_item_params_s {
-  bool                   ext                          = false;
   bool                   ran_param_value_type_present = false;
   uint64_t               ran_param_id                 = 1;
   ran_param_value_type_c ran_param_value_type;
@@ -3408,7 +3282,6 @@ struct e2sm_rc_query_outcome_format2_item_ue_s {
   using ran_p_list_l_ = dyn_array<e2sm_rc_query_outcome_format2_item_params_s>;
 
   // member variables
-  bool          ext                = false;
   bool          ue_filt_id_present = false;
   ue_id_c       ue_id;
   ran_p_list_l_ ran_p_list;
@@ -3426,7 +3299,6 @@ struct e2sm_rc_query_outcome_format2_s {
   using ue_info_list_l_ = dyn_array<e2sm_rc_query_outcome_format2_item_ue_s>;
 
   // member variables
-  bool            ext = false;
   ue_info_list_l_ ue_info_list;
   // ...
 
@@ -3490,7 +3362,6 @@ struct e2sm_rc_query_outcome_s {
   };
 
   // member variables
-  bool                         ext = false;
   ric_query_outcome_formats_c_ ric_query_outcome_formats;
   // ...
 
@@ -3502,7 +3373,6 @@ struct e2sm_rc_query_outcome_s {
 
 // RANFunctionDefinition-EventTrigger-Style-Item ::= SEQUENCE
 struct ran_function_definition_event_trigger_style_item_s {
-  bool                                 ext                          = false;
   int64_t                              ric_event_trigger_style_type = 0;
   printable_string<1, 150, true, true> ric_event_trigger_style_name;
   int64_t                              ric_event_trigger_format_type = 0;
@@ -3516,7 +3386,6 @@ struct ran_function_definition_event_trigger_style_item_s {
 
 // L2Parameters-RANParameter-Item ::= SEQUENCE
 struct l2_params_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -3533,7 +3402,6 @@ struct ran_function_definition_event_trigger_breakpoint_item_s {
   using ran_call_process_breakpoint_params_list_l_ = dyn_array<call_process_breakpoint_ran_param_item_s>;
 
   // member variables
-  bool                                       ext                        = false;
   uint32_t                                   call_process_breakpoint_id = 1;
   printable_string<1, 150, true, true>       call_process_breakpoint_name;
   ran_call_process_breakpoint_params_list_l_ ran_call_process_breakpoint_params_list;
@@ -3550,7 +3418,6 @@ struct ran_function_definition_event_trigger_call_process_item_s {
   using call_process_breakpoints_list_l_ = dyn_array<ran_function_definition_event_trigger_breakpoint_item_s>;
 
   // member variables
-  bool                                 ext                  = false;
   uint32_t                             call_process_type_id = 1;
   printable_string<1, 150, true, true> call_process_type_name;
   call_process_breakpoints_list_l_     call_process_breakpoints_list;
@@ -3564,7 +3431,6 @@ struct ran_function_definition_event_trigger_call_process_item_s {
 
 // UEIdentification-RANParameter-Item ::= SEQUENCE
 struct ue_identif_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -3585,7 +3451,6 @@ struct ran_function_definition_event_trigger_s {
   using ran_cell_identif_params_list_l_ = dyn_array<cell_identif_ran_param_item_s>;
 
   // member variables
-  bool                            ext = false;
   ric_event_trigger_style_list_l_ ric_event_trigger_style_list;
   ran_l2_params_list_l_           ran_l2_params_list;
   ran_call_process_types_list_l_  ran_call_process_types_list;
@@ -3601,7 +3466,6 @@ struct ran_function_definition_event_trigger_s {
 
 // Report-RANParameter-Item ::= SEQUENCE
 struct report_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -3618,7 +3482,6 @@ struct ran_function_definition_report_item_s {
   using ran_report_params_list_l_ = dyn_array<report_ran_param_item_s>;
 
   // member variables
-  bool                                 ext                   = false;
   int64_t                              ric_report_style_type = 0;
   printable_string<1, 150, true, true> ric_report_style_name;
   int64_t                              ric_supported_event_trigger_style_type = 0;
@@ -3639,7 +3502,6 @@ struct ran_function_definition_report_s {
   using ric_report_style_list_l_ = dyn_array<ran_function_definition_report_item_s>;
 
   // member variables
-  bool                     ext = false;
   ric_report_style_list_l_ ric_report_style_list;
   // ...
 
@@ -3651,7 +3513,6 @@ struct ran_function_definition_report_s {
 
 // InsertIndication-RANParameter-Item ::= SEQUENCE
 struct insert_ind_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -3668,7 +3529,6 @@ struct ran_function_definition_insert_ind_item_s {
   using ran_insert_ind_params_list_l_ = dyn_array<insert_ind_ran_param_item_s>;
 
   // member variables
-  bool                                 ext               = false;
   uint32_t                             ric_insert_ind_id = 1;
   printable_string<1, 150, true, true> ric_insert_ind_name;
   ran_insert_ind_params_list_l_        ran_insert_ind_params_list;
@@ -3685,7 +3545,6 @@ struct ran_function_definition_insert_item_s {
   using ric_insert_ind_list_l_ = dyn_array<ran_function_definition_insert_ind_item_s>;
 
   // member variables
-  bool                                 ext                   = false;
   int64_t                              ric_insert_style_type = 0;
   printable_string<1, 150, true, true> ric_insert_style_name;
   int64_t                              ric_supported_event_trigger_style_type = 0;
@@ -3707,7 +3566,6 @@ struct ran_function_definition_insert_s {
   using ric_insert_style_list_l_ = dyn_array<ran_function_definition_insert_item_s>;
 
   // member variables
-  bool                     ext = false;
   ric_insert_style_list_l_ ric_insert_style_list;
   // ...
 
@@ -3728,7 +3586,6 @@ struct ran_function_definition_ctrl_action_item_s {
   using ue_group_ctrl_action_supported_e_ = enumerated<ue_group_ctrl_action_supported_opts, true>;
 
   // member variables
-  bool                                 ext                = false;
   uint32_t                             ric_ctrl_action_id = 1;
   printable_string<1, 150, true, true> ric_ctrl_action_name;
   ran_ctrl_action_params_list_l_       ran_ctrl_action_params_list;
@@ -3751,7 +3608,6 @@ struct ran_function_definition_ctrl_item_s {
   using ran_ctrl_outcome_params_list_l_ = dyn_array<ctrl_outcome_ran_param_item_s>;
 
   // member variables
-  bool                                 ext                                     = false;
   bool                                 ric_call_process_id_format_type_present = false;
   int64_t                              ric_ctrl_style_type                     = 0;
   printable_string<1, 150, true, true> ric_ctrl_style_name;
@@ -3775,7 +3631,6 @@ struct ran_function_definition_ctrl_s {
   using ric_ctrl_style_list_l_ = dyn_array<ran_function_definition_ctrl_item_s>;
 
   // member variables
-  bool                   ext = false;
   ric_ctrl_style_list_l_ ric_ctrl_style_list;
   // ...
 
@@ -3787,7 +3642,6 @@ struct ran_function_definition_ctrl_s {
 
 // PolicyAction-RANParameter-Item ::= SEQUENCE
 struct policy_action_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -3801,7 +3655,6 @@ struct policy_action_ran_param_item_s {
 
 // PolicyCondition-RANParameter-Item ::= SEQUENCE
 struct policy_condition_ran_param_item_s {
-  bool                                 ext          = false;
   uint64_t                             ran_param_id = 1;
   printable_string<1, 150, true, true> ran_param_name;
   // ...
@@ -3819,7 +3672,6 @@ struct ran_function_definition_policy_action_item_s {
   using ran_policy_condition_params_list_l_ = dyn_array<policy_condition_ran_param_item_s>;
 
   // member variables
-  bool                                 ext                  = false;
   uint32_t                             ric_policy_action_id = 1;
   printable_string<1, 150, true, true> ric_policy_action_name;
   int64_t                              ric_action_definition_format_type = 0;
@@ -3838,7 +3690,6 @@ struct ran_function_definition_policy_item_s {
   using ric_policy_action_list_l_ = dyn_array<ran_function_definition_policy_action_item_s>;
 
   // member variables
-  bool                                 ext                   = false;
   int64_t                              ric_policy_style_type = 0;
   printable_string<1, 150, true, true> ric_policy_style_name;
   int64_t                              ric_supported_event_trigger_style_type = 0;
@@ -3856,7 +3707,6 @@ struct ran_function_definition_policy_s {
   using ric_policy_style_list_l_ = dyn_array<ran_function_definition_policy_item_s>;
 
   // member variables
-  bool                     ext = false;
   ric_policy_style_list_l_ ric_policy_style_list;
   // ...
 
@@ -3868,7 +3718,6 @@ struct ran_function_definition_policy_s {
 
 // Query-RANParameter-Item ::= SEQUENCE
 struct query_ran_param_item_s {
-  bool                                 ext                          = false;
   bool                                 ran_param_definition_present = false;
   uint64_t                             ran_param_id                 = 1;
   printable_string<1, 150, true, true> ran_param_name;
@@ -3886,7 +3735,6 @@ struct ran_function_definition_query_item_s {
   using ran_query_params_list_l_ = dyn_array<query_ran_param_item_s>;
 
   // member variables
-  bool                                 ext                  = false;
   int64_t                              ric_query_style_type = 0;
   printable_string<1, 150, true, true> ric_query_style_name;
   int64_t                              ric_query_hdr_format_type        = 0;
@@ -3906,7 +3754,6 @@ struct ran_function_definition_query_s {
   using ric_query_style_list_l_ = dyn_array<ran_function_definition_query_item_s>;
 
   // member variables
-  bool                    ext = false;
   ric_query_style_list_l_ ric_query_style_list;
   // ...
 
@@ -3918,7 +3765,6 @@ struct ran_function_definition_query_s {
 
 // E2SM-RC-RANFunctionDefinition ::= SEQUENCE
 struct e2sm_rc_ran_function_definition_s {
-  bool                                    ext                                           = false;
   bool                                    ran_function_definition_event_trigger_present = false;
   bool                                    ran_function_definition_report_present        = false;
   bool                                    ran_function_definition_insert_present        = false;

@@ -263,7 +263,6 @@ sib19_r17_s ocudu::odu::make_asn1_rrc_cell_sib19(const sib19_info& sib19_params)
 
     // Pack remaining neighbors into extension list (R17 extension).
     if (sib19_params.ncells.size() > MAX_NOF_NTN_NEIGHBORS_BASE_LIST) {
-      sib19.ext = true;
       sib19.ntn_neigh_cell_cfg_list_ext_v1720.set_present();
       for (size_t i = MAX_NOF_NTN_NEIGHBORS_BASE_LIST, e = sib19_params.ncells.size(); i != e; ++i) {
         sib19.ntn_neigh_cell_cfg_list_ext_v1720->push_back(make_asn1_ntn_neighbor_cell(sib19_params.ncells[i]));
@@ -273,7 +272,6 @@ sib19_r17_s ocudu::odu::make_asn1_rrc_cell_sib19(const sib19_info& sib19_params)
 
   // Moving Reference Location (R18 extension).
   if (sib19_params.moving_ref_location.has_value()) {
-    sib19.ext            = true;
     auto moving_ref_buff = pack_asn1_ellipsoid_point(*sib19_params.moving_ref_location);
     if (!sib19.moving_ref_location_r18.resize(moving_ref_buff.length())) {
       ocudu_assertion_failure("Failed to pack moving reference location in SIB19.");
@@ -283,7 +281,6 @@ sib19_r17_s ocudu::odu::make_asn1_rrc_cell_sib19(const sib19_info& sib19_params)
 
   // Coverage Enhancements (R18 extension).
   if (sib19_params.coverage_enhancements.has_value()) {
-    sib19.ext = true;
     sib19.ntn_cov_enh_r18.set_present();
     auto&       cov_enh        = *sib19.ntn_cov_enh_r18;
     const auto& cov_enh_params = *sib19_params.coverage_enhancements;
@@ -304,7 +301,6 @@ sib19_r17_s ocudu::odu::make_asn1_rrc_cell_sib19(const sib19_info& sib19_params)
   // Satellite Switch with Resynchronization (R18 extension).
   if (sib19_params.sat_switch_with_resync.has_value()) {
     const auto& sat_switch_with_resync = *sib19_params.sat_switch_with_resync;
-    sib19.ext                          = true;
     sib19.sat_switch_with_re_sync_r18.set_present();
     auto& sat_switch = *sib19.sat_switch_with_re_sync_r18;
 

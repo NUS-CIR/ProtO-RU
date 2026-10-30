@@ -80,7 +80,6 @@ private:
 
 // BinRangeItem ::= SEQUENCE
 struct bin_range_item_s {
-  bool              ext     = false;
   uint32_t          bin_idx = 1;
   bin_range_value_c start_value;
   bin_range_value_c end_value;
@@ -97,7 +96,6 @@ using bin_range_list_l = dyn_array<bin_range_item_s>;
 
 // BinRangeDefinition ::= SEQUENCE
 struct bin_range_definition_s {
-  bool             ext = false;
   bin_range_list_l bin_range_list_x;
   bin_range_list_l bin_range_list_y;
   bin_range_list_l bin_range_list_z;
@@ -161,7 +159,6 @@ private:
 
 // DistMeasurementBinRangeItem ::= SEQUENCE
 struct dist_meas_bin_range_item_s {
-  bool                   ext = false;
   meas_type_c            meas_type;
   bin_range_definition_s bin_range_def;
   // ...
@@ -221,7 +218,6 @@ struct meas_label_s {
   using avg_e_ = enumerated<avg_opts, true>;
 
   // member variables
-  bool                     ext                        = false;
   bool                     no_label_present           = false;
   bool                     plmn_id_present            = false;
   bool                     slice_id_present           = false;
@@ -282,7 +278,6 @@ struct meas_label_s {
 
 // LabelInfoItem ::= SEQUENCE
 struct label_info_item_s {
-  bool         ext = false;
   meas_label_s meas_label;
   // ...
 
@@ -424,7 +419,6 @@ private:
 
 // MeasValueReportCond ::= SEQUENCE
 struct meas_value_report_cond_s {
-  bool                              ext = false;
   meas_value_test_cond_expression_e test_expr;
   test_cond_value_c                 test_value;
   // ...
@@ -445,7 +439,6 @@ using lc_or_e = enumerated<lc_or_opts, true>;
 
 // MatchCondReportItem ::= SEQUENCE
 struct match_cond_report_item_s {
-  bool                     ext           = false;
   bool                     lc_or_present = false;
   meas_value_report_cond_s meas_value_report_cond;
   lc_or_e                  lc_or;
@@ -462,7 +455,6 @@ using match_cond_report_list_l = dyn_array<match_cond_report_item_s>;
 
 // MeasurementInfoItem ::= SEQUENCE
 struct meas_info_item_s {
-  bool              ext = false;
   meas_type_c       meas_type;
   label_info_list_l label_info_list;
   // ...
@@ -479,7 +471,6 @@ using meas_info_list_l = dyn_array<meas_info_item_s>;
 
 // E2SM-KPM-ActionDefinition-Format1 ::= SEQUENCE
 struct e2sm_kpm_action_definition_format1_s {
-  bool             ext                    = false;
   bool             cell_global_id_present = false;
   meas_info_list_l meas_info_list;
   uint64_t         granul_period = 1;
@@ -495,7 +486,6 @@ struct e2sm_kpm_action_definition_format1_s {
 
 // E2SM-KPM-ActionDefinition-Format2 ::= SEQUENCE
 struct e2sm_kpm_action_definition_format2_s {
-  bool                                 ext = false;
   ue_id_c                              ue_id;
   e2sm_kpm_action_definition_format1_s subscript_info;
   // ...
@@ -746,7 +736,6 @@ using test_cond_expression_e = enumerated<test_cond_expression_opts, true>;
 
 // TestCondInfo ::= SEQUENCE
 struct test_cond_info_s {
-  bool                   ext                = false;
   bool                   test_expr_present  = false;
   bool                   test_value_present = false;
   test_cond_type_c       test_type;
@@ -812,7 +801,6 @@ private:
 
 // MatchingCondItem ::= SEQUENCE
 struct matching_cond_item_s {
-  bool                        ext           = false;
   bool                        lc_or_present = false;
   matching_cond_item_choice_c matching_cond_choice;
   lc_or_e                     lc_or;
@@ -829,7 +817,6 @@ using matching_cond_list_l = dyn_array<matching_cond_item_s>;
 
 // MeasurementCondItem ::= SEQUENCE
 struct meas_cond_item_s {
-  bool                 ext = false;
   meas_type_c          meas_type;
   matching_cond_list_l matching_cond;
   // ...
@@ -846,7 +833,6 @@ using meas_cond_list_l = dyn_array<meas_cond_item_s>;
 
 // E2SM-KPM-ActionDefinition-Format3 ::= SEQUENCE
 struct e2sm_kpm_action_definition_format3_s {
-  bool             ext                    = false;
   bool             cell_global_id_present = false;
   meas_cond_list_l meas_cond_list;
   uint64_t         granul_period = 1;
@@ -861,7 +847,6 @@ struct e2sm_kpm_action_definition_format3_s {
 
 // MatchingUeCondPerSubItem ::= SEQUENCE
 struct matching_ue_cond_per_sub_item_s {
-  bool             ext = false;
   test_cond_info_s test_cond_info;
   // ...
   bool    lc_or_present = false;
@@ -878,7 +863,6 @@ using matching_ue_cond_per_sub_list_l = dyn_array<matching_ue_cond_per_sub_item_
 
 // E2SM-KPM-ActionDefinition-Format4 ::= SEQUENCE
 struct e2sm_kpm_action_definition_format4_s {
-  bool                                 ext = false;
   matching_ue_cond_per_sub_list_l      matching_ue_cond_list;
   e2sm_kpm_action_definition_format1_s sub_info;
   // ...
@@ -891,7 +875,6 @@ struct e2sm_kpm_action_definition_format4_s {
 
 // MatchingUEidPerSubItem ::= SEQUENCE
 struct matching_ue_id_per_sub_item_s {
-  bool    ext = false;
   ue_id_c ue_id;
   // ...
 
@@ -906,7 +889,6 @@ using matching_ue_id_per_sub_list_l = dyn_array<matching_ue_id_per_sub_item_s>;
 
 // E2SM-KPM-ActionDefinition-Format5 ::= SEQUENCE
 struct e2sm_kpm_action_definition_format5_s {
-  bool                                 ext = false;
   matching_ue_id_per_sub_list_l        matching_ue_id_list;
   e2sm_kpm_action_definition_format1_s sub_info;
   // ...
@@ -1017,7 +999,6 @@ struct e2sm_kpm_action_definition_fundamental_s {
   };
 
   // member variables
-  bool                                     ext = false;
   action_definition_fundamental_formats_c_ action_definition_fundamental_formats;
   // ...
 
@@ -1029,7 +1010,6 @@ struct e2sm_kpm_action_definition_fundamental_s {
 
 // MultiReportActionDefinitionItem ::= SEQUENCE
 struct multi_report_action_definition_item_s {
-  bool                                     ext                           = false;
   bool                                     job_action_definition_present = false;
   bool                                     job_cell_global_id_present    = false;
   bool                                     job_ue_id_present             = false;
@@ -1059,7 +1039,6 @@ using multi_report_approach_e = enumerated<multi_report_approach_opts, true>;
 
 // E2SM-KPM-ActionDefinition-Format255 ::= SEQUENCE
 struct e2sm_kpm_action_definition_format255_s {
-  bool                                     ext                              = false;
   bool                                     common_action_definition_present = false;
   multi_report_action_definition_list_l    multi_report_action_definition_list;
   multi_report_approach_e                  multi_report_approach;
@@ -1185,7 +1164,6 @@ struct e2sm_kpm_action_definition_s {
   };
 
   // member variables
-  bool                         ext            = false;
   int64_t                      ric_style_type = 0;
   action_definition_formats_c_ action_definition_formats;
   // ...
@@ -1198,7 +1176,6 @@ struct e2sm_kpm_action_definition_s {
 
 // E2SM-KPM-EventTriggerDefinition-Format1 ::= SEQUENCE
 struct e2sm_kpm_event_trigger_definition_format1_s {
-  bool     ext           = false;
   uint64_t report_period = 1;
   // ...
 
@@ -1210,7 +1187,6 @@ struct e2sm_kpm_event_trigger_definition_format1_s {
 
 // EventMeasurementDefinition ::= SEQUENCE
 struct event_meas_definition_s {
-  bool              ext                    = false;
   bool              cell_global_id_present = false;
   meas_type_c       meas_type;
   label_info_list_l label_info_list;
@@ -1225,7 +1201,6 @@ struct event_meas_definition_s {
 
 // EventWindowDefinition ::= SEQUENCE
 struct event_win_definition_s {
-  bool                        ext      = false;
   uint8_t                     win_size = 1;
   aggregation_function_type_e aggre_func;
   // ...
@@ -1238,7 +1213,6 @@ struct event_win_definition_s {
 
 // EventParameterMeasurement ::= SEQUENCE
 struct event_param_meas_s {
-  bool                    ext              = false;
   bool                    win_func_present = false;
   event_meas_definition_s meas_def;
   event_win_definition_s  win_func;
@@ -1252,7 +1226,6 @@ struct event_param_meas_s {
 
 // EventParameterValue ::= SEQUENCE
 struct event_param_value_s {
-  bool              ext           = false;
   bool              value_present = false;
   test_cond_value_c value;
   // ...
@@ -1323,7 +1296,6 @@ struct event_param_item_s {
   };
 
   // member variables
-  bool                 ext                  = false;
   bool                 next_math_op_present = false;
   param_type_c_        param_type;
   next_math_operator_e next_math_op;
@@ -1340,7 +1312,6 @@ using event_param_list_l = dyn_array<event_param_item_s>;
 
 // EventExpression ::= SEQUENCE
 struct event_expression_s {
-  bool                        ext                = false;
   bool                        aggre_func_present = false;
   event_param_list_l          param_list;
   aggregation_function_type_e aggre_func;
@@ -1362,7 +1333,6 @@ using event_lc_operator_e = enumerated<event_lc_operator_opts, true>;
 
 // EventFormula ::= SEQUENCE
 struct event_formula_s {
-  bool                ext = false;
   event_expression_s  left_expr;
   event_lc_operator_e logic_op;
   event_expression_s  right_expr;
@@ -1376,7 +1346,6 @@ struct event_formula_s {
 
 // EventTriggerItem ::= SEQUENCE
 struct event_trigger_item_s {
-  bool            ext                       = false;
   bool            event_eval_period_present = false;
   bool            lc_or_present             = false;
   event_formula_s event_cond;
@@ -1395,7 +1364,6 @@ using event_triger_list_l = dyn_array<event_trigger_item_s>;
 
 // E2SM-KPM-EventTriggerDefinition-Format2 ::= SEQUENCE
 struct e2sm_kpm_event_trigger_definition_format2_s {
-  bool                ext = false;
   event_triger_list_l event_trigger_list;
   // ...
 
@@ -1459,7 +1427,6 @@ struct e2sm_kpm_event_trigger_definition_s {
   };
 
   // member variables
-  bool                        ext = false;
   event_definition_formats_c_ event_definition_formats;
   // ...
 
@@ -1471,7 +1438,6 @@ struct e2sm_kpm_event_trigger_definition_s {
 
 // E2SM-KPM-IndicationHeader-Format1 ::= SEQUENCE
 struct e2sm_kpm_ind_hdr_format1_s {
-  bool                                 ext                        = false;
   bool                                 file_formatversion_present = false;
   bool                                 sender_name_present        = false;
   bool                                 sender_type_present        = false;
@@ -1517,7 +1483,6 @@ struct e2sm_kpm_ind_hdr_s {
   };
 
   // member variables
-  bool               ext = false;
   ind_hdr_formats_c_ ind_hdr_formats;
   // ...
 
@@ -1592,7 +1557,6 @@ struct meas_data_item_s {
   using incomplete_flag_e_ = enumerated<incomplete_flag_opts, true>;
 
   // member variables
-  bool               ext                     = false;
   bool               incomplete_flag_present = false;
   meas_record_l      meas_record;
   incomplete_flag_e_ incomplete_flag;
@@ -1609,7 +1573,6 @@ using meas_data_l = dyn_array<meas_data_item_s>;
 
 // E2SM-KPM-IndicationMessage-Format1 ::= SEQUENCE
 struct e2sm_kpm_ind_msg_format1_s {
-  bool             ext                   = false;
   bool             granul_period_present = false;
   meas_data_l      meas_data;
   meas_info_list_l meas_info_list;
@@ -1624,7 +1587,6 @@ struct e2sm_kpm_ind_msg_format1_s {
 
 // MatchingUEidItem ::= SEQUENCE
 struct matching_ue_id_item_s {
-  bool    ext = false;
   ue_id_c ue_id;
   // ...
 
@@ -1639,7 +1601,6 @@ using matching_ue_id_list_l = dyn_array<matching_ue_id_item_s>;
 
 // MatchingUEidItem-PerGP ::= SEQUENCE
 struct matching_ue_id_item_per_gp_s {
-  bool    ext = false;
   ue_id_c ue_id;
   // ...
 
@@ -1712,7 +1673,6 @@ struct matching_ue_id_per_gp_item_s {
   };
 
   // member variables
-  bool              ext = false;
   matched_per_gp_c_ matched_per_gp;
   // ...
 
@@ -1727,7 +1687,6 @@ using matching_ue_id_per_gp_l = dyn_array<matching_ue_id_per_gp_item_s>;
 
 // MeasurementCondUEidItem ::= SEQUENCE
 struct meas_cond_ue_id_item_s {
-  bool                  ext = false;
   meas_type_c           meas_type;
   matching_cond_list_l  matching_cond;
   matching_ue_id_list_l matching_ue_id_list;
@@ -1745,7 +1704,6 @@ using meas_cond_ue_id_list_l = dyn_array<meas_cond_ue_id_item_s>;
 
 // E2SM-KPM-IndicationMessage-Format2 ::= SEQUENCE
 struct e2sm_kpm_ind_msg_format2_s {
-  bool                   ext                   = false;
   bool                   granul_period_present = false;
   meas_data_l            meas_data;
   meas_cond_ue_id_list_l meas_cond_ue_id_list;
@@ -1760,7 +1718,6 @@ struct e2sm_kpm_ind_msg_format2_s {
 
 // UEMeasurementReportItem ::= SEQUENCE
 struct ue_meas_report_item_s {
-  bool                       ext = false;
   ue_id_c                    ue_id;
   e2sm_kpm_ind_msg_format1_s meas_report;
   // ...
@@ -1776,7 +1733,6 @@ using ue_meas_report_list_l = dyn_array<ue_meas_report_item_s>;
 
 // E2SM-KPM-IndicationMessage-Format3 ::= SEQUENCE
 struct e2sm_kpm_ind_msg_format3_s {
-  bool                  ext = false;
   ue_meas_report_list_l ue_meas_report_list;
   // ...
 
@@ -1851,7 +1807,6 @@ struct e2sm_kpm_ind_msg_fundamental_s {
   };
 
   // member variables
-  bool                           ext = false;
   ind_msg_fundamental_formats_c_ ind_msg_fundamental_formats;
   // ...
 
@@ -1863,7 +1818,6 @@ struct e2sm_kpm_ind_msg_fundamental_s {
 
 // MultiReportIndicationMessageItem ::= SEQUENCE
 struct multi_report_ind_msg_item_s {
-  bool                           ext    = false;
   uint32_t                       job_id = 1;
   e2sm_kpm_ind_msg_fundamental_s ind_msg;
   // ...
@@ -1879,7 +1833,6 @@ using multi_report_ind_msg_list_l = dyn_array<multi_report_ind_msg_item_s>;
 
 // E2SM-KPM-IndicationMessage-Format255 ::= SEQUENCE
 struct e2sm_kpm_ind_msg_format255_s {
-  bool                        ext = false;
   multi_report_ind_msg_list_l multi_report_ind_msg_list;
   // ...
 
@@ -1969,7 +1922,6 @@ struct e2sm_kpm_ind_msg_s {
   };
 
   // member variables
-  bool               ext = false;
   ind_msg_formats_c_ ind_msg_formats;
   // ...
 
@@ -1981,7 +1933,6 @@ struct e2sm_kpm_ind_msg_s {
 
 // RIC-EventTriggerStyle-Item ::= SEQUENCE
 struct ric_event_trigger_style_item_s {
-  bool                                 ext                          = false;
   int64_t                              ric_event_trigger_style_type = 0;
   printable_string<1, 150, true, true> ric_event_trigger_style_name;
   int64_t                              ric_event_trigger_format_type = 0;
@@ -1995,7 +1946,6 @@ struct ric_event_trigger_style_item_s {
 
 // MeasurementInfo-Action-Item ::= SEQUENCE
 struct meas_info_action_item_s {
-  bool                                 ext             = false;
   bool                                 meas_id_present = false;
   printable_string<1, 150, true, true> meas_name;
   uint32_t                             meas_id = 1;
@@ -2013,7 +1963,6 @@ using meas_info_action_list_l = dyn_array<meas_info_action_item_s>;
 
 // RIC-ReportStyle-Item ::= SEQUENCE
 struct ric_report_style_item_s {
-  bool                                 ext                   = false;
   int64_t                              ric_report_style_type = 0;
   printable_string<1, 150, true, true> ric_report_style_name;
   int64_t                              ric_action_format_type = 0;
@@ -2030,7 +1979,6 @@ struct ric_report_style_item_s {
 
 // RIC-FundamentalLevelReportStyle-Item ::= SEQUENCE
 struct ric_fundamental_level_report_style_item_s {
-  bool    ext                   = false;
   int64_t ric_report_style_type = 0;
   // ...
 
@@ -2051,7 +1999,6 @@ struct ric_integrated_report_style_item_s {
   using ric_multiple_individual_report_support_e_ = enumerated<ric_multiple_individual_report_support_opts, true>;
 
   // member variables
-  bool                                       ext                                            = false;
   bool                                       ric_multiple_individual_report_support_present = false;
   int64_t                                    ric_report_style_type                          = 0;
   printable_string<1, 150, true, true>       ric_report_style_name;
@@ -2075,7 +2022,6 @@ struct e2sm_kpm_ra_nfunction_description_s {
   using ric_integrated_report_style_list_l_ = dyn_array<ric_integrated_report_style_item_s>;
 
   // member variables
-  bool                            ext = false;
   ra_nfunction_name_s             ran_function_name;
   ric_event_trigger_style_list_l_ ric_event_trigger_style_list;
   ric_report_style_list_l_        ric_report_style_list;

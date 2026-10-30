@@ -311,7 +311,6 @@ static byte_buffer pack_ue_cap_with_repetition_caps(const repetition_caps_builde
   band.band_nr = 78;
   if (params.pdsch_tdra_rep) {
     band.mimo_params_per_band_present = true;
-    band.mimo_params_per_band.ext     = true;
     band.mimo_params_per_band.support_inter_slot_tdm_r16.set_present();
     auto& inter_slot_tdm = *band.mimo_params_per_band.support_inter_slot_tdm_r16;
     inter_slot_tdm.support_rep_num_pdsch_tdra_r16.value =
@@ -321,7 +320,6 @@ static byte_buffer pack_ue_cap_with_repetition_caps(const repetition_caps_builde
     inter_slot_tdm.max_num_tci_states_r16 = 1;
   }
   if (params.pusch_rep_avail_slot) {
-    band.ext                                         = true;
     band.pusch_type_a_repeats_avail_slot_r17_present = true;
   }
   ue_cap.rf_params.supported_band_list_nr.push_back(band);
@@ -329,7 +327,6 @@ static byte_buffer pack_ue_cap_with_repetition_caps(const repetition_caps_builde
   if (params.pusch_rep_type_a_shared or params.pusch_rep_type_a_non_shared) {
     auto& phy_common                            = ue_cap.phy_params.phy_params_common;
     ue_cap.phy_params.phy_params_common_present = true;
-    phy_common.ext                              = true;
     phy_common.pusch_repeat_type_a_r16.set_present();
     phy_common.pusch_repeat_type_a_r16->shared_spec_ch_access_r16_present     = params.pusch_rep_type_a_shared;
     phy_common.pusch_repeat_type_a_r16->non_shared_spec_ch_access_r16_present = params.pusch_rep_type_a_non_shared;
@@ -410,7 +407,6 @@ static byte_buffer pack_ue_cap_with_type2_codebook_caps(const type2_codebook_cap
   band_nr_s band;
   band.band_nr                      = 78;
   band.mimo_params_per_band_present = true;
-  band.mimo_params_per_band.ext     = true;
   band.mimo_params_per_band.codebook_params.set_present();
   codebook_params_s& cb_params = *band.mimo_params_per_band.codebook_params;
 
@@ -534,7 +530,6 @@ static byte_buffer pack_ue_cap_with_ntn_caps(const ntn_caps_builder_params& para
 
   band_nr_s band;
   band.band_nr                          = 256;
-  band.ext                              = true;
   band.ul_pre_compensation_r17_present  = params.ul_pre_compensation;
   band.ul_ta_report_r17_present         = params.ul_ta_report;
   band.ue_specific_k_offset_r17_present = params.ue_specific_k_offset;
@@ -554,7 +549,6 @@ static byte_buffer pack_ue_cap_with_ntn_caps(const ntn_caps_builder_params& para
       auto& mac_common                                = v1700.ntn_params_r17.mac_params_ntn_r17.mac_params_common;
       v1700.ntn_params_r17.mac_params_ntn_r17_present = true;
       v1700.ntn_params_r17.mac_params_ntn_r17.mac_params_common_present = true;
-      mac_common.ext                                                    = true;
       mac_common.harq_feedback_disabled_r17_present                     = params.harq_feedback_disabled;
       mac_common.ul_harq_mode_b_r17_present                             = params.ul_harq_mode_b;
     }

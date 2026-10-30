@@ -584,20 +584,17 @@ asn1::rrc_nr::meas_obj_nr_s ocudu::ocucp::meas_obj_nr_to_rrc_asn1(const rrc_meas
   // Fill group 0.
   // Fill freq band ind NR.
   if (meas_obj_nr.freq_band_ind_nr.has_value()) {
-    asn1_meas_obj_nr.ext                      = true;
     asn1_meas_obj_nr.freq_band_ind_nr_present = true;
     asn1_meas_obj_nr.freq_band_ind_nr         = meas_obj_nr.freq_band_ind_nr.value();
   }
   // Fill meas cycle scell.
   if (meas_obj_nr.meas_cycle_scell.has_value()) {
-    asn1_meas_obj_nr.ext                      = true;
     asn1_meas_obj_nr.meas_cycle_scell_present = true;
     asn1::number_to_enum(asn1_meas_obj_nr.meas_cycle_scell, meas_obj_nr.meas_cycle_scell.value());
   }
   // Fill group 1.
   // Fill t312.
   if (meas_obj_nr.t312.has_value()) {
-    asn1_meas_obj_nr.ext = true;
     asn1_meas_obj_nr.t312_r16.set_present();
     asn1_meas_obj_nr.t312_r16->set_setup();
     asn1::number_to_enum(asn1_meas_obj_nr.t312_r16->setup(), meas_obj_nr.t312.value());
@@ -613,7 +610,6 @@ asn1::rrc_nr::meas_obj_nr_s ocudu::ocucp::meas_obj_nr_to_rrc_asn1(const rrc_meas
                   meas_obj_nr.cells_to_add_mod_list.end(),
                   [](const rrc_cells_to_add_mod& c) { return c.ntn_polarization.has_value(); });
   if (has_ntn_polarization) {
-    asn1_meas_obj_nr.ext = true;
     asn1_meas_obj_nr.cells_to_add_mod_list_ext_v1710.set_present();
     auto& ext_list_v1710 = *asn1_meas_obj_nr.cells_to_add_mod_list_ext_v1710;
     for (const auto& cell : meas_obj_nr.cells_to_add_mod_list) {
@@ -635,7 +631,6 @@ asn1::rrc_nr::meas_obj_nr_s ocudu::ocucp::meas_obj_nr_to_rrc_asn1(const rrc_meas
                   meas_obj_nr.cells_to_add_mod_list.end(),
                   [](const rrc_cells_to_add_mod& c) { return c.ntn_neighbour_info.has_value(); });
   if (has_ntn_cells) {
-    asn1_meas_obj_nr.ext = true;
     asn1_meas_obj_nr.cells_to_add_mod_list_ext_v1800.set_present();
     auto& ext_list = *asn1_meas_obj_nr.cells_to_add_mod_list_ext_v1800;
     for (const auto& cell : meas_obj_nr.cells_to_add_mod_list) {
@@ -905,7 +900,6 @@ ocudu::ocucp::periodical_report_cfg_to_rrc_asn1(const rrc_periodical_report_cfg&
   asn1_periodical_report_cfg.use_allowed_cell_list = periodical_report_cfg.use_allowed_cell_list;
 
   if (periodical_report_cfg.coarse_location_request) {
-    asn1_periodical_report_cfg.ext                                 = true;
     asn1_periodical_report_cfg.coarse_location_request_r17_present = true;
   }
 
@@ -1072,13 +1066,11 @@ ocudu::ocucp::event_triggered_report_cfg_to_rrc_asn1(const rrc_event_trigger_cfg
 
   // Fill use T312.
   if (event_trigger_cfg.t312.has_value()) {
-    asn1_event_trigger_cfg.ext                  = true;
     asn1_event_trigger_cfg.use_t312_r16_present = true;
     asn1_event_trigger_cfg.use_t312_r16         = true;
   }
 
   if (event_trigger_cfg.coarse_location_request) {
-    asn1_event_trigger_cfg.ext                                 = true;
     asn1_event_trigger_cfg.coarse_location_request_r17_present = true;
   }
 

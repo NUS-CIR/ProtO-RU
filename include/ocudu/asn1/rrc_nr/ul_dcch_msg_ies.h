@@ -164,7 +164,6 @@ struct overheat_assist_r17_s {
 
 // ResourceConfigPerFR-r17 ::= SEQUENCE
 struct res_cfg_per_fr_r17_s {
-  bool     ext                                         = false;
   bool     bm_max_num_csi_rs_res_r17_present           = false;
   bool     bm_max_num_aperiodic_csi_rs_res_r17_present = false;
   bool     cg_max_num_cfgs_all_cc_r17_present          = false;
@@ -191,7 +190,6 @@ struct res_cfg_per_fr_r17_s {
 
 // ResourceConfigNRDC-r17 ::= SEQUENCE
 struct res_cfg_nrdc_r17_s {
-  bool                 ext                                         = false;
   bool                 fr1_res_cfg_r17_present                     = false;
   bool                 fr2_res_cfg_r17_present                     = false;
   bool                 max_num_res_across_cc_across_fr_r17_present = false;
@@ -233,7 +231,6 @@ using allowed_aggr_bw_sn_list_r17_l = dyn_array<allowed_aggr_bw_r17_s>;
 
 // L1-MeasConfigNRDC-r18 ::= SEQUENCE
 struct l1_meas_cfg_nrdc_r18_s {
-  bool    ext                                              = false;
   bool    max_l1_meas_no_gap_scg_r18_present               = false;
   bool    max_l1_meas_with_gap_scg_r18_present             = false;
   bool    max_cells_l1_meas_no_gap_scg_r18_present         = false;
@@ -273,7 +270,6 @@ struct l1_meas_cfg_nrdc_r18_s {
 
 // LTM-ResourceConfigNRDC-r18 ::= SEQUENCE
 struct ltm_res_cfg_nrdc_r18_s {
-  bool    ext                                    = false;
   bool    max_cells_ta_meas_r18_present          = false;
   bool    max_cfg_joint_tci_states_r18_present   = false;
   bool    max_cells_joint_tci_r18_present        = false;
@@ -345,7 +341,6 @@ struct cfg_restrict_info_scg_s {
   using nrdc_pc_mode_fr2_r16_e_ = enumerated<nrdc_pc_mode_fr2_r16_opts>;
 
   // member variables
-  bool                         ext                             = false;
   bool                         pwr_coordination_fr1_present    = false;
   bool                         serv_cell_idx_range_scg_present = false;
   bool                         max_meas_freqs_scg_present      = false;
@@ -577,7 +572,6 @@ using need_for_interruption_band_list_nr_r18_l = dyn_array<need_for_interruption
 
 // NeedForInterruptionInfoNR-r18 ::= SEQUENCE
 struct need_for_interruption_info_nr_r18_s {
-  bool                                        ext = false;
   need_for_interruption_intra_freq_list_r18_l intra_freq_need_for_interruption_r18;
   need_for_interruption_band_list_nr_r18_l    inter_freq_need_for_interruption_r18;
   // ...
@@ -983,7 +977,6 @@ struct drx_info_s {
 
 // NR-FreqInfo ::= SEQUENCE
 struct nr_freq_info_s {
-  bool     ext                   = false;
   bool     measured_freq_present = false;
   uint32_t measured_freq         = 0;
   // ...
@@ -1690,7 +1683,6 @@ struct freq_cfg_nr_r16_s {
 
 // ServCellInfoXCG-NR-r16 ::= SEQUENCE
 struct serv_cell_info_xcg_nr_r16_s {
-  bool              ext                         = false;
   bool              dl_freq_info_nr_r16_present = false;
   bool              ul_freq_info_nr_r16_present = false;
   freq_cfg_nr_r16_s dl_freq_info_nr_r16;
@@ -1715,7 +1707,6 @@ using tx_bw_eutra_r16_e = enumerated<tx_bw_eutra_r16_opts>;
 
 // ServCellInfoXCG-EUTRA-r16 ::= SEQUENCE
 struct serv_cell_info_xcg_eutra_r16_s {
-  bool              ext                               = false;
   bool              dl_carrier_freq_eutra_r16_present = false;
   bool              ul_carrier_freq_eutra_r16_present = false;
   bool              tx_bw_eutra_r16_present           = false;
@@ -1783,7 +1774,6 @@ struct cgi_info_nr_s {
   };
 
   // member variables
-  bool                      ext             = false;
   bool                      no_sib1_present = false;
   plmn_id_info_list_l       plmn_id_info_list;
   multi_freq_band_list_nr_l freq_band_list;
@@ -1836,7 +1826,6 @@ struct meas_result_nr_s {
   };
 
   // member variables
-  bool           ext         = false;
   bool           pci_present = false;
   uint16_t       pci         = 0;
   meas_result_s_ meas_result;
@@ -1861,7 +1850,6 @@ using meas_result_list_nr_l = dyn_array<meas_result_nr_s>;
 
 // MeasResult2NR ::= SEQUENCE
 struct meas_result2_nr_s {
-  bool                  ext                              = false;
   bool                  ssb_freq_present                 = false;
   bool                  ref_freq_csi_rs_present          = false;
   bool                  meas_result_serving_cell_present = false;
@@ -1910,7 +1898,6 @@ struct meas_cfg_mn_s {
   using gap_purpose_e_ = enumerated<gap_purpose_opts>;
 
   // member variables
-  bool                       ext                  = false;
   bool                       meas_gap_cfg_present = false;
   bool                       gap_purpose_present  = false;
   measured_frequencies_mn_l_ measured_frequencies_mn;
@@ -1983,7 +1970,6 @@ struct affected_freq_range_r18_s {
 
 // VictimSystemType-r16 ::= SEQUENCE
 struct victim_sys_type_r16_s {
-  bool ext                   = false;
   bool gps_r16_present       = false;
   bool glonass_r16_present   = false;
   bool bds_r16_present       = false;
@@ -2180,7 +2166,6 @@ struct idc_tdm_assist_r18_s {
   };
 
   // member variables
-  bool              ext = false;
   cycle_len_r18_e_  cycle_len_r18;
   uint16_t          start_offset_r18 = 0;
   uint8_t           slot_offset_r18  = 0;
@@ -2198,7 +2183,6 @@ struct mrdc_assist_info_s {
   using affected_carrier_freq_comb_info_list_mrdc_l_ = dyn_array<affected_carrier_freq_comb_info_mrdc_s>;
 
   // member variables
-  bool                                         ext = false;
   affected_carrier_freq_comb_info_list_mrdc_l_ affected_carrier_freq_comb_info_list_mrdc;
   // ...
   // group 0
@@ -2228,7 +2212,6 @@ struct ph_ul_carrier_mcg_s {
   using ph_type1or3_e_ = enumerated<ph_type1or3_opts>;
 
   // member variables
-  bool           ext = false;
   ph_type1or3_e_ ph_type1or3;
   // ...
 
@@ -2240,7 +2223,6 @@ struct ph_ul_carrier_mcg_s {
 
 // PH-InfoMCG ::= SEQUENCE
 struct ph_info_mcg_s {
-  bool                ext                         = false;
   bool                ph_supplementary_ul_present = false;
   uint8_t             serv_cell_idx               = 0;
   ph_ul_carrier_mcg_s ph_ul;
@@ -2983,7 +2965,6 @@ struct meas_quant_results_eutra_s {
 
 // MeasResultEUTRA ::= SEQUENCE
 struct meas_result_eutra_s {
-  bool                       ext              = false;
   bool                       cgi_info_present = false;
   uint16_t                   eutra_pci        = 0;
   meas_quant_results_eutra_s meas_result;
@@ -2998,7 +2979,6 @@ struct meas_result_eutra_s {
 
 // MeasResult2EUTRA ::= SEQUENCE
 struct meas_result2_eutra_s {
-  bool                ext                                 = false;
   bool                meas_result_serving_cell_present    = false;
   bool                meas_result_best_neigh_cell_present = false;
   uint32_t            carrier_freq                        = 0;
@@ -3363,7 +3343,6 @@ struct meas_result_failed_cell_r16_s {
 
 // LogMeasResultBT-r16 ::= SEQUENCE
 struct log_meas_result_bt_r16_s {
-  bool                ext                 = false;
   bool                rssi_bt_r16_present = false;
   fixed_bitstring<48> bt_addr_r16;
   int16_t             rssi_bt_r16 = -128;
@@ -3380,7 +3359,6 @@ using log_meas_result_list_bt_r16_l = dyn_array<log_meas_result_bt_r16_s>;
 
 // WLAN-Identifiers-r16 ::= SEQUENCE
 struct wlan_ids_r16_s {
-  bool                     ext                = false;
   bool                     bssid_r16_present  = false;
   bool                     hessid_r16_present = false;
   bounded_octstring<1, 32> ssid_r16;
@@ -3411,7 +3389,6 @@ struct wlan_rtt_r16_s {
   using rtt_units_r16_e_ = enumerated<rtt_units_r16_opts, true>;
 
   // member variables
-  bool             ext                      = false;
   bool             rtt_accuracy_r16_present = false;
   uint32_t         rtt_value_r16            = 0;
   rtt_units_r16_e_ rtt_units_r16;
@@ -3426,7 +3403,6 @@ struct wlan_rtt_r16_s {
 
 // LogMeasResultWLAN-r16 ::= SEQUENCE
 struct log_meas_result_wlan_r16_s {
-  bool           ext                   = false;
   bool           rssi_wlan_r16_present = false;
   bool           rtt_wlan_r16_present  = false;
   wlan_ids_r16_s wlan_ids_r16;
@@ -3445,7 +3421,6 @@ using log_meas_result_list_wlan_r16_l = dyn_array<log_meas_result_wlan_r16_s>;
 
 // Sensor-LocationInfo-r16 ::= SEQUENCE
 struct sensor_location_info_r16_s {
-  bool          ext = false;
   dyn_octstring sensor_meas_info_r16;
   dyn_octstring sensor_motion_info_r16;
   // ...
@@ -3458,7 +3433,6 @@ struct sensor_location_info_r16_s {
 
 // LocationInfo-r16 ::= SEQUENCE
 struct location_info_r16_s {
-  bool                            ext                              = false;
   bool                            common_location_info_r16_present = false;
   bool                            sensor_location_info_r16_present = false;
   common_location_info_r16_s      common_location_info_r16;
@@ -3509,7 +3483,6 @@ using meas_result_list2_eutra_r16_l = dyn_array<meas_result2_eutra_r16_s>;
 
 // PerRAAttemptInfo-r16 ::= SEQUENCE
 struct per_ra_attempt_info_r16_s {
-  bool ext                             = false;
   bool contention_detected_r16_present = false;
   bool dl_rsrp_above_thres_r16_present = false;
   bool contention_detected_r16         = false;
@@ -3611,7 +3584,6 @@ struct conn_est_fail_report_r16_s {
   };
 
   // member variables
-  bool                           ext                       = false;
   bool                           location_info_r16_present = false;
   meas_result_failed_cell_r16_s  meas_result_failed_cell_r16;
   location_info_r16_s            location_info_r16;
@@ -4060,7 +4032,6 @@ private:
 
 // EUTRA-RSTD-Info ::= SEQUENCE
 struct eutra_rstd_info_s {
-  bool     ext             = false;
   uint32_t carrier_freq    = 0;
   uint8_t  meas_prs_offset = 0;
   // ...
@@ -4206,7 +4177,6 @@ struct fail_report_indirect_path_r18_s {
   using n3c_relay_ue_info_list_r18_l_  = dyn_array<n3_c_relay_ue_info_r18_s>;
 
   // member variables
-  bool                           ext                                 = false;
   bool                           fail_type_indirect_path_r18_present = false;
   bool                           n3c_relay_ue_info_list_r18_present  = false;
   fail_type_indirect_path_r18_e_ fail_type_indirect_path_r18;
@@ -4282,7 +4252,6 @@ struct fail_report_mcg_r16_s {
   using fail_type_r16_e_ = enumerated<fail_type_r16_opts>;
 
   // member variables
-  bool                      ext                   = false;
   bool                      fail_type_r16_present = false;
   fail_type_r16_e_          fail_type_r16;
   meas_result_list2_nr_l    meas_result_freq_list_r16;
@@ -4317,7 +4286,6 @@ using per_ra_info_list_v1660_l = dyn_array<per_ra_csi_r_si_nfo_v1660_s>;
 
 // PerRASSBInfo-v1800 ::= SEQUENCE
 struct per_ra_ssb_info_v1800_s {
-  bool ext                         = false;
   bool all_preambs_blocked_present = false;
   bool lbt_detected_r18_present    = false;
   // ...
@@ -4330,7 +4298,6 @@ struct per_ra_ssb_info_v1800_s {
 
 // PerRACSI-RSInfo-v1800 ::= SEQUENCE
 struct per_ra_csi_r_si_nfo_v1800_s {
-  bool ext                         = false;
   bool all_preambs_blocked_present = false;
   bool lbt_detected_r18_present    = false;
   // ...
@@ -4442,7 +4409,6 @@ struct fail_report_scg_s {
   };
 
   // member variables
-  bool                    ext = false;
   fail_type_e_            fail_type;
   meas_result_freq_list_l meas_result_freq_list;
   dyn_octstring           meas_result_scg_fail;
@@ -4493,7 +4459,6 @@ struct fail_report_scg_eutra_s {
   using fail_type_e_ = enumerated<fail_type_opts>;
 
   // member variables
-  bool                              ext = false;
   fail_type_e_                      fail_type;
   meas_result_freq_list_fail_mrdc_l meas_result_freq_list_mrdc;
   dyn_octstring                     meas_result_scg_fail_mrdc;
@@ -4539,7 +4504,6 @@ struct iab_ip_address_and_traffic_r16_s {
 
 // IAB-IP-AddressNumReq-r16 ::= SEQUENCE
 struct iab_ip_address_num_req_r16_s {
-  bool    ext                                = false;
   bool    all_traffic_num_req_r16_present    = false;
   bool    f1_c_traffic_num_req_r16_present   = false;
   bool    f1_u_traffic_num_req_r16_present   = false;
@@ -4558,7 +4522,6 @@ struct iab_ip_address_num_req_r16_s {
 
 // IAB-IP-AddressPrefixReq-r16 ::= SEQUENCE
 struct iab_ip_address_prefix_req_r16_s {
-  bool ext                                   = false;
   bool all_traffic_prefix_req_r16_present    = false;
   bool f1_c_traffic_prefix_req_r16_present   = false;
   bool f1_u_traffic_prefix_req_r16_present   = false;
@@ -4810,7 +4773,6 @@ struct iab_other_info_r16_s {
 
 // IDC-Assistance-r16 ::= SEQUENCE
 struct idc_assist_r16_s {
-  bool                                  ext = false;
   affected_carrier_freq_list_r16_l      affected_carrier_freq_list_r16;
   affected_carrier_freq_comb_list_r16_l affected_carrier_freq_comb_list_r16;
   // ...
@@ -4823,7 +4785,6 @@ struct idc_assist_r16_s {
 
 // IDC-FDM-Assistance-r18 ::= SEQUENCE
 struct idc_fdm_assist_r18_s {
-  bool                                        ext = false;
   affected_carrier_freq_range_list_r18_l      affected_carrier_freq_range_list_r18;
   affected_carrier_freq_range_comb_list_r18_l affected_carrier_freq_range_comb_list_r18;
   // ...
@@ -5003,7 +4964,6 @@ struct nr_prs_meas_info_r16_s {
   using nr_meas_prs_len_r16_e_ = enumerated<nr_meas_prs_len_r16_opts>;
 
   // member variables
-  bool                                 ext                = false;
   uint32_t                             dl_prs_point_a_r16 = 0;
   nr_meas_prs_repeat_and_offset_r16_c_ nr_meas_prs_repeat_and_offset_r16;
   nr_meas_prs_len_r16_e_               nr_meas_prs_len_r16;
@@ -5183,7 +5143,6 @@ struct log_meas_info_r16_s {
   };
 
   // member variables
-  bool                           ext                                  = false;
   bool                           location_info_r16_present            = false;
   bool                           serv_cell_id_r16_present             = false;
   bool                           meas_result_serving_cell_r16_present = false;
@@ -5208,7 +5167,6 @@ using log_meas_info_list_r16_l = dyn_array<log_meas_info_r16_s>;
 
 // LogMeasReport-r16 ::= SEQUENCE
 struct log_meas_report_r16_s {
-  bool                     ext                                 = false;
   bool                     log_meas_available_r16_present      = false;
   bool                     log_meas_available_bt_r16_present   = false;
   bool                     log_meas_available_wlan_r16_present = false;
@@ -5463,7 +5421,6 @@ using mu_si_m_gap_prio_pref_list_r18_l = bounded_array<uint8_t, 3>;
 
 // MUSIM-Assistance-v1800 ::= SEQUENCE
 struct mu_si_m_assist_v1800_s {
-  bool                             ext                                     = false;
   bool                             musim_gap_keep_pref_r18_present         = false;
   bool                             musim_cap_restrict_r18_present          = false;
   bool                             musim_need_for_gaps_info_nr_r18_present = false;
@@ -5571,7 +5528,6 @@ struct ran_visible_meass_r17_s {
   using pdu_session_id_list_ext_v1800_l_   = dyn_array<qfi_list_r18_l>;
 
   // member variables
-  bool                               ext                                         = false;
   bool                               playout_delay_for_media_startup_r17_present = false;
   app_layer_buffer_level_list_r17_l_ app_layer_buffer_level_list_r17;
   uint16_t                           playout_delay_for_media_startup_r17 = 0;
@@ -5614,7 +5570,6 @@ struct meas_report_app_layer_v1800_s {
   using meas_report_app_layer_container_list_r18_l_ = bounded_array<dyn_octstring, 16>;
 
   // member variables
-  bool                                        ext                                     = false;
   bool                                        app_layer_idle_inactive_cfg_r18_present = false;
   app_layer_idle_inactive_cfg_r18_s           app_layer_idle_inactive_cfg_r18;
   meas_report_app_layer_container_list_r18_l_ meas_report_app_layer_container_list_r18;
@@ -5628,7 +5583,6 @@ struct meas_report_app_layer_v1800_s {
 
 // MeasResultCBR-DedicatedSL-PRS-r18 ::= SEQUENCE
 struct meas_result_cbr_ded_sl_prs_r18_s {
-  bool    ext                              = false;
   uint8_t sl_prs_res_pool_id_r18           = 1;
   uint8_t sl_cbr_results_ded_sl_prs_rp_r18 = 0;
   // ...
@@ -5641,7 +5595,6 @@ struct meas_result_cbr_ded_sl_prs_r18_s {
 
 // MeasResultCBR-NR-r16 ::= SEQUENCE
 struct meas_result_cbr_nr_r16_s {
-  bool    ext                   = false;
   uint8_t sl_pool_report_id_r16 = 1;
   uint8_t sl_cbr_results_nr_r16 = 0;
   // ...
@@ -5712,7 +5665,6 @@ struct meas_results_per_cell_idle_eutra_r16_s {
   };
 
   // member variables
-  bool                          ext           = false;
   uint16_t                      eutra_pci_r16 = 0;
   meas_idle_result_eutra_r16_s_ meas_idle_result_eutra_r16;
   // ...
@@ -5731,7 +5683,6 @@ struct meas_results_per_carrier_idle_eutra_r16_s {
   using meas_results_per_cell_list_idle_eutra_r16_l_ = dyn_array<meas_results_per_cell_idle_eutra_r16_s>;
 
   // member variables
-  bool                                         ext                    = false;
   uint32_t                                     carrier_freq_eutra_r16 = 0;
   meas_results_per_cell_list_idle_eutra_r16_l_ meas_results_per_cell_list_idle_eutra_r16;
   // ...
@@ -5747,7 +5698,6 @@ struct meas_result_idle_eutra_r16_s {
   using meas_results_per_carrier_list_idle_eutra_r16_l_ = dyn_array<meas_results_per_carrier_idle_eutra_r16_s>;
 
   // member variables
-  bool                                            ext = false;
   meas_results_per_carrier_list_idle_eutra_r16_l_ meas_results_per_carrier_list_idle_eutra_r16;
   // ...
 
@@ -5791,7 +5741,6 @@ struct meas_results_per_cell_idle_nr_r16_s {
   };
 
   // member variables
-  bool                       ext     = false;
   uint16_t                   pci_r16 = 0;
   meas_idle_result_nr_r16_s_ meas_idle_result_nr_r16;
   // ...
@@ -5810,7 +5759,6 @@ struct meas_results_per_carrier_idle_nr_r16_s {
   using meas_results_per_cell_list_idle_nr_r16_l_ = dyn_array<meas_results_per_cell_idle_nr_r16_s>;
 
   // member variables
-  bool                                      ext              = false;
   uint32_t                                  carrier_freq_r16 = 0;
   meas_results_per_cell_list_idle_nr_r16_l_ meas_results_per_cell_list_idle_nr_r16;
   // ...
@@ -5833,7 +5781,6 @@ struct meas_result_idle_nr_r16_s {
   using meas_results_per_carrier_list_idle_nr_r16_l_ = dyn_array<meas_results_per_carrier_idle_nr_r16_s>;
 
   // member variables
-  bool                                         ext = false;
   meas_result_serving_cell_r16_s_              meas_result_serving_cell_r16;
   meas_results_per_carrier_list_idle_nr_r16_l_ meas_results_per_carrier_list_idle_nr_r16;
   // ...
@@ -5849,7 +5796,6 @@ struct meas_result_nr_sl_r16_s {
   using meas_result_list_cbr_nr_r16_l_ = dyn_array<meas_result_cbr_nr_r16_s>;
 
   // member variables
-  bool                           ext = false;
   meas_result_list_cbr_nr_r16_l_ meas_result_list_cbr_nr_r16;
   // ...
 
@@ -5864,7 +5810,6 @@ struct meas_result_nr_sl_r18_s {
   using meas_result_list_cbr_ded_sl_prs_r18_l_ = dyn_array<meas_result_cbr_ded_sl_prs_r18_s>;
 
   // member variables
-  bool                                   ext = false;
   meas_result_list_cbr_ded_sl_prs_r18_l_ meas_result_list_cbr_ded_sl_prs_r18;
   // ...
 
@@ -5929,7 +5874,6 @@ struct meas_result_rlf_nr_r16_s {
 
 // MeasResultRxTxTimeDiff-r17 ::= SEQUENCE
 struct meas_result_rx_tx_time_diff_r17_s {
-  bool                  ext                            = false;
   bool                  rx_tx_time_diff_ue_r17_present = false;
   rx_tx_time_diff_r17_s rx_tx_time_diff_ue_r17;
   // ...
@@ -5945,7 +5889,6 @@ using meas_result_serv_freq_list_nr_scg_l = dyn_array<meas_result2_nr_s>;
 
 // MeasResultServMO ::= SEQUENCE
 struct meas_result_serv_mo_s {
-  bool             ext                                 = false;
   bool             meas_result_best_neigh_cell_present = false;
   uint8_t          serv_cell_id                        = 0;
   meas_result_nr_s meas_result_serving_cell;
@@ -5991,7 +5934,6 @@ struct meas_result_success_ho_nr_r17_s {
 
 // UL-PDCP-DelayValueResult-r16 ::= SEQUENCE
 struct ul_pdcp_delay_value_result_r16_s {
-  bool     ext               = false;
   uint8_t  drb_id_r16        = 1;
   uint16_t average_delay_r16 = 0;
   // ...
@@ -6057,7 +5999,6 @@ struct meas_results_sl_r16_s {
   };
 
   // member variables
-  bool                        ext = false;
   meas_results_list_sl_r16_c_ meas_results_list_sl_r16;
   // ...
 
@@ -6069,7 +6010,6 @@ struct meas_results_sl_r16_s {
 
 // UL-PDCP-ExcessDelayResult-r17 ::= SEQUENCE
 struct ul_pdcp_excess_delay_result_r17_s {
-  bool    ext              = false;
   uint8_t drb_id_r17       = 1;
   uint8_t excess_delay_r17 = 0;
   // ...
@@ -6165,7 +6105,6 @@ struct meas_results_s {
   using cells_met_report_on_leave_list_r18_l_ = bounded_array<uint16_t, 8>;
 
   // member variables
-  bool                       ext                             = false;
   bool                       meas_result_neigh_cells_present = false;
   uint8_t                    meas_id                         = 1;
   meas_result_serv_mo_list_l meas_result_serving_mo_list;
@@ -6657,7 +6596,6 @@ struct visited_pscell_info_r17_s {
   };
 
   // member variables
-  bool                   ext                         = false;
   bool                   visited_cell_id_r17_present = false;
   visited_cell_id_r17_c_ visited_cell_id_r17;
   uint16_t               time_spent_r17 = 0;
@@ -6820,7 +6758,6 @@ struct visited_cell_info_r16_s {
   };
 
   // member variables
-  bool                   ext                         = false;
   bool                   visited_cell_id_r16_present = false;
   visited_cell_id_r16_c_ visited_cell_id_r16;
   uint16_t               time_spent_r16 = 0;
@@ -6916,7 +6853,6 @@ struct nr_time_stamp_r17_s {
   };
 
   // member variables
-  bool           ext        = false;
   uint16_t       nr_sfn_r17 = 0;
   nr_slot_r17_c_ nr_slot_r17;
   // ...
@@ -6994,7 +6930,6 @@ struct qos_flow_ul_traffic_info_r18_s {
   };
 
   // member variables
-  bool                      ext                             = false;
   bool                      jitter_range_r18_present        = false;
   bool                      burst_arrival_time_r18_present  = false;
   bool                      traffic_periodicity_r18_present = false;
@@ -7239,7 +7174,6 @@ struct ra_info_common_r16_s {
   using intended_sibs_r18_l_           = bounded_array<sib_type_r18_e, 32>;
 
   // member variables
-  bool                   ext                                      = false;
   bool                   msg1_freq_start_r16_present              = false;
   bool                   msg1_freq_start_cfra_r16_present         = false;
   bool                   msg1_subcarrier_spacing_r16_present      = false;
@@ -7394,7 +7328,6 @@ struct ra_report_r16_s {
   using ra_purpose_r16_e_ = enumerated<ra_purpose_r16_opts>;
 
   // member variables
-  bool                 ext                        = false;
   bool                 ra_info_common_r16_present = false;
   cell_id_r16_c_       cell_id_r16;
   ra_info_common_r16_s ra_info_common_r16;
@@ -7823,7 +7756,6 @@ struct rlf_report_r16_c {
     using scg_fail_cause_r18_e_ = enumerated<scg_fail_cause_r18_opts>;
 
     // member variables
-    bool                           ext                                 = false;
     bool                           meas_result_neigh_cells_r16_present = false;
     bool                           prev_pcell_id_r16_present           = false;
     bool                           reconnect_cell_id_r16_present       = false;
@@ -7883,7 +7815,6 @@ struct rlf_report_r16_c {
     void          to_json(json_writer& j) const;
   };
   struct eutra_rlf_report_r16_s_ {
-    bool                     ext = false;
     cgi_info_eutra_logging_s failed_pcell_id_eutra;
     dyn_octstring            meas_result_rlf_report_eutra_r16;
     // ...
@@ -7961,7 +7892,6 @@ struct ul_tx_direct_current_cell_s {
   using ul_direct_current_bwp_sul_l_ = dyn_array<ul_tx_direct_current_bwp_s>;
 
   // member variables
-  bool                     ext           = false;
   uint8_t                  serv_cell_idx = 0;
   ul_direct_current_bwp_l_ ul_direct_current_bwp;
   // ...
@@ -7979,7 +7909,6 @@ using ul_tx_direct_current_list_l = dyn_array<ul_tx_direct_current_cell_s>;
 
 // UE-MeasurementsAvailable-r16 ::= SEQUENCE
 struct ue_meass_available_r16_s {
-  bool ext                                      = false;
   bool log_meas_available_r16_present           = false;
   bool log_meas_available_bt_r16_present        = false;
   bool log_meas_available_wlan_r16_present      = false;
@@ -8941,7 +8870,6 @@ struct scg_fail_info_eutra_s {
 
 // SHR-Cause-r17 ::= SEQUENCE
 struct shr_cause_r17_s {
-  bool ext                          = false;
   bool t304_cause_r17_present       = false;
   bool t310_cause_r17_present       = false;
   bool t312_cause_r17_present       = false;
@@ -9416,7 +9344,6 @@ struct sl_prs_qos_info_r18_s {
   using sl_prs_bw_r18_e_ = enumerated<sl_prs_bw_r18_opts>;
 
   // member variables
-  bool             ext                             = false;
   bool             sl_prs_prio_r18_present         = false;
   bool             sl_prs_delay_budget_r18_present = false;
   bool             sl_prs_bw_r18_present           = false;
@@ -9503,7 +9430,6 @@ struct sl_prs_tx_info_r18_s {
   using sl_prs_bw_r18_e_ = enumerated<sl_prs_bw_r18_opts>;
 
   // member variables
-  bool                      ext                             = false;
   bool                      sl_prs_prio_r18_present         = false;
   bool                      sl_prs_delay_budget_r18_present = false;
   bool                      sl_prs_bw_r18_present           = false;
@@ -9561,7 +9487,6 @@ struct sl_pos_tx_res_req_r18_s {
   using sl_pos_qos_info_list_r18_l_     = dyn_array<sl_prs_qos_info_r18_s>;
 
   // member variables
-  bool                             ext = false;
   fixed_bitstring<24>              sl_pos_dest_id_r18;
   sl_pos_cast_type_r18_e_          sl_pos_cast_type_r18;
   sl_tx_interested_freq_list_r16_l sl_pos_tx_interested_freq_list_r18;
@@ -9603,7 +9528,6 @@ using sl_tx_profile_r18_e = enumerated<sl_tx_profile_r18_opts>;
 
 // SL-QoS-Info-v1800 ::= SEQUENCE
 struct sl_qos_info_v1800_s {
-  bool                             ext                       = false;
   bool                             sl_tx_profile_r18_present = false;
   sl_tx_interested_freq_list_r16_l sl_tx_interested_freq_list_r18;
   sl_tx_profile_r18_e              sl_tx_profile_r18;
@@ -9677,7 +9601,6 @@ struct sl_rlc_mode_ind_r16_s {
 
 // SL-RxDRX-Report-v1700 ::= SEQUENCE
 struct sl_rx_drx_report_v1700_s {
-  bool                            ext = false;
   sl_drx_cfg_uc_semi_static_r17_s sl_drx_cfg_from_tx_r17;
   // ...
 
@@ -9709,7 +9632,6 @@ using sl_rx_interested_gc_bc_dest_list_r17_l = dyn_array<sl_rx_interested_gc_bc_
 
 // SL-SplitQoS-Info-r18 ::= SEQUENCE
 struct sl_split_qos_info_r18_s {
-  bool     ext                                      = false;
   bool     sl_split_packet_delay_budget_r18_present = false;
   uint16_t sl_qos_flow_id_r18                       = 1;
   uint16_t sl_split_packet_delay_budget_r18         = 0;
@@ -9783,7 +9705,6 @@ struct sl_tx_res_req_v1700_s {
   using sl_qos_info_list_v1800_l_ = dyn_array<sl_qos_info_v1800_s>;
 
   // member variables
-  bool                            ext                    = false;
   bool                            sl_drx_ind_r17_present = false;
   sl_drx_info_from_rx_list_r17_l_ sl_drx_info_from_rx_list_r17;
   sl_drx_ind_r17_e_               sl_drx_ind_r17;
@@ -9802,7 +9723,6 @@ struct sl_tx_res_req_l2_u2_n_relay_r17_s {
   using sl_type_tx_sync_list_l2_u2_n_r17_l_ = bounded_array<sl_type_tx_sync_r16_e, 8>;
 
   // member variables
-  bool                                ext                                = false;
   bool                                sl_dest_id_l2_u2_n_r17_present     = false;
   bool                                sl_local_id_request_r17_present    = false;
   bool                                sl_paging_id_remote_ue_r17_present = false;
@@ -9906,7 +9826,6 @@ struct sl_tx_res_req_disc_r17_s {
   using ue_type_u2_u_r18_e_ = enumerated<ue_type_u2_u_r18_opts>;
 
   // member variables
-  bool                             ext                               = false;
   bool                             sl_source_id_relay_ue_r17_present = false;
   fixed_bitstring<24>              sl_dest_id_disc_r17;
   fixed_bitstring<24>              sl_source_id_relay_ue_r17;
@@ -9999,7 +9918,6 @@ struct sl_tx_res_req_l2_u2_u_r18_s {
   using sl_rlc_mode_ind_list_l2_u2_u_r18_l_ = dyn_array<sl_rlc_mode_r18_c>;
 
   // member variables
-  bool                                ext                            = false;
   bool                                sl_dest_id_l2_u2_u_r18_present = false;
   fixed_bitstring<24>                 sl_dest_id_l2_u2_u_r18;
   sl_tx_interested_freq_list_r16_l    sl_tx_interested_freq_list_l2_u2_u_r18;
@@ -10032,7 +9950,6 @@ using sl_ue_assist_info_nr_r16_l = dyn_array<sl_traffic_pattern_info_r16_s>;
 
 // SPR-Cause-r18 ::= SEQUENCE
 struct spr_cause_r18_s {
-  bool ext                    = false;
   bool t304_cause_r18_present = false;
   bool t310_cause_r18_present = false;
   bool t312_cause_r18_present = false;
@@ -10350,7 +10267,6 @@ struct success_ho_report_r17_s {
   };
 
   // member variables
-  bool                           ext                                    = false;
   bool                           meas_result_neigh_cells_r17_present    = false;
   bool                           location_info_r17_present              = false;
   bool                           time_since_cho_recfg_r17_present       = false;
@@ -10504,7 +10420,6 @@ struct success_pscell_report_r18_s {
   };
 
   // member variables
-  bool                           ext                                    = false;
   bool                           source_pscell_info_r18_present         = false;
   bool                           meas_result_neigh_cells_r18_present    = false;
   bool                           spr_cause_r18_present                  = false;

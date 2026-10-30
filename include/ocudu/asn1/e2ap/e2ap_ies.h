@@ -105,7 +105,6 @@ using cause_misc_e = enumerated<cause_misc_opts, true>;
 
 // CauseServiceLayer ::= SEQUENCE
 struct cause_service_layer_s {
-  bool                      ext = false;
   unbounded_octstring<true> service_layer_cause;
   // ...
 
@@ -233,7 +232,6 @@ private:
 
 // RICrequestID ::= SEQUENCE
 struct ric_request_id_s {
-  bool     ext              = false;
   uint32_t ric_requestor_id = 0;
   uint32_t ric_instance_id  = 0;
   // ...
@@ -254,7 +252,6 @@ using type_of_error_e = enumerated<type_of_error_opts, true>;
 
 // CriticalityDiagnostics-IE-Item ::= SEQUENCE
 struct crit_diagnostics_ie_item_s {
-  bool            ext = false;
   crit_e          ie_crit;
   uint32_t        ie_id = 0;
   type_of_error_e type_of_error;
@@ -271,7 +268,6 @@ using crit_diagnostics_ie_list_l = dyn_array<crit_diagnostics_ie_item_s>;
 
 // CriticalityDiagnostics ::= SEQUENCE
 struct crit_diagnostics_s {
-  bool                       ext                      = false;
   bool                       proc_code_present        = false;
   bool                       trigger_msg_present      = false;
   bool                       proc_crit_present        = false;
@@ -291,7 +287,6 @@ struct crit_diagnostics_s {
 
 // E2nodeComponentConfiguration ::= SEQUENCE
 struct e2node_component_cfg_s {
-  bool                      ext = false;
   unbounded_octstring<true> e2node_component_request_part;
   unbounded_octstring<true> e2node_component_resp_part;
   // ...
@@ -312,7 +307,6 @@ struct e2node_component_cfg_ack_s {
   using upd_outcome_e_ = enumerated<upd_outcome_opts, true>;
 
   // member variables
-  bool           ext                = false;
   bool           fail_cause_present = false;
   upd_outcome_e_ upd_outcome;
   cause_c        fail_cause;
@@ -326,7 +320,6 @@ struct e2node_component_cfg_ack_s {
 
 // E2nodeComponentInterfaceNG ::= SEQUENCE
 struct e2node_component_interface_ng_s {
-  bool                                 ext = false;
   printable_string<1, 150, true, true> amf_name;
   // ...
 
@@ -360,7 +353,6 @@ private:
 
 // GlobalgNB-ID ::= SEQUENCE
 struct global_gnb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   gnb_id_choice_c          gnb_id;
   // ...
@@ -434,7 +426,6 @@ private:
 
 // GlobalngeNB-ID ::= SEQUENCE
 struct globalng_enb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   enb_id_choice_c          enb_id;
   // ...
@@ -497,7 +488,6 @@ private:
 
 // E2nodeComponentInterfaceXn ::= SEQUENCE
 struct e2node_component_interface_xn_s {
-  bool                    ext = false;
   global_ng_ran_node_id_c global_ng_ran_node_id;
   // ...
 
@@ -509,7 +499,6 @@ struct e2node_component_interface_xn_s {
 
 // E2nodeComponentInterfaceE1 ::= SEQUENCE
 struct e2node_component_interface_e1_s {
-  bool     ext          = false;
   uint64_t gnb_cu_up_id = 0;
   // ...
 
@@ -521,7 +510,6 @@ struct e2node_component_interface_e1_s {
 
 // E2nodeComponentInterfaceF1 ::= SEQUENCE
 struct e2node_component_interface_f1_s {
-  bool     ext       = false;
   uint64_t gnb_du_id = 0;
   // ...
 
@@ -533,7 +521,6 @@ struct e2node_component_interface_f1_s {
 
 // E2nodeComponentInterfaceW1 ::= SEQUENCE
 struct e2node_component_interface_w1_s {
-  bool     ext          = false;
   uint64_t ng_enb_du_id = 0;
   // ...
 
@@ -545,7 +532,6 @@ struct e2node_component_interface_w1_s {
 
 // E2nodeComponentInterfaceS1 ::= SEQUENCE
 struct e2node_component_interface_s1_s {
-  bool                                 ext = false;
   printable_string<1, 150, true, true> mme_name;
   // ...
 
@@ -629,7 +615,6 @@ private:
 
 // GlobalENB-ID ::= SEQUENCE
 struct global_enb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   enb_id_c                 enb_id;
   // ...
@@ -664,7 +649,6 @@ private:
 
 // GlobalenGNB-ID ::= SEQUENCE
 struct globalen_gnb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   en_gnb_id_c              gnb_id;
   // ...
@@ -677,7 +661,6 @@ struct globalen_gnb_id_s {
 
 // E2nodeComponentInterfaceX2 ::= SEQUENCE
 struct e2node_component_interface_x2_s {
-  bool              ext                      = false;
   bool              global_enb_id_present    = false;
   bool              global_en_gnb_id_present = false;
   global_enb_id_s   global_enb_id;
@@ -822,7 +805,6 @@ using e2node_component_interface_type_e = enumerated<e2node_component_interface_
 
 // GlobalE2node-gNB-ID ::= SEQUENCE
 struct global_e2node_gnb_id_s {
-  bool              ext                      = false;
   bool              global_en_gnb_id_present = false;
   bool              gnb_cu_up_id_present     = false;
   bool              gnb_du_id_present        = false;
@@ -840,7 +822,6 @@ struct global_e2node_gnb_id_s {
 
 // GlobalE2node-en-gNB-ID ::= SEQUENCE
 struct global_e2node_en_gnb_id_s {
-  bool              ext                     = false;
   bool              en_gnb_cu_up_id_present = false;
   bool              en_gnb_du_id_present    = false;
   globalen_gnb_id_s global_en_gnb_id;
@@ -856,7 +837,6 @@ struct global_e2node_en_gnb_id_s {
 
 // GlobalE2node-ng-eNB-ID ::= SEQUENCE
 struct global_e2node_ng_enb_id_s {
-  bool              ext                   = false;
   bool              global_enb_id_present = false;
   bool              ng_enb_du_id_present  = false;
   globalng_enb_id_s global_ng_enb_id;
@@ -872,7 +852,6 @@ struct global_e2node_ng_enb_id_s {
 
 // GlobalE2node-eNB-ID ::= SEQUENCE
 struct global_e2node_enb_id_s {
-  bool            ext = false;
   global_enb_id_s global_enb_id;
   // ...
 
@@ -957,7 +936,6 @@ private:
 
 // GlobalRIC-ID ::= SEQUENCE
 struct global_ric_id_s {
-  bool                             ext = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<20, false, true> ric_id;
   // ...
@@ -1026,7 +1004,6 @@ struct ric_load_info_s {
   using load_status_e_ = enumerated<load_status_opts, true>;
 
   // member variables
-  bool           ext                   = false;
   bool           load_status_present   = false;
   bool           load_estimate_present = false;
   load_status_e_ load_status;
@@ -1049,7 +1026,6 @@ using ric_load_request_e = enumerated<ric_load_request_opts, true>;
 
 // RICserviceLoadConfirm ::= SEQUENCE
 struct ric_service_load_confirm_s {
-  bool               ext                                     = false;
   bool               ric_service_report_load_confirm_present = false;
   bool               ric_service_insert_load_confirm_present = false;
   bool               ric_service_ctrl_load_confirm_present   = false;
@@ -1070,7 +1046,6 @@ struct ric_service_load_confirm_s {
 
 // RICserviceLoadInformation ::= SEQUENCE
 struct ric_service_load_info_s {
-  bool            ext                                  = false;
   bool            ric_service_report_load_info_present = false;
   bool            ric_service_insert_load_info_present = false;
   bool            ric_service_ctrl_load_info_present   = false;
@@ -1091,7 +1066,6 @@ struct ric_service_load_info_s {
 
 // RICserviceLoadRequest ::= SEQUENCE
 struct ric_service_load_request_s {
-  bool               ext                                     = false;
   bool               ric_service_report_load_request_present = false;
   bool               ric_service_insert_load_request_present = false;
   bool               ric_service_ctrl_load_request_present   = false;
@@ -1112,7 +1086,6 @@ struct ric_service_load_request_s {
 
 // RICsubscriptionAuditFlag ::= SEQUENCE
 struct ric_sub_audit_flag_s {
-  bool                  ext                         = false;
   bool                  listed_records_only_present = false;
   listed_records_only_e listed_records_only;
   // ...
@@ -1161,7 +1134,6 @@ using ric_time_to_wait_e = enumerated<ric_time_to_wait_opts, true>;
 
 // RICsubsequentAction ::= SEQUENCE
 struct ric_subsequent_action_s {
-  bool                         ext = false;
   ric_subsequent_action_type_e ric_subsequent_action_type;
   ric_time_to_wait_e           ric_time_to_wait;
   // ...
@@ -1210,7 +1182,6 @@ using report_periodicity_e2_e = enumerated<report_periodicity_e2_opts, true>;
 
 // TNLinformation ::= SEQUENCE
 struct tnl_info_s {
-  bool                                  ext              = false;
   bool                                  tnl_port_present = false;
   bounded_bitstring<1, 160, true, true> tnl_address;
   fixed_bitstring<16, false, true>      tnl_port;

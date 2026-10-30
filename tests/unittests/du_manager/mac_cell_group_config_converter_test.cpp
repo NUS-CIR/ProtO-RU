@@ -101,8 +101,6 @@ TEST(mac_cell_group_config_converter_test, test_extended_sr_prohibit_timer_conve
   ASSERT_TRUE(rrc_mcg_cfg.sched_request_cfg.sched_request_to_add_mod_list[0].sr_prohibit_timer_present);
   ASSERT_EQ(rrc_mcg_cfg.sched_request_cfg.sched_request_to_add_mod_list[0].sr_prohibit_timer,
             asn1::rrc_nr::sched_request_to_add_mod_s::sr_prohibit_timer_opts::ms128);
-
-  ASSERT_TRUE(rrc_mcg_cfg.ext) << "the extension lives in an extension group";
   ASSERT_TRUE(rrc_mcg_cfg.sched_request_cfg_v1700.is_present());
   const auto& ext_list = rrc_mcg_cfg.sched_request_cfg_v1700->sched_request_to_add_mod_list_ext_v1700;
   // One entry per schedulingRequestToAddModList entry, in the same order.

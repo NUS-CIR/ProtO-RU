@@ -399,7 +399,6 @@ struct bsr_cfg_s {
   using lc_ch_sr_delay_timer_e_ = enumerated<lc_ch_sr_delay_timer_opts>;
 
   // member variables
-  bool                    ext                          = false;
   bool                    lc_ch_sr_delay_timer_present = false;
   periodic_bsr_timer_e_   periodic_bsr_timer;
   retx_bsr_timer_e_       retx_bsr_timer;
@@ -472,7 +471,6 @@ struct rrc_reject_s {
 
 // MAC-MainConfigSL-r16 ::= SEQUENCE
 struct mac_main_cfg_sl_r16_s {
-  bool      ext                                 = false;
   bool      sl_bsr_cfg_r16_present              = false;
   bool      ul_prioritization_thres_r16_present = false;
   bool      sl_prioritization_thres_r16_present = false;
@@ -600,7 +598,6 @@ struct sl_cfg_grant_cfg_r16_s {
   };
 
   // member variables
-  bool                           ext                                 = false;
   bool                           sl_period_cg_r16_present            = false;
   bool                           sl_nr_of_harq_processes_r16_present = false;
   bool                           sl_harq_proc_id_offset_r16_present  = false;
@@ -689,7 +686,6 @@ struct sl_sched_cfg_r16_s {
   using sl_dci_to_sl_trans_r16_l_ = bounded_array<uint8_t, 8>;
 
   // member variables
-  bool                        ext                               = false;
   bool                        mac_main_cfg_sl_r16_present       = false;
   bool                        sl_cs_rnti_r16_present            = false;
   bool                        sl_cfg_grant_cfg_list_r16_present = false;
@@ -810,7 +806,6 @@ struct sl_pssch_tx_cfg_r16_s {
   using sl_thres_ue_speed_r16_e_ = enumerated<sl_thres_ue_speed_r16_opts>;
 
   // member variables
-  bool                     ext                         = false;
   bool                     sl_type_tx_sync_r16_present = false;
   sl_type_tx_sync_r16_e    sl_type_tx_sync_r16;
   sl_thres_ue_speed_r16_e_ sl_thres_ue_speed_r16;
@@ -915,7 +910,6 @@ struct sl_ue_sel_cfg_r16_s {
   using sl_reselect_after_r16_e_ = enumerated<sl_reselect_after_r16_opts>;
 
   // member variables
-  bool                            ext                                   = false;
   bool                            sl_prob_res_keep_r16_present          = false;
   bool                            sl_reselect_after_r16_present         = false;
   bool                            sl_cbr_common_tx_cfg_list_r16_present = false;
@@ -950,7 +944,6 @@ struct sl_ps_bch_cfg_r16_s {
   using dl_alpha_ps_bch_r16_e_ = enumerated<dl_alpha_ps_bch_r16_opts>;
 
   // member variables
-  bool                   ext                         = false;
   bool                   dl_p0_ps_bch_r16_present    = false;
   bool                   dl_alpha_ps_bch_r16_present = false;
   int8_t                 dl_p0_ps_bch_r16            = -16;
@@ -994,7 +987,6 @@ struct sl_lbt_fail_recovery_cfg_r18_s {
   using sl_lbt_recovery_timer_r18_e_ = enumerated<sl_lbt_recovery_timer_r18_opts>;
 
   // member variables
-  bool                                  ext                                        = false;
   bool                                  sl_lbt_fail_instance_max_count_r18_present = false;
   bool                                  sl_lbt_fail_detection_timer_r18_present    = false;
   bool                                  sl_lbt_recovery_timer_r18_present          = false;
@@ -1116,7 +1108,6 @@ struct sl_bwp_generic_r16_s {
   using sl_start_symbol_r16_e_ = enumerated<sl_start_symbol_r16_opts>;
 
   // member variables
-  bool                                 ext                                       = false;
   bool                                 sl_bwp_r16_present                        = false;
   bool                                 sl_len_symbols_r16_present                = false;
   bool                                 sl_start_symbol_r16_present               = false;
@@ -1157,7 +1148,6 @@ struct sl_pscch_cfg_r16_s {
   using sl_freq_res_pscch_r16_e_ = enumerated<sl_freq_res_pscch_r16_opts>;
 
   // member variables
-  bool                     ext                              = false;
   bool                     sl_time_res_pscch_r16_present    = false;
   bool                     sl_freq_res_pscch_r16_present    = false;
   bool                     sl_dmrs_scramble_id_r16_present  = false;
@@ -1186,7 +1176,6 @@ struct sl_pssch_cfg_r16_s {
   using sl_scaling_r16_e_ = enumerated<sl_scaling_r16_opts>;
 
   // member variables
-  bool                                   ext                                = false;
   bool                                   sl_beta_offsets2nd_sci_r16_present = false;
   bool                                   sl_scaling_r16_present             = false;
   sl_pssch_dmrs_time_pattern_list_r16_l_ sl_pssch_dmrs_time_pattern_list_r16;
@@ -1234,7 +1223,6 @@ struct sl_psfch_cfg_r16_s {
   using sl_psfch_candidate_res_type_r16_e_ = enumerated<sl_psfch_candidate_res_type_r16_opts>;
 
   // member variables
-  bool                               ext                                     = false;
   bool                               sl_psfch_period_r16_present             = false;
   bool                               sl_psfch_rb_set_r16_present             = false;
   bool                               sl_num_mux_cs_pair_r16_present          = false;
@@ -1282,7 +1270,6 @@ struct sl_ptrs_cfg_r16_s {
   using sl_ptrs_re_offset_r16_e_ = enumerated<sl_ptrs_re_offset_r16_opts>;
 
   // member variables
-  bool                        ext                              = false;
   bool                        sl_ptrs_freq_density_r16_present = false;
   bool                        sl_ptrs_time_density_r16_present = false;
   bool                        sl_ptrs_re_offset_r16_present    = false;
@@ -1449,7 +1436,6 @@ struct sl_ue_sel_cfg_rp_r16_s {
   using sl_rs_for_sensing_r16_e_ = enumerated<sl_rs_for_sensing_r16_opts>;
 
   // member variables
-  bool                              ext                                = false;
   bool                              sl_thres_rsrp_list_r16_present     = false;
   bool                              sl_multi_reserve_res_r16_present   = false;
   bool                              sl_max_num_per_reserve_r16_present = false;
@@ -1487,7 +1473,6 @@ struct sl_zone_cfg_r16_s {
   using sl_zone_len_r16_e_ = enumerated<sl_zone_len_r16_opts>;
 
   // member variables
-  bool               ext = false;
   sl_zone_len_r16_e_ sl_zone_len_r16;
   // ...
 
@@ -1543,7 +1528,6 @@ struct sl_zone_cfg_mcr_r16_s {
   using sl_trans_range_r16_e_ = enumerated<sl_trans_range_r16_opts>;
 
   // member variables
-  bool                  ext                        = false;
   bool                  sl_trans_range_r16_present = false;
   bool                  sl_zone_cfg_r16_present    = false;
   uint8_t               sl_zone_cfg_mcr_idx_r16    = 0;
@@ -1616,7 +1600,6 @@ struct sl_pwr_ctrl_r16_s {
   using dl_alpha_psfch_r16_e_ = enumerated<dl_alpha_psfch_r16_opts>;
 
   // member variables
-  bool                        ext                              = false;
   bool                        sl_alpha_pssch_pscch_r16_present = false;
   bool                        dl_alpha_pssch_pscch_r16_present = false;
   bool                        sl_p0_pssch_pscch_r16_present    = false;
@@ -1688,7 +1671,6 @@ struct sl_pbps_cp_s_cfg_r17_s {
   using sl_partial_sensing_inactive_time_r17_e_ = enumerated<sl_partial_sensing_inactive_time_r17_opts>;
 
   // member variables
-  bool                                        ext                                              = false;
   bool                                        sl_allowed_res_sel_cfg_r17_present               = false;
   bool                                        sl_min_num_candidate_slots_periodic_r17_present  = false;
   bool                                        sl_add_pbps_occasion_r17_present                 = false;
@@ -1764,7 +1746,6 @@ struct sl_inter_ue_coordination_scheme1_r17_s {
   using sl_determine_res_type_r17_e_ = enumerated<sl_determine_res_type_r17_opts>;
 
   // member variables
-  bool                                             ext                                              = false;
   bool                                             sl_iuc_explicit_r17_present                      = false;
   bool                                             sl_iuc_condition_r17_present                     = false;
   bool                                             sl_condition1_a_2_r17_present                    = false;
@@ -1814,7 +1795,6 @@ struct sl_inter_ue_coordination_scheme2_r17_s {
   using sl_ind_ue_b_r17_e_ = enumerated<sl_ind_ue_b_r17_opts>;
 
   // member variables
-  bool                       ext                                      = false;
   bool                       sl_iuc_scheme2_r17_present               = false;
   bool                       sl_rb_set_psfch_r17_present              = false;
   bool                       sl_type_ue_a_r17_present                 = false;
@@ -1839,7 +1819,6 @@ struct sl_inter_ue_coordination_scheme2_r17_s {
 
 // SL-InterUE-CoordinationConfig-r17 ::= SEQUENCE
 struct sl_inter_ue_coordination_cfg_r17_s {
-  bool                                   ext                                          = false;
   bool                                   sl_inter_ue_coordination_scheme1_r17_present = false;
   bool                                   sl_inter_ue_coordination_scheme2_r17_present = false;
   sl_inter_ue_coordination_scheme1_r17_s sl_inter_ue_coordination_scheme1_r17;
@@ -2053,7 +2032,6 @@ struct sl_res_pool_r16_s {
   using sl_prs_res_shared_sl_prs_rp_r18_l_ = dyn_array<sl_prs_res_shared_sl_prs_rp_r18_s>;
 
   // member variables
-  bool                                ext                                = false;
   bool                                sl_pscch_cfg_r16_present           = false;
   bool                                sl_pssch_cfg_r16_present           = false;
   bool                                sl_psfch_cfg_r16_present           = false;
@@ -2239,7 +2217,6 @@ struct sl_pscch_cfg_ded_sl_prs_rp_r18_s {
   using sl_freq_res_pscch_ded_sl_prs_rp_r18_e_ = enumerated<sl_freq_res_pscch_ded_sl_prs_rp_r18_opts>;
 
   // member variables
-  bool                                   ext                                         = false;
   bool                                   sl_time_res_pscch_ded_sl_prs_rp_r18_present = false;
   bool                                   sl_freq_res_pscch_ded_sl_prs_rp_r18_present = false;
   sl_time_res_pscch_ded_sl_prs_rp_r18_e_ sl_time_res_pscch_ded_sl_prs_rp_r18;
@@ -2640,7 +2617,6 @@ struct sl_bwp_prs_pool_cfg_r18_s {
 
 // SL-BWP-Config-r16 ::= SEQUENCE
 struct sl_bwp_cfg_r16_s {
-  bool                  ext                         = false;
   bool                  sl_bwp_generic_r16_present  = false;
   bool                  sl_bwp_pool_cfg_r16_present = false;
   uint8_t               sl_bwp_id                   = 0;
@@ -2713,7 +2689,6 @@ struct sl_sync_cfg_r16_s {
   };
 
   // member variables
-  bool                         ext                               = false;
   bool                         sl_sync_ref_min_hyst_r16_present  = false;
   bool                         sl_sync_ref_diff_hyst_r16_present = false;
   bool                         sl_filt_coef_r16_present          = false;
@@ -2787,7 +2762,6 @@ struct sl_rlc_cfg_r16_c {
     using sl_max_retx_thres_r16_e_ = enumerated<sl_max_retx_thres_r16_opts>;
 
     // member variables
-    bool                     ext                            = false;
     bool                     sl_sn_field_len_am_r16_present = false;
     sn_field_len_am_e        sl_sn_field_len_am_r16;
     t_poll_retx_e            sl_t_poll_retx_r16;
@@ -2797,7 +2771,6 @@ struct sl_rlc_cfg_r16_c {
     // ...
   };
   struct sl_um_rlc_r16_s_ {
-    bool              ext                            = false;
     bool              sl_sn_field_len_um_r16_present = false;
     sn_field_len_um_e sl_sn_field_len_um_r16;
     // ...
@@ -2921,7 +2894,6 @@ struct sl_lc_ch_cfg_r16_s {
   using sl_allowed_carriers_r18_l_ = bounded_array<uint8_t, 8>;
 
   // member variables
-  bool                            ext                                         = false;
   bool                            sl_cfg_grant_type1_allowed_r16_present      = false;
   bool                            sl_harq_feedback_enabled_r16_present        = false;
   bool                            sl_allowed_cg_list_r16_present              = false;
@@ -2953,7 +2925,6 @@ struct sl_lc_ch_cfg_r16_s {
 
 // SL-RLC-BearerConfig-r16 ::= SEQUENCE
 struct sl_rlc_bearer_cfg_r16_s {
-  bool               ext                                = false;
   bool               sl_served_radio_bearer_r16_present = false;
   bool               sl_rlc_cfg_r16_present             = false;
   bool               sl_mac_lc_ch_cfg_r16_present       = false;
@@ -3029,7 +3000,6 @@ struct sl_pqi_r16_c {
     using sl_res_type_r16_e_ = enumerated<sl_res_type_r16_opts>;
 
     // member variables
-    bool               ext                                  = false;
     bool               sl_res_type_r16_present              = false;
     bool               sl_prio_level_r16_present            = false;
     bool               sl_packet_delay_budget_r16_present   = false;
@@ -3094,7 +3064,6 @@ private:
 
 // SL-QoS-Profile-r16 ::= SEQUENCE
 struct sl_qos_profile_r16_s {
-  bool         ext                  = false;
   bool         sl_pqi_r16_present   = false;
   bool         sl_gfbr_r16_present  = false;
   bool         sl_mfbr_r16_present  = false;
@@ -3191,7 +3160,6 @@ struct sl_sdap_cfg_r16_s {
   using sl_cast_type_r16_e_ = enumerated<sl_cast_type_r16_opts>;
 
   // member variables
-  bool                       ext                             = false;
   bool                       sl_mapped_qos_flows_r16_present = false;
   bool                       sl_cast_type_r16_present        = false;
   sl_sdap_hdr_r16_e_         sl_sdap_hdr_r16;
@@ -3246,7 +3214,6 @@ struct sl_pdcp_cfg_r16_s {
   using sl_pdcp_sn_size_r16_e_ = enumerated<sl_pdcp_sn_size_r16_opts>;
 
   // member variables
-  bool                    ext                              = false;
   bool                    sl_discard_timer_r16_present     = false;
   bool                    sl_pdcp_sn_size_r16_present      = false;
   bool                    sl_out_of_order_delivery_present = false;
@@ -3306,7 +3273,6 @@ struct sl_radio_bearer_cfg_r16_s {
   using sl_trans_range_r16_e_ = enumerated<sl_trans_range_r16_opts>;
 
   // member variables
-  bool                  ext                        = false;
   bool                  sl_sdap_cfg_r16_present    = false;
   bool                  sl_pdcp_cfg_r16_present    = false;
   bool                  sl_trans_range_r16_present = false;
@@ -3327,7 +3293,6 @@ using sl_meas_obj_to_rem_list_r16_l = dyn_array<uint8_t>;
 
 // SL-MeasObject-r16 ::= SEQUENCE
 struct sl_meas_obj_r16_s {
-  bool     ext              = false;
   uint32_t freq_info_sl_r16 = 0;
   // ...
 
@@ -3339,7 +3304,6 @@ struct sl_meas_obj_r16_s {
 
 // SL-MeasObjectInfo-r16 ::= SEQUENCE
 struct sl_meas_obj_info_r16_s {
-  bool              ext                = false;
   uint8_t           sl_meas_obj_id_r16 = 1;
   sl_meas_obj_r16_s sl_meas_obj_r16;
   // ...
@@ -3376,7 +3340,6 @@ struct sl_periodical_report_cfg_r16_s {
   using sl_report_amount_r16_e_ = enumerated<sl_report_amount_r16_opts>;
 
   // member variables
-  bool                       ext = false;
   report_interv_e            sl_report_interv_r16;
   sl_report_amount_r16_e_    sl_report_amount_r16;
   sl_meas_report_quant_r16_c sl_report_quant_r16;
@@ -3393,7 +3356,6 @@ struct sl_periodical_report_cfg_r16_s {
 struct sl_event_trigger_cfg_r16_s {
   struct sl_event_id_r16_c_ {
     struct event_s1_r16_s_ {
-      bool                        ext = false;
       sl_meas_trigger_quant_r16_c s1_thres_r16;
       bool                        sl_report_on_leave_r16 = false;
       uint8_t                     sl_hysteresis_r16      = 0;
@@ -3401,7 +3363,6 @@ struct sl_event_trigger_cfg_r16_s {
       // ...
     };
     struct event_s2_r16_s_ {
-      bool                        ext = false;
       sl_meas_trigger_quant_r16_c s2_thres_r16;
       bool                        sl_report_on_leave_r16 = false;
       uint8_t                     sl_hysteresis_r16      = 0;
@@ -3467,7 +3428,6 @@ struct sl_event_trigger_cfg_r16_s {
   using sl_report_amount_r16_e_ = enumerated<sl_report_amount_r16_opts>;
 
   // member variables
-  bool                       ext = false;
   sl_event_id_r16_c_         sl_event_id_r16;
   report_interv_e            sl_report_interv_r16;
   sl_report_amount_r16_e_    sl_report_amount_r16;
@@ -3533,7 +3493,6 @@ struct sl_report_cfg_r16_s {
   };
 
   // member variables
-  bool                  ext = false;
   sl_report_type_r16_c_ sl_report_type_r16;
   // ...
 
@@ -3545,7 +3504,6 @@ struct sl_report_cfg_r16_s {
 
 // SL-ReportConfigInfo-r16 ::= SEQUENCE
 struct sl_report_cfg_info_r16_s {
-  bool                ext                  = false;
   uint8_t             sl_report_cfg_id_r16 = 1;
   sl_report_cfg_r16_s sl_report_cfg_r16;
   // ...
@@ -3564,7 +3522,6 @@ using sl_meas_id_to_rem_list_r16_l = dyn_array<uint8_t>;
 
 // SL-MeasIdInfo-r16 ::= SEQUENCE
 struct sl_meas_id_info_r16_s {
-  bool    ext                  = false;
   uint8_t sl_meas_id_r16       = 1;
   uint8_t sl_meas_obj_id_r16   = 1;
   uint8_t sl_report_cfg_id_r16 = 1;
@@ -3581,7 +3538,6 @@ using sl_meas_id_list_r16_l = dyn_array<sl_meas_id_info_r16_s>;
 
 // SL-QuantityConfig-r16 ::= SEQUENCE
 struct sl_quant_cfg_r16_s {
-  bool        ext                           = false;
   bool        sl_filt_coef_dmrs_r16_present = false;
   filt_coef_e sl_filt_coef_dmrs_r16;
   // ...
@@ -3594,7 +3550,6 @@ struct sl_quant_cfg_r16_s {
 
 // SL-MeasConfig-r16 ::= SEQUENCE
 struct sl_meas_cfg_r16_s {
-  bool                            ext                      = false;
   bool                            sl_quant_cfg_r16_present = false;
   sl_meas_obj_to_rem_list_r16_l   sl_meas_obj_to_rem_list_r16;
   sl_meas_obj_list_r16_l          sl_meas_obj_to_add_mod_list_r16;
@@ -3613,7 +3568,6 @@ struct sl_meas_cfg_r16_s {
 
 // SL-MeasConfigInfo-r16 ::= SEQUENCE
 struct sl_meas_cfg_info_r16_s {
-  bool              ext             = false;
   uint8_t           sl_dest_idx_r16 = 0;
   sl_meas_cfg_r16_s sl_meas_cfg_r16;
   // ...
@@ -3803,7 +3757,6 @@ struct sl_drx_gc_bc_qos_r17_s {
   using sl_drx_gc_bc_cycle_r17_e_ = enumerated<sl_drx_gc_bc_cycle_r17_opts>;
 
   // member variables
-  bool                                     ext = false;
   sl_drx_gc_bc_mapped_qos_flow_list_r17_l_ sl_drx_gc_bc_mapped_qos_flow_list_r17;
   sl_drx_gc_bc_on_dur_timer_r17_c_         sl_drx_gc_bc_on_dur_timer_r17;
   sl_drx_gc_inactivity_timer_r17_e_        sl_drx_gc_inactivity_timer_r17;
@@ -3895,7 +3848,6 @@ struct sl_drx_cfg_gc_bc_r17_s {
   using sl_drx_gc_bc_per_qos_list_r17_l_ = dyn_array<sl_drx_gc_bc_qos_r17_s>;
 
   // member variables
-  bool                             ext                              = false;
   bool                             sl_drx_gc_generic_r17_present    = false;
   bool                             sl_default_drx_gc_bc_r17_present = false;
   sl_drx_gc_bc_per_qos_list_r17_l_ sl_drx_gc_bc_per_qos_list_r17;
@@ -4391,7 +4343,6 @@ struct sl_drx_cfg_uc_r17_s {
 
 // SL-DRX-ConfigUC-Info-r17 ::= SEQUENCE
 struct sl_drx_cfg_uc_info_r17_s {
-  bool                ext                       = false;
   bool                sl_dest_idx_r17_present   = false;
   bool                sl_drx_cfg_uc_r17_present = false;
   uint8_t             sl_dest_idx_r17           = 0;
@@ -4410,7 +4361,6 @@ struct sl_drx_cfg_r17_s {
   using sl_drx_cfg_uc_to_add_mod_list_r17_l_ = dyn_array<sl_drx_cfg_uc_info_r17_s>;
 
   // member variables
-  bool                                 ext                          = false;
   bool                                 sl_drx_cfg_gc_bc_r17_present = false;
   sl_drx_cfg_gc_bc_r17_s               sl_drx_cfg_gc_bc_r17;
   sl_drx_cfg_uc_to_release_list_r17_l_ sl_drx_cfg_uc_to_release_list_r17;
@@ -4425,7 +4375,6 @@ struct sl_drx_cfg_r17_s {
 
 // SL-RLC-ChannelConfig-r17 ::= SEQUENCE
 struct sl_rlc_ch_cfg_r17_s {
-  bool               ext                                = false;
   bool               sl_rlc_cfg_r17_present             = false;
   bool               sl_mac_lc_ch_cfg_r17_present       = false;
   bool               sl_packet_delay_budget_r17_present = false;
@@ -4509,7 +4458,6 @@ struct sl_freq_cfg_ext_v1800_s {
   };
 
   // member variables
-  bool                           ext                                                             = false;
   bool                           absence_of_any_other_technology_r18_present                     = false;
   bool                           sl_sync_tx_disabled_r18_present                                 = false;
   bool                           sl_energy_detection_cfg_r18_present                             = false;
@@ -4562,7 +4510,6 @@ struct sl_phy_mac_rlc_cfg_v1700_s {
   using sl_sync_freq_list_r18_l_                        = bounded_array<uint8_t, 8>;
 
   // member variables
-  bool                             ext                    = false;
   bool                             sl_drx_cfg_r17_present = false;
   sl_drx_cfg_r17_s                 sl_drx_cfg_r17;
   sl_rlc_ch_to_release_list_r17_l_ sl_rlc_ch_to_release_list_r17;
@@ -4695,7 +4642,6 @@ struct sl_disc_cfg_v1800_s {
 
 // SL-RemoteUE-ConfigU2U-v1830 ::= SEQUENCE
 struct sl_remote_ue_cfg_u2_u_v1830_s {
-  bool        ext                           = false;
   bool        sl_filt_coef_u2_u_r18_present = false;
   filt_coef_e sl_filt_coef_u2_u_r18;
   // ...
@@ -4719,7 +4665,6 @@ struct sl_disc_cfg_v1830_s {
 
 // SL-RelayUE-ConfigU2U-v1840 ::= SEQUENCE
 struct sl_relay_ue_cfg_u2_u_v1840_s {
-  bool        ext                           = false;
   bool        sl_filt_coef_u2_u_r18_present = false;
   bool        sd_filt_coef_u2_u_r18_present = false;
   filt_coef_e sl_filt_coef_u2_u_r18;
@@ -4759,7 +4704,6 @@ struct sl_cfg_ded_nr_r16_s {
   using t400_r16_e_ = enumerated<t400_r16_opts>;
 
   // member variables
-  bool                                    ext                            = false;
   bool                                    sl_phy_mac_rlc_cfg_r16_present = false;
   bool                                    t400_r16_present               = false;
   sl_phy_mac_rlc_cfg_r16_s                sl_phy_mac_rlc_cfg_r16;
@@ -4837,7 +4781,6 @@ private:
 
 // SL-MappingToAddMod-r17 ::= SEQUENCE
 struct sl_map_to_add_mod_r17_s {
-  bool                     ext                              = false;
   bool                     sl_egress_rlc_ch_uu_r17_present  = false;
   bool                     sl_egress_rlc_ch_pc5_r17_present = false;
   sl_remote_ue_rb_id_r17_c sl_remote_ue_rb_id_r17;
@@ -4857,7 +4800,6 @@ struct sl_srap_cfg_r17_s {
   using sl_map_to_release_list_r17_l_ = dyn_array<sl_remote_ue_rb_id_r17_c>;
 
   // member variables
-  bool                          ext                     = false;
   bool                          sl_local_id_r17_present = false;
   uint16_t                      sl_local_id_r17         = 0;
   sl_map_to_add_mod_list_r17_l_ sl_map_to_add_mod_list_r17;
@@ -4872,7 +4814,6 @@ struct sl_srap_cfg_r17_s {
 
 // SL-MappingConfig-U2U-r18 ::= SEQUENCE
 struct sl_map_cfg_u2_u_r18_s {
-  bool     ext                      = false;
   uint16_t sl_remote_ue_slrb_id_r18 = 1;
   uint16_t sl_egress_rlc_ch_pc5_r18 = 1;
   // ...
@@ -4900,7 +4841,6 @@ struct sl_srap_cfg_u2_u_r18_s {
 
 // SL-TargetRemoteUE-Config-r18 ::= SEQUENCE
 struct sl_target_remote_ue_cfg_r18_s {
-  bool                   ext = false;
   fixed_bitstring<24>    sl_target_ue_id_r18;
   sl_srap_cfg_u2_u_r18_s sl_srap_cfg_u2_u_r18;
   // ...
@@ -4917,7 +4857,6 @@ struct sl_u2_u_relay_ue_cfg_r18_s {
   using sl_target_remote_ue_to_release_list_r18_l_ = bounded_array<fixed_bitstring<24>, 32>;
 
   // member variables
-  bool                                       ext = false;
   fixed_bitstring<24>                        sl_l2_id_relay_r18;
   sl_target_remote_ue_to_add_mod_list_r18_l_ sl_target_remote_ue_to_add_mod_list_r18;
   sl_target_remote_ue_to_release_list_r18_l_ sl_target_remote_ue_to_release_list_r18;
@@ -4935,7 +4874,6 @@ struct sl_l2_remote_ue_cfg_r17_s {
   using sl_u2_u_relay_ue_to_release_list_r18_l_ = bounded_array<fixed_bitstring<24>, 32>;
 
   // member variables
-  bool              ext                            = false;
   bool              sl_srap_cfg_remote_r17_present = false;
   bool              sl_ue_id_remote_r17_present    = false;
   sl_srap_cfg_r17_s sl_srap_cfg_remote_r17;

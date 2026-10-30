@@ -44,7 +44,6 @@ private:
 
 // NR-CGI ::= SEQUENCE
 struct nr_cgi_s {
-  bool                             ext = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<36, false, true> nr_cell_id;
   // ...
@@ -57,7 +56,6 @@ struct nr_cgi_s {
 
 // EUTRA-CGI ::= SEQUENCE
 struct eutra_cgi_s {
-  bool                             ext = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<28, false, true> eutra_cell_id;
   // ...
@@ -120,7 +118,6 @@ private:
 
 // Cell-RNTI ::= SEQUENCE
 struct cell_rnti_s {
-  bool     ext    = false;
   uint32_t c_rnti = 0;
   cgi_c    cell_global_id;
   // ...
@@ -133,7 +130,6 @@ struct cell_rnti_s {
 
 // GUAMI ::= SEQUENCE
 struct guami_s {
-  bool                             ext = false;
   fixed_octstring<3, true>         plmn_id;
   fixed_bitstring<8, false, true>  amf_region_id;
   fixed_bitstring<10, false, true> amf_set_id;
@@ -148,7 +144,6 @@ struct guami_s {
 
 // GUMMEI ::= SEQUENCE
 struct gummei_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   fixed_octstring<2, true> mme_group_id;
   fixed_octstring<1, true> mme_code;
@@ -308,7 +303,6 @@ private:
 
 // FreqBandNrItem ::= SEQUENCE
 struct freq_band_nr_item_s {
-  bool     ext              = false;
   uint16_t freq_band_ind_nr = 1;
   // ...
 
@@ -342,7 +336,6 @@ private:
 
 // GlobalENB-ID ::= SEQUENCE
 struct global_enb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   enb_id_c                 enb_id;
   // ...
@@ -355,7 +348,6 @@ struct global_enb_id_s {
 
 // GlobalGNB-ID ::= SEQUENCE
 struct global_gnb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   gnb_id_c                 gnb_id;
   // ...
@@ -429,7 +421,6 @@ private:
 
 // GlobalNgENB-ID ::= SEQUENCE
 struct global_ng_enb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   ng_enb_id_c              ng_enb_id;
   // ...
@@ -492,7 +483,6 @@ private:
 
 // GlobalenGNB-ID ::= SEQUENCE
 struct globalen_gnb_id_s {
-  bool                     ext = false;
   fixed_octstring<3, true> plmn_id;
   en_gnb_id_c              en_gnb_id;
   // ...
@@ -565,7 +555,6 @@ struct interface_msg_id_s {
   using msg_type_e_ = enumerated<msg_type_opts, true>;
 
   // member variables
-  bool        ext               = false;
   int64_t     interface_proc_id = 0;
   msg_type_e_ msg_type;
   // ...
@@ -578,7 +567,6 @@ struct interface_msg_id_s {
 
 // InterfaceID-E1 ::= SEQUENCE
 struct interface_id_e1_s {
-  bool            ext = false;
   global_gnb_id_s global_gnb_id;
   uint64_t        gnb_cu_up_id = 0;
   // ...
@@ -591,7 +579,6 @@ struct interface_id_e1_s {
 
 // InterfaceID-F1 ::= SEQUENCE
 struct interface_id_f1_s {
-  bool            ext = false;
   global_gnb_id_s global_gnb_id;
   uint64_t        gnb_du_id = 0;
   // ...
@@ -604,7 +591,6 @@ struct interface_id_f1_s {
 
 // InterfaceID-NG ::= SEQUENCE
 struct interface_id_ng_s {
-  bool    ext = false;
   guami_s guami;
   // ...
 
@@ -616,7 +602,6 @@ struct interface_id_ng_s {
 
 // InterfaceID-S1 ::= SEQUENCE
 struct interface_id_s1_s {
-  bool     ext = false;
   gummei_s gummei;
   // ...
 
@@ -628,7 +613,6 @@ struct interface_id_s1_s {
 
 // InterfaceID-W1 ::= SEQUENCE
 struct interface_id_w1_s {
-  bool               ext = false;
   global_ng_enb_id_s global_ng_enb_id;
   uint64_t           ng_enb_du_id = 0;
   // ...
@@ -691,7 +675,6 @@ struct interface_id_x2_s {
   };
 
   // member variables
-  bool         ext = false;
   node_type_c_ node_type;
   // ...
 
@@ -703,7 +686,6 @@ struct interface_id_x2_s {
 
 // InterfaceID-Xn ::= SEQUENCE
 struct interface_id_xn_s {
-  bool                   ext = false;
   global_ngran_node_id_c global_ng_ran_id;
   // ...
 
@@ -835,7 +817,6 @@ using interface_type_e = enumerated<interface_type_opts, true>;
 
 // NR-ARFCN ::= SEQUENCE
 struct nr_arfcn_s {
-  bool     ext      = false;
   uint32_t nr_arfcn = 0;
   // ...
 
@@ -847,7 +828,6 @@ struct nr_arfcn_s {
 
 // SupportedSULFreqBandItem ::= SEQUENCE
 struct supported_sul_freq_band_item_s {
-  bool     ext              = false;
   uint16_t freq_band_ind_nr = 1;
   // ...
 
@@ -862,7 +842,6 @@ using supported_sul_band_list_l = dyn_array<supported_sul_freq_band_item_s>;
 
 // NRFrequencyBandItem ::= SEQUENCE
 struct nr_freq_band_item_s {
-  bool                      ext              = false;
   uint16_t                  freq_band_ind_nr = 1;
   supported_sul_band_list_l supported_sul_band_list;
   // ...
@@ -886,7 +865,6 @@ using nr_freq_shift7p5khz_e = enumerated<nr_freq_shift7p5khz_opts, true>;
 
 // NRFrequencyInfo ::= SEQUENCE
 struct nr_freq_info_s {
-  bool                  ext                      = false;
   bool                  freq_shift7p5khz_present = false;
   nr_arfcn_s            nr_arfcn;
   nr_freq_band_list_l   freq_band_list;
@@ -901,7 +879,6 @@ struct nr_freq_info_s {
 
 // PartialUEID ::= SEQUENCE
 struct partial_ue_id_s {
-  bool                     ext                           = false;
   bool                     amf_ue_ngap_id_present        = false;
   bool                     guami_present                 = false;
   bool                     gnb_cu_ue_f1ap_id_present     = false;
@@ -992,7 +969,6 @@ private:
 
 // RANfunction-Name ::= SEQUENCE
 struct ra_nfunction_name_s {
-  bool                                  ext                           = false;
   bool                                  ran_function_instance_present = false;
   printable_string<1, 150, true, true>  ran_function_short_name;
   printable_string<1, 1000, true, true> ran_function_e2sm_o_id;
@@ -1091,7 +1067,6 @@ struct rrc_msg_id_s {
   };
 
   // member variables
-  bool        ext = false;
   rrc_type_c_ rrc_type;
   int64_t     msg_id = 0;
   // ...
@@ -1104,7 +1079,6 @@ struct rrc_msg_id_s {
 
 // S-NSSAI ::= SEQUENCE
 struct s_nssai_s {
-  bool                     ext        = false;
   bool                     sd_present = false;
   fixed_octstring<1, true> sst;
   fixed_octstring<3, true> sd;
@@ -1218,7 +1192,6 @@ private:
 
 // UEID-GNB-CU-CP-F1AP-ID-Item ::= SEQUENCE
 struct ue_id_gnb_cu_cp_f1ap_id_item_s {
-  bool     ext               = false;
   uint64_t gnb_cu_ue_f1ap_id = 0;
   // ...
 
@@ -1233,7 +1206,6 @@ using ue_id_gnb_cu_f1ap_id_list_l = dyn_array<ue_id_gnb_cu_cp_f1ap_id_item_s>;
 
 // UEID-GNB-CU-CP-E1AP-ID-Item ::= SEQUENCE
 struct ue_id_gnb_cu_cp_e1ap_id_item_s {
-  bool     ext                  = false;
   uint64_t gnb_cu_cp_ue_e1ap_id = 0;
   // ...
 
@@ -1248,7 +1220,6 @@ using ue_id_gnb_cu_cp_e1ap_id_list_l = dyn_array<ue_id_gnb_cu_cp_e1ap_id_item_s>
 
 // UEID-GNB ::= SEQUENCE
 struct ue_id_gnb_s {
-  bool                           ext                         = false;
   bool                           ran_ue_id_present           = false;
   bool                           m_ng_ran_ue_xnap_id_present = false;
   bool                           global_gnb_id_present       = false;
@@ -1271,7 +1242,6 @@ struct ue_id_gnb_s {
 
 // UEID-GNB-DU ::= SEQUENCE
 struct ue_id_gnb_du_s {
-  bool                     ext               = false;
   bool                     ran_ue_id_present = false;
   uint64_t                 gnb_cu_ue_f1ap_id = 0;
   fixed_octstring<8, true> ran_ue_id;
@@ -1286,7 +1256,6 @@ struct ue_id_gnb_du_s {
 
 // UEID-GNB-CU-UP ::= SEQUENCE
 struct ue_id_gnb_cu_up_s {
-  bool                     ext                  = false;
   bool                     ran_ue_id_present    = false;
   uint64_t                 gnb_cu_cp_ue_e1ap_id = 0;
   fixed_octstring<8, true> ran_ue_id;
@@ -1300,7 +1269,6 @@ struct ue_id_gnb_cu_up_s {
 
 // UEID-NG-ENB ::= SEQUENCE
 struct ue_id_ng_enb_s {
-  bool               ext                           = false;
   bool               ng_enb_cu_ue_w1_ap_id_present = false;
   bool               m_ng_ran_ue_xnap_id_present   = false;
   bool               global_ng_enb_id_present      = false;
@@ -1321,7 +1289,6 @@ struct ue_id_ng_enb_s {
 
 // UEID-NG-ENB-DU ::= SEQUENCE
 struct ue_id_ng_enb_du_s {
-  bool     ext                   = false;
   uint64_t ng_enb_cu_ue_w1_ap_id = 0;
   // ...
   copy_ptr<cell_rnti_s> cell_rnti;
@@ -1334,7 +1301,6 @@ struct ue_id_ng_enb_du_s {
 
 // UEID-EN-GNB ::= SEQUENCE
 struct ue_id_en_gnb_s {
-  bool                           ext                          = false;
   bool                           m_enb_ue_x2ap_id_ext_present = false;
   bool                           gnb_cu_ue_f1ap_id_present    = false;
   bool                           ran_ue_id_present            = false;
@@ -1355,7 +1321,6 @@ struct ue_id_en_gnb_s {
 
 // UEID-ENB ::= SEQUENCE
 struct ue_id_enb_s {
-  bool            ext                          = false;
   bool            m_enb_ue_x2ap_id_present     = false;
   bool            m_enb_ue_x2ap_id_ext_present = false;
   bool            global_enb_id_present        = false;

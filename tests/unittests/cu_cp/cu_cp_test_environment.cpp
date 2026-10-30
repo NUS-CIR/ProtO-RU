@@ -827,8 +827,8 @@ bool cu_cp_test_environment::setup_ue_security_and_ue_capabilities(
       srb_id_t::srb1,
       4,
       test_helpers::pack_ul_dcch_msg(test_helpers::create_ue_capability_info(2, rrc_inactive_supported)),
-      rrc_inactive_supported ? std::array<uint8_t, 4>{0x11, 0x23, 0x53, 0x24}
-                             : std::array<uint8_t, 4>{0xb8, 0xe4, 0x13, 0x83}));
+      rrc_inactive_supported ? std::array<uint8_t, 4>{0x3c, 0x9b, 0x5c, 0x4d}
+                             : std::array<uint8_t, 4>{0xd8, 0x0a, 0xdc, 0xc0}));
 
   // Wait for DL RRC Message Transfer (containing NAS Registration Accept).
   result = this->wait_for_f1ap_tx_pdu(du_idx, f1ap_pdu);

@@ -272,7 +272,6 @@ TEST(serving_cell_config_converter_test, test_ue_pdsch_td_alloc_list_r16_convers
   odu::calculate_cell_group_config_diff(rrc_cell_grp_cfg, src_cfg, dest_cfg);
 
   auto& rrc_pdsch_cfg = rrc_cell_grp_cfg.sp_cell_cfg.sp_cell_cfg_ded.init_dl_bwp.pdsch_cfg.setup();
-  ASSERT_TRUE(rrc_pdsch_cfg.ext);
   ASSERT_TRUE(rrc_pdsch_cfg.pdsch_time_domain_alloc_list_r16.is_present());
   ASSERT_TRUE(rrc_pdsch_cfg.pdsch_time_domain_alloc_list_r16->is_setup());
 
@@ -329,7 +328,6 @@ TEST(serving_cell_config_converter_test, test_ue_pusch_td_alloc_list_dci_0_1_r16
   odu::calculate_cell_group_config_diff(rrc_cell_grp_cfg, src_cfg, dest_cfg);
 
   auto& rrc_pusch_cfg = rrc_cell_grp_cfg.sp_cell_cfg.sp_cell_cfg_ded.ul_cfg.init_ul_bwp.pusch_cfg.setup();
-  ASSERT_TRUE(rrc_pusch_cfg.ext);
   ASSERT_TRUE(rrc_pusch_cfg.pusch_time_domain_alloc_list_dci_0_1_r16.is_present());
   ASSERT_TRUE(rrc_pusch_cfg.pusch_time_domain_alloc_list_dci_0_1_r16->is_setup());
   // pusch-RepTypeIndicatorDCI-0-1-r16 is mandatory whenever pusch-TimeDomainAllocationListDCI-0-1-r16 is configured.

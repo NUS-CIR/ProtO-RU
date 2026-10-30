@@ -455,7 +455,6 @@ struct lc_ch_cfg_s {
     using allowed_harq_mode_r17_e_ = enumerated<allowed_harq_mode_r17_opts>;
 
     // member variables
-    bool                     ext                             = false;
     bool                     max_pusch_dur_present           = false;
     bool                     cfg_grant_type1_allowed_present = false;
     bool                     lc_ch_group_present             = false;
@@ -498,7 +497,6 @@ struct lc_ch_cfg_s {
   using bit_rate_multiplier_r16_e_ = enumerated<bit_rate_multiplier_r16_opts>;
 
   // member variables
-  bool                  ext                        = false;
   bool                  ul_specific_params_present = false;
   ul_specific_params_s_ ul_specific_params;
   // ...
@@ -516,7 +514,6 @@ struct lc_ch_cfg_s {
 
 // BH-RLC-ChannelConfig-r16 ::= SEQUENCE
 struct bh_rlc_ch_cfg_r16_s {
-  bool                ext                         = false;
   bool                bh_lc_ch_id_r16_present     = false;
   bool                reestablish_rlc_r16_present = false;
   bool                rlc_cfg_r16_present         = false;
@@ -583,7 +580,6 @@ struct cc_state_r17_s {
 
 // CFRA-SSB-Resource ::= SEQUENCE
 struct cfra_ssb_res_s {
-  bool    ext           = false;
   uint8_t ssb           = 0;
   uint8_t ra_preamb_idx = 0;
   // ...
@@ -602,7 +598,6 @@ struct cfra_csi_rs_res_s {
   using ra_occasion_list_l_ = dyn_array<uint16_t>;
 
   // member variables
-  bool                ext    = false;
   uint8_t             csi_rs = 0;
   ra_occasion_list_l_ ra_occasion_list;
   uint8_t             ra_preamb_idx = 0;
@@ -704,7 +699,6 @@ struct cfra_s {
   using msg1_repeat_num_r18_e_ = enumerated<msg1_repeat_num_r18_opts>;
 
   // member variables
-  bool         ext               = false;
   bool         occasions_present = false;
   occasions_s_ occasions;
   res_c_       res;
@@ -756,7 +750,6 @@ struct cfra_two_step_r16_s {
   };
 
   // member variables
-  bool                         ext                               = false;
   bool                         occasions_two_step_ra_r16_present = false;
   bool                         msg_a_trans_max_r16_present       = false;
   occasions_two_step_ra_r16_s_ occasions_two_step_ra_r16;
@@ -794,7 +787,6 @@ using t_status_prohibit_v1610_e = enumerated<t_status_prohibit_v1610_opts>;
 
 // DL-AM-RLC-v1610 ::= SEQUENCE
 struct dl_am_rlc_v1610_s {
-  bool                      ext                             = false;
   bool                      t_status_prohibit_v1610_present = false;
   t_status_prohibit_v1610_e t_status_prohibit_v1610;
   // ...
@@ -921,7 +913,6 @@ struct rlc_bearer_cfg_s {
   };
 
   // member variables
-  bool                   ext                         = false;
   bool                   served_radio_bearer_present = false;
   bool                   reestablish_rlc_present     = false;
   bool                   rlc_cfg_present             = false;
@@ -998,7 +989,6 @@ struct sched_request_cfg_s {
 
 // TAG ::= SEQUENCE
 struct tag_s {
-  bool               ext    = false;
   uint8_t            tag_id = 0;
   time_align_timer_e time_align_timer;
   // ...
@@ -1073,7 +1063,6 @@ struct mpe_cfg_fr2_r17_s {
   using mpe_thres_r17_e_ = enumerated<mpe_thres_r17_opts>;
 
   // member variables
-  bool                      ext = false;
   mpe_prohibit_timer_r17_e_ mpe_prohibit_timer_r17;
   mpe_thres_r17_e_          mpe_thres_r17;
   uint8_t                   nof_n_r17 = 1;
@@ -1119,7 +1108,6 @@ struct phr_cfg_s {
   using phr_mode_other_cg_e_ = enumerated<phr_mode_other_cg_opts>;
 
   // member variables
-  bool                        ext = false;
   phr_periodic_timer_e_       phr_periodic_timer;
   phr_prohibit_timer_e_       phr_prohibit_timer;
   phr_tx_pwr_factor_change_e_ phr_tx_pwr_factor_change;
@@ -1460,7 +1448,6 @@ struct tar_cfg_r17_s {
   using offset_thres_ta_r17_e_ = enumerated<offset_thres_ta_r17_opts>;
 
   // member variables
-  bool                   ext                           = false;
   bool                   offset_thres_ta_r17_present   = false;
   bool                   timing_advance_sr_r17_present = false;
   offset_thres_ta_r17_e_ offset_thres_ta_r17;
@@ -2393,7 +2380,6 @@ struct drx_cfg_ext2_v1800_s {
 
 // LCG-DSR-Config-r18 ::= SEQUENCE
 struct lcg_dsr_cfg_r18_s {
-  bool    ext                      = false;
   uint8_t lcg_id_r18               = 0;
   uint8_t remaining_time_thres_r18 = 1;
   // ...
@@ -2406,7 +2392,6 @@ struct lcg_dsr_cfg_r18_s {
 
 // TAR-Config-r18 ::= SEQUENCE
 struct tar_cfg_r18_s {
-  bool    ext                           = false;
   bool    offset_thres_ta_r18_present   = false;
   bool    timing_advance_sr_r18_present = false;
   uint8_t offset_thres_ta_r18           = 1;
@@ -2428,7 +2413,6 @@ struct mac_cell_group_cfg_s {
   using dsr_cfg_to_release_list_r18_l_       = bounded_array<uint8_t, 8>;
 
   // member variables
-  bool                       ext                       = false;
   bool                       drx_cfg_present           = false;
   bool                       sched_request_cfg_present = false;
   bool                       bsr_cfg_present           = false;
@@ -2584,7 +2568,6 @@ struct pdsch_harq_ack_enh_type3_r17_s {
   using per_harq_ext_r17_l_ = bounded_array<fixed_bitstring<32>, 32>;
 
   // member variables
-  bool              ext                                      = false;
   bool              pdsch_harq_ack_enh_type3_ndi_r17_present = false;
   bool              pdsch_harq_ack_enh_type3_cbg_r17_present = false;
   uint8_t           pdsch_harq_ack_enh_type3_idx_r17         = 0;
@@ -2712,7 +2695,6 @@ struct phys_cell_group_cfg_s {
   using pucch_s_scell_pattern_secondary_pucch_group_r17_l_        = dyn_array<uint8_t>;
 
   // member variables
-  bool                                         ext                                     = false;
   bool                                         harq_ack_spatial_bundling_pucch_present = false;
   bool                                         harq_ack_spatial_bundling_pusch_present = false;
   bool                                         p_nr_fr1_present                        = false;
@@ -2833,7 +2815,6 @@ struct freq_info_dl_s {
   using scs_specific_carrier_list_l_ = dyn_array<scs_specific_carrier_s>;
 
   // member variables
-  bool                         ext                       = false;
   bool                         absolute_freq_ssb_present = false;
   uint32_t                     absolute_freq_ssb         = 0;
   multi_freq_band_list_nr_l    freq_band_list;
@@ -2852,7 +2833,6 @@ struct freq_info_dl_s {
 
 // DownlinkConfigCommon ::= SEQUENCE
 struct dl_cfg_common_s {
-  bool            ext                  = false;
   bool            freq_info_dl_present = false;
   bool            init_dl_bwp_present  = false;
   freq_info_dl_s  freq_info_dl;
@@ -2872,7 +2852,6 @@ struct freq_info_ul_s {
   using scs_specific_carrier_list_l_ = dyn_array<scs_specific_carrier_s>;
 
   // member variables
-  bool                         ext                           = false;
   bool                         absolute_freq_point_a_present = false;
   bool                         add_spec_emission_present     = false;
   bool                         p_max_present                 = false;
@@ -2912,7 +2891,6 @@ struct ul_cfg_common_s {
 
 // HighSpeedConfig-v1700 ::= SEQUENCE
 struct high_speed_cfg_v1700_s {
-  bool ext                                    = false;
   bool high_speed_meas_ca_scell_r17_present   = false;
   bool high_speed_meas_inter_freq_r17_present = false;
   bool high_speed_demod_ca_scell_r17_present  = false;
@@ -3091,7 +3069,6 @@ struct serving_cell_cfg_common_s {
   };
 
   // member variables
-  bool                                          ext                                  = false;
   bool                                          pci_present                          = false;
   bool                                          dl_cfg_common_present                = false;
   bool                                          ul_cfg_common_present                = false;
@@ -3150,7 +3127,6 @@ struct serving_cell_cfg_common_s {
 
 // RACH-ConfigDedicated ::= SEQUENCE
 struct rach_cfg_ded_s {
-  bool                ext                       = false;
   bool                cfra_present              = false;
   bool                ra_prioritization_present = false;
   cfra_s              cfra;
@@ -3200,7 +3176,6 @@ struct sl_path_switch_cfg_r17_s {
   using t420_r17_e_ = enumerated<t420_r17_opts>;
 
   // member variables
-  bool                ext = false;
   fixed_bitstring<24> target_relay_ue_id_r17;
   t420_r17_e_         t420_r17;
   // ...
@@ -3271,7 +3246,6 @@ struct rach_less_ho_r18_s {
   };
 
   // member variables
-  bool              ext                    = false;
   bool              target_nta_r18_present = false;
   bool              beam_ind_r18_present   = false;
   target_nta_r18_e_ target_nta_r18;
@@ -3344,7 +3318,6 @@ struct recfg_with_sync_s {
   };
 
   // member variables
-  bool                      ext                        = false;
   bool                      sp_cell_cfg_common_present = false;
   bool                      rach_cfg_ded_present       = false;
   serving_cell_cfg_common_s sp_cell_cfg_common;
@@ -3404,7 +3377,6 @@ struct rlf_timers_and_consts_s {
   using t311_e_ = enumerated<t311_opts>;
 
   // member variables
-  bool    ext = false;
   t310_e_ t310;
   n310_e_ n310;
   n311_e_ n311;
@@ -3441,7 +3413,6 @@ struct good_serving_cell_eval_r17_s {
 
 // DeactivatedSCG-Config-r17 ::= SEQUENCE
 struct deactiv_scg_cfg_r17_s {
-  bool ext             = false;
   bool bfd_and_rlm_r17 = false;
   // ...
 
@@ -3495,7 +3466,6 @@ struct sp_cell_cfg_s {
   };
 
   // member variables
-  bool                                     ext                                   = false;
   bool                                     serv_cell_idx_present                 = false;
   bool                                     recfg_with_sync_present               = false;
   bool                                     rlf_timers_and_consts_present         = false;
@@ -3520,7 +3490,6 @@ struct sp_cell_cfg_s {
 
 // SCellConfig ::= SEQUENCE
 struct scell_cfg_s {
-  bool                      ext                      = false;
   bool                      scell_cfg_common_present = false;
   bool                      scell_cfg_ded_present    = false;
   uint8_t                   scell_idx                = 1;
@@ -3549,7 +3518,6 @@ struct scell_cfg_s {
 
 // Uu-RelayRLC-ChannelConfig-r17 ::= SEQUENCE
 struct uu_relay_rlc_ch_cfg_r17_s {
-  bool        ext                         = false;
   bool        uu_lc_ch_id_r17_present     = false;
   bool        reestablish_rlc_r17_present = false;
   bool        rlc_cfg_r17_present         = false;
@@ -3577,7 +3545,6 @@ struct iab_res_cfg_r17_s {
   using periodicity_slot_list_r17_e_ = enumerated<periodicity_slot_list_r17_opts>;
 
   // member variables
-  bool                         ext                                      = false;
   bool                         periodicity_slot_list_r17_present        = false;
   bool                         slot_list_subcarrier_spacing_r17_present = false;
   uint32_t                     iab_res_cfg_id_r17                       = 0;
@@ -4280,7 +4247,6 @@ struct ncr_periodic_fwd_res_r18_s {
   };
 
   // member variables
-  bool                      ext                      = false;
   uint16_t                  periodic_fwd_rsrc_id_r18 = 0;
   uint8_t                   beam_idx_r18             = 0;
   periodic_time_rsrc_r18_s_ periodic_time_rsrc_r18;
@@ -4298,7 +4264,6 @@ struct ncr_periodic_fwd_res_set_r18_s {
   using periodic_fwd_rsrc_to_release_list_r18_l_ = dyn_array<uint16_t>;
 
   // member variables
-  bool                                     ext                          = false;
   bool                                     ref_scs_r18_present          = false;
   bool                                     prio_flag_r18_present        = false;
   uint8_t                                  periodic_fwd_rsrc_set_id_r18 = 0;
@@ -4315,7 +4280,6 @@ struct ncr_periodic_fwd_res_set_r18_s {
 
 // NCR-AperiodicFwdTimeResource-r18 ::= SEQUENCE
 struct ncr_aperiodic_fwd_time_res_r18_s {
-  bool    ext                            = false;
   uint8_t aperiodic_fwd_time_rsrc_id_r18 = 0;
   uint8_t slot_offset_aperiodic_r18      = 0;
   uint8_t symbol_offset_r18              = 0;
@@ -4334,7 +4298,6 @@ struct ncr_aperiodic_fwd_cfg_r18_s {
   using aperiodic_fwd_time_rsrc_to_release_list_r18_l_ = dyn_array<uint8_t>;
 
   // member variables
-  bool                                           ext                                    = false;
   bool                                           ref_scs_r18_present                    = false;
   bool                                           aperiodic_beam_field_width_r18_present = false;
   bool                                           nof_fields_r18_present                 = false;
@@ -4360,7 +4323,6 @@ struct ncr_semi_persistent_fwd_res_r18_s {
   };
 
   // member variables
-  bool                             ext                             = false;
   uint8_t                          semi_persistent_fwd_rsrc_id_r18 = 0;
   uint8_t                          beam_idx_r18                    = 0;
   semi_persistent_time_rsrc_r18_s_ semi_persistent_time_rsrc_r18;
@@ -4378,7 +4340,6 @@ struct ncr_semi_persistent_fwd_res_set_r18_s {
   using semi_persistent_fwd_rsrc_to_release_list_r18_l_ = dyn_array<uint8_t>;
 
   // member variables
-  bool                                            ext                                 = false;
   bool                                            ref_scs_r18_present                 = false;
   bool                                            prio_flag_r18_present               = false;
   uint8_t                                         semi_persistent_fwd_rsrc_set_id_r18 = 0;
@@ -4401,7 +4362,6 @@ struct ncr_fwd_cfg_r18_s {
   using semi_persistent_fwd_rsrc_set_to_release_list_r18_l_ = bounded_array<uint8_t, 32>;
 
   // member variables
-  bool                                                ext                           = false;
   bool                                                aperiodic_fwd_cfg_r18_present = false;
   periodic_fwd_rsrc_set_to_add_mod_list_r18_l_        periodic_fwd_rsrc_set_to_add_mod_list_r18;
   periodic_fwd_rsrc_set_to_release_list_r18_l_        periodic_fwd_rsrc_set_to_release_list_r18;
@@ -4434,7 +4394,6 @@ struct ul_tx_switching_band_pair_cfg_r18_s {
   using switching_period_cfg_for_band_pair_r18_e_ = enumerated<switching_period_cfg_for_band_pair_r18_opts>;
 
   // member variables
-  bool                                      ext                                            = false;
   bool                                      switching2_t_mode_r18_present                  = false;
   bool                                      switching_period_cfg_for_band_pair_r18_present = false;
   uint8_t                                   band_info_ul1_r18                              = 1;
@@ -4472,7 +4431,6 @@ struct ul_tx_switching_more_bands_r18_s {
   using ul_tx_switching_band_list_r18_l_ = bounded_array<uint16_t, 32>;
 
   // member variables
-  bool                                               ext                                                      = false;
   bool                                               ul_tx_switching_associated_band_dual_ul_list_r18_present = false;
   ul_tx_switching_band_list_r18_l_                   ul_tx_switching_band_list_r18;
   ul_tx_switching_band_pair_list_r18_l               ul_tx_switching_band_pair_list_r18;
@@ -4534,7 +4492,6 @@ struct cell_group_cfg_s {
   using iab_res_cfg_to_release_list_r17_l_      = dyn_array<uint32_t>;
 
   // member variables
-  bool                          ext                         = false;
   bool                          mac_cell_group_cfg_present  = false;
   bool                          phys_cell_group_cfg_present = false;
   bool                          sp_cell_cfg_present         = false;

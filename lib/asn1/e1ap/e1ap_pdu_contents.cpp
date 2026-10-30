@@ -17647,7 +17647,8 @@ OCUDUASN_CODE supported_plmns_item_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE supported_plmns_item_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   bool slice_support_list_present;
   HANDLE_CODE(bref.unpack(slice_support_list_present, 1));
   bool nr_cgi_support_list_present;
@@ -26656,7 +26657,8 @@ OCUDUASN_CODE private_msg_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE private_msg_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(private_ies.unpack(bref));
 
   if (ext) {

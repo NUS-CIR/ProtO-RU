@@ -92,8 +92,6 @@ TEST(ntn_meas_asn1, ext_list_is_parallel_to_cells_to_add_mod_list)
   meas_obj.cells_to_add_mod_list[1].ntn_neighbour_info = make_ntn_info();
 
   auto asn1_obj = meas_obj_nr_to_rrc_asn1(meas_obj);
-
-  EXPECT_TRUE(asn1_obj.ext);
   ASSERT_TRUE(asn1_obj.cells_to_add_mod_list_ext_v1800.is_present());
   const auto& ext_list = *asn1_obj.cells_to_add_mod_list_ext_v1800;
   ASSERT_EQ(ext_list.size(), meas_obj.cells_to_add_mod_list.size());
@@ -195,8 +193,6 @@ TEST(ntn_meas_asn1, polarization_ext_v1710_is_parallel_to_cells_to_add_mod_list)
       ntn_pol{ntn_pol::polarization_type::rhcp, ntn_pol::polarization_type::lhcp};
 
   auto asn1_obj = meas_obj_nr_to_rrc_asn1(meas_obj);
-
-  EXPECT_TRUE(asn1_obj.ext);
   ASSERT_TRUE(asn1_obj.cells_to_add_mod_list_ext_v1710.is_present());
   const auto& ext_list = *asn1_obj.cells_to_add_mod_list_ext_v1710;
   ASSERT_EQ(ext_list.size(), meas_obj.cells_to_add_mod_list.size());

@@ -422,7 +422,6 @@ using e2_res_status_upd_s = elementary_procedure_option<e2_res_status_upd_ies_co
 
 // E2connectionSetupFailed-Item ::= SEQUENCE
 struct e2conn_setup_failed_item_s {
-  bool       ext = false;
   tnl_info_s tnl_info;
   cause_c    cause;
   // ...
@@ -472,7 +471,6 @@ using e2conn_setup_failed_list_l = bounded_array<protocol_ie_single_container_s<
 
 // E2connectionUpdate-Item ::= SEQUENCE
 struct e2conn_upd_item_s {
-  bool        ext = false;
   tnl_info_s  tnl_info;
   tnl_usage_e tnl_usage;
   // ...
@@ -522,7 +520,6 @@ using e2conn_upd_list_l = bounded_array<protocol_ie_single_container_s<e2conn_up
 
 // E2connectionUpdateRemove-Item ::= SEQUENCE
 struct e2conn_upd_rem_item_s {
-  bool       ext = false;
   tnl_info_s tnl_info;
   // ...
 
@@ -746,7 +743,6 @@ using e2conn_upd_fail_s = elementary_procedure_option<e2conn_upd_fail_ies_contai
 
 // E2nodeComponentConfigAddition-Item ::= SEQUENCE
 struct e2node_component_cfg_addition_item_s {
-  bool                              ext = false;
   e2node_component_interface_type_e e2node_component_interface_type;
   e2node_component_id_c             e2node_component_id;
   e2node_component_cfg_s            e2node_component_cfg;
@@ -798,7 +794,6 @@ using e2node_component_cfg_addition_list_l =
 
 // E2nodeComponentConfigAdditionAck-Item ::= SEQUENCE
 struct e2node_component_cfg_addition_ack_item_s {
-  bool                              ext = false;
   e2node_component_interface_type_e e2node_component_interface_type;
   e2node_component_id_c             e2node_component_id;
   e2node_component_cfg_ack_s        e2node_component_cfg_ack;
@@ -851,7 +846,6 @@ using e2node_component_cfg_addition_ack_list_l =
 
 // E2nodeComponentConfigRemoval-Item ::= SEQUENCE
 struct e2node_component_cfg_removal_item_s {
-  bool                              ext = false;
   e2node_component_interface_type_e e2node_component_interface_type;
   e2node_component_id_c             e2node_component_id;
   // ...
@@ -902,7 +896,6 @@ using e2node_component_cfg_removal_list_l =
 
 // E2nodeComponentConfigRemovalAck-Item ::= SEQUENCE
 struct e2node_component_cfg_removal_ack_item_s {
-  bool                              ext = false;
   e2node_component_interface_type_e e2node_component_interface_type;
   e2node_component_id_c             e2node_component_id;
   e2node_component_cfg_ack_s        e2node_component_cfg_ack;
@@ -955,7 +948,6 @@ using e2node_component_cfg_removal_ack_list_l =
 
 // E2nodeComponentConfigUpdate-Item ::= SEQUENCE
 struct e2node_component_cfg_upd_item_s {
-  bool                              ext = false;
   e2node_component_interface_type_e e2node_component_interface_type;
   e2node_component_id_c             e2node_component_id;
   e2node_component_cfg_s            e2node_component_cfg;
@@ -1006,7 +998,6 @@ using e2node_component_cfg_upd_list_l = dyn_array<protocol_ie_single_container_s
 
 // E2nodeComponentConfigUpdateAck-Item ::= SEQUENCE
 struct e2node_component_cfg_upd_ack_item_s {
-  bool                              ext = false;
   e2node_component_interface_type_e e2node_component_interface_type;
   e2node_component_id_c             e2node_component_id;
   e2node_component_cfg_ack_s        e2node_component_cfg_ack;
@@ -1059,7 +1050,6 @@ using e2node_component_cfg_upd_ack_list_l =
 
 // E2nodeTNLassociationRemoval-Item ::= SEQUENCE
 struct e2node_tnl_assoc_removal_item_s {
-  bool       ext = false;
   tnl_info_s tnl_info;
   tnl_info_s tnl_info_ric;
   // ...
@@ -1374,7 +1364,6 @@ using e2setup_fail_s = elementary_procedure_option<e2setup_fail_ies_container>;
 
 // RANfunction-Item ::= SEQUENCE
 struct ran_function_item_s {
-  bool                                  ext             = false;
   uint16_t                              ran_function_id = 0;
   unbounded_octstring<true>             ran_function_definition;
   uint16_t                              ran_function_revision = 0;
@@ -1486,7 +1475,6 @@ using e2setup_request_s = elementary_procedure_option<e2setup_request_ies_contai
 
 // RANfunctionID-Item ::= SEQUENCE
 struct ran_function_id_item_s {
-  bool     ext                   = false;
   uint16_t ran_function_id       = 0;
   uint16_t ran_function_revision = 0;
   // ...
@@ -1534,7 +1522,6 @@ using ran_functions_id_list_l = dyn_array<protocol_ie_single_container_s<ran_fun
 
 // RANfunctionIDcause-Item ::= SEQUENCE
 struct ran_function_id_cause_item_s {
-  bool     ext             = false;
   uint16_t ran_function_id = 0;
   cause_c  cause;
   // ...
@@ -1582,7 +1569,6 @@ using ran_functions_id_cause_list_l = dyn_array<protocol_ie_single_container_s<r
 
 // RANfunction-AcceptModified-Item ::= SEQUENCE
 struct ran_function_accept_modified_item_s {
-  bool                      ext             = false;
   uint16_t                  ran_function_id = 0;
   unbounded_octstring<true> rev_ran_function_definition;
   uint16_t                  ran_function_revision = 0;
@@ -1771,7 +1757,6 @@ using error_ind_s = elementary_procedure_option<error_ind_ies_container>;
 
 // RICactionLoad-Item ::= SEQUENCE
 struct ric_action_load_item_s {
-  bool            ext           = false;
   uint16_t        ric_action_id = 0;
   ric_load_info_s ric_action_load_info;
   // ...
@@ -1819,7 +1804,6 @@ using ric_action_load_list_l = bounded_array<protocol_ie_single_container_s<ric_
 
 // RICsubscriptionLoad-ItemIE ::= SEQUENCE
 struct ric_sub_load_item_ie_s {
-  bool                   ext                       = false;
   bool                   ric_sub_load_info_present = false;
   ric_request_id_s       ric_request_id;
   ric_load_info_s        ric_sub_load_info;
@@ -1869,7 +1853,6 @@ using ric_sub_load_list_l = dyn_array<protocol_ie_single_container_s<ric_sub_loa
 
 // RANfunctionLoad-Item ::= SEQUENCE
 struct ran_function_load_item_s {
-  bool                    ext                            = false;
   bool                    ran_function_load_info_present = false;
   bool                    ric_service_load_info_present  = false;
   uint16_t                ran_function_id                = 0;
@@ -1921,7 +1904,6 @@ using ran_function_load_list_l = dyn_array<protocol_ie_single_container_s<ran_fu
 
 // RICactionLoadConfirm-Item ::= SEQUENCE
 struct ric_action_load_confirm_item_s {
-  bool               ext           = false;
   uint16_t           ric_action_id = 0;
   ric_load_confirm_e ric_action_load_confirm;
   // ...
@@ -1970,7 +1952,6 @@ using ric_action_load_confirm_list_l =
 
 // RICsubscriptionLoadConfirm-ItemIE ::= SEQUENCE
 struct ric_sub_load_confirm_item_ie_s {
-  bool                           ext                          = false;
   bool                           ric_sub_load_confirm_present = false;
   ric_request_id_s               ric_request_id;
   ric_load_confirm_e             ric_sub_load_confirm;
@@ -2020,7 +2001,6 @@ using ric_sub_load_confirm_list_l = dyn_array<protocol_ie_single_container_s<ric
 
 // RANfunctionLoadConfirm-Item ::= SEQUENCE
 struct ran_function_load_confirm_item_s {
-  bool                        ext                               = false;
   bool                        ran_function_load_confirm_present = false;
   bool                        ric_service_load_confirm_present  = false;
   uint16_t                    ran_function_id                   = 0;
@@ -2073,7 +2053,6 @@ using ran_function_load_confirm_list_l =
 
 // RICactionLoadRequest-Item ::= SEQUENCE
 struct ric_action_load_request_item_s {
-  bool               ext           = false;
   uint16_t           ric_action_id = 0;
   ric_load_request_e ric_action_load_request;
   // ...
@@ -2122,7 +2101,6 @@ using ric_action_load_request_list_l =
 
 // RICsubscriptionLoadRequest-ItemIE ::= SEQUENCE
 struct ric_sub_load_request_item_ie_s {
-  bool                           ext                          = false;
   bool                           ric_sub_load_request_present = false;
   ric_request_id_s               ric_request_id;
   ric_load_request_e             ric_sub_load_request;
@@ -2172,7 +2150,6 @@ using ric_sub_load_request_list_l = dyn_array<protocol_ie_single_container_s<ric
 
 // RANfunctionLoadRequest-Item ::= SEQUENCE
 struct ran_function_load_request_item_s {
-  bool                        ext                               = false;
   bool                        ran_function_load_request_present = false;
   bool                        ric_service_load_request_present  = false;
   uint16_t                    ran_function_id                   = 0;
@@ -2225,7 +2202,6 @@ using ran_function_load_request_list_l =
 
 // RICactionList-Item ::= SEQUENCE
 struct ric_action_list_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2272,7 +2248,6 @@ using ric_action_list_l = bounded_array<protocol_ie_single_container_s<ric_actio
 
 // RICsubscriptionList-Item ::= SEQUENCE
 struct ric_sub_list_item_s {
-  bool              ext = false;
   ric_request_id_s  ric_request_id;
   ric_action_list_l ric_action_list;
   // ...
@@ -2323,7 +2298,6 @@ using ric_sub_resumed_list_l = dyn_array<protocol_ie_single_container_s<ric_sub_
 
 // RANfunctionStateConfirm-Item ::= SEQUENCE
 struct ran_function_state_confirm_item_s {
-  bool                     ext             = false;
   uint16_t                 ran_function_id = 0;
   ric_sub_suspended_list_l ric_sub_suspended_list;
   ric_sub_resumed_list_l   ric_sub_resumed_list;
@@ -2379,7 +2353,6 @@ using ric_sub_to_be_resumed_list_l = dyn_array<protocol_ie_single_container_s<ri
 
 // RANfunctionStateControl-Item ::= SEQUENCE
 struct ran_function_state_ctrl_item_s {
-  bool                           ext             = false;
   uint16_t                       ran_function_id = 0;
   ric_sub_to_be_suspended_list_l ric_sub_to_be_suspended_list;
   ric_sub_to_be_resumed_list_l   ric_sub_to_be_resumed_list;
@@ -2428,7 +2401,6 @@ using ran_function_state_ctrl_list_l = dyn_array<protocol_ie_single_container_s<
 
 // RICaction-AddedForModification-Item ::= SEQUENCE
 struct ric_action_added_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2472,7 +2444,6 @@ struct ric_action_added_for_mod_item_ies_o {
 
 // RICaction-Admitted-Item ::= SEQUENCE
 struct ric_action_admitted_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2519,7 +2490,6 @@ using ric_action_admitted_list_l = bounded_array<protocol_ie_single_container_s<
 
 // RICaction-ConfirmedForModification-Item ::= SEQUENCE
 struct ric_action_confirmed_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2563,7 +2533,6 @@ struct ric_action_confirmed_for_mod_item_ies_o {
 
 // RICaction-ConfirmedForRemoval-Item ::= SEQUENCE
 struct ric_action_confirmed_for_removal_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2607,7 +2576,6 @@ struct ric_action_confirmed_for_removal_item_ies_o {
 
 // RICaction-FailedToBeAddedForModification-Item ::= SEQUENCE
 struct ric_action_failed_to_be_added_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -2652,7 +2620,6 @@ struct ric_action_failed_to_be_added_for_mod_item_ies_o {
 
 // RICaction-FailedToBeModifiedForModification-Item ::= SEQUENCE
 struct ric_action_failed_to_be_modified_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -2700,7 +2667,6 @@ struct ric_action_failed_to_be_modified_for_mod_item_ies_o {
 
 // RICaction-FailedToBeRemovedForModification-Item ::= SEQUENCE
 struct ric_action_failed_to_be_remd_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -2745,7 +2711,6 @@ struct ric_action_failed_to_be_remd_for_mod_item_ies_o {
 
 // RICaction-ModifiedForModification-Item ::= SEQUENCE
 struct ric_action_modified_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2789,7 +2754,6 @@ struct ric_action_modified_for_mod_item_ies_o {
 
 // RICaction-NotAdmitted-Item ::= SEQUENCE
 struct ric_action_not_admitted_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -2838,7 +2802,6 @@ using ric_action_not_admitted_list_l =
 
 // RICaction-RefusedToBeModified-Item ::= SEQUENCE
 struct ric_action_refused_to_be_modified_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -2883,7 +2846,6 @@ struct ric_action_refused_to_be_modified_item_ies_o {
 
 // RICaction-RefusedToBeRemoved-Item ::= SEQUENCE
 struct ric_action_refused_to_be_remd_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -2928,7 +2890,6 @@ struct ric_action_refused_to_be_remd_item_ies_o {
 
 // RICaction-RemovedForModification-Item ::= SEQUENCE
 struct ric_action_remd_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -2972,7 +2933,6 @@ struct ric_action_remd_for_mod_item_ies_o {
 
 // RICaction-RequiredToBeModified-Item ::= SEQUENCE
 struct ric_action_required_to_be_modified_item_s {
-  bool               ext           = false;
   uint16_t           ric_action_id = 0;
   ric_time_to_wait_e ric_time_to_wait;
   // ...
@@ -3017,7 +2977,6 @@ struct ric_action_required_to_be_modified_item_ies_o {
 
 // RICaction-RequiredToBeRemoved-Item ::= SEQUENCE
 struct ric_action_required_to_be_remd_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   cause_c  cause;
   // ...
@@ -3062,7 +3021,6 @@ struct ric_action_required_to_be_remd_item_ies_o {
 
 // RICaction-ToBeAddedForModification-Item ::= SEQUENCE
 struct ric_action_to_be_added_for_mod_item_s {
-  bool                      ext                           = false;
   bool                      ric_subsequent_action_present = false;
   uint16_t                  ric_action_id                 = 0;
   ric_action_type_e         ric_action_type;
@@ -3111,7 +3069,6 @@ struct ric_action_to_be_added_for_mod_item_ies_o {
 
 // RICaction-ToBeModifiedForModification-Item ::= SEQUENCE
 struct ric_action_to_be_modified_for_mod_item_s {
-  bool                      ext                                = false;
   bool                      ric_action_execution_order_present = false;
   bool                      ric_subsequent_action_present      = false;
   uint16_t                  ric_action_id                      = 0;
@@ -3160,7 +3117,6 @@ struct ric_action_to_be_modified_for_mod_item_ies_o {
 
 // RICaction-ToBeRemovedForModification-Item ::= SEQUENCE
 struct ric_action_to_be_remd_for_mod_item_s {
-  bool     ext           = false;
   uint16_t ric_action_id = 0;
   // ...
 
@@ -3204,7 +3160,6 @@ struct ric_action_to_be_remd_for_mod_item_ies_o {
 
 // RICaction-ToBeSetup-Item ::= SEQUENCE
 struct ric_action_to_be_setup_item_s {
-  bool                      ext                           = false;
   bool                      ric_subsequent_action_present = false;
   uint16_t                  ric_action_id                 = 0;
   ric_action_type_e         ric_action_type;
@@ -4538,7 +4493,6 @@ using ric_service_upd_fail_s = elementary_procedure_option<ric_service_upd_fail_
 
 // RICsubscription-withCause-Item ::= SEQUENCE
 struct ric_sub_with_cause_item_s {
-  bool             ext = false;
   ric_request_id_s ric_request_id;
   uint16_t         ran_function_id = 0;
   cause_c          cause;
@@ -4587,7 +4541,6 @@ using ric_sub_list_with_cause_l = dyn_array<protocol_ie_single_container_s<ric_s
 
 // RICsubscriptionAudit-Item ::= SEQUENCE
 struct ric_sub_audit_item_s {
-  bool             ext = false;
   ric_request_id_s ric_request_id;
   uint16_t         ran_function_id = 0;
   // ...
@@ -4632,7 +4585,6 @@ struct ric_sub_audit_item_ies_o {
 
 // RICsubscriptionAuditAction-Item ::= SEQUENCE
 struct ric_sub_audit_action_item_s {
-  bool                       ext = false;
   ric_request_id_s           ric_request_id;
   uint16_t                   ran_function_id = 0;
   ric_action_admitted_list_l ric_action_admitted_list;
@@ -5056,7 +5008,6 @@ using ric_sub_delete_resp_s = elementary_procedure_option<ric_sub_delete_resp_ie
 
 // RICsubscriptionDetails ::= SEQUENCE
 struct ric_sub_details_s {
-  bool                           ext = false;
   unbounded_octstring<true>      ric_event_trigger_definition;
   ric_actions_to_be_setup_list_l ric_action_to_be_setup_list;
   // ...

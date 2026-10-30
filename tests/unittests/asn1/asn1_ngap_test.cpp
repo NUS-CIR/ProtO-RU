@@ -182,7 +182,6 @@ TEST_F(asn1_ngap_test, ng_setup_request_pack_and_unpack)
   ASSERT_EQ(pdu.init_msg().crit.value, crit_opts::reject);
   ASSERT_EQ(pdu.init_msg().value.type().value, ngap_elem_procs_o::init_msg_c::types_opts::ng_setup_request);
   ng_setup_request_s& ngsetup = pdu.init_msg().value.ng_setup_request();
-  ASSERT_FALSE(ngsetup.ext);
   // Field 0
   ASSERT_EQ(ngsetup->global_ran_node_id.type().value, global_ran_node_id_c::types_opts::global_gnb_id);
   global_gnb_id_s& global_gnb = ngsetup->global_ran_node_id.global_gnb_id();
@@ -265,9 +264,8 @@ TEST_F(asn1_ngap_test, amf_config_update)
   ASSERT_EQ(crit_opts::reject, pdu.init_msg().crit.value);
   ngap_elem_procs_o::init_msg_c& init_choice = pdu.init_msg().value;
   ASSERT_EQ(ngap_elem_procs_o::init_msg_c::types_opts::amf_cfg_upd, init_choice.type().value);
-  amf_cfg_upd_s& amf_upd = init_choice.amf_cfg_upd();
-  ASSERT_FALSE(amf_upd.ext);
-  auto& amf_name = amf_upd->amf_name;
+  amf_cfg_upd_s& amf_upd  = init_choice.amf_cfg_upd();
+  auto&          amf_name = amf_upd->amf_name;
   ASSERT_TRUE(amf_upd->amf_name_present);
   ASSERT_EQ("tstran", amf_name.to_string());
 

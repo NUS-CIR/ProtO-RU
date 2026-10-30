@@ -716,7 +716,8 @@ OCUDUASN_CODE spatial_relation_info_pdc_r17_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE spatial_relation_info_pdc_r17_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(ref_sig.unpack(bref));
 
   if (ext) {
@@ -928,7 +929,7 @@ OCUDUASN_CODE srs_res_s::pack(bit_ref& bref) const
   group_flags[3] |= nrof_srs_ports_n8_r18_present;
   group_flags[3] |= comb_offset_hop_r18.is_present();
   group_flags[3] |= cyclic_shift_hop_r18.is_present();
-  bref.pack(ext and group_flags.any(), 1);
+  bref.pack(group_flags.any(), 1);
   HANDLE_CODE(bref.pack(ptrs_port_idx_present, 1));
   HANDLE_CODE(bref.pack(spatial_relation_info_present, 1));
 
@@ -953,7 +954,7 @@ OCUDUASN_CODE srs_res_s::pack(bit_ref& bref) const
     HANDLE_CODE(spatial_relation_info.pack(bref));
   }
 
-  if (ext and group_flags.any()) {
+  if (group_flags.any()) {
     HANDLE_CODE(group_flags.pack(bref));
 
     if (group_flags[0]) {
@@ -1043,7 +1044,8 @@ OCUDUASN_CODE srs_res_s::pack(bit_ref& bref) const
 }
 OCUDUASN_CODE srs_res_s::unpack(cbit_ref& bref)
 {
-  bref.unpack(ext, 1);
+  bool ext;
+  HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(ptrs_port_idx_present, 1));
   HANDLE_CODE(bref.unpack(spatial_relation_info_present, 1));
 
@@ -1185,91 +1187,89 @@ void srs_res_s::to_json(json_writer& j) const
     j.write_fieldname("spatialRelationInfo");
     spatial_relation_info.to_json(j);
   }
-  if (ext) {
-    if (res_map_r16.is_present()) {
-      j.write_fieldname("resourceMapping-r16");
-      j.start_obj();
-      j.write_int("startPosition-r16", res_map_r16->start_position_r16);
-      j.write_str("nrofSymbols-r16", res_map_r16->nrof_symbols_r16.to_string());
-      j.write_str("repetitionFactor-r16", res_map_r16->repeat_factor_r16.to_string());
-      j.end_obj();
+  if (res_map_r16.is_present()) {
+    j.write_fieldname("resourceMapping-r16");
+    j.start_obj();
+    j.write_int("startPosition-r16", res_map_r16->start_position_r16);
+    j.write_str("nrofSymbols-r16", res_map_r16->nrof_symbols_r16.to_string());
+    j.write_str("repetitionFactor-r16", res_map_r16->repeat_factor_r16.to_string());
+    j.end_obj();
+  }
+  if (spatial_relation_info_pdc_r17.is_present()) {
+    j.write_fieldname("spatialRelationInfo-PDC-r17");
+    spatial_relation_info_pdc_r17->to_json(j);
+  }
+  if (res_map_r17.is_present()) {
+    j.write_fieldname("resourceMapping-r17");
+    j.start_obj();
+    j.write_int("startPosition-r17", res_map_r17->start_position_r17);
+    j.write_str("nrofSymbols-r17", res_map_r17->nrof_symbols_r17.to_string());
+    j.write_str("repetitionFactor-r17", res_map_r17->repeat_factor_r17.to_string());
+    j.end_obj();
+  }
+  if (partial_freq_sr17.is_present()) {
+    j.write_fieldname("partialFreqSounding-r17");
+    j.start_obj();
+    j.write_fieldname("startRBIndexFScaling-r17");
+    partial_freq_sr17->start_rb_idx_f_scaling_r17.to_json(j);
+    if (partial_freq_sr17->enable_start_rb_hop_r17_present) {
+      j.write_str("enableStartRBHopping-r17", "enable");
     }
-    if (spatial_relation_info_pdc_r17.is_present()) {
-      j.write_fieldname("spatialRelationInfo-PDC-r17");
-      spatial_relation_info_pdc_r17->to_json(j);
+    j.end_obj();
+  }
+  if (tx_comb_n8_r17.is_present()) {
+    j.write_fieldname("transmissionComb-n8-r17");
+    j.start_obj();
+    j.write_int("combOffset-n8-r17", tx_comb_n8_r17->comb_offset_n8_r17);
+    j.write_int("cyclicShift-n8-r17", tx_comb_n8_r17->cyclic_shift_n8_r17);
+    j.end_obj();
+  }
+  if (srs_tci_state_r17.is_present()) {
+    j.write_fieldname("srs-TCI-State-r17");
+    srs_tci_state_r17->to_json(j);
+  }
+  if (repeat_factor_v1730_present) {
+    j.write_str("repetitionFactor-v1730", "n3");
+  }
+  if (srs_dl_or_joint_tci_state_v1730.is_present()) {
+    j.write_fieldname("srs-DLorJointTCI-State-v1730");
+    j.start_obj();
+    j.write_fieldname("cellAndBWP-r17");
+    srs_dl_or_joint_tci_state_v1730->cell_and_bwp_r17.to_json(j);
+    j.end_obj();
+  }
+  if (nrof_srs_ports_n8_r18_present) {
+    j.write_str("nrofSRS-Ports-n8-r18", nrof_srs_ports_n8_r18.to_string());
+  }
+  if (comb_offset_hop_r18.is_present()) {
+    j.write_fieldname("combOffsetHopping-r18");
+    j.start_obj();
+    if (comb_offset_hop_r18->hop_id_r18_present) {
+      j.write_int("hoppingId-r18", comb_offset_hop_r18->hop_id_r18);
     }
-    if (res_map_r17.is_present()) {
-      j.write_fieldname("resourceMapping-r17");
-      j.start_obj();
-      j.write_int("startPosition-r17", res_map_r17->start_position_r17);
-      j.write_str("nrofSymbols-r17", res_map_r17->nrof_symbols_r17.to_string());
-      j.write_str("repetitionFactor-r17", res_map_r17->repeat_factor_r17.to_string());
-      j.end_obj();
+    if (comb_offset_hop_r18->hop_subset_r18_present) {
+      j.write_fieldname("hoppingSubset-r18");
+      comb_offset_hop_r18->hop_subset_r18.to_json(j);
     }
-    if (partial_freq_sr17.is_present()) {
-      j.write_fieldname("partialFreqSounding-r17");
-      j.start_obj();
-      j.write_fieldname("startRBIndexFScaling-r17");
-      partial_freq_sr17->start_rb_idx_f_scaling_r17.to_json(j);
-      if (partial_freq_sr17->enable_start_rb_hop_r17_present) {
-        j.write_str("enableStartRBHopping-r17", "enable");
-      }
-      j.end_obj();
+    if (comb_offset_hop_r18->hop_with_repeat_r18_present) {
+      j.write_str("hoppingWithRepetition-r18", comb_offset_hop_r18->hop_with_repeat_r18.to_string());
     }
-    if (tx_comb_n8_r17.is_present()) {
-      j.write_fieldname("transmissionComb-n8-r17");
-      j.start_obj();
-      j.write_int("combOffset-n8-r17", tx_comb_n8_r17->comb_offset_n8_r17);
-      j.write_int("cyclicShift-n8-r17", tx_comb_n8_r17->cyclic_shift_n8_r17);
-      j.end_obj();
+    j.end_obj();
+  }
+  if (cyclic_shift_hop_r18.is_present()) {
+    j.write_fieldname("cyclicShiftHopping-r18");
+    j.start_obj();
+    if (cyclic_shift_hop_r18->hop_id_r18_present) {
+      j.write_int("hoppingId-r18", cyclic_shift_hop_r18->hop_id_r18);
     }
-    if (srs_tci_state_r17.is_present()) {
-      j.write_fieldname("srs-TCI-State-r17");
-      srs_tci_state_r17->to_json(j);
+    if (cyclic_shift_hop_r18->hop_subset_r18_present) {
+      j.write_fieldname("hoppingSubset-r18");
+      cyclic_shift_hop_r18->hop_subset_r18.to_json(j);
     }
-    if (repeat_factor_v1730_present) {
-      j.write_str("repetitionFactor-v1730", "n3");
+    if (cyclic_shift_hop_r18->hop_finer_granularity_r18_present) {
+      j.write_str("hoppingFinerGranularity-r18", "enable");
     }
-    if (srs_dl_or_joint_tci_state_v1730.is_present()) {
-      j.write_fieldname("srs-DLorJointTCI-State-v1730");
-      j.start_obj();
-      j.write_fieldname("cellAndBWP-r17");
-      srs_dl_or_joint_tci_state_v1730->cell_and_bwp_r17.to_json(j);
-      j.end_obj();
-    }
-    if (nrof_srs_ports_n8_r18_present) {
-      j.write_str("nrofSRS-Ports-n8-r18", nrof_srs_ports_n8_r18.to_string());
-    }
-    if (comb_offset_hop_r18.is_present()) {
-      j.write_fieldname("combOffsetHopping-r18");
-      j.start_obj();
-      if (comb_offset_hop_r18->hop_id_r18_present) {
-        j.write_int("hoppingId-r18", comb_offset_hop_r18->hop_id_r18);
-      }
-      if (comb_offset_hop_r18->hop_subset_r18_present) {
-        j.write_fieldname("hoppingSubset-r18");
-        comb_offset_hop_r18->hop_subset_r18.to_json(j);
-      }
-      if (comb_offset_hop_r18->hop_with_repeat_r18_present) {
-        j.write_str("hoppingWithRepetition-r18", comb_offset_hop_r18->hop_with_repeat_r18.to_string());
-      }
-      j.end_obj();
-    }
-    if (cyclic_shift_hop_r18.is_present()) {
-      j.write_fieldname("cyclicShiftHopping-r18");
-      j.start_obj();
-      if (cyclic_shift_hop_r18->hop_id_r18_present) {
-        j.write_int("hoppingId-r18", cyclic_shift_hop_r18->hop_id_r18);
-      }
-      if (cyclic_shift_hop_r18->hop_subset_r18_present) {
-        j.write_fieldname("hoppingSubset-r18");
-        cyclic_shift_hop_r18->hop_subset_r18.to_json(j);
-      }
-      if (cyclic_shift_hop_r18->hop_finer_granularity_r18_present) {
-        j.write_str("hoppingFinerGranularity-r18", "enable");
-      }
-      j.end_obj();
-    }
+    j.end_obj();
   }
   j.end_obj();
 }
@@ -1624,24 +1624,27 @@ OCUDUASN_CODE srs_res_s::res_type_c_::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::aperiodic:
-      bref.unpack(c.get<aperiodic_s_>().ext, 1);
-      if (c.get<aperiodic_s_>().ext) {
+      bool c_get_aperiodic_s_ext;
+      HANDLE_CODE(bref.unpack(c_get_aperiodic_s_ext, 1));
+      if (c_get_aperiodic_s_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::semi_persistent:
-      bref.unpack(c.get<semi_persistent_s_>().ext, 1);
+      bool c_get_semi_persistent_s_ext;
+      HANDLE_CODE(bref.unpack(c_get_semi_persistent_s_ext, 1));
       HANDLE_CODE(c.get<semi_persistent_s_>().periodicity_and_offset_sp.unpack(bref));
-      if (c.get<semi_persistent_s_>().ext) {
+      if (c_get_semi_persistent_s_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::periodic:
-      bref.unpack(c.get<periodic_s_>().ext, 1);
+      bool c_get_periodic_s_ext;
+      HANDLE_CODE(bref.unpack(c_get_periodic_s_ext, 1));
       HANDLE_CODE(c.get<periodic_s_>().periodicity_and_offset_p.unpack(bref));
-      if (c.get<periodic_s_>().ext) {
+      if (c_get_periodic_s_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }

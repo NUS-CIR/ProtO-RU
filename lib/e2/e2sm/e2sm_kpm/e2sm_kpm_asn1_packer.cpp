@@ -75,7 +75,6 @@ asn1::unbounded_octstring<true> e2sm_kpm_asn1_packer::pack_ran_function_descript
   ran_function_desc.ran_function_name.ran_function_short_name.from_string(short_name);
   ran_function_desc.ran_function_name.ran_function_e2sm_o_id.from_string(oid);
   ran_function_desc.ran_function_name.ran_function_description.from_string(func_description);
-  ran_function_desc.ext = false;
   // Add ric_event_trigger_style item.
   ric_event_trigger_style_item_s ric_event_trigger_style_item;
   ric_event_trigger_style_item.ric_event_trigger_style_type = 1;
