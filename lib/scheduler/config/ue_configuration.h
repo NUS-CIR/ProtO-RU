@@ -188,7 +188,7 @@ public:
 
   /// \brief Gets the CSI report configuration of the UE.
   /// \remark Call it only for a UE with a CSI configuration.
-  const csi_report_configuration& csi_report() const
+  const csi_report_configuration& csi_report_cfg() const
   {
     return cell_cfg_common.bwp_res[to_bwp_id(0)].dl().csi.value().report(init_bwp().ul.ue_cfg()->csi.codebook);
   }

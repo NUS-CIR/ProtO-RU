@@ -985,7 +985,7 @@ public:
   {
     ocudu_assert(t_bench.get_main_ue().get_pcell().cfg().has_csi_cfg(), "CSI configuration needed for this test");
     csi_report_size =
-        get_csi_report_pucch_size(t_bench.get_main_ue().get_pcell().cfg().csi_report()).part1_size.value();
+        get_csi_report_pucch_size(t_bench.get_main_ue().get_pcell().cfg().csi_report_cfg()).part1_size.value();
   }
 
 protected:

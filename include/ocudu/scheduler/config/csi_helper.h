@@ -168,14 +168,14 @@ zp_csi_rs_resource_set make_periodic_zp_csi_rs_resource_set(const csi_meas_confi
 /// measurements.
 std::vector<nzp_csi_rs_resource> make_nzp_csi_rs_resource_list(const csi_meas_config_builder_params& params);
 
-/// \brief Converts a CSI resource periodicity to a suitable CSI report periodicity. Report peridiocity should be
+/// Converts a CSI resource periodicity to a suitable CSI report periodicity. Report peridiocity should be
 /// larger than the resource periodicity.
 csi_report_periodicity convert_csi_resource_period_to_report_period(csi_resource_periodicity res_period);
 
-/// \brief Generate CSI-IM Resource List, one resource for each periodic ZP-CSI-RS resource.
+/// Generate CSI-IM Resource List, one resource for each periodic ZP-CSI-RS resource.
 std::vector<csi_im_resource> make_csi_im_resource_list(const csi_meas_config_builder_params& params);
 
-/// \brief Gets \e reportTriggerSize, the size of the CSI request field in DCI Format 0_1.
+/// Gets \e reportTriggerSize, the size of the CSI request field in DCI Format 0_1.
 /// \return Zero if the cell configures no aperiodic CSI reports.
 unsigned get_csi_report_trigger_size(const du_csi_params& csi_params);
 

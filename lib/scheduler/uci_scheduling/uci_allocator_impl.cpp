@@ -52,7 +52,7 @@ static void update_uci_on_pusch_harq_offsets(uci_info::harq_info& uci_harq, cons
 static void
 add_csi_to_uci_on_pusch(uci_info::csi_info& uci_csi, const ue_cell_configuration& ue_cell_cfg, bool configured_grant)
 {
-  uci_csi.csi_rep_cfg = ue_cell_cfg.csi_report();
+  uci_csi.csi_rep_cfg = ue_cell_cfg.csi_report_cfg();
 
   // NOTE: The CSI size depends on whether the CSI is configured on PUSCH or PUCCH, as per Section 5.2.3, TS 38.214:
   // "For both Type I and Type II reports configured for PUCCH but transmitted on PUSCH, the determination of the
@@ -240,7 +240,7 @@ std::optional<uci_allocation> uci_allocator_impl::alloc_harq_ack(cell_resource_a
                                           cell_cfg.params.init_bwp.csi->csi_rs_period,
                                           ue_ul_slot)) {
       // TODO: Remove this when the PUCCH allocator handle properly more than 2 HARQ-ACK bits + CSI.
-      const unsigned csi_report_size = get_csi_report_pucch_size(ue_cell_cfg.csi_report()).part1_size.value();
+      const unsigned csi_report_size = get_csi_report_pucch_size(ue_cell_cfg.csi_report_cfg()).part1_size.value();
       // NOTE: This is only to avoid allocating more than 2 HARQ bits in PUCCH that are expected to carry CSI reporting.
       nof_available_harq_bits = std::min(max_pucch_payload - csi_report_size - static_cast<unsigned>(is_sr_opportunity),
                                          static_cast<unsigned>(max_harq_bits_per_uci));

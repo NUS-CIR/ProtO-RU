@@ -146,11 +146,9 @@ struct nzp_csi_rs_resource_set {
 /// \brief CSI-IM-Resource is used to configure one CSI Interference Management (IM) resource.
 /// \remark See TS 38.331, \c CSI-IM-Resource.
 struct csi_im_resource {
-  /// Number of consecutive REs in frequency. The scheduler supports only the resource element pattern Pattern1 (4,1).
-  /// See TS 38.214, Section 5.2.2.4.
+  /// REs in frequency of Pattern1 (4,1), the only pattern supported. See TS 38.214, 5.2.2.4 and TS 38.331, 6.3.2.
   static constexpr unsigned nof_subcarriers = 4;
-  /// Number of consecutive OFDM symbols. The scheduler supports only the resource element pattern Pattern1 (4,1). See
-  /// TS 38.214, Section 5.2.2.4.
+  /// OFDM symbols of Pattern1 (4,1), the only pattern supported. See TS 38.214, 5.2.2.4 and TS 38.331, 6.3.2.
   static constexpr unsigned nof_symbols = 1;
 
   csi_im_res_id_t res_id;

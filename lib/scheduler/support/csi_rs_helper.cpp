@@ -44,13 +44,13 @@ bool ocudu::csi_helper::is_csi_rs_slot(const cell_configuration& cell_cfg, slot_
   }
 
   for (const auto& zp_csi : csi_cfg->zp_csi_rs_list) {
-    if ((sl_tx - zp_csi.offset).count() % (unsigned)zp_csi.period == 0) {
+    if ((sl_tx - zp_csi.offset).count() % static_cast<unsigned>(zp_csi.period) == 0) {
       return true;
     }
   }
 
   for (const auto& nzp_csi : csi_cfg->nzp_csi_rs_list) {
-    if ((sl_tx - nzp_csi.csi_res_offset).count() % (unsigned)nzp_csi.csi_res_period == 0) {
+    if ((sl_tx - nzp_csi.csi_res_offset).count() % static_cast<unsigned>(nzp_csi.csi_res_period) == 0) {
       return true;
     }
   }
