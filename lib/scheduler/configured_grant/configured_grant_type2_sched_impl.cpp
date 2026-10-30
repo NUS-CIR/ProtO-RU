@@ -105,7 +105,7 @@ configured_grant_type2_sched_impl::find_pending(du_ue_index_t ue_idx)
 {
   return std::find_if(ues_pending_activation.begin(),
                       ues_pending_activation.end(),
-                      [ue_idx](const ue_pending_activation& u) { return u.ue_index == ue_idx; });
+                      [ue_idx](const ue_pending_activation& u) { return u.ue_index() == ue_idx; });
 }
 
 void configured_grant_type2_sched_impl::add_ue_to_wheel(const ue_cell_configuration& ue_cfg,
@@ -147,19 +147,10 @@ void configured_grant_type2_sched_impl::rem_ue(const ue_cell_configuration& ue_c
   // Remove UE from updated UEs list. Keyed on the RNTI alone, so it is done before anything that needs the UE context.
   rem_ue_from_updated_ues(ue_cfg.crnti);
 
+  // The UE removal and the UE reconfiguration both call this function while the UE is still in the repository, with
+  // its current configuration, whose C-RNTI is the one the UE is registered with.
   auto* u = ues.find_by_rnti(ue_cfg.crnti);
-  if (u == nullptr) {
-    // The offset and period the UE was added to the wheel with live in its CG state manager, which is gone with the UE
-    // context, so fall back to a full sweep. Leaving entries behind would keep producing CG PUSCH allocations for an
-    // RNTI that no longer exists, or for whichever UE is assigned that RNTI next.
-    const unsigned nof_removed = periodic_pusch_slot_wheel.rem_ue_everywhere(ue_cfg.crnti);
-    logger.error("rnti={}: UE not found in the CG scheduler UEs repo during UE removal. Swept {} stale CG grants from "
-                 "the slot wheel; its CG resource cannot be reclaimed, and its pending activation entry is dropped by "
-                 "the next run_ues_activation()",
-                 ue_cfg.crnti,
-                 nof_removed);
-    return;
-  }
+  ocudu_assert(u != nullptr, "rnti={}: UE not found in the CG scheduler UEs repo during UE removal", ue_cfg.crnti);
 
   // UE only added to the UEs pending activation list.
   auto ue_to_rem_it = find_pending(u->ue_index);
@@ -306,45 +297,37 @@ void configured_grant_type2_sched_impl::run_ues_activation(cell_resource_allocat
 
   // Re-activations go first: each one can only be served in the slots from which a TDRA row lands on the UE's CG
   // offset, whereas a first activation can be served in any slot.
-  for (size_t i = 0; i != ues_pending_activation.size();) {
-    ue_pending_activation& u = ues_pending_activation[i];
+  for (ue_pending_activation& u : ues_pending_activation) {
+    // A UE leaves this list before it leaves the repository: rem_ue() takes it out on UE removal, and stop() clears the
+    // list on cell deactivation.
+    ocudu_assert(ues.contains(u.ue_index()),
+                 "ue={}: UE pending CG Type 2 activation not found in the CG scheduler UEs repo",
+                 fmt::underlying(u.ue_index()));
 
-    // Drop the entries of UEs that are no longer in the repository. rem_ue() normally takes a UE out of this list,
-    // but it cannot do so when the UE context is already gone by the time it runs. Such an entry must not be left
-    // behind: activate_ue() would keep failing on it.
-    auto* ue_it = ues.find(u.ue_index);
-    if (ue_it == nullptr) {
-      logger.error("ue={}: Dropping stale CG Type 2 activation. Cause: UE not found in the CG scheduler UEs repo",
-                   fmt::underlying(u.ue_index));
-      std::swap(u, ues_pending_activation.back());
-      ues_pending_activation.pop_back();
-      continue;
-    }
-    ++i;
-
-    if (not u.reactivation_due) {
+    if (u.state() != ue_pending_activation::state_t::reactivation_due) {
       continue;
     }
     if (is_slot_full()) {
       return;
     }
-    if (not can_receive_activation_dci(*ue_it)) {
+    ue& ue_ref = ues[u.ue_index()];
+    if (not can_receive_activation_dci(ue_ref)) {
       continue;
     }
-    if (reactivate_ue(cell_alloc, u, *ue_it) == activation_outcome::success) {
+    if (reactivate_ue(cell_alloc, u, ue_ref) == activation_outcome::success) {
       ++nof_activations;
     }
   }
 
   // First activations, for the UEs that have no activation DCI outstanding or due.
   for (ue_pending_activation& u : ues_pending_activation) {
-    if (u.reactivation_due or u.confirmation_deadline.valid()) {
+    if (u.state() != ue_pending_activation::state_t::awaiting_first_activation) {
       continue;
     }
     if (is_slot_full()) {
       return;
     }
-    ue& ue_ref = ues[u.ue_index];
+    ue& ue_ref = ues[u.ue_index()];
     if (not can_receive_activation_dci(ue_ref)) {
       continue;
     }
@@ -369,25 +352,42 @@ void configured_grant_type2_sched_impl::check_confirmation_deadlines(slot_point 
   // NOTE: the deadline is checked on every slot and lies at most k2 + max_expected_crc_delay slots after the DCI, so
   // the slot_point comparison stays within half a hyperframe.
   for (ue_pending_activation& u : ues_pending_activation) {
-    if (not u.confirmation_deadline.valid() or slot <= u.confirmation_deadline) {
-      continue;
+    if (u.check_confirmation_deadline(slot)) {
+      logger.info("ue={}: Re-activating CG Type 2. Cause: the activation DCI of slot={} was not confirmed by slot={}",
+                  fmt::underlying(u.ue_index()),
+                  u.activation_pdcch_slot(),
+                  u.confirmation_deadline());
     }
-    logger.info("ue={}: Re-activating CG Type 2. Cause: the activation DCI of slot={} was not confirmed by slot={}",
-                fmt::underlying(u.ue_index),
-                u.activation_pdcch_slot,
-                u.confirmation_deadline);
-    u.confirmation_deadline = {};
-    u.reactivation_due      = true;
   }
 }
 
-void configured_grant_type2_sched_impl::on_activation_dci_allocated(ue_pending_activation& pending,
-                                                                    slot_point             pdcch_slot,
-                                                                    slot_point             first_tx_slot)
+void configured_grant_type2_sched_impl::ue_pending_activation::on_activation_dci_allocated(slot_point pdcch_slot_,
+                                                                                           slot_point deadline_)
 {
-  pending.activation_pdcch_slot = pdcch_slot;
-  pending.confirmation_deadline = first_tx_slot + max_expected_crc_delay;
-  pending.reactivation_due      = false;
+  ocudu_assert(st != state_t::awaiting_confirmation,
+               "ue={}: CG Type 2 activation DCI allocated while the previous one awaits confirmation",
+               fmt::underlying(ue_idx));
+  st         = state_t::awaiting_confirmation;
+  pdcch_slot = pdcch_slot_;
+  deadline   = deadline_;
+}
+
+bool configured_grant_type2_sched_impl::ue_pending_activation::check_confirmation_deadline(slot_point slot)
+{
+  if (st != state_t::awaiting_confirmation or slot <= deadline) {
+    return false;
+  }
+  st = state_t::reactivation_due;
+  return true;
+}
+
+bool configured_grant_type2_sched_impl::ue_pending_activation::on_pdcch_discarded(slot_point sl_tx)
+{
+  if (st != state_t::awaiting_confirmation or pdcch_slot != sl_tx) {
+    return false;
+  }
+  st = state_t::reactivation_due;
+  return true;
 }
 
 configured_grant_type2_sched_impl::activation_outcome
@@ -507,10 +507,10 @@ configured_grant_type2_sched_impl::activate_ue(cell_resource_allocator& cell_all
   // cg_slot_wheel::rem_ue() removes exactly the entries inserted here.
   add_ue_to_wheel(u.get_pcell().cfg(), candidate_cg_offset.value());
 
-  on_activation_dci_allocated(pending, slot_pdcch, first_tx_slot);
+  pending.on_activation_dci_allocated(slot_pdcch, first_tx_slot + max_expected_crc_delay);
 
-  // NOTE: the HARQ reconfiguration is done during the reconfiguration /ref add_reconf_ue(), to avoid reconfiguring the
-  // HARQs while there are in-flight PUSCHs.
+  // NOTE: the HARQ reconfiguration is done during the UE reconfiguration, to avoid reconfiguring the HARQs while there
+  // are in-flight PUSCHs.
   return activation_outcome::success;
 }
 
@@ -558,7 +558,7 @@ configured_grant_type2_sched_impl::reactivate_ue(cell_resource_allocator& cell_a
   // The row has the same symbols as the stored one, so the TBS and the grid reservations stay valid.
   ue_cg_state_mng.set_time_domain_allocation(*td_alloc);
 
-  on_activation_dci_allocated(pending, slot_pdcch, slot_pdcch + pusch_td_list[*td_alloc].k2);
+  pending.on_activation_dci_allocated(slot_pdcch, slot_pdcch + pusch_td_list[*td_alloc].k2 + max_expected_crc_delay);
 
   logger.debug("ue={}: Re-sent CG Type 2 activation DCI at slot={}", fmt::underlying(u.ue_index), slot_pdcch);
   return activation_outcome::success;
@@ -612,13 +612,11 @@ void configured_grant_type2_sched_impl::handle_error_indication(slot_point      
   // A CG occasion needs no PDCCH of its own, so the only PDCCH this scheduler puts on the grid is the activation DCI.
   // If it was discarded, the UE never received it, so re-activate the UE without waiting for the confirmation deadline.
   for (ue_pending_activation& u : ues_pending_activation) {
-    if (u.confirmation_deadline.valid() and u.activation_pdcch_slot == sl_tx) {
+    if (u.on_pdcch_discarded(sl_tx)) {
       logger.info("ue={}: Re-activating CG Type 2. Cause: the activation PDCCH of slot={} was discarded by the lower "
                   "layers",
-                  fmt::underlying(u.ue_index),
+                  fmt::underlying(u.ue_index()),
                   sl_tx);
-      u.confirmation_deadline = {};
-      u.reactivation_due      = true;
     }
   }
 }
@@ -631,7 +629,7 @@ void configured_grant_type2_sched_impl::handle_cg_activation_complete_indication
     return;
   }
 
-  if (not it->activation_pdcch_slot.valid()) {
+  if (not it->can_be_confirmed()) {
     // No activation DCI has been sent for the UE's current CG configuration, so this confirms an earlier one.
     logger.warning("ue={}: Ignoring CG activation confirmation. Cause: no activation DCI was sent for the current CG "
                    "configuration",

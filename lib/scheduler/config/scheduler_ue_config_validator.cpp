@@ -240,9 +240,10 @@ error_type<std::string>
 ocudu::config_validators::validate_sched_ue_reconfiguration_message(const sched_ue_reconfiguration_message& msg,
                                                                     const cell_configuration&               cell_cfg)
 {
-  // A reconfiguration carries a delta: an absent cell list leaves the UE's cell configuration untouched, so there is
-  // nothing to check. The entries it does carry are complete ServingCellConfigs rather than deltas of their own, so the
-  // very same per-cell checks as for a UE creation apply to them.
+  // Only the parts the request actually carries are checked. A reconfiguration carries a delta: an absent cell list
+  // leaves the UE's cell configuration untouched, so there is nothing to check. The entries it does carry are complete
+  // ServingCellConfigs rather than deltas of their own, so the very same per-cell checks as for a UE creation apply to
+  // them.
   if (not msg.cfg.cells.has_value()) {
     return {};
   }

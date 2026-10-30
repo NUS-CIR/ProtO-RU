@@ -12,9 +12,11 @@
 #include "tests/unittests/scheduler/test_utils/config_generators.h"
 #include "tests/unittests/scheduler/test_utils/dummy_test_components.h"
 #include "ocudu/mac/mac_pdu_format.h"
+#include "ocudu/scheduler/config/cg_builder_params.h"
 #include "ocudu/scheduler/config/scheduler_expert_config_factory.h"
 #include "ocudu/scheduler/config/serving_cell_config_factory.h"
 #include <gtest/gtest.h>
+#include <limits>
 
 using namespace ocudu;
 
@@ -22,10 +24,15 @@ using namespace ocudu;
 class sched_ue_test : public ::testing::Test
 {
 protected:
-  sched_ue_test() :
+  /// \param[in] cg_cfg Configured Grant of the cell, if any. The UE gets one too when the cell has it.
+  explicit sched_ue_test(const std::optional<cg_builder_params>& cg_cfg = std::nullopt) :
     expert_cfg(config_helpers::make_default_scheduler_expert_config()),
     cfg_mng(scheduler_config{expert_cfg, metric_notif}),
-    sched_cfg(sched_config_helper::make_default_sched_cell_configuration_request(builder_params)),
+    sched_cfg([this, &cg_cfg]() {
+      auto req                = sched_config_helper::make_default_sched_cell_configuration_request(builder_params);
+      req.ran.init_bwp.cg_cfg = cg_cfg;
+      return req;
+    }()),
     cell_cfg(*cfg_mng.add_cell(sched_cfg)),
     serv_cell_cfg(config_helpers::make_default_ue_cell_config(cell_cfg.params).serv_cell_cfg),
     ue_db(expert_cfg.ue)
@@ -194,6 +201,85 @@ TEST_F(sched_ue_test, when_mcs_increases_estimated_ul_rate_increases)
     }
   }
 }
+
+/// A CRC report for a PUSCH, together with whether the UE cell should take the PUSCH as transmitted.
+struct crc_dtx_test_params {
+  std::string          name;
+  bool                 is_cg;
+  bool                 crc_ok;
+  std::optional<float> sinr_dB;
+  /// False if the CRC should be taken as a DTX, i.e. the UE did not transmit.
+  bool pusch_transmitted;
+};
+
+/// Formatter for CRC DTX params, used by gtest. Avoids the fallback raw-byte printer, which reads uninitialized padding
+/// bytes.
+void PrintTo(const crc_dtx_test_params& value, ::std::ostream* os)
+{
+  *os << value.name;
+}
+
+class ue_cell_crc_dtx_test : public sched_ue_test, public ::testing::WithParamInterface<crc_dtx_test_params>
+{
+protected:
+  ue_cell_crc_dtx_test() : sched_ue_test(cg_builder_params{}) {}
+};
+
+TEST_P(ue_cell_crc_dtx_test, crc_ko_on_cg_pusch_is_dtx_only_when_the_sinr_is_low_or_invalid)
+{
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // The SINR values of the test cases are chosen around the default threshold.
+  ASSERT_EQ(cell_cfg.expert_cfg.ue.cg_pusch_sinr_threshold_dB, -8.0F);
+
+  ue_cell&    ue_cc  = ue_db[to_du_ue_index(0)].get_pcell();
+  const auto* ul_ded = ue_cc.cfg().init_bwp().ul.ded();
+  ASSERT_TRUE(ul_ded != nullptr and ul_ded->cg_cfg.has_value()) << "the UE has no CG configured";
+  // The CG HARQ processes are only reserved by a reconfiguration, as a UE gets its CG together with its first DRB.
+  ue_cc.handle_reconfiguration_request(ue_cc.cfg());
+
+  // A CG PUSCH is never retransmitted, so its HARQ process is allocated with no retransmissions.
+  const slot_point pdcch_slot{cell_cfg.scs_common(), 0};
+  const slot_point pusch_slot = pdcch_slot + 4;
+  const unsigned   max_retxs  = 0;
+  const auto       h_ul =
+      GetParam().is_cg
+                ? ue_cc.harqs.alloc_ul_harq(pdcch_slot,
+                                      pusch_slot,
+                                      max_retxs,
+                                      cg_harq_alloc_params{.harq_id = to_harq_id(0), .cg_harq_timeout = 160})
+                : ue_cc.harqs.alloc_ul_harq(pdcch_slot, pusch_slot, max_retxs);
+  ASSERT_TRUE(h_ul.has_value());
+  ASSERT_EQ(h_ul->is_cg(), GetParam().is_cg);
+
+  const ul_crc_pdu_indication crc{.rnti           = ue_cc.rnti(),
+                                  .ue_index       = ue_cc.ue_index,
+                                  .harq_id        = h_ul->id(),
+                                  .tb_crc_success = GetParam().crc_ok,
+                                  .ul_sinr_dB     = GetParam().sinr_dB};
+  const auto                  outcome = ue_cc.handle_crc_pdu(pusch_slot, crc);
+  ASSERT_TRUE(outcome.has_value()) << "the CRC was not attributed to the HARQ process of the PUSCH";
+  EXPECT_EQ(outcome->is_cg, GetParam().is_cg);
+  EXPECT_EQ(outcome->pusch_transmitted, GetParam().pusch_transmitted)
+      << (GetParam().pusch_transmitted ? "the CRC was wrongly taken as a DTX" : "the CRC was not taken as a DTX");
+  if (not GetParam().pusch_transmitted) {
+    EXPECT_EQ(outcome->tbs, units::bytes{0U}) << "a DTX carries no TBS";
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    crc_report,
+    ue_cell_crc_dtx_test,
+    ::testing::Values(
+        crc_dtx_test_params{"cg_crc_ko_below_sinr_threshold", true, false, -20.0F, false},
+        crc_dtx_test_params{"cg_crc_ko_infinite_sinr", true, false, std::numeric_limits<float>::infinity(), false},
+        crc_dtx_test_params{"cg_crc_ko_nan_sinr", true, false, std::numeric_limits<float>::quiet_NaN(), false},
+        crc_dtx_test_params{"cg_crc_ko_at_sinr_threshold", true, false, -8.0F, true},
+        crc_dtx_test_params{"cg_crc_ko_above_sinr_threshold", true, false, 10.0F, true},
+        crc_dtx_test_params{"cg_crc_ko_without_sinr", true, false, std::nullopt, true},
+        crc_dtx_test_params{"cg_crc_ok_below_sinr_threshold", true, true, -20.0F, true},
+        crc_dtx_test_params{"dynamic_crc_ko_below_sinr_threshold", false, false, -20.0F, true}),
+    [](const auto& p) { return p.param.name; });
 
 class cfra_ue_repository_test : public ::testing::Test
 {

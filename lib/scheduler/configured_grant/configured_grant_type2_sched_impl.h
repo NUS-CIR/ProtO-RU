@@ -43,17 +43,54 @@ public:
   void stop() override;
 
 private:
-  // UE whose CG Type 2 activation is not confirmed yet, with the state of its latest activation DCI.
-  struct ue_pending_activation {
-    explicit ue_pending_activation(du_ue_index_t ue_index_) : ue_index(ue_index_) {}
+  // UE whose CG Type 2 activation is not confirmed yet, with the state of its activation.
+  //
+  // The allowed transitions are:
+  // - awaiting_first_activation -> awaiting_confirmation: the first activation DCI is allocated.
+  // - awaiting_confirmation -> reactivation_due: the deadline passes, or the activation PDCCH is discarded.
+  // - reactivation_due -> awaiting_confirmation: a new activation DCI for the same grant is allocated.
+  // A confirmed UE leaves the list of UEs pending activation, so "confirmed" is not a state of its own. The UE can be
+  // confirmed from awaiting_confirmation or reactivation_due, as every activation DCI carries the same grant.
+  class ue_pending_activation
+  {
+  public:
+    enum class state_t {
+      // No activation DCI was sent yet for the UE's current CG configuration.
+      awaiting_first_activation,
+      // An activation DCI was sent, whose confirmation is awaited until the deadline.
+      awaiting_confirmation,
+      // The latest activation DCI was not confirmed, so a new one is due for the grant the UE already holds.
+      reactivation_due
+    };
 
-    du_ue_index_t ue_index;
-    // Slot of the PDCCH of the latest activation DCI; invalid until the first one is allocated.
-    slot_point activation_pdcch_slot;
-    // Slot by which the latest activation DCI must be confirmed; invalid while none awaits confirmation.
-    slot_point confirmation_deadline;
-    // Whether the UE is due a new activation DCI for its current grant.
-    bool reactivation_due = false;
+    explicit ue_pending_activation(du_ue_index_t ue_index_) : ue_idx(ue_index_) {}
+
+    du_ue_index_t ue_index() const { return ue_idx; }
+    state_t       state() const { return st; }
+    // Slot of the PDCCH of the latest activation DCI; invalid in awaiting_first_activation.
+    slot_point activation_pdcch_slot() const { return pdcch_slot; }
+    // Slot by which the latest activation DCI must be confirmed; invalid in awaiting_first_activation.
+    slot_point confirmation_deadline() const { return deadline; }
+
+    // Records an activation DCI sent in \c pdcch_slot_, which must be confirmed by \c deadline_.
+    void on_activation_dci_allocated(slot_point pdcch_slot_, slot_point deadline_);
+
+    // Moves to reactivation_due if the activation DCI is awaiting confirmation past its deadline. Returns whether it
+    // did.
+    bool check_confirmation_deadline(slot_point slot);
+
+    // Moves to reactivation_due if the activation DCI awaiting confirmation was sent in \c sl_tx, whose PDCCH was
+    // discarded. Returns whether it did.
+    bool on_pdcch_discarded(slot_point sl_tx);
+
+    // Whether a CG activation confirmation can be taken for this UE, i.e. an activation DCI was sent.
+    bool can_be_confirmed() const { return st != state_t::awaiting_first_activation; }
+
+  private:
+    du_ue_index_t ue_idx;
+    state_t       st = state_t::awaiting_first_activation;
+    slot_point    pdcch_slot;
+    slot_point    deadline;
   };
 
   // Adds a UE's CG grant positions to the slot wheel, one every CG period.
@@ -77,9 +114,6 @@ private:
 
   // Sends a new activation DCI for the grant the UE already holds: same resource, offset, VRBs and MCS.
   activation_outcome reactivate_ue(cell_resource_allocator& cell_alloc, ue_pending_activation& pending, ue& u);
-
-  // Records an activation DCI sent in \c pdcch_slot, whose first CG transmission is in \c first_tx_slot.
-  void on_activation_dci_allocated(ue_pending_activation& pending, slot_point pdcch_slot, slot_point first_tx_slot);
 
   // Marks for re-activation the UEs whose latest activation DCI was not confirmed by its deadline.
   void check_confirmation_deadlines(slot_point slot);

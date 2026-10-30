@@ -195,8 +195,8 @@ bool configured_grant_scheduler_base::allocate_cg_opportunity(cell_slot_resource
   if (ue_cc->get_conf_grant_state_manager().is_before_first_tx(slot_alloc.slot)) {
     return false;
   }
-  // This occasion is at or after the first transmission, so the gate has served its purpose. Reset it here, to prevents
-  // it remains set under certain conditions (e.g., all of them fall in the UE's measurement gaps).
+  // This occasion is at or after the first transmission, so the gate has served its purpose. Reset it here to ensure it
+  // is not left set under certain conditions (e.g., all of them fall in the UE's measurement gaps).
   ue_cc->get_conf_grant_state_manager().clear_first_tx_slot();
 
   if (not validate_cg_opportunity(slot_alloc, *ue_cc)) {

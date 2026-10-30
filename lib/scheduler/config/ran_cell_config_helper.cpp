@@ -496,8 +496,8 @@ std::optional<unsigned> config_helpers::find_cg_pusch_td_res_idx(const ran_cell_
   ocudu_assert(cell_cfg.ul_cfg_common.init_ul_bwp.pusch_cfg_common.has_value(),
                "PUSCH Config Common must be configured.");
 
-  /// The list is sorted by increasing k2 first, then by decreasing \c symbols.stop(), so the first qualifying entry is
-  /// the one with both the lowest k2 and the most symbols among those that avoid the SRS.
+  // The list is sorted by increasing k2 first, then by decreasing \c symbols.stop(), so the first qualifying entry is
+  // the one with both the lowest k2 and the most symbols among those that avoid the SRS.
 
   // Symbols left free by the SRS, which sits at the end of the slot.
   const unsigned last_non_srs_symbol = compute_last_non_srs_symbol(cell_cfg);

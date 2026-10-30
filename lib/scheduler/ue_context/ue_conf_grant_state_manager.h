@@ -64,7 +64,7 @@ public:
 
   /// Update CG state variables.
   /// \param first_tx The first slot the UE will transmit on, which gates the occasions preceding it. Left unset for
-  /// CG Type 1, whose occasions are all valid from the moment the configuration is applied.
+  /// CG Type 1.
   void update_state(unsigned                  period_slots,
                     units::bytes              tbs,
                     vrb_interval              vrbs,
@@ -74,7 +74,8 @@ public:
                     unsigned                  res_id,
                     std::optional<slot_point> first_tx = std::nullopt)
   {
-    state         = cg_grant_params{period_slots, t_offset, tbs, vrbs, mcs, td_alloc, res_id};
+    state = cg_grant_params{period_slots, t_offset, tbs, vrbs, mcs, td_alloc, res_id};
+    // Only used for CG type 2, as in type 1 all occasions are valid from the moment the configuration is applied.
     first_tx_slot = first_tx;
   }
 
