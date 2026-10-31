@@ -32,7 +32,7 @@ static const asn1::e1ap::pdu_session_res_to_setup_item_s& get_pdu_session_res_to
   const auto& ng_ran_bearer_ctxt = msg.pdu.init_msg()
                                        .value.bearer_context_setup_request()
                                        ->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request();
-  return ng_ran_bearer_ctxt[0]->pdu_session_res_to_setup_list()[0];
+  return ng_ran_bearer_ctxt.pdu_session_res_to_setup_list[0];
 }
 
 class cu_cp_inter_cu_ng_handover_test : public cu_cp_test_environment, public ::testing::Test

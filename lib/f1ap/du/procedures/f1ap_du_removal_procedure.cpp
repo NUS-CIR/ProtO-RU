@@ -70,9 +70,7 @@ void f1ap_du_removal_procedure::send_f1_removal_request()
   msg.pdu.set_init_msg().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
   asn1::f1ap::f1_removal_request_s& rem = msg.pdu.init_msg().value.f1_removal_request();
 
-  rem->resize(1);
-  (*rem)[0].load_info_obj(ASN1_F1AP_ID_TRANSACTION_ID);
-  (*rem)[0].value().transaction_id() = transaction.id();
+  rem->transaction_id = transaction.id();
 
   // Send unpacked message to F1-C GW.
   cu_notifier.on_new_message(msg);

@@ -30,14 +30,6 @@ crit_e aperiodic_srs_ext_ies_o::get_crit(const uint32_t& id)
   asn1::log_error("The id={} is not recognized", id);
   return {};
 }
-aperiodic_srs_ext_ies_o::ext_c aperiodic_srs_ext_ies_o::get_ext(const uint32_t& id)
-{
-  ext_c ret{};
-  if (id != 122) {
-    asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e aperiodic_srs_ext_ies_o::get_presence(const uint32_t& id)
 {
   if (id == 122) {
@@ -47,32 +39,64 @@ presence_e aperiodic_srs_ext_ies_o::get_presence(const uint32_t& id)
   return {};
 }
 
-// Extension ::= OPEN TYPE
-void aperiodic_srs_ext_ies_o::ext_c::to_json(json_writer& j) const
+OCUDUASN_CODE aperiodic_srs_ext_ies_container::pack(bit_ref& bref) const
 {
-  j.start_array("");
-  for (const auto& e1 : c) {
-    e1.to_json(j);
+  uint32_t nof_ies = 0;
+  nof_ies += pos_srs_res_set_aggregation_list_present ? 1 : 0;
+  HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
+
+  if (pos_srs_res_set_aggregation_list_present) {
+    HANDLE_CODE(pack_integer(bref, (uint32_t)122, (uint32_t)0u, (uint32_t)65535u, false, true));
+    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
+    varlength_field_pack_guard varlen_scope(bref, true);
+    HANDLE_CODE(pack_dyn_seq_of(bref, pos_srs_res_set_aggregation_list, 1, 32, true));
+  }
+
+  return OCUDUASN_SUCCESS;
+}
+OCUDUASN_CODE aperiodic_srs_ext_ies_container::unpack(cbit_ref& bref)
+{
+  uint32_t nof_ies = 0;
+  HANDLE_CODE(unpack_length(nof_ies, bref, 1u, 65535u, true));
+
+  for (; nof_ies > 0; --nof_ies) {
+    uint32_t id;
+    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
+    crit_e crit;
+    HANDLE_CODE(crit.unpack(bref));
+    if (crit != aperiodic_srs_ext_ies_o::get_crit(id)) {
+      asn1::log_warning("Unpacked crit does not match object set definition");
+    }
+
+    if (id == 122) {
+      {
+        pos_srs_res_set_aggregation_list_present = true;
+        varlength_field_unpack_guard varlen_scope(bref, true);
+        HANDLE_CODE(unpack_dyn_seq_of(pos_srs_res_set_aggregation_list, bref, 1, 32, true));
+      }
+    } else {
+      HANDLE_CODE(skip_ignored_ie(bref, crit, id));
+      break;
+    }
+  }
+
+  return OCUDUASN_SUCCESS;
+}
+void aperiodic_srs_ext_ies_container::to_json(json_writer& j) const
+{
+  j.start_array();
+  if (pos_srs_res_set_aggregation_list_present) {
+    j.start_obj();
+    j.write_int("id", 122);
+    j.write_str("criticality", "ignore");
+    j.start_array("extensionValue");
+    for (const auto& e1 : pos_srs_res_set_aggregation_list) {
+      e1.to_json(j);
+    }
+    j.end_array();
+    j.end_obj();
   }
   j.end_array();
-}
-OCUDUASN_CODE aperiodic_srs_ext_ies_o::ext_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  HANDLE_CODE(pack_dyn_seq_of(bref, c, 1, 32, true));
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE aperiodic_srs_ext_ies_o::ext_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  HANDLE_CODE(unpack_dyn_seq_of(c, bref, 1, 32, true));
-  return OCUDUASN_SUCCESS;
-}
-
-const char* aperiodic_srs_ext_ies_o::ext_c::types_opts::to_string() const
-{
-  static const char* names[] = {"PosSRSResourceSet-Aggregation-List"};
-  return convert_enum_idx(names, 1, value, "aperiodic_srs_ext_ies_o::ext_c::types");
 }
 
 // AperiodicSRS ::= SEQUENCE
@@ -80,14 +104,14 @@ OCUDUASN_CODE aperiodic_srs_s::pack(bit_ref& bref) const
 {
   bref.pack(false, 1);
   HANDLE_CODE(bref.pack(srs_res_trigger_present, 1));
-  HANDLE_CODE(bref.pack(ie_exts.size() > 0, 1));
+  HANDLE_CODE(bref.pack(ie_exts_present, 1));
 
   HANDLE_CODE(aperiodic.pack(bref));
   if (srs_res_trigger_present) {
     HANDLE_CODE(srs_res_trigger.pack(bref));
   }
-  if (ie_exts.size() > 0) {
-    HANDLE_CODE(pack_dyn_seq_of(bref, ie_exts, 1, 65535, true));
+  if (ie_exts_present) {
+    HANDLE_CODE(ie_exts.pack(bref));
   }
 
   return OCUDUASN_SUCCESS;
@@ -97,7 +121,6 @@ OCUDUASN_CODE aperiodic_srs_s::unpack(cbit_ref& bref)
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
   HANDLE_CODE(bref.unpack(srs_res_trigger_present, 1));
-  bool ie_exts_present;
   HANDLE_CODE(bref.unpack(ie_exts_present, 1));
 
   HANDLE_CODE(aperiodic.unpack(bref));
@@ -105,7 +128,7 @@ OCUDUASN_CODE aperiodic_srs_s::unpack(cbit_ref& bref)
     HANDLE_CODE(srs_res_trigger.unpack(bref));
   }
   if (ie_exts_present) {
-    HANDLE_CODE(unpack_dyn_seq_of(ie_exts, bref, 1, 65535, true));
+    HANDLE_CODE(ie_exts.unpack(bref));
   }
 
   if (ext) {
@@ -122,7 +145,7 @@ void aperiodic_srs_s::to_json(json_writer& j) const
     j.write_fieldname("sRSResourceTrigger");
     srs_res_trigger.to_json(j);
   }
-  if (ie_exts.size() > 0) {
+  if (ie_exts_present) {
     j.write_fieldname("iE-Extensions");
     ie_exts.to_json(j);
   }
@@ -165,24 +188,6 @@ crit_e assist_info_ctrl_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-assist_info_ctrl_ies_o::value_c assist_info_ctrl_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 23:
-      ret.set(value_c::types::assist_info);
-      break;
-    case 24:
-      ret.set(value_c::types::broadcast);
-      break;
-    case 38:
-      ret.set(value_c::types::positioning_broadcast_cells);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e assist_info_ctrl_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -197,123 +202,6 @@ presence_e assist_info_ctrl_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void assist_info_ctrl_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::assist_info:
-      c = assist_info_s{};
-      break;
-    case types::broadcast:
-      c = broadcast_e{};
-      break;
-    case types::positioning_broadcast_cells:
-      c = positioning_broadcast_cells_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_ctrl_ies_o::value_c");
-  }
-}
-assist_info_s& assist_info_ctrl_ies_o::value_c::assist_info()
-{
-  assert_choice_type(types::assist_info, type_, "Value");
-  return c.get<assist_info_s>();
-}
-broadcast_e& assist_info_ctrl_ies_o::value_c::broadcast()
-{
-  assert_choice_type(types::broadcast, type_, "Value");
-  return c.get<broadcast_e>();
-}
-positioning_broadcast_cells_l& assist_info_ctrl_ies_o::value_c::positioning_broadcast_cells()
-{
-  assert_choice_type(types::positioning_broadcast_cells, type_, "Value");
-  return c.get<positioning_broadcast_cells_l>();
-}
-const assist_info_s& assist_info_ctrl_ies_o::value_c::assist_info() const
-{
-  assert_choice_type(types::assist_info, type_, "Value");
-  return c.get<assist_info_s>();
-}
-const broadcast_e& assist_info_ctrl_ies_o::value_c::broadcast() const
-{
-  assert_choice_type(types::broadcast, type_, "Value");
-  return c.get<broadcast_e>();
-}
-const positioning_broadcast_cells_l& assist_info_ctrl_ies_o::value_c::positioning_broadcast_cells() const
-{
-  assert_choice_type(types::positioning_broadcast_cells, type_, "Value");
-  return c.get<positioning_broadcast_cells_l>();
-}
-void assist_info_ctrl_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::assist_info:
-      c.get<assist_info_s>().to_json(j);
-      break;
-    case types::broadcast:
-      j.write_str(c.get<broadcast_e>().to_string());
-      break;
-    case types::positioning_broadcast_cells:
-      j.start_array("");
-      for (const auto& e1 : c.get<positioning_broadcast_cells_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_ctrl_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE assist_info_ctrl_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::assist_info:
-      HANDLE_CODE(c.get<assist_info_s>().pack(bref));
-      break;
-    case types::broadcast:
-      HANDLE_CODE(c.get<broadcast_e>().pack(bref));
-      break;
-    case types::positioning_broadcast_cells:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<positioning_broadcast_cells_l>(), 1, 16384, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_ctrl_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE assist_info_ctrl_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::assist_info:
-      HANDLE_CODE(c.get<assist_info_s>().unpack(bref));
-      break;
-    case types::broadcast:
-      HANDLE_CODE(c.get<broadcast_e>().unpack(bref));
-      break;
-    case types::positioning_broadcast_cells:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<positioning_broadcast_cells_l>(), bref, 1, 16384, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_ctrl_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* assist_info_ctrl_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Assistance-Information", "Broadcast", "PositioningBroadcastCells"};
-  return convert_enum_idx(names, 3, value, "assist_info_ctrl_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<assist_info_ctrl_ies_o>;
 
 OCUDUASN_CODE assist_info_ctrl_ies_container::pack(bit_ref& bref) const
 {
@@ -447,24 +335,6 @@ crit_e assist_info_feedback_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-assist_info_feedback_ies_o::value_c assist_info_feedback_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 25:
-      ret.set(value_c::types::assist_info_fail_list);
-      break;
-    case 38:
-      ret.set(value_c::types::positioning_broadcast_cells);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e assist_info_feedback_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -479,128 +349,6 @@ presence_e assist_info_feedback_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void assist_info_feedback_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::assist_info_fail_list:
-      c = assist_info_fail_list_l{};
-      break;
-    case types::positioning_broadcast_cells:
-      c = positioning_broadcast_cells_l{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_feedback_ies_o::value_c");
-  }
-}
-assist_info_fail_list_l& assist_info_feedback_ies_o::value_c::assist_info_fail_list()
-{
-  assert_choice_type(types::assist_info_fail_list, type_, "Value");
-  return c.get<assist_info_fail_list_l>();
-}
-positioning_broadcast_cells_l& assist_info_feedback_ies_o::value_c::positioning_broadcast_cells()
-{
-  assert_choice_type(types::positioning_broadcast_cells, type_, "Value");
-  return c.get<positioning_broadcast_cells_l>();
-}
-crit_diagnostics_s& assist_info_feedback_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const assist_info_fail_list_l& assist_info_feedback_ies_o::value_c::assist_info_fail_list() const
-{
-  assert_choice_type(types::assist_info_fail_list, type_, "Value");
-  return c.get<assist_info_fail_list_l>();
-}
-const positioning_broadcast_cells_l& assist_info_feedback_ies_o::value_c::positioning_broadcast_cells() const
-{
-  assert_choice_type(types::positioning_broadcast_cells, type_, "Value");
-  return c.get<positioning_broadcast_cells_l>();
-}
-const crit_diagnostics_s& assist_info_feedback_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void assist_info_feedback_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::assist_info_fail_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<assist_info_fail_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::positioning_broadcast_cells:
-      j.start_array("");
-      for (const auto& e1 : c.get<positioning_broadcast_cells_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_feedback_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE assist_info_feedback_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::assist_info_fail_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<assist_info_fail_list_l>(), 1, 32, true));
-      break;
-    case types::positioning_broadcast_cells:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<positioning_broadcast_cells_l>(), 1, 16384, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_feedback_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE assist_info_feedback_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::assist_info_fail_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<assist_info_fail_list_l>(), bref, 1, 32, true));
-      break;
-    case types::positioning_broadcast_cells:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<positioning_broadcast_cells_l>(), bref, 1, 16384, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "assist_info_feedback_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* assist_info_feedback_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {
-      "AssistanceInformationFailureList", "PositioningBroadcastCells", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 3, value, "assist_info_feedback_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<assist_info_feedback_ies_o>;
 
 OCUDUASN_CODE assist_info_feedback_ies_container::pack(bit_ref& bref) const
 {
@@ -738,24 +486,6 @@ crit_e e_c_id_meas_fail_ind_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-e_c_id_meas_fail_ind_ies_o::value_c e_c_id_meas_fail_ind_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 2:
-      ret.set(value_c::types::lmf_ue_meas_id);
-      break;
-    case 6:
-      ret.set(value_c::types::ran_ue_meas_id);
-      break;
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e e_c_id_meas_fail_ind_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -770,119 +500,6 @@ presence_e e_c_id_meas_fail_ind_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void e_c_id_meas_fail_ind_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::ran_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_fail_ind_ies_o::value_c");
-  }
-}
-uint8_t& e_c_id_meas_fail_ind_ies_o::value_c::lmf_ue_meas_id()
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-uint8_t& e_c_id_meas_fail_ind_ies_o::value_c::ran_ue_meas_id()
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-cause_c& e_c_id_meas_fail_ind_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const uint8_t& e_c_id_meas_fail_ind_ies_o::value_c::lmf_ue_meas_id() const
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const uint8_t& e_c_id_meas_fail_ind_ies_o::value_c::ran_ue_meas_id() const
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const cause_c& e_c_id_meas_fail_ind_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-void e_c_id_meas_fail_ind_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::ran_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_fail_ind_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE e_c_id_meas_fail_ind_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_fail_ind_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE e_c_id_meas_fail_ind_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_fail_ind_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* e_c_id_meas_fail_ind_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..15,...)", "INTEGER (1..15,...)", "Cause"};
-  return convert_enum_idx(names, 3, value, "e_c_id_meas_fail_ind_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<e_c_id_meas_fail_ind_ies_o>;
 
 OCUDUASN_CODE e_c_id_meas_fail_ind_ies_container::pack(bit_ref& bref) const
 {
@@ -1009,24 +626,6 @@ crit_e e_c_id_meas_initiation_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-e_c_id_meas_initiation_fail_ies_o::value_c e_c_id_meas_initiation_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 2:
-      ret.set(value_c::types::lmf_ue_meas_id);
-      break;
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e e_c_id_meas_initiation_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -1041,124 +640,6 @@ presence_e e_c_id_meas_initiation_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void e_c_id_meas_initiation_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_fail_ies_o::value_c");
-  }
-}
-uint8_t& e_c_id_meas_initiation_fail_ies_o::value_c::lmf_ue_meas_id()
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-cause_c& e_c_id_meas_initiation_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& e_c_id_meas_initiation_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const uint8_t& e_c_id_meas_initiation_fail_ies_o::value_c::lmf_ue_meas_id() const
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const cause_c& e_c_id_meas_initiation_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& e_c_id_meas_initiation_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void e_c_id_meas_initiation_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE e_c_id_meas_initiation_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE e_c_id_meas_initiation_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* e_c_id_meas_initiation_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..15,...)", "Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 3, value, "e_c_id_meas_initiation_fail_ies_o::value_c::types");
-}
-uint8_t e_c_id_meas_initiation_fail_ies_o::value_c::types_opts::to_number() const
-{
-  static const uint8_t numbers[] = {1};
-  return map_enum_number(numbers, 1, value, "e_c_id_meas_initiation_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<e_c_id_meas_initiation_fail_ies_o>;
 
 OCUDUASN_CODE e_c_id_meas_initiation_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -1297,36 +778,6 @@ crit_e e_c_id_meas_initiation_request_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-e_c_id_meas_initiation_request_ies_o::value_c e_c_id_meas_initiation_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 2:
-      ret.set(value_c::types::lmf_ue_meas_id);
-      break;
-    case 3:
-      ret.set(value_c::types::report_characteristics);
-      break;
-    case 4:
-      ret.set(value_c::types::meas_periodicity);
-      break;
-    case 5:
-      ret.set(value_c::types::meas_quantities);
-      break;
-    case 15:
-      ret.set(value_c::types::other_rat_meas_quantities);
-      break;
-    case 19:
-      ret.set(value_c::types::wlan_meas_quantities);
-      break;
-    case 105:
-      ret.set(value_c::types::meas_periodicity_nr_ao_a);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e e_c_id_meas_initiation_request_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -1349,230 +800,6 @@ presence_e e_c_id_meas_initiation_request_ies_o::get_presence(const uint32_t& id
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void e_c_id_meas_initiation_request_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::report_characteristics:
-      c = report_characteristics_e{};
-      break;
-    case types::meas_periodicity:
-      c = meas_periodicity_e{};
-      break;
-    case types::meas_quantities:
-      c = meas_quantities_l{};
-      break;
-    case types::other_rat_meas_quantities:
-      c = other_rat_meas_quantities_l{};
-      break;
-    case types::wlan_meas_quantities:
-      c = wlan_meas_quantities_l{};
-      break;
-    case types::meas_periodicity_nr_ao_a:
-      c = meas_periodicity_nr_ao_a_e{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_request_ies_o::value_c");
-  }
-}
-uint8_t& e_c_id_meas_initiation_request_ies_o::value_c::lmf_ue_meas_id()
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-report_characteristics_e& e_c_id_meas_initiation_request_ies_o::value_c::report_characteristics()
-{
-  assert_choice_type(types::report_characteristics, type_, "Value");
-  return c.get<report_characteristics_e>();
-}
-meas_periodicity_e& e_c_id_meas_initiation_request_ies_o::value_c::meas_periodicity()
-{
-  assert_choice_type(types::meas_periodicity, type_, "Value");
-  return c.get<meas_periodicity_e>();
-}
-meas_quantities_l& e_c_id_meas_initiation_request_ies_o::value_c::meas_quantities()
-{
-  assert_choice_type(types::meas_quantities, type_, "Value");
-  return c.get<meas_quantities_l>();
-}
-other_rat_meas_quantities_l& e_c_id_meas_initiation_request_ies_o::value_c::other_rat_meas_quantities()
-{
-  assert_choice_type(types::other_rat_meas_quantities, type_, "Value");
-  return c.get<other_rat_meas_quantities_l>();
-}
-wlan_meas_quantities_l& e_c_id_meas_initiation_request_ies_o::value_c::wlan_meas_quantities()
-{
-  assert_choice_type(types::wlan_meas_quantities, type_, "Value");
-  return c.get<wlan_meas_quantities_l>();
-}
-meas_periodicity_nr_ao_a_e& e_c_id_meas_initiation_request_ies_o::value_c::meas_periodicity_nr_ao_a()
-{
-  assert_choice_type(types::meas_periodicity_nr_ao_a, type_, "Value");
-  return c.get<meas_periodicity_nr_ao_a_e>();
-}
-const uint8_t& e_c_id_meas_initiation_request_ies_o::value_c::lmf_ue_meas_id() const
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const report_characteristics_e& e_c_id_meas_initiation_request_ies_o::value_c::report_characteristics() const
-{
-  assert_choice_type(types::report_characteristics, type_, "Value");
-  return c.get<report_characteristics_e>();
-}
-const meas_periodicity_e& e_c_id_meas_initiation_request_ies_o::value_c::meas_periodicity() const
-{
-  assert_choice_type(types::meas_periodicity, type_, "Value");
-  return c.get<meas_periodicity_e>();
-}
-const meas_quantities_l& e_c_id_meas_initiation_request_ies_o::value_c::meas_quantities() const
-{
-  assert_choice_type(types::meas_quantities, type_, "Value");
-  return c.get<meas_quantities_l>();
-}
-const other_rat_meas_quantities_l& e_c_id_meas_initiation_request_ies_o::value_c::other_rat_meas_quantities() const
-{
-  assert_choice_type(types::other_rat_meas_quantities, type_, "Value");
-  return c.get<other_rat_meas_quantities_l>();
-}
-const wlan_meas_quantities_l& e_c_id_meas_initiation_request_ies_o::value_c::wlan_meas_quantities() const
-{
-  assert_choice_type(types::wlan_meas_quantities, type_, "Value");
-  return c.get<wlan_meas_quantities_l>();
-}
-const meas_periodicity_nr_ao_a_e& e_c_id_meas_initiation_request_ies_o::value_c::meas_periodicity_nr_ao_a() const
-{
-  assert_choice_type(types::meas_periodicity_nr_ao_a, type_, "Value");
-  return c.get<meas_periodicity_nr_ao_a_e>();
-}
-void e_c_id_meas_initiation_request_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::report_characteristics:
-      j.write_str(c.get<report_characteristics_e>().to_string());
-      break;
-    case types::meas_periodicity:
-      j.write_str(c.get<meas_periodicity_e>().to_string());
-      break;
-    case types::meas_quantities:
-      j.start_array("");
-      for (const auto& e1 : c.get<meas_quantities_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::other_rat_meas_quantities:
-      j.start_array("");
-      for (const auto& e1 : c.get<other_rat_meas_quantities_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::wlan_meas_quantities:
-      j.start_array("");
-      for (const auto& e1 : c.get<wlan_meas_quantities_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::meas_periodicity_nr_ao_a:
-      j.write_str(c.get<meas_periodicity_nr_ao_a_e>().to_string());
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_request_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE e_c_id_meas_initiation_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::report_characteristics:
-      HANDLE_CODE(c.get<report_characteristics_e>().pack(bref));
-      break;
-    case types::meas_periodicity:
-      HANDLE_CODE(c.get<meas_periodicity_e>().pack(bref));
-      break;
-    case types::meas_quantities:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<meas_quantities_l>(), 1, 64, true));
-      break;
-    case types::other_rat_meas_quantities:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<other_rat_meas_quantities_l>(), 0, 64, true));
-      break;
-    case types::wlan_meas_quantities:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<wlan_meas_quantities_l>(), 0, 64, true));
-      break;
-    case types::meas_periodicity_nr_ao_a:
-      HANDLE_CODE(c.get<meas_periodicity_nr_ao_a_e>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_request_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE e_c_id_meas_initiation_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::report_characteristics:
-      HANDLE_CODE(c.get<report_characteristics_e>().unpack(bref));
-      break;
-    case types::meas_periodicity:
-      HANDLE_CODE(c.get<meas_periodicity_e>().unpack(bref));
-      break;
-    case types::meas_quantities:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<meas_quantities_l>(), bref, 1, 64, true));
-      break;
-    case types::other_rat_meas_quantities:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<other_rat_meas_quantities_l>(), bref, 0, 64, true));
-      break;
-    case types::wlan_meas_quantities:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<wlan_meas_quantities_l>(), bref, 0, 64, true));
-      break;
-    case types::meas_periodicity_nr_ao_a:
-      HANDLE_CODE(c.get<meas_periodicity_nr_ao_a_e>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_request_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* e_c_id_meas_initiation_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..15,...)",
-                                "ReportCharacteristics",
-                                "MeasurementPeriodicity",
-                                "MeasurementQuantities",
-                                "OtherRATMeasurementQuantities",
-                                "WLANMeasurementQuantities",
-                                "MeasurementPeriodicityNR-AoA"};
-  return convert_enum_idx(names, 7, value, "e_c_id_meas_initiation_request_ies_o::value_c::types");
-}
-uint8_t e_c_id_meas_initiation_request_ies_o::value_c::types_opts::to_number() const
-{
-  static const uint8_t numbers[] = {1};
-  return map_enum_number(numbers, 1, value, "e_c_id_meas_initiation_request_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<e_c_id_meas_initiation_request_ies_o>;
 
 OCUDUASN_CODE e_c_id_meas_initiation_request_ies_container::pack(bit_ref& bref) const
 {
@@ -1798,36 +1025,6 @@ crit_e e_c_id_meas_initiation_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-e_c_id_meas_initiation_resp_ies_o::value_c e_c_id_meas_initiation_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 2:
-      ret.set(value_c::types::lmf_ue_meas_id);
-      break;
-    case 6:
-      ret.set(value_c::types::ran_ue_meas_id);
-      break;
-    case 7:
-      ret.set(value_c::types::e_c_id_meas_result);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    case 14:
-      ret.set(value_c::types::cell_portion_id);
-      break;
-    case 17:
-      ret.set(value_c::types::other_rat_meas_result);
-      break;
-    case 21:
-      ret.set(value_c::types::wlan_meas_result);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e e_c_id_meas_initiation_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -1850,221 +1047,6 @@ presence_e e_c_id_meas_initiation_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void e_c_id_meas_initiation_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::ran_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::e_c_id_meas_result:
-      c = e_c_id_meas_result_s{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::cell_portion_id:
-      c = uint16_t{};
-      break;
-    case types::other_rat_meas_result:
-      c = other_rat_meas_result_l{};
-      break;
-    case types::wlan_meas_result:
-      c = wlan_meas_result_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_resp_ies_o::value_c");
-  }
-}
-uint8_t& e_c_id_meas_initiation_resp_ies_o::value_c::lmf_ue_meas_id()
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-uint8_t& e_c_id_meas_initiation_resp_ies_o::value_c::ran_ue_meas_id()
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-e_c_id_meas_result_s& e_c_id_meas_initiation_resp_ies_o::value_c::e_c_id_meas_result()
-{
-  assert_choice_type(types::e_c_id_meas_result, type_, "Value");
-  return c.get<e_c_id_meas_result_s>();
-}
-crit_diagnostics_s& e_c_id_meas_initiation_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-uint16_t& e_c_id_meas_initiation_resp_ies_o::value_c::cell_portion_id()
-{
-  assert_choice_type(types::cell_portion_id, type_, "Value");
-  return c.get<uint16_t>();
-}
-other_rat_meas_result_l& e_c_id_meas_initiation_resp_ies_o::value_c::other_rat_meas_result()
-{
-  assert_choice_type(types::other_rat_meas_result, type_, "Value");
-  return c.get<other_rat_meas_result_l>();
-}
-wlan_meas_result_l& e_c_id_meas_initiation_resp_ies_o::value_c::wlan_meas_result()
-{
-  assert_choice_type(types::wlan_meas_result, type_, "Value");
-  return c.get<wlan_meas_result_l>();
-}
-const uint8_t& e_c_id_meas_initiation_resp_ies_o::value_c::lmf_ue_meas_id() const
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const uint8_t& e_c_id_meas_initiation_resp_ies_o::value_c::ran_ue_meas_id() const
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const e_c_id_meas_result_s& e_c_id_meas_initiation_resp_ies_o::value_c::e_c_id_meas_result() const
-{
-  assert_choice_type(types::e_c_id_meas_result, type_, "Value");
-  return c.get<e_c_id_meas_result_s>();
-}
-const crit_diagnostics_s& e_c_id_meas_initiation_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const uint16_t& e_c_id_meas_initiation_resp_ies_o::value_c::cell_portion_id() const
-{
-  assert_choice_type(types::cell_portion_id, type_, "Value");
-  return c.get<uint16_t>();
-}
-const other_rat_meas_result_l& e_c_id_meas_initiation_resp_ies_o::value_c::other_rat_meas_result() const
-{
-  assert_choice_type(types::other_rat_meas_result, type_, "Value");
-  return c.get<other_rat_meas_result_l>();
-}
-const wlan_meas_result_l& e_c_id_meas_initiation_resp_ies_o::value_c::wlan_meas_result() const
-{
-  assert_choice_type(types::wlan_meas_result, type_, "Value");
-  return c.get<wlan_meas_result_l>();
-}
-void e_c_id_meas_initiation_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::ran_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::e_c_id_meas_result:
-      c.get<e_c_id_meas_result_s>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    case types::cell_portion_id:
-      j.write_int(c.get<uint16_t>());
-      break;
-    case types::other_rat_meas_result:
-      j.start_array("");
-      for (const auto& e1 : c.get<other_rat_meas_result_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::wlan_meas_result:
-      j.start_array("");
-      for (const auto& e1 : c.get<wlan_meas_result_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE e_c_id_meas_initiation_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::e_c_id_meas_result:
-      HANDLE_CODE(c.get<e_c_id_meas_result_s>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    case types::cell_portion_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint16_t>(), (uint16_t)0u, (uint16_t)4095u, true, true));
-      break;
-    case types::other_rat_meas_result:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<other_rat_meas_result_l>(), 1, 64, true));
-      break;
-    case types::wlan_meas_result:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<wlan_meas_result_l>(), 1, 64, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE e_c_id_meas_initiation_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::e_c_id_meas_result:
-      HANDLE_CODE(c.get<e_c_id_meas_result_s>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    case types::cell_portion_id:
-      HANDLE_CODE(unpack_integer(c.get<uint16_t>(), bref, (uint16_t)0u, (uint16_t)4095u, true, true));
-      break;
-    case types::other_rat_meas_result:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<other_rat_meas_result_l>(), bref, 1, 64, true));
-      break;
-    case types::wlan_meas_result:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<wlan_meas_result_l>(), bref, 1, 64, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_initiation_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* e_c_id_meas_initiation_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..15,...)",
-                                "INTEGER (1..15,...)",
-                                "E-CID-MeasurementResult",
-                                "CriticalityDiagnostics",
-                                "INTEGER (0..4095,...)",
-                                "OtherRATMeasurementResult",
-                                "WLANMeasurementResult"};
-  return convert_enum_idx(names, 7, value, "e_c_id_meas_initiation_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<e_c_id_meas_initiation_resp_ies_o>;
 
 OCUDUASN_CODE e_c_id_meas_initiation_resp_ies_container::pack(bit_ref& bref) const
 {
@@ -2285,27 +1267,6 @@ crit_e e_c_id_meas_report_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-e_c_id_meas_report_ies_o::value_c e_c_id_meas_report_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 2:
-      ret.set(value_c::types::lmf_ue_meas_id);
-      break;
-    case 6:
-      ret.set(value_c::types::ran_ue_meas_id);
-      break;
-    case 7:
-      ret.set(value_c::types::e_c_id_meas_result);
-      break;
-    case 14:
-      ret.set(value_c::types::cell_portion_id);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e e_c_id_meas_report_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -2322,142 +1283,6 @@ presence_e e_c_id_meas_report_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void e_c_id_meas_report_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::ran_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::e_c_id_meas_result:
-      c = e_c_id_meas_result_s{};
-      break;
-    case types::cell_portion_id:
-      c = uint16_t{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_report_ies_o::value_c");
-  }
-}
-uint8_t& e_c_id_meas_report_ies_o::value_c::lmf_ue_meas_id()
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-uint8_t& e_c_id_meas_report_ies_o::value_c::ran_ue_meas_id()
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-e_c_id_meas_result_s& e_c_id_meas_report_ies_o::value_c::e_c_id_meas_result()
-{
-  assert_choice_type(types::e_c_id_meas_result, type_, "Value");
-  return c.get<e_c_id_meas_result_s>();
-}
-uint16_t& e_c_id_meas_report_ies_o::value_c::cell_portion_id()
-{
-  assert_choice_type(types::cell_portion_id, type_, "Value");
-  return c.get<uint16_t>();
-}
-const uint8_t& e_c_id_meas_report_ies_o::value_c::lmf_ue_meas_id() const
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const uint8_t& e_c_id_meas_report_ies_o::value_c::ran_ue_meas_id() const
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const e_c_id_meas_result_s& e_c_id_meas_report_ies_o::value_c::e_c_id_meas_result() const
-{
-  assert_choice_type(types::e_c_id_meas_result, type_, "Value");
-  return c.get<e_c_id_meas_result_s>();
-}
-const uint16_t& e_c_id_meas_report_ies_o::value_c::cell_portion_id() const
-{
-  assert_choice_type(types::cell_portion_id, type_, "Value");
-  return c.get<uint16_t>();
-}
-void e_c_id_meas_report_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::ran_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::e_c_id_meas_result:
-      c.get<e_c_id_meas_result_s>().to_json(j);
-      break;
-    case types::cell_portion_id:
-      j.write_int(c.get<uint16_t>());
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_report_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE e_c_id_meas_report_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::e_c_id_meas_result:
-      HANDLE_CODE(c.get<e_c_id_meas_result_s>().pack(bref));
-      break;
-    case types::cell_portion_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint16_t>(), (uint16_t)0u, (uint16_t)4095u, true, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_report_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE e_c_id_meas_report_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::e_c_id_meas_result:
-      HANDLE_CODE(c.get<e_c_id_meas_result_s>().unpack(bref));
-      break;
-    case types::cell_portion_id:
-      HANDLE_CODE(unpack_integer(c.get<uint16_t>(), bref, (uint16_t)0u, (uint16_t)4095u, true, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_report_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* e_c_id_meas_report_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {
-      "INTEGER (1..15,...)", "INTEGER (1..15,...)", "E-CID-MeasurementResult", "INTEGER (0..4095,...)"};
-  return convert_enum_idx(names, 4, value, "e_c_id_meas_report_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<e_c_id_meas_report_ies_o>;
 
 OCUDUASN_CODE e_c_id_meas_report_ies_container::pack(bit_ref& bref) const
 {
@@ -2602,21 +1427,6 @@ crit_e e_c_id_meas_termination_cmd_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-e_c_id_meas_termination_cmd_ies_o::value_c e_c_id_meas_termination_cmd_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 2:
-      ret.set(value_c::types::lmf_ue_meas_id);
-      break;
-    case 6:
-      ret.set(value_c::types::ran_ue_meas_id);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e e_c_id_meas_termination_cmd_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -2629,97 +1439,6 @@ presence_e e_c_id_meas_termination_cmd_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void e_c_id_meas_termination_cmd_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::ran_ue_meas_id:
-      c = uint8_t{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_termination_cmd_ies_o::value_c");
-  }
-}
-uint8_t& e_c_id_meas_termination_cmd_ies_o::value_c::lmf_ue_meas_id()
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-uint8_t& e_c_id_meas_termination_cmd_ies_o::value_c::ran_ue_meas_id()
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const uint8_t& e_c_id_meas_termination_cmd_ies_o::value_c::lmf_ue_meas_id() const
-{
-  assert_choice_type(types::lmf_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-const uint8_t& e_c_id_meas_termination_cmd_ies_o::value_c::ran_ue_meas_id() const
-{
-  assert_choice_type(types::ran_ue_meas_id, type_, "Value");
-  return c.get<uint8_t>();
-}
-void e_c_id_meas_termination_cmd_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::ran_ue_meas_id:
-      j.write_int(c.get<uint8_t>());
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_termination_cmd_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE e_c_id_meas_termination_cmd_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_termination_cmd_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE e_c_id_meas_termination_cmd_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    case types::ran_ue_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)1u, (uint8_t)15u, true, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "e_c_id_meas_termination_cmd_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* e_c_id_meas_termination_cmd_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..15,...)", "INTEGER (1..15,...)"};
-  return convert_enum_idx(names, 2, value, "e_c_id_meas_termination_cmd_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<e_c_id_meas_termination_cmd_ies_o>;
 
 OCUDUASN_CODE e_c_id_meas_termination_cmd_ies_container::pack(bit_ref& bref) const
 {
@@ -2826,21 +1545,6 @@ crit_e error_ind_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-error_ind_ies_o::value_c error_ind_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e error_ind_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -2853,97 +1557,6 @@ presence_e error_ind_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void error_ind_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
-  }
-}
-cause_c& error_ind_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& error_ind_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& error_ind_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& error_ind_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void error_ind_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE error_ind_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE error_ind_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* error_ind_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "error_ind_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<error_ind_ies_o>;
 
 OCUDUASN_CODE error_ind_ies_container::pack(bit_ref& bref) const
 {
@@ -3052,21 +1665,6 @@ crit_e meas_abort_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_abort_ies_o::value_c meas_abort_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 40:
-      ret.set(value_c::types::ran_meas_id);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_abort_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -3079,97 +1677,6 @@ presence_e meas_abort_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_abort_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::ran_meas_id:
-      c = uint32_t{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_abort_ies_o::value_c");
-  }
-}
-uint32_t& meas_abort_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-uint32_t& meas_abort_ies_o::value_c::ran_meas_id()
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const uint32_t& meas_abort_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const uint32_t& meas_abort_ies_o::value_c::ran_meas_id() const
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-void meas_abort_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::ran_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_abort_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_abort_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_abort_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_abort_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_abort_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_abort_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..65536,...)", "INTEGER (1..65536,...)"};
-  return convert_enum_idx(names, 2, value, "meas_abort_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_abort_ies_o>;
 
 OCUDUASN_CODE meas_abort_ies_container::pack(bit_ref& bref) const
 {
@@ -3276,21 +1783,6 @@ crit_e meas_activation_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_activation_ies_o::value_c meas_activation_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 98:
-      ret.set(value_c::types::request_type);
-      break;
-    case 88:
-      ret.set(value_c::types::prs_meass_info_list);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_activation_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -3303,101 +1795,6 @@ presence_e meas_activation_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_activation_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::request_type:
-      c = request_type_e{};
-      break;
-    case types::prs_meass_info_list:
-      c = prs_meass_info_list_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_activation_ies_o::value_c");
-  }
-}
-request_type_e& meas_activation_ies_o::value_c::request_type()
-{
-  assert_choice_type(types::request_type, type_, "Value");
-  return c.get<request_type_e>();
-}
-prs_meass_info_list_l& meas_activation_ies_o::value_c::prs_meass_info_list()
-{
-  assert_choice_type(types::prs_meass_info_list, type_, "Value");
-  return c.get<prs_meass_info_list_l>();
-}
-const request_type_e& meas_activation_ies_o::value_c::request_type() const
-{
-  assert_choice_type(types::request_type, type_, "Value");
-  return c.get<request_type_e>();
-}
-const prs_meass_info_list_l& meas_activation_ies_o::value_c::prs_meass_info_list() const
-{
-  assert_choice_type(types::prs_meass_info_list, type_, "Value");
-  return c.get<prs_meass_info_list_l>();
-}
-void meas_activation_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::request_type:
-      j.write_str(c.get<request_type_e>().to_string());
-      break;
-    case types::prs_meass_info_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<prs_meass_info_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_activation_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_activation_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::request_type:
-      HANDLE_CODE(c.get<request_type_e>().pack(bref));
-      break;
-    case types::prs_meass_info_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<prs_meass_info_list_l>(), 1, 4, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_activation_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_activation_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::request_type:
-      HANDLE_CODE(c.get<request_type_e>().unpack(bref));
-      break;
-    case types::prs_meass_info_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<prs_meass_info_list_l>(), bref, 1, 4, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_activation_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_activation_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"RequestType", "PRS-Measurements-Info-List"};
-  return convert_enum_idx(names, 2, value, "meas_activation_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_activation_ies_o>;
 
 OCUDUASN_CODE meas_activation_ies_container::pack(bit_ref& bref) const
 {
@@ -3513,24 +1910,6 @@ crit_e meas_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_fail_ies_o::value_c meas_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -3545,124 +1924,6 @@ presence_e meas_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ies_o::value_c");
-  }
-}
-uint32_t& meas_fail_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-cause_c& meas_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& meas_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const uint32_t& meas_fail_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const cause_c& meas_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& meas_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void meas_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..65536,...)", "Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 3, value, "meas_fail_ies_o::value_c::types");
-}
-uint8_t meas_fail_ies_o::value_c::types_opts::to_number() const
-{
-  static const uint8_t numbers[] = {1};
-  return map_enum_number(numbers, 1, value, "meas_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_fail_ies_o>;
 
 OCUDUASN_CODE meas_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -3793,24 +2054,6 @@ crit_e meas_fail_ind_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_fail_ind_ies_o::value_c meas_fail_ind_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 40:
-      ret.set(value_c::types::ran_meas_id);
-      break;
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_fail_ind_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -3825,119 +2068,6 @@ presence_e meas_fail_ind_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_fail_ind_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::ran_meas_id:
-      c = uint32_t{};
-      break;
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ind_ies_o::value_c");
-  }
-}
-uint32_t& meas_fail_ind_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-uint32_t& meas_fail_ind_ies_o::value_c::ran_meas_id()
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-cause_c& meas_fail_ind_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const uint32_t& meas_fail_ind_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const uint32_t& meas_fail_ind_ies_o::value_c::ran_meas_id() const
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const cause_c& meas_fail_ind_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-void meas_fail_ind_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::ran_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ind_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_fail_ind_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ind_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_fail_ind_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_fail_ind_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_fail_ind_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..65536,...)", "INTEGER (1..65536,...)", "Cause"};
-  return convert_enum_idx(names, 3, value, "meas_fail_ind_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_fail_ind_ies_o>;
 
 OCUDUASN_CODE meas_fail_ind_ies_container::pack(bit_ref& bref) const
 {
@@ -4062,21 +2192,6 @@ crit_e meas_precfg_confirm_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_precfg_confirm_ies_o::value_c meas_precfg_confirm_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 97:
-      ret.set(value_c::types::precfg_result);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_precfg_confirm_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -4089,97 +2204,6 @@ presence_e meas_precfg_confirm_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_precfg_confirm_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::precfg_result:
-      c = fixed_bitstring<8, false, true>{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_confirm_ies_o::value_c");
-  }
-}
-fixed_bitstring<8, false, true>& meas_precfg_confirm_ies_o::value_c::precfg_result()
-{
-  assert_choice_type(types::precfg_result, type_, "Value");
-  return c.get<fixed_bitstring<8, false, true>>();
-}
-crit_diagnostics_s& meas_precfg_confirm_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const fixed_bitstring<8, false, true>& meas_precfg_confirm_ies_o::value_c::precfg_result() const
-{
-  assert_choice_type(types::precfg_result, type_, "Value");
-  return c.get<fixed_bitstring<8, false, true>>();
-}
-const crit_diagnostics_s& meas_precfg_confirm_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void meas_precfg_confirm_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::precfg_result:
-      c.get<fixed_bitstring<8, false, true>>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_confirm_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_precfg_confirm_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::precfg_result:
-      HANDLE_CODE((c.get<fixed_bitstring<8, false, true>>().pack(bref)));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_confirm_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_precfg_confirm_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::precfg_result:
-      HANDLE_CODE((c.get<fixed_bitstring<8, false, true>>().unpack(bref)));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_confirm_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_precfg_confirm_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"BIT STRING", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "meas_precfg_confirm_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_precfg_confirm_ies_o>;
 
 OCUDUASN_CODE meas_precfg_confirm_ies_container::pack(bit_ref& bref) const
 {
@@ -4291,21 +2315,6 @@ crit_e meas_precfg_refuse_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_precfg_refuse_ies_o::value_c meas_precfg_refuse_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_precfg_refuse_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -4318,97 +2327,6 @@ presence_e meas_precfg_refuse_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_precfg_refuse_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_refuse_ies_o::value_c");
-  }
-}
-cause_c& meas_precfg_refuse_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& meas_precfg_refuse_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& meas_precfg_refuse_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& meas_precfg_refuse_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void meas_precfg_refuse_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_refuse_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_precfg_refuse_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_refuse_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_precfg_refuse_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_precfg_refuse_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_precfg_refuse_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "meas_precfg_refuse_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_precfg_refuse_ies_o>;
 
 OCUDUASN_CODE meas_precfg_refuse_ies_container::pack(bit_ref& bref) const
 {
@@ -4510,14 +2428,6 @@ crit_e meas_precfg_required_ies_o::get_crit(const uint32_t& id)
   asn1::log_error("The id={} is not recognized", id);
   return {};
 }
-meas_precfg_required_ies_o::value_c meas_precfg_required_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  if (id != 87) {
-    asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_precfg_required_ies_o::get_presence(const uint32_t& id)
 {
   if (id == 87) {
@@ -4527,32 +2437,67 @@ presence_e meas_precfg_required_ies_o::get_presence(const uint32_t& id)
   return {};
 }
 
-// Value ::= OPEN TYPE
-void meas_precfg_required_ies_o::value_c::to_json(json_writer& j) const
+OCUDUASN_CODE meas_precfg_required_ies_container::pack(bit_ref& bref) const
 {
-  j.start_array("");
-  for (const auto& e1 : c) {
+  uint32_t nof_ies = 1;
+  HANDLE_CODE(pack_length(bref, nof_ies, 0u, 65535u, true));
+
+  {
+    HANDLE_CODE(pack_integer(bref, (uint32_t)87, (uint32_t)0u, (uint32_t)65535u, false, true));
+    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
+    varlength_field_pack_guard varlen_scope(bref, true);
+    HANDLE_CODE(pack_dyn_seq_of(bref, trp_prs_info_list, 1, 256, true));
+  }
+
+  return OCUDUASN_SUCCESS;
+}
+OCUDUASN_CODE meas_precfg_required_ies_container::unpack(cbit_ref& bref)
+{
+  uint32_t nof_ies = 0;
+  HANDLE_CODE(unpack_length(nof_ies, bref, 0u, 65535u, true));
+
+  uint32_t nof_mandatory_ies = 1;
+
+  for (; nof_ies > 0; --nof_ies) {
+    uint32_t id;
+    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
+    crit_e crit;
+    HANDLE_CODE(crit.unpack(bref));
+    if (crit != meas_precfg_required_ies_o::get_crit(id)) {
+      asn1::log_warning("Unpacked crit does not match object set definition");
+    }
+
+    if (id == 87) {
+      {
+        nof_mandatory_ies--;
+        varlength_field_unpack_guard varlen_scope(bref, true);
+        HANDLE_CODE(unpack_dyn_seq_of(trp_prs_info_list, bref, 1, 256, true));
+      }
+    } else {
+      HANDLE_CODE(skip_ignored_ie(bref, crit, id));
+      break;
+    }
+  }
+  if (nof_mandatory_ies > 0) {
+    asn1::log_error("Mandatory fields are missing\n");
+
+    return OCUDUASN_ERROR_DECODE_FAIL;
+  }
+  return OCUDUASN_SUCCESS;
+}
+void meas_precfg_required_ies_container::to_json(json_writer& j) const
+{
+  j.start_array();
+  j.start_obj();
+  j.write_int("id", 87);
+  j.write_str("criticality", "ignore");
+  j.start_array("value");
+  for (const auto& e1 : trp_prs_info_list) {
     e1.to_json(j);
   }
   j.end_array();
-}
-OCUDUASN_CODE meas_precfg_required_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  HANDLE_CODE(pack_dyn_seq_of(bref, c, 1, 256, true));
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_precfg_required_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  HANDLE_CODE(unpack_dyn_seq_of(c, bref, 1, 256, true));
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_precfg_required_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"TRP-PRS-Information-List"};
-  return convert_enum_idx(names, 1, value, "meas_precfg_required_ies_o::value_c::types");
+  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementReport-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -4585,24 +2530,6 @@ crit_e meas_report_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_report_ies_o::value_c meas_report_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 40:
-      ret.set(value_c::types::ran_meas_id);
-      break;
-    case 43:
-      ret.set(value_c::types::trp_meas_report_list);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_report_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -4617,123 +2544,6 @@ presence_e meas_report_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_report_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::ran_meas_id:
-      c = uint32_t{};
-      break;
-    case types::trp_meas_report_list:
-      c = trp_meas_resp_list_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_report_ies_o::value_c");
-  }
-}
-uint32_t& meas_report_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-uint32_t& meas_report_ies_o::value_c::ran_meas_id()
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-trp_meas_resp_list_l& meas_report_ies_o::value_c::trp_meas_report_list()
-{
-  assert_choice_type(types::trp_meas_report_list, type_, "Value");
-  return c.get<trp_meas_resp_list_l>();
-}
-const uint32_t& meas_report_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const uint32_t& meas_report_ies_o::value_c::ran_meas_id() const
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const trp_meas_resp_list_l& meas_report_ies_o::value_c::trp_meas_report_list() const
-{
-  assert_choice_type(types::trp_meas_report_list, type_, "Value");
-  return c.get<trp_meas_resp_list_l>();
-}
-void meas_report_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::ran_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::trp_meas_report_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_meas_resp_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_report_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_report_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::trp_meas_report_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_meas_resp_list_l>(), 1, 64, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_report_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_report_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::trp_meas_report_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_meas_resp_list_l>(), bref, 1, 64, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_report_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_report_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..65536,...)", "INTEGER (1..65536,...)", "TRP-MeasurementResponseList"};
-  return convert_enum_idx(names, 3, value, "meas_report_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_report_ies_o>;
 
 OCUDUASN_CODE meas_report_ies_container::pack(bit_ref& bref) const
 {
@@ -4889,63 +2699,6 @@ crit_e meas_request_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_request_ies_o::value_c meas_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 41:
-      ret.set(value_c::types::trp_meas_request_list);
-      break;
-    case 3:
-      ret.set(value_c::types::report_characteristics);
-      break;
-    case 4:
-      ret.set(value_c::types::meas_periodicity);
-      break;
-    case 52:
-      ret.set(value_c::types::trp_meas_quantities);
-      break;
-    case 54:
-      ret.set(value_c::types::sfn_initisation_time);
-      break;
-    case 26:
-      ret.set(value_c::types::srs_cfg);
-      break;
-    case 31:
-      ret.set(value_c::types::meas_beam_info_request);
-      break;
-    case 49:
-      ret.set(value_c::types::sys_frame_num);
-      break;
-    case 50:
-      ret.set(value_c::types::slot_num);
-      break;
-    case 64:
-      ret.set(value_c::types::meas_periodicity_extended);
-      break;
-    case 72:
-      ret.set(value_c::types::resp_time);
-      break;
-    case 92:
-      ret.set(value_c::types::meas_characteristics_request_ind);
-      break;
-    case 91:
-      ret.set(value_c::types::meas_time_occasion);
-      break;
-    case 95:
-      ret.set(value_c::types::meas_amount);
-      break;
-    case 125:
-      ret.set(value_c::types::time_win_info_meas_list);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_request_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -4986,432 +2739,6 @@ presence_e meas_request_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_request_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::trp_meas_request_list:
-      c = trp_meas_request_list_l{};
-      break;
-    case types::report_characteristics:
-      c = report_characteristics_e{};
-      break;
-    case types::meas_periodicity:
-      c = meas_periodicity_e{};
-      break;
-    case types::trp_meas_quantities:
-      c = trp_meas_quantities_l{};
-      break;
-    case types::sfn_initisation_time:
-      c = fixed_bitstring<64, false, true>{};
-      break;
-    case types::srs_cfg:
-      c = srs_configuration_s{};
-      break;
-    case types::meas_beam_info_request:
-      c = meas_beam_info_request_e{};
-      break;
-    case types::sys_frame_num:
-      c = uint16_t{};
-      break;
-    case types::slot_num:
-      c = uint8_t{};
-      break;
-    case types::meas_periodicity_extended:
-      c = meas_periodicity_extended_e{};
-      break;
-    case types::resp_time:
-      c = resp_time_s{};
-      break;
-    case types::meas_characteristics_request_ind:
-      c = fixed_bitstring<16, false, true>{};
-      break;
-    case types::meas_time_occasion:
-      c = meas_time_occasion_e{};
-      break;
-    case types::meas_amount:
-      c = meas_amount_e{};
-      break;
-    case types::time_win_info_meas_list:
-      c = time_win_info_meas_list_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_request_ies_o::value_c");
-  }
-}
-uint32_t& meas_request_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-trp_meas_request_list_l& meas_request_ies_o::value_c::trp_meas_request_list()
-{
-  assert_choice_type(types::trp_meas_request_list, type_, "Value");
-  return c.get<trp_meas_request_list_l>();
-}
-report_characteristics_e& meas_request_ies_o::value_c::report_characteristics()
-{
-  assert_choice_type(types::report_characteristics, type_, "Value");
-  return c.get<report_characteristics_e>();
-}
-meas_periodicity_e& meas_request_ies_o::value_c::meas_periodicity()
-{
-  assert_choice_type(types::meas_periodicity, type_, "Value");
-  return c.get<meas_periodicity_e>();
-}
-trp_meas_quantities_l& meas_request_ies_o::value_c::trp_meas_quantities()
-{
-  assert_choice_type(types::trp_meas_quantities, type_, "Value");
-  return c.get<trp_meas_quantities_l>();
-}
-fixed_bitstring<64, false, true>& meas_request_ies_o::value_c::sfn_initisation_time()
-{
-  assert_choice_type(types::sfn_initisation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-srs_configuration_s& meas_request_ies_o::value_c::srs_cfg()
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-meas_beam_info_request_e& meas_request_ies_o::value_c::meas_beam_info_request()
-{
-  assert_choice_type(types::meas_beam_info_request, type_, "Value");
-  return c.get<meas_beam_info_request_e>();
-}
-uint16_t& meas_request_ies_o::value_c::sys_frame_num()
-{
-  assert_choice_type(types::sys_frame_num, type_, "Value");
-  return c.get<uint16_t>();
-}
-uint8_t& meas_request_ies_o::value_c::slot_num()
-{
-  assert_choice_type(types::slot_num, type_, "Value");
-  return c.get<uint8_t>();
-}
-meas_periodicity_extended_e& meas_request_ies_o::value_c::meas_periodicity_extended()
-{
-  assert_choice_type(types::meas_periodicity_extended, type_, "Value");
-  return c.get<meas_periodicity_extended_e>();
-}
-resp_time_s& meas_request_ies_o::value_c::resp_time()
-{
-  assert_choice_type(types::resp_time, type_, "Value");
-  return c.get<resp_time_s>();
-}
-fixed_bitstring<16, false, true>& meas_request_ies_o::value_c::meas_characteristics_request_ind()
-{
-  assert_choice_type(types::meas_characteristics_request_ind, type_, "Value");
-  return c.get<fixed_bitstring<16, false, true>>();
-}
-meas_time_occasion_e& meas_request_ies_o::value_c::meas_time_occasion()
-{
-  assert_choice_type(types::meas_time_occasion, type_, "Value");
-  return c.get<meas_time_occasion_e>();
-}
-meas_amount_e& meas_request_ies_o::value_c::meas_amount()
-{
-  assert_choice_type(types::meas_amount, type_, "Value");
-  return c.get<meas_amount_e>();
-}
-time_win_info_meas_list_l& meas_request_ies_o::value_c::time_win_info_meas_list()
-{
-  assert_choice_type(types::time_win_info_meas_list, type_, "Value");
-  return c.get<time_win_info_meas_list_l>();
-}
-const uint32_t& meas_request_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const trp_meas_request_list_l& meas_request_ies_o::value_c::trp_meas_request_list() const
-{
-  assert_choice_type(types::trp_meas_request_list, type_, "Value");
-  return c.get<trp_meas_request_list_l>();
-}
-const report_characteristics_e& meas_request_ies_o::value_c::report_characteristics() const
-{
-  assert_choice_type(types::report_characteristics, type_, "Value");
-  return c.get<report_characteristics_e>();
-}
-const meas_periodicity_e& meas_request_ies_o::value_c::meas_periodicity() const
-{
-  assert_choice_type(types::meas_periodicity, type_, "Value");
-  return c.get<meas_periodicity_e>();
-}
-const trp_meas_quantities_l& meas_request_ies_o::value_c::trp_meas_quantities() const
-{
-  assert_choice_type(types::trp_meas_quantities, type_, "Value");
-  return c.get<trp_meas_quantities_l>();
-}
-const fixed_bitstring<64, false, true>& meas_request_ies_o::value_c::sfn_initisation_time() const
-{
-  assert_choice_type(types::sfn_initisation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-const srs_configuration_s& meas_request_ies_o::value_c::srs_cfg() const
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-const meas_beam_info_request_e& meas_request_ies_o::value_c::meas_beam_info_request() const
-{
-  assert_choice_type(types::meas_beam_info_request, type_, "Value");
-  return c.get<meas_beam_info_request_e>();
-}
-const uint16_t& meas_request_ies_o::value_c::sys_frame_num() const
-{
-  assert_choice_type(types::sys_frame_num, type_, "Value");
-  return c.get<uint16_t>();
-}
-const uint8_t& meas_request_ies_o::value_c::slot_num() const
-{
-  assert_choice_type(types::slot_num, type_, "Value");
-  return c.get<uint8_t>();
-}
-const meas_periodicity_extended_e& meas_request_ies_o::value_c::meas_periodicity_extended() const
-{
-  assert_choice_type(types::meas_periodicity_extended, type_, "Value");
-  return c.get<meas_periodicity_extended_e>();
-}
-const resp_time_s& meas_request_ies_o::value_c::resp_time() const
-{
-  assert_choice_type(types::resp_time, type_, "Value");
-  return c.get<resp_time_s>();
-}
-const fixed_bitstring<16, false, true>& meas_request_ies_o::value_c::meas_characteristics_request_ind() const
-{
-  assert_choice_type(types::meas_characteristics_request_ind, type_, "Value");
-  return c.get<fixed_bitstring<16, false, true>>();
-}
-const meas_time_occasion_e& meas_request_ies_o::value_c::meas_time_occasion() const
-{
-  assert_choice_type(types::meas_time_occasion, type_, "Value");
-  return c.get<meas_time_occasion_e>();
-}
-const meas_amount_e& meas_request_ies_o::value_c::meas_amount() const
-{
-  assert_choice_type(types::meas_amount, type_, "Value");
-  return c.get<meas_amount_e>();
-}
-const time_win_info_meas_list_l& meas_request_ies_o::value_c::time_win_info_meas_list() const
-{
-  assert_choice_type(types::time_win_info_meas_list, type_, "Value");
-  return c.get<time_win_info_meas_list_l>();
-}
-void meas_request_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::trp_meas_request_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_meas_request_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::report_characteristics:
-      j.write_str(c.get<report_characteristics_e>().to_string());
-      break;
-    case types::meas_periodicity:
-      j.write_str(c.get<meas_periodicity_e>().to_string());
-      break;
-    case types::trp_meas_quantities:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_meas_quantities_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::sfn_initisation_time:
-      c.get<fixed_bitstring<64, false, true>>().to_json(j);
-      break;
-    case types::srs_cfg:
-      c.get<srs_configuration_s>().to_json(j);
-      break;
-    case types::meas_beam_info_request:
-      j.write_str("true");
-      break;
-    case types::sys_frame_num:
-      j.write_int(c.get<uint16_t>());
-      break;
-    case types::slot_num:
-      j.write_int(c.get<uint8_t>());
-      break;
-    case types::meas_periodicity_extended:
-      j.write_str(c.get<meas_periodicity_extended_e>().to_string());
-      break;
-    case types::resp_time:
-      c.get<resp_time_s>().to_json(j);
-      break;
-    case types::meas_characteristics_request_ind:
-      c.get<fixed_bitstring<16, false, true>>().to_json(j);
-      break;
-    case types::meas_time_occasion:
-      j.write_str(c.get<meas_time_occasion_e>().to_string());
-      break;
-    case types::meas_amount:
-      j.write_str(c.get<meas_amount_e>().to_string());
-      break;
-    case types::time_win_info_meas_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<time_win_info_meas_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_request_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::trp_meas_request_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_meas_request_list_l>(), 1, 64, true));
-      break;
-    case types::report_characteristics:
-      HANDLE_CODE(c.get<report_characteristics_e>().pack(bref));
-      break;
-    case types::meas_periodicity:
-      HANDLE_CODE(c.get<meas_periodicity_e>().pack(bref));
-      break;
-    case types::trp_meas_quantities:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_meas_quantities_l>(), 1, 16384, true));
-      break;
-    case types::sfn_initisation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().pack(bref)));
-      break;
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().pack(bref));
-      break;
-    case types::meas_beam_info_request:
-      HANDLE_CODE(c.get<meas_beam_info_request_e>().pack(bref));
-      break;
-    case types::sys_frame_num:
-      HANDLE_CODE(pack_integer(bref, c.get<uint16_t>(), (uint16_t)0u, (uint16_t)1023u, false, true));
-      break;
-    case types::slot_num:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)0u, (uint8_t)79u, false, true));
-      break;
-    case types::meas_periodicity_extended:
-      HANDLE_CODE(c.get<meas_periodicity_extended_e>().pack(bref));
-      break;
-    case types::resp_time:
-      HANDLE_CODE(c.get<resp_time_s>().pack(bref));
-      break;
-    case types::meas_characteristics_request_ind:
-      HANDLE_CODE((c.get<fixed_bitstring<16, false, true>>().pack(bref)));
-      break;
-    case types::meas_time_occasion:
-      HANDLE_CODE(c.get<meas_time_occasion_e>().pack(bref));
-      break;
-    case types::meas_amount:
-      HANDLE_CODE(c.get<meas_amount_e>().pack(bref));
-      break;
-    case types::time_win_info_meas_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<time_win_info_meas_list_l>(), 1, 16, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_request_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::trp_meas_request_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_meas_request_list_l>(), bref, 1, 64, true));
-      break;
-    case types::report_characteristics:
-      HANDLE_CODE(c.get<report_characteristics_e>().unpack(bref));
-      break;
-    case types::meas_periodicity:
-      HANDLE_CODE(c.get<meas_periodicity_e>().unpack(bref));
-      break;
-    case types::trp_meas_quantities:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_meas_quantities_l>(), bref, 1, 16384, true));
-      break;
-    case types::sfn_initisation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().unpack(bref)));
-      break;
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().unpack(bref));
-      break;
-    case types::meas_beam_info_request:
-      HANDLE_CODE(c.get<meas_beam_info_request_e>().unpack(bref));
-      break;
-    case types::sys_frame_num:
-      HANDLE_CODE(unpack_integer(c.get<uint16_t>(), bref, (uint16_t)0u, (uint16_t)1023u, false, true));
-      break;
-    case types::slot_num:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)0u, (uint8_t)79u, false, true));
-      break;
-    case types::meas_periodicity_extended:
-      HANDLE_CODE(c.get<meas_periodicity_extended_e>().unpack(bref));
-      break;
-    case types::resp_time:
-      HANDLE_CODE(c.get<resp_time_s>().unpack(bref));
-      break;
-    case types::meas_characteristics_request_ind:
-      HANDLE_CODE((c.get<fixed_bitstring<16, false, true>>().unpack(bref)));
-      break;
-    case types::meas_time_occasion:
-      HANDLE_CODE(c.get<meas_time_occasion_e>().unpack(bref));
-      break;
-    case types::meas_amount:
-      HANDLE_CODE(c.get<meas_amount_e>().unpack(bref));
-      break;
-    case types::time_win_info_meas_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<time_win_info_meas_list_l>(), bref, 1, 16, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_request_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..65536,...)",
-                                "TRP-MeasurementRequestList",
-                                "ReportCharacteristics",
-                                "MeasurementPeriodicity",
-                                "TRPMeasurementQuantities",
-                                "BIT STRING",
-                                "SRSConfiguration",
-                                "MeasurementBeamInfoRequest",
-                                "INTEGER (0..1023)",
-                                "INTEGER (0..79)",
-                                "MeasurementPeriodicityExtended",
-                                "ResponseTime",
-                                "BIT STRING",
-                                "MeasurementTimeOccasion",
-                                "MeasurementAmount",
-                                "TimeWindowInformation-Measurement-List"};
-  return convert_enum_idx(names, 16, value, "meas_request_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_request_ies_o>;
 
 OCUDUASN_CODE meas_request_ies_container::pack(bit_ref& bref) const
 {
@@ -5812,27 +3139,6 @@ crit_e meas_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_resp_ies_o::value_c meas_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 40:
-      ret.set(value_c::types::ran_meas_id);
-      break;
-    case 42:
-      ret.set(value_c::types::trp_meas_resp_list);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -5849,146 +3155,6 @@ presence_e meas_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::ran_meas_id:
-      c = uint32_t{};
-      break;
-    case types::trp_meas_resp_list:
-      c = trp_meas_resp_list_l{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_resp_ies_o::value_c");
-  }
-}
-uint32_t& meas_resp_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-uint32_t& meas_resp_ies_o::value_c::ran_meas_id()
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-trp_meas_resp_list_l& meas_resp_ies_o::value_c::trp_meas_resp_list()
-{
-  assert_choice_type(types::trp_meas_resp_list, type_, "Value");
-  return c.get<trp_meas_resp_list_l>();
-}
-crit_diagnostics_s& meas_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const uint32_t& meas_resp_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const uint32_t& meas_resp_ies_o::value_c::ran_meas_id() const
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const trp_meas_resp_list_l& meas_resp_ies_o::value_c::trp_meas_resp_list() const
-{
-  assert_choice_type(types::trp_meas_resp_list, type_, "Value");
-  return c.get<trp_meas_resp_list_l>();
-}
-const crit_diagnostics_s& meas_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void meas_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::ran_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::trp_meas_resp_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_meas_resp_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::trp_meas_resp_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_meas_resp_list_l>(), 1, 64, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::trp_meas_resp_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_meas_resp_list_l>(), bref, 1, 64, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {
-      "INTEGER (1..65536,...)", "INTEGER (1..65536,...)", "TRP-MeasurementResponseList", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 4, value, "meas_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_resp_ies_o>;
 
 OCUDUASN_CODE meas_resp_ies_container::pack(bit_ref& bref) const
 {
@@ -6148,33 +3314,6 @@ crit_e meas_upd_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-meas_upd_ies_o::value_c meas_upd_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 39:
-      ret.set(value_c::types::lmf_meas_id);
-      break;
-    case 40:
-      ret.set(value_c::types::ran_meas_id);
-      break;
-    case 26:
-      ret.set(value_c::types::srs_cfg);
-      break;
-    case 70:
-      ret.set(value_c::types::trp_meas_upd_list);
-      break;
-    case 92:
-      ret.set(value_c::types::meas_characteristics_request_ind);
-      break;
-    case 91:
-      ret.set(value_c::types::meas_time_occasion);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e meas_upd_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -6195,194 +3334,6 @@ presence_e meas_upd_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void meas_upd_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::lmf_meas_id:
-      c = uint32_t{};
-      break;
-    case types::ran_meas_id:
-      c = uint32_t{};
-      break;
-    case types::srs_cfg:
-      c = srs_configuration_s{};
-      break;
-    case types::trp_meas_upd_list:
-      c = trp_meas_upd_list_l{};
-      break;
-    case types::meas_characteristics_request_ind:
-      c = fixed_bitstring<16, false, true>{};
-      break;
-    case types::meas_time_occasion:
-      c = meas_time_occasion_e{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_upd_ies_o::value_c");
-  }
-}
-uint32_t& meas_upd_ies_o::value_c::lmf_meas_id()
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-uint32_t& meas_upd_ies_o::value_c::ran_meas_id()
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-srs_configuration_s& meas_upd_ies_o::value_c::srs_cfg()
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-trp_meas_upd_list_l& meas_upd_ies_o::value_c::trp_meas_upd_list()
-{
-  assert_choice_type(types::trp_meas_upd_list, type_, "Value");
-  return c.get<trp_meas_upd_list_l>();
-}
-fixed_bitstring<16, false, true>& meas_upd_ies_o::value_c::meas_characteristics_request_ind()
-{
-  assert_choice_type(types::meas_characteristics_request_ind, type_, "Value");
-  return c.get<fixed_bitstring<16, false, true>>();
-}
-meas_time_occasion_e& meas_upd_ies_o::value_c::meas_time_occasion()
-{
-  assert_choice_type(types::meas_time_occasion, type_, "Value");
-  return c.get<meas_time_occasion_e>();
-}
-const uint32_t& meas_upd_ies_o::value_c::lmf_meas_id() const
-{
-  assert_choice_type(types::lmf_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const uint32_t& meas_upd_ies_o::value_c::ran_meas_id() const
-{
-  assert_choice_type(types::ran_meas_id, type_, "Value");
-  return c.get<uint32_t>();
-}
-const srs_configuration_s& meas_upd_ies_o::value_c::srs_cfg() const
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-const trp_meas_upd_list_l& meas_upd_ies_o::value_c::trp_meas_upd_list() const
-{
-  assert_choice_type(types::trp_meas_upd_list, type_, "Value");
-  return c.get<trp_meas_upd_list_l>();
-}
-const fixed_bitstring<16, false, true>& meas_upd_ies_o::value_c::meas_characteristics_request_ind() const
-{
-  assert_choice_type(types::meas_characteristics_request_ind, type_, "Value");
-  return c.get<fixed_bitstring<16, false, true>>();
-}
-const meas_time_occasion_e& meas_upd_ies_o::value_c::meas_time_occasion() const
-{
-  assert_choice_type(types::meas_time_occasion, type_, "Value");
-  return c.get<meas_time_occasion_e>();
-}
-void meas_upd_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::lmf_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::ran_meas_id:
-      j.write_int(c.get<uint32_t>());
-      break;
-    case types::srs_cfg:
-      c.get<srs_configuration_s>().to_json(j);
-      break;
-    case types::trp_meas_upd_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_meas_upd_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::meas_characteristics_request_ind:
-      c.get<fixed_bitstring<16, false, true>>().to_json(j);
-      break;
-    case types::meas_time_occasion:
-      j.write_str(c.get<meas_time_occasion_e>().to_string());
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_upd_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE meas_upd_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(pack_integer(bref, c.get<uint32_t>(), (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().pack(bref));
-      break;
-    case types::trp_meas_upd_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_meas_upd_list_l>(), 1, 64, true));
-      break;
-    case types::meas_characteristics_request_ind:
-      HANDLE_CODE((c.get<fixed_bitstring<16, false, true>>().pack(bref)));
-      break;
-    case types::meas_time_occasion:
-      HANDLE_CODE(c.get<meas_time_occasion_e>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_upd_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE meas_upd_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::lmf_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::ran_meas_id:
-      HANDLE_CODE(unpack_integer(c.get<uint32_t>(), bref, (uint32_t)1u, (uint32_t)65536u, true, true));
-      break;
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().unpack(bref));
-      break;
-    case types::trp_meas_upd_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_meas_upd_list_l>(), bref, 1, 64, true));
-      break;
-    case types::meas_characteristics_request_ind:
-      HANDLE_CODE((c.get<fixed_bitstring<16, false, true>>().unpack(bref)));
-      break;
-    case types::meas_time_occasion:
-      HANDLE_CODE(c.get<meas_time_occasion_e>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "meas_upd_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* meas_upd_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"INTEGER (1..65536,...)",
-                                "INTEGER (1..65536,...)",
-                                "SRSConfiguration",
-                                "TRP-MeasurementUpdateList",
-                                "BIT STRING",
-                                "MeasurementTimeOccasion"};
-  return convert_enum_idx(names, 6, value, "meas_upd_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<meas_upd_ies_o>;
 
 OCUDUASN_CODE meas_upd_ies_container::pack(bit_ref& bref) const
 {
@@ -6675,21 +3626,6 @@ crit_e otdoa_info_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-otdoa_info_fail_ies_o::value_c otdoa_info_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e otdoa_info_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -6702,97 +3638,6 @@ presence_e otdoa_info_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void otdoa_info_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_fail_ies_o::value_c");
-  }
-}
-cause_c& otdoa_info_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& otdoa_info_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& otdoa_info_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& otdoa_info_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void otdoa_info_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE otdoa_info_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE otdoa_info_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* otdoa_info_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "otdoa_info_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<otdoa_info_fail_ies_o>;
 
 OCUDUASN_CODE otdoa_info_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -6894,14 +3739,6 @@ crit_e otdoa_info_request_ies_o::get_crit(const uint32_t& id)
   asn1::log_error("The id={} is not recognized", id);
   return {};
 }
-otdoa_info_request_ies_o::value_c otdoa_info_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  if (id != 9) {
-    asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e otdoa_info_request_ies_o::get_presence(const uint32_t& id)
 {
   if (id == 9) {
@@ -6911,32 +3748,67 @@ presence_e otdoa_info_request_ies_o::get_presence(const uint32_t& id)
   return {};
 }
 
-// Value ::= OPEN TYPE
-void otdoa_info_request_ies_o::value_c::to_json(json_writer& j) const
+OCUDUASN_CODE otdoa_info_request_ies_container::pack(bit_ref& bref) const
 {
-  j.start_array("");
-  for (const auto& e1 : c) {
+  uint32_t nof_ies = 1;
+  HANDLE_CODE(pack_length(bref, nof_ies, 0u, 65535u, true));
+
+  {
+    HANDLE_CODE(pack_integer(bref, (uint32_t)9, (uint32_t)0u, (uint32_t)65535u, false, true));
+    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
+    varlength_field_pack_guard varlen_scope(bref, true);
+    HANDLE_CODE(pack_dyn_seq_of(bref, otdoa_info_type_group, 1, 63, true));
+  }
+
+  return OCUDUASN_SUCCESS;
+}
+OCUDUASN_CODE otdoa_info_request_ies_container::unpack(cbit_ref& bref)
+{
+  uint32_t nof_ies = 0;
+  HANDLE_CODE(unpack_length(nof_ies, bref, 0u, 65535u, true));
+
+  uint32_t nof_mandatory_ies = 1;
+
+  for (; nof_ies > 0; --nof_ies) {
+    uint32_t id;
+    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
+    crit_e crit;
+    HANDLE_CODE(crit.unpack(bref));
+    if (crit != otdoa_info_request_ies_o::get_crit(id)) {
+      asn1::log_warning("Unpacked crit does not match object set definition");
+    }
+
+    if (id == 9) {
+      {
+        nof_mandatory_ies--;
+        varlength_field_unpack_guard varlen_scope(bref, true);
+        HANDLE_CODE(unpack_dyn_seq_of(otdoa_info_type_group, bref, 1, 63, true));
+      }
+    } else {
+      HANDLE_CODE(skip_ignored_ie(bref, crit, id));
+      break;
+    }
+  }
+  if (nof_mandatory_ies > 0) {
+    asn1::log_error("Mandatory fields are missing\n");
+
+    return OCUDUASN_ERROR_DECODE_FAIL;
+  }
+  return OCUDUASN_SUCCESS;
+}
+void otdoa_info_request_ies_container::to_json(json_writer& j) const
+{
+  j.start_array();
+  j.start_obj();
+  j.write_int("id", 9);
+  j.write_str("criticality", "reject");
+  j.start_array("value");
+  for (const auto& e1 : otdoa_info_type_group) {
     e1.to_json(j);
   }
   j.end_array();
-}
-OCUDUASN_CODE otdoa_info_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  HANDLE_CODE(pack_dyn_seq_of(bref, c, 1, 63, true));
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE otdoa_info_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  HANDLE_CODE(unpack_dyn_seq_of(c, bref, 1, 63, true));
-  return OCUDUASN_SUCCESS;
-}
-
-const char* otdoa_info_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"OTDOA-Information-Type"};
-  return convert_enum_idx(names, 1, value, "otdoa_info_request_ies_o::value_c::types");
+  j.end_obj();
+  j.end_array();
 }
 
 // OTDOAInformationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -6967,21 +3839,6 @@ crit_e otdoa_info_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-otdoa_info_resp_ies_o::value_c otdoa_info_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 8:
-      ret.set(value_c::types::otdoa_cells);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e otdoa_info_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -6994,101 +3851,6 @@ presence_e otdoa_info_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void otdoa_info_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::otdoa_cells:
-      c = otdoa_cells_l{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_resp_ies_o::value_c");
-  }
-}
-otdoa_cells_l& otdoa_info_resp_ies_o::value_c::otdoa_cells()
-{
-  assert_choice_type(types::otdoa_cells, type_, "Value");
-  return c.get<otdoa_cells_l>();
-}
-crit_diagnostics_s& otdoa_info_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const otdoa_cells_l& otdoa_info_resp_ies_o::value_c::otdoa_cells() const
-{
-  assert_choice_type(types::otdoa_cells, type_, "Value");
-  return c.get<otdoa_cells_l>();
-}
-const crit_diagnostics_s& otdoa_info_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void otdoa_info_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::otdoa_cells:
-      j.start_array("");
-      for (const auto& e1 : c.get<otdoa_cells_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE otdoa_info_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::otdoa_cells:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<otdoa_cells_l>(), 1, 3840, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE otdoa_info_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::otdoa_cells:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<otdoa_cells_l>(), bref, 1, 3840, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "otdoa_info_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* otdoa_info_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"OTDOACells", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "otdoa_info_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<otdoa_info_resp_ies_o>;
 
 OCUDUASN_CODE otdoa_info_resp_ies_container::pack(bit_ref& bref) const
 {
@@ -7203,21 +3965,6 @@ crit_e prs_cfg_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-prs_cfg_fail_ies_o::value_c prs_cfg_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e prs_cfg_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -7230,97 +3977,6 @@ presence_e prs_cfg_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void prs_cfg_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_fail_ies_o::value_c");
-  }
-}
-cause_c& prs_cfg_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& prs_cfg_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& prs_cfg_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& prs_cfg_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void prs_cfg_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE prs_cfg_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE prs_cfg_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* prs_cfg_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "prs_cfg_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<prs_cfg_fail_ies_o>;
 
 OCUDUASN_CODE prs_cfg_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -7432,21 +4088,6 @@ crit_e prs_cfg_request_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-prs_cfg_request_ies_o::value_c prs_cfg_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 89:
-      ret.set(value_c::types::prs_cfg_request_type);
-      break;
-    case 66:
-      ret.set(value_c::types::prstrp_list);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e prs_cfg_request_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -7459,101 +4100,6 @@ presence_e prs_cfg_request_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void prs_cfg_request_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::prs_cfg_request_type:
-      c = prs_cfg_request_type_e{};
-      break;
-    case types::prstrp_list:
-      c = prstrp_list_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_request_ies_o::value_c");
-  }
-}
-prs_cfg_request_type_e& prs_cfg_request_ies_o::value_c::prs_cfg_request_type()
-{
-  assert_choice_type(types::prs_cfg_request_type, type_, "Value");
-  return c.get<prs_cfg_request_type_e>();
-}
-prstrp_list_l& prs_cfg_request_ies_o::value_c::prstrp_list()
-{
-  assert_choice_type(types::prstrp_list, type_, "Value");
-  return c.get<prstrp_list_l>();
-}
-const prs_cfg_request_type_e& prs_cfg_request_ies_o::value_c::prs_cfg_request_type() const
-{
-  assert_choice_type(types::prs_cfg_request_type, type_, "Value");
-  return c.get<prs_cfg_request_type_e>();
-}
-const prstrp_list_l& prs_cfg_request_ies_o::value_c::prstrp_list() const
-{
-  assert_choice_type(types::prstrp_list, type_, "Value");
-  return c.get<prstrp_list_l>();
-}
-void prs_cfg_request_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::prs_cfg_request_type:
-      j.write_str(c.get<prs_cfg_request_type_e>().to_string());
-      break;
-    case types::prstrp_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<prstrp_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_request_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE prs_cfg_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::prs_cfg_request_type:
-      HANDLE_CODE(c.get<prs_cfg_request_type_e>().pack(bref));
-      break;
-    case types::prstrp_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<prstrp_list_l>(), 1, 65535, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_request_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE prs_cfg_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::prs_cfg_request_type:
-      HANDLE_CODE(c.get<prs_cfg_request_type_e>().unpack(bref));
-      break;
-    case types::prstrp_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<prstrp_list_l>(), bref, 1, 65535, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_request_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* prs_cfg_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"PRSConfigRequestType", "PRSTRPList"};
-  return convert_enum_idx(names, 2, value, "prs_cfg_request_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<prs_cfg_request_ies_o>;
 
 OCUDUASN_CODE prs_cfg_request_ies_container::pack(bit_ref& bref) const
 {
@@ -7664,21 +4210,6 @@ crit_e prs_cfg_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-prs_cfg_resp_ies_o::value_c prs_cfg_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 67:
-      ret.set(value_c::types::prs_tx_trp_list);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e prs_cfg_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -7691,101 +4222,6 @@ presence_e prs_cfg_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void prs_cfg_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::prs_tx_trp_list:
-      c = prs_tx_trp_list_l{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_resp_ies_o::value_c");
-  }
-}
-prs_tx_trp_list_l& prs_cfg_resp_ies_o::value_c::prs_tx_trp_list()
-{
-  assert_choice_type(types::prs_tx_trp_list, type_, "Value");
-  return c.get<prs_tx_trp_list_l>();
-}
-crit_diagnostics_s& prs_cfg_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const prs_tx_trp_list_l& prs_cfg_resp_ies_o::value_c::prs_tx_trp_list() const
-{
-  assert_choice_type(types::prs_tx_trp_list, type_, "Value");
-  return c.get<prs_tx_trp_list_l>();
-}
-const crit_diagnostics_s& prs_cfg_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void prs_cfg_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::prs_tx_trp_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<prs_tx_trp_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE prs_cfg_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::prs_tx_trp_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<prs_tx_trp_list_l>(), 1, 65535, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE prs_cfg_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::prs_tx_trp_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<prs_tx_trp_list_l>(), bref, 1, 65535, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "prs_cfg_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* prs_cfg_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"PRSTransmissionTRPList", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "prs_cfg_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<prs_cfg_resp_ies_o>;
 
 OCUDUASN_CODE prs_cfg_resp_ies_container::pack(bit_ref& bref) const
 {
@@ -7897,21 +4333,6 @@ crit_e positioning_activation_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_activation_fail_ies_o::value_c positioning_activation_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_activation_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -7924,97 +4345,6 @@ presence_e positioning_activation_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_activation_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_fail_ies_o::value_c");
-  }
-}
-cause_c& positioning_activation_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& positioning_activation_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& positioning_activation_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& positioning_activation_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void positioning_activation_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_activation_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_activation_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_activation_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "positioning_activation_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_activation_fail_ies_o>;
 
 OCUDUASN_CODE positioning_activation_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -8128,24 +4458,6 @@ crit_e semipersistent_srs_ext_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-semipersistent_srs_ext_ies_o::ext_c semipersistent_srs_ext_ies_o::get_ext(const uint32_t& id)
-{
-  ext_c ret{};
-  switch (id) {
-    case 48:
-      ret.set(ext_c::types::srs_spatial_relation);
-      break;
-    case 63:
-      ret.set(ext_c::types::srs_spatial_relation_per_srs_res);
-      break;
-    case 122:
-      ret.set(ext_c::types::pos_srs_res_set_aggregation_list);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e semipersistent_srs_ext_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -8160,124 +4472,6 @@ presence_e semipersistent_srs_ext_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Extension ::= OPEN TYPE
-void semipersistent_srs_ext_ies_o::ext_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::srs_spatial_relation:
-      c = spatial_relation_info_s{};
-      break;
-    case types::srs_spatial_relation_per_srs_res:
-      c = spatial_relation_per_srs_res_s{};
-      break;
-    case types::pos_srs_res_set_aggregation_list:
-      c = pos_srs_res_set_aggregation_list_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "semipersistent_srs_ext_ies_o::ext_c");
-  }
-}
-spatial_relation_info_s& semipersistent_srs_ext_ies_o::ext_c::srs_spatial_relation()
-{
-  assert_choice_type(types::srs_spatial_relation, type_, "Extension");
-  return c.get<spatial_relation_info_s>();
-}
-spatial_relation_per_srs_res_s& semipersistent_srs_ext_ies_o::ext_c::srs_spatial_relation_per_srs_res()
-{
-  assert_choice_type(types::srs_spatial_relation_per_srs_res, type_, "Extension");
-  return c.get<spatial_relation_per_srs_res_s>();
-}
-pos_srs_res_set_aggregation_list_l& semipersistent_srs_ext_ies_o::ext_c::pos_srs_res_set_aggregation_list()
-{
-  assert_choice_type(types::pos_srs_res_set_aggregation_list, type_, "Extension");
-  return c.get<pos_srs_res_set_aggregation_list_l>();
-}
-const spatial_relation_info_s& semipersistent_srs_ext_ies_o::ext_c::srs_spatial_relation() const
-{
-  assert_choice_type(types::srs_spatial_relation, type_, "Extension");
-  return c.get<spatial_relation_info_s>();
-}
-const spatial_relation_per_srs_res_s& semipersistent_srs_ext_ies_o::ext_c::srs_spatial_relation_per_srs_res() const
-{
-  assert_choice_type(types::srs_spatial_relation_per_srs_res, type_, "Extension");
-  return c.get<spatial_relation_per_srs_res_s>();
-}
-const pos_srs_res_set_aggregation_list_l& semipersistent_srs_ext_ies_o::ext_c::pos_srs_res_set_aggregation_list() const
-{
-  assert_choice_type(types::pos_srs_res_set_aggregation_list, type_, "Extension");
-  return c.get<pos_srs_res_set_aggregation_list_l>();
-}
-void semipersistent_srs_ext_ies_o::ext_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::srs_spatial_relation:
-      c.get<spatial_relation_info_s>().to_json(j);
-      break;
-    case types::srs_spatial_relation_per_srs_res:
-      c.get<spatial_relation_per_srs_res_s>().to_json(j);
-      break;
-    case types::pos_srs_res_set_aggregation_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<pos_srs_res_set_aggregation_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "semipersistent_srs_ext_ies_o::ext_c");
-  }
-}
-OCUDUASN_CODE semipersistent_srs_ext_ies_o::ext_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_spatial_relation:
-      HANDLE_CODE(c.get<spatial_relation_info_s>().pack(bref));
-      break;
-    case types::srs_spatial_relation_per_srs_res:
-      HANDLE_CODE(c.get<spatial_relation_per_srs_res_s>().pack(bref));
-      break;
-    case types::pos_srs_res_set_aggregation_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<pos_srs_res_set_aggregation_list_l>(), 1, 32, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "semipersistent_srs_ext_ies_o::ext_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE semipersistent_srs_ext_ies_o::ext_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_spatial_relation:
-      HANDLE_CODE(c.get<spatial_relation_info_s>().unpack(bref));
-      break;
-    case types::srs_spatial_relation_per_srs_res:
-      HANDLE_CODE(c.get<spatial_relation_per_srs_res_s>().unpack(bref));
-      break;
-    case types::pos_srs_res_set_aggregation_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<pos_srs_res_set_aggregation_list_l>(), bref, 1, 32, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "semipersistent_srs_ext_ies_o::ext_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* semipersistent_srs_ext_ies_o::ext_c::types_opts::to_string() const
-{
-  static const char* names[] = {
-      "SpatialRelationInfo", "SpatialRelationPerSRSResource", "PosSRSResourceSet-Aggregation-List"};
-  return convert_enum_idx(names, 3, value, "semipersistent_srs_ext_ies_o::ext_c::types");
-}
-
-template struct asn1::protocol_ext_field_s<semipersistent_srs_ext_ies_o>;
 
 OCUDUASN_CODE semipersistent_srs_ext_ies_container::pack(bit_ref& bref) const
 {
@@ -8614,21 +4808,6 @@ crit_e positioning_activation_request_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_activation_request_ies_o::value_c positioning_activation_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 44:
-      ret.set(value_c::types::srs_type);
-      break;
-    case 45:
-      ret.set(value_c::types::activation_time);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_activation_request_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -8641,97 +4820,6 @@ presence_e positioning_activation_request_ies_o::get_presence(const uint32_t& id
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_activation_request_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::srs_type:
-      c = srs_type_c{};
-      break;
-    case types::activation_time:
-      c = fixed_bitstring<64, false, true>{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_request_ies_o::value_c");
-  }
-}
-srs_type_c& positioning_activation_request_ies_o::value_c::srs_type()
-{
-  assert_choice_type(types::srs_type, type_, "Value");
-  return c.get<srs_type_c>();
-}
-fixed_bitstring<64, false, true>& positioning_activation_request_ies_o::value_c::activation_time()
-{
-  assert_choice_type(types::activation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-const srs_type_c& positioning_activation_request_ies_o::value_c::srs_type() const
-{
-  assert_choice_type(types::srs_type, type_, "Value");
-  return c.get<srs_type_c>();
-}
-const fixed_bitstring<64, false, true>& positioning_activation_request_ies_o::value_c::activation_time() const
-{
-  assert_choice_type(types::activation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-void positioning_activation_request_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::srs_type:
-      c.get<srs_type_c>().to_json(j);
-      break;
-    case types::activation_time:
-      c.get<fixed_bitstring<64, false, true>>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_request_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_activation_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_type:
-      HANDLE_CODE(c.get<srs_type_c>().pack(bref));
-      break;
-    case types::activation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().pack(bref)));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_request_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_activation_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_type:
-      HANDLE_CODE(c.get<srs_type_c>().unpack(bref));
-      break;
-    case types::activation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().unpack(bref)));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_request_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_activation_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"SRSType", "BIT STRING"};
-  return convert_enum_idx(names, 2, value, "positioning_activation_request_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_activation_request_ies_o>;
 
 OCUDUASN_CODE positioning_activation_request_ies_container::pack(bit_ref& bref) const
 {
@@ -8845,24 +4933,6 @@ crit_e positioning_activation_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_activation_resp_ies_o::value_c positioning_activation_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    case 49:
-      ret.set(value_c::types::sys_frame_num);
-      break;
-    case 50:
-      ret.set(value_c::types::slot_num);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_activation_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -8877,119 +4947,6 @@ presence_e positioning_activation_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_activation_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::sys_frame_num:
-      c = uint16_t{};
-      break;
-    case types::slot_num:
-      c = uint8_t{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_resp_ies_o::value_c");
-  }
-}
-crit_diagnostics_s& positioning_activation_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-uint16_t& positioning_activation_resp_ies_o::value_c::sys_frame_num()
-{
-  assert_choice_type(types::sys_frame_num, type_, "Value");
-  return c.get<uint16_t>();
-}
-uint8_t& positioning_activation_resp_ies_o::value_c::slot_num()
-{
-  assert_choice_type(types::slot_num, type_, "Value");
-  return c.get<uint8_t>();
-}
-const crit_diagnostics_s& positioning_activation_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const uint16_t& positioning_activation_resp_ies_o::value_c::sys_frame_num() const
-{
-  assert_choice_type(types::sys_frame_num, type_, "Value");
-  return c.get<uint16_t>();
-}
-const uint8_t& positioning_activation_resp_ies_o::value_c::slot_num() const
-{
-  assert_choice_type(types::slot_num, type_, "Value");
-  return c.get<uint8_t>();
-}
-void positioning_activation_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    case types::sys_frame_num:
-      j.write_int(c.get<uint16_t>());
-      break;
-    case types::slot_num:
-      j.write_int(c.get<uint8_t>());
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_activation_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    case types::sys_frame_num:
-      HANDLE_CODE(pack_integer(bref, c.get<uint16_t>(), (uint16_t)0u, (uint16_t)1023u, false, true));
-      break;
-    case types::slot_num:
-      HANDLE_CODE(pack_integer(bref, c.get<uint8_t>(), (uint8_t)0u, (uint8_t)79u, false, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_activation_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    case types::sys_frame_num:
-      HANDLE_CODE(unpack_integer(c.get<uint16_t>(), bref, (uint16_t)0u, (uint16_t)1023u, false, true));
-      break;
-    case types::slot_num:
-      HANDLE_CODE(unpack_integer(c.get<uint8_t>(), bref, (uint8_t)0u, (uint8_t)79u, false, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_activation_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_activation_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"CriticalityDiagnostics", "INTEGER (0..1023)", "INTEGER (0..79)"};
-  return convert_enum_idx(names, 3, value, "positioning_activation_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_activation_resp_ies_o>;
 
 OCUDUASN_CODE positioning_activation_resp_ies_container::pack(bit_ref& bref) const
 {
@@ -9107,14 +5064,6 @@ crit_e positioning_deactivation_ies_o::get_crit(const uint32_t& id)
   asn1::log_error("The id={} is not recognized", id);
   return {};
 }
-positioning_deactivation_ies_o::value_c positioning_deactivation_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  if (id != 53) {
-    asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_deactivation_ies_o::get_presence(const uint32_t& id)
 {
   if (id == 53) {
@@ -9124,28 +5073,64 @@ presence_e positioning_deactivation_ies_o::get_presence(const uint32_t& id)
   return {};
 }
 
-// Value ::= OPEN TYPE
-void positioning_deactivation_ies_o::value_c::to_json(json_writer& j) const
+OCUDUASN_CODE positioning_deactivation_ies_container::pack(bit_ref& bref) const
 {
-  c.to_json(j);
-}
-OCUDUASN_CODE positioning_deactivation_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  HANDLE_CODE(c.pack(bref));
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_deactivation_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  HANDLE_CODE(c.unpack(bref));
-  return OCUDUASN_SUCCESS;
-}
+  uint32_t nof_ies = 1;
+  HANDLE_CODE(pack_length(bref, nof_ies, 0u, 65535u, true));
 
-const char* positioning_deactivation_ies_o::value_c::types_opts::to_string() const
+  {
+    HANDLE_CODE(pack_integer(bref, (uint32_t)53, (uint32_t)0u, (uint32_t)65535u, false, true));
+    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
+    varlength_field_pack_guard varlen_scope(bref, true);
+    HANDLE_CODE(abort_tx.pack(bref));
+  }
+
+  return OCUDUASN_SUCCESS;
+}
+OCUDUASN_CODE positioning_deactivation_ies_container::unpack(cbit_ref& bref)
 {
-  static const char* names[] = {"AbortTransmission"};
-  return convert_enum_idx(names, 1, value, "positioning_deactivation_ies_o::value_c::types");
+  uint32_t nof_ies = 0;
+  HANDLE_CODE(unpack_length(nof_ies, bref, 0u, 65535u, true));
+
+  uint32_t nof_mandatory_ies = 1;
+
+  for (; nof_ies > 0; --nof_ies) {
+    uint32_t id;
+    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
+    crit_e crit;
+    HANDLE_CODE(crit.unpack(bref));
+    if (crit != positioning_deactivation_ies_o::get_crit(id)) {
+      asn1::log_warning("Unpacked crit does not match object set definition");
+    }
+
+    if (id == 53) {
+      {
+        nof_mandatory_ies--;
+        varlength_field_unpack_guard varlen_scope(bref, true);
+        HANDLE_CODE(abort_tx.unpack(bref));
+      }
+    } else {
+      HANDLE_CODE(skip_ignored_ie(bref, crit, id));
+      break;
+    }
+  }
+  if (nof_mandatory_ies > 0) {
+    asn1::log_error("Mandatory fields are missing\n");
+
+    return OCUDUASN_ERROR_DECODE_FAIL;
+  }
+  return OCUDUASN_SUCCESS;
+}
+void positioning_deactivation_ies_container::to_json(json_writer& j) const
+{
+  j.start_array();
+  j.start_obj();
+  j.write_int("id", 53);
+  j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
+  abort_tx.to_json(j);
+  j.end_obj();
+  j.end_array();
 }
 
 // PositioningInformationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -9176,21 +5161,6 @@ crit_e positioning_info_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_info_fail_ies_o::value_c positioning_info_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_info_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -9203,97 +5173,6 @@ presence_e positioning_info_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_info_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_fail_ies_o::value_c");
-  }
-}
-cause_c& positioning_info_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& positioning_info_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& positioning_info_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& positioning_info_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void positioning_info_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_info_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_info_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_info_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "positioning_info_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_info_fail_ies_o>;
 
 OCUDUASN_CODE positioning_info_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -9415,36 +5294,6 @@ crit_e positioning_info_request_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_info_request_ies_o::value_c positioning_info_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 12:
-      ret.set(value_c::types::requested_srs_tx_characteristics);
-      break;
-    case 73:
-      ret.set(value_c::types::ue_report_info);
-      break;
-    case 90:
-      ret.set(value_c::types::ue_teg_info_request);
-      break;
-    case 99:
-      ret.set(value_c::types::ue_teg_report_periodicity);
-      break;
-    case 124:
-      ret.set(value_c::types::time_win_info_srs_list);
-      break;
-    case 136:
-      ret.set(value_c::types::requested_srs_precfg_characteristics_list);
-      break;
-    case 159:
-      ret.set(value_c::types::remote_ue_ind_request);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_info_request_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -9467,224 +5316,6 @@ presence_e positioning_info_request_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_info_request_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::requested_srs_tx_characteristics:
-      c = requested_srs_tx_characteristics_s{};
-      break;
-    case types::ue_report_info:
-      c = ue_report_info_s{};
-      break;
-    case types::ue_teg_info_request:
-      c = ue_teg_info_request_e{};
-      break;
-    case types::ue_teg_report_periodicity:
-      c = ue_teg_report_periodicity_e{};
-      break;
-    case types::time_win_info_srs_list:
-      c = time_win_info_srs_list_l{};
-      break;
-    case types::requested_srs_precfg_characteristics_list:
-      c = requested_srs_precfg_characteristics_list_l{};
-      break;
-    case types::remote_ue_ind_request:
-      c = remote_ue_ind_request_e{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_request_ies_o::value_c");
-  }
-}
-requested_srs_tx_characteristics_s& positioning_info_request_ies_o::value_c::requested_srs_tx_characteristics()
-{
-  assert_choice_type(types::requested_srs_tx_characteristics, type_, "Value");
-  return c.get<requested_srs_tx_characteristics_s>();
-}
-ue_report_info_s& positioning_info_request_ies_o::value_c::ue_report_info()
-{
-  assert_choice_type(types::ue_report_info, type_, "Value");
-  return c.get<ue_report_info_s>();
-}
-ue_teg_info_request_e& positioning_info_request_ies_o::value_c::ue_teg_info_request()
-{
-  assert_choice_type(types::ue_teg_info_request, type_, "Value");
-  return c.get<ue_teg_info_request_e>();
-}
-ue_teg_report_periodicity_e& positioning_info_request_ies_o::value_c::ue_teg_report_periodicity()
-{
-  assert_choice_type(types::ue_teg_report_periodicity, type_, "Value");
-  return c.get<ue_teg_report_periodicity_e>();
-}
-time_win_info_srs_list_l& positioning_info_request_ies_o::value_c::time_win_info_srs_list()
-{
-  assert_choice_type(types::time_win_info_srs_list, type_, "Value");
-  return c.get<time_win_info_srs_list_l>();
-}
-requested_srs_precfg_characteristics_list_l&
-positioning_info_request_ies_o::value_c::requested_srs_precfg_characteristics_list()
-{
-  assert_choice_type(types::requested_srs_precfg_characteristics_list, type_, "Value");
-  return c.get<requested_srs_precfg_characteristics_list_l>();
-}
-remote_ue_ind_request_e& positioning_info_request_ies_o::value_c::remote_ue_ind_request()
-{
-  assert_choice_type(types::remote_ue_ind_request, type_, "Value");
-  return c.get<remote_ue_ind_request_e>();
-}
-const requested_srs_tx_characteristics_s&
-positioning_info_request_ies_o::value_c::requested_srs_tx_characteristics() const
-{
-  assert_choice_type(types::requested_srs_tx_characteristics, type_, "Value");
-  return c.get<requested_srs_tx_characteristics_s>();
-}
-const ue_report_info_s& positioning_info_request_ies_o::value_c::ue_report_info() const
-{
-  assert_choice_type(types::ue_report_info, type_, "Value");
-  return c.get<ue_report_info_s>();
-}
-const ue_teg_info_request_e& positioning_info_request_ies_o::value_c::ue_teg_info_request() const
-{
-  assert_choice_type(types::ue_teg_info_request, type_, "Value");
-  return c.get<ue_teg_info_request_e>();
-}
-const ue_teg_report_periodicity_e& positioning_info_request_ies_o::value_c::ue_teg_report_periodicity() const
-{
-  assert_choice_type(types::ue_teg_report_periodicity, type_, "Value");
-  return c.get<ue_teg_report_periodicity_e>();
-}
-const time_win_info_srs_list_l& positioning_info_request_ies_o::value_c::time_win_info_srs_list() const
-{
-  assert_choice_type(types::time_win_info_srs_list, type_, "Value");
-  return c.get<time_win_info_srs_list_l>();
-}
-const requested_srs_precfg_characteristics_list_l&
-positioning_info_request_ies_o::value_c::requested_srs_precfg_characteristics_list() const
-{
-  assert_choice_type(types::requested_srs_precfg_characteristics_list, type_, "Value");
-  return c.get<requested_srs_precfg_characteristics_list_l>();
-}
-const remote_ue_ind_request_e& positioning_info_request_ies_o::value_c::remote_ue_ind_request() const
-{
-  assert_choice_type(types::remote_ue_ind_request, type_, "Value");
-  return c.get<remote_ue_ind_request_e>();
-}
-void positioning_info_request_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::requested_srs_tx_characteristics:
-      c.get<requested_srs_tx_characteristics_s>().to_json(j);
-      break;
-    case types::ue_report_info:
-      c.get<ue_report_info_s>().to_json(j);
-      break;
-    case types::ue_teg_info_request:
-      j.write_str(c.get<ue_teg_info_request_e>().to_string());
-      break;
-    case types::ue_teg_report_periodicity:
-      j.write_str(c.get<ue_teg_report_periodicity_e>().to_string());
-      break;
-    case types::time_win_info_srs_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<time_win_info_srs_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::requested_srs_precfg_characteristics_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<requested_srs_precfg_characteristics_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::remote_ue_ind_request:
-      j.write_str("true");
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_request_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_info_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::requested_srs_tx_characteristics:
-      HANDLE_CODE(c.get<requested_srs_tx_characteristics_s>().pack(bref));
-      break;
-    case types::ue_report_info:
-      HANDLE_CODE(c.get<ue_report_info_s>().pack(bref));
-      break;
-    case types::ue_teg_info_request:
-      HANDLE_CODE(c.get<ue_teg_info_request_e>().pack(bref));
-      break;
-    case types::ue_teg_report_periodicity:
-      HANDLE_CODE(c.get<ue_teg_report_periodicity_e>().pack(bref));
-      break;
-    case types::time_win_info_srs_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<time_win_info_srs_list_l>(), 1, 16, true));
-      break;
-    case types::requested_srs_precfg_characteristics_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<requested_srs_precfg_characteristics_list_l>(), 1, 16, true));
-      break;
-    case types::remote_ue_ind_request:
-      HANDLE_CODE(c.get<remote_ue_ind_request_e>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_request_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_info_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::requested_srs_tx_characteristics:
-      HANDLE_CODE(c.get<requested_srs_tx_characteristics_s>().unpack(bref));
-      break;
-    case types::ue_report_info:
-      HANDLE_CODE(c.get<ue_report_info_s>().unpack(bref));
-      break;
-    case types::ue_teg_info_request:
-      HANDLE_CODE(c.get<ue_teg_info_request_e>().unpack(bref));
-      break;
-    case types::ue_teg_report_periodicity:
-      HANDLE_CODE(c.get<ue_teg_report_periodicity_e>().unpack(bref));
-      break;
-    case types::time_win_info_srs_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<time_win_info_srs_list_l>(), bref, 1, 16, true));
-      break;
-    case types::requested_srs_precfg_characteristics_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<requested_srs_precfg_characteristics_list_l>(), bref, 1, 16, true));
-      break;
-    case types::remote_ue_ind_request:
-      HANDLE_CODE(c.get<remote_ue_ind_request_e>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_request_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_info_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"RequestedSRSTransmissionCharacteristics",
-                                "UEReportingInformation",
-                                "UE-TEG-Info-Request",
-                                "UE-TEG-ReportingPeriodicity",
-                                "TimeWindowInformation-SRS-List",
-                                "RequestedSRSPreconfigurationCharacteristics-List",
-                                "Remote-UE-Indication-Request"};
-  return convert_enum_idx(names, 7, value, "positioning_info_request_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_info_request_ies_o>;
 
 OCUDUASN_CODE positioning_info_request_ies_container::pack(bit_ref& bref) const
 {
@@ -9913,39 +5544,6 @@ crit_e positioning_info_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_info_resp_ies_o::value_c positioning_info_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 26:
-      ret.set(value_c::types::srs_cfg);
-      break;
-    case 54:
-      ret.set(value_c::types::sfn_initisation_time);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    case 81:
-      ret.set(value_c::types::ue_tx_teg_assoc_list);
-      break;
-    case 113:
-      ret.set(value_c::types::new_nr_cgi);
-      break;
-    case 128:
-      ret.set(value_c::types::pos_validity_area_cell_list);
-      break;
-    case 137:
-      ret.set(value_c::types::srs_precfg_list);
-      break;
-    case 160:
-      ret.set(value_c::types::remote_ue_ind);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_info_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -9970,248 +5568,6 @@ presence_e positioning_info_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_info_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::srs_cfg:
-      c = srs_configuration_s{};
-      break;
-    case types::sfn_initisation_time:
-      c = fixed_bitstring<64, false, true>{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::ue_tx_teg_assoc_list:
-      c = ue_tx_teg_assoc_list_l{};
-      break;
-    case types::new_nr_cgi:
-      c = cgi_nr_s{};
-      break;
-    case types::pos_validity_area_cell_list:
-      c = pos_validity_area_cell_list_l{};
-      break;
-    case types::srs_precfg_list:
-      c = srs_precfg_list_l{};
-      break;
-    case types::remote_ue_ind:
-      c = remote_ue_ind_e{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_resp_ies_o::value_c");
-  }
-}
-srs_configuration_s& positioning_info_resp_ies_o::value_c::srs_cfg()
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-fixed_bitstring<64, false, true>& positioning_info_resp_ies_o::value_c::sfn_initisation_time()
-{
-  assert_choice_type(types::sfn_initisation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-crit_diagnostics_s& positioning_info_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-ue_tx_teg_assoc_list_l& positioning_info_resp_ies_o::value_c::ue_tx_teg_assoc_list()
-{
-  assert_choice_type(types::ue_tx_teg_assoc_list, type_, "Value");
-  return c.get<ue_tx_teg_assoc_list_l>();
-}
-cgi_nr_s& positioning_info_resp_ies_o::value_c::new_nr_cgi()
-{
-  assert_choice_type(types::new_nr_cgi, type_, "Value");
-  return c.get<cgi_nr_s>();
-}
-pos_validity_area_cell_list_l& positioning_info_resp_ies_o::value_c::pos_validity_area_cell_list()
-{
-  assert_choice_type(types::pos_validity_area_cell_list, type_, "Value");
-  return c.get<pos_validity_area_cell_list_l>();
-}
-srs_precfg_list_l& positioning_info_resp_ies_o::value_c::srs_precfg_list()
-{
-  assert_choice_type(types::srs_precfg_list, type_, "Value");
-  return c.get<srs_precfg_list_l>();
-}
-remote_ue_ind_e& positioning_info_resp_ies_o::value_c::remote_ue_ind()
-{
-  assert_choice_type(types::remote_ue_ind, type_, "Value");
-  return c.get<remote_ue_ind_e>();
-}
-const srs_configuration_s& positioning_info_resp_ies_o::value_c::srs_cfg() const
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-const fixed_bitstring<64, false, true>& positioning_info_resp_ies_o::value_c::sfn_initisation_time() const
-{
-  assert_choice_type(types::sfn_initisation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-const crit_diagnostics_s& positioning_info_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const ue_tx_teg_assoc_list_l& positioning_info_resp_ies_o::value_c::ue_tx_teg_assoc_list() const
-{
-  assert_choice_type(types::ue_tx_teg_assoc_list, type_, "Value");
-  return c.get<ue_tx_teg_assoc_list_l>();
-}
-const cgi_nr_s& positioning_info_resp_ies_o::value_c::new_nr_cgi() const
-{
-  assert_choice_type(types::new_nr_cgi, type_, "Value");
-  return c.get<cgi_nr_s>();
-}
-const pos_validity_area_cell_list_l& positioning_info_resp_ies_o::value_c::pos_validity_area_cell_list() const
-{
-  assert_choice_type(types::pos_validity_area_cell_list, type_, "Value");
-  return c.get<pos_validity_area_cell_list_l>();
-}
-const srs_precfg_list_l& positioning_info_resp_ies_o::value_c::srs_precfg_list() const
-{
-  assert_choice_type(types::srs_precfg_list, type_, "Value");
-  return c.get<srs_precfg_list_l>();
-}
-const remote_ue_ind_e& positioning_info_resp_ies_o::value_c::remote_ue_ind() const
-{
-  assert_choice_type(types::remote_ue_ind, type_, "Value");
-  return c.get<remote_ue_ind_e>();
-}
-void positioning_info_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::srs_cfg:
-      c.get<srs_configuration_s>().to_json(j);
-      break;
-    case types::sfn_initisation_time:
-      c.get<fixed_bitstring<64, false, true>>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    case types::ue_tx_teg_assoc_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<ue_tx_teg_assoc_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::new_nr_cgi:
-      c.get<cgi_nr_s>().to_json(j);
-      break;
-    case types::pos_validity_area_cell_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<pos_validity_area_cell_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::srs_precfg_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<srs_precfg_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::remote_ue_ind:
-      j.write_str("l2-u2n-remote-ue");
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_info_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().pack(bref));
-      break;
-    case types::sfn_initisation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().pack(bref)));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    case types::ue_tx_teg_assoc_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<ue_tx_teg_assoc_list_l>(), 1, 256, true));
-      break;
-    case types::new_nr_cgi:
-      HANDLE_CODE(c.get<cgi_nr_s>().pack(bref));
-      break;
-    case types::pos_validity_area_cell_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<pos_validity_area_cell_list_l>(), 1, 32, true));
-      break;
-    case types::srs_precfg_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<srs_precfg_list_l>(), 1, 16, true));
-      break;
-    case types::remote_ue_ind:
-      HANDLE_CODE(c.get<remote_ue_ind_e>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_info_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().unpack(bref));
-      break;
-    case types::sfn_initisation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().unpack(bref)));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    case types::ue_tx_teg_assoc_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<ue_tx_teg_assoc_list_l>(), bref, 1, 256, true));
-      break;
-    case types::new_nr_cgi:
-      HANDLE_CODE(c.get<cgi_nr_s>().unpack(bref));
-      break;
-    case types::pos_validity_area_cell_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<pos_validity_area_cell_list_l>(), bref, 1, 32, true));
-      break;
-    case types::srs_precfg_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<srs_precfg_list_l>(), bref, 1, 16, true));
-      break;
-    case types::remote_ue_ind:
-      HANDLE_CODE(c.get<remote_ue_ind_e>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_info_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"SRSConfiguration",
-                                "BIT STRING",
-                                "CriticalityDiagnostics",
-                                "UETxTEGAssociationList",
-                                "CGI-NR",
-                                "PosValidityAreaCellList",
-                                "SRSPreconfiguration-List",
-                                "Remote-UE-Indication"};
-  return convert_enum_idx(names, 8, value, "positioning_info_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_info_resp_ies_o>;
 
 OCUDUASN_CODE positioning_info_resp_ies_container::pack(bit_ref& bref) const
 {
@@ -10462,33 +5818,6 @@ crit_e positioning_info_upd_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-positioning_info_upd_ies_o::value_c positioning_info_upd_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 26:
-      ret.set(value_c::types::srs_cfg);
-      break;
-    case 54:
-      ret.set(value_c::types::sfn_initisation_time);
-      break;
-    case 81:
-      ret.set(value_c::types::ue_tx_teg_assoc_list);
-      break;
-    case 106:
-      ret.set(value_c::types::srs_tx_status);
-      break;
-    case 134:
-      ret.set(value_c::types::new_cell_id);
-      break;
-    case 161:
-      ret.set(value_c::types::remote_ue_status);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e positioning_info_upd_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -10509,194 +5838,6 @@ presence_e positioning_info_upd_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void positioning_info_upd_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::srs_cfg:
-      c = srs_configuration_s{};
-      break;
-    case types::sfn_initisation_time:
-      c = fixed_bitstring<64, false, true>{};
-      break;
-    case types::ue_tx_teg_assoc_list:
-      c = ue_tx_teg_assoc_list_l{};
-      break;
-    case types::srs_tx_status:
-      c = srs_tx_status_e{};
-      break;
-    case types::new_cell_id:
-      c = cgi_nr_s{};
-      break;
-    case types::remote_ue_status:
-      c = remote_ue_status_e{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_upd_ies_o::value_c");
-  }
-}
-srs_configuration_s& positioning_info_upd_ies_o::value_c::srs_cfg()
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-fixed_bitstring<64, false, true>& positioning_info_upd_ies_o::value_c::sfn_initisation_time()
-{
-  assert_choice_type(types::sfn_initisation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-ue_tx_teg_assoc_list_l& positioning_info_upd_ies_o::value_c::ue_tx_teg_assoc_list()
-{
-  assert_choice_type(types::ue_tx_teg_assoc_list, type_, "Value");
-  return c.get<ue_tx_teg_assoc_list_l>();
-}
-srs_tx_status_e& positioning_info_upd_ies_o::value_c::srs_tx_status()
-{
-  assert_choice_type(types::srs_tx_status, type_, "Value");
-  return c.get<srs_tx_status_e>();
-}
-cgi_nr_s& positioning_info_upd_ies_o::value_c::new_cell_id()
-{
-  assert_choice_type(types::new_cell_id, type_, "Value");
-  return c.get<cgi_nr_s>();
-}
-remote_ue_status_e& positioning_info_upd_ies_o::value_c::remote_ue_status()
-{
-  assert_choice_type(types::remote_ue_status, type_, "Value");
-  return c.get<remote_ue_status_e>();
-}
-const srs_configuration_s& positioning_info_upd_ies_o::value_c::srs_cfg() const
-{
-  assert_choice_type(types::srs_cfg, type_, "Value");
-  return c.get<srs_configuration_s>();
-}
-const fixed_bitstring<64, false, true>& positioning_info_upd_ies_o::value_c::sfn_initisation_time() const
-{
-  assert_choice_type(types::sfn_initisation_time, type_, "Value");
-  return c.get<fixed_bitstring<64, false, true>>();
-}
-const ue_tx_teg_assoc_list_l& positioning_info_upd_ies_o::value_c::ue_tx_teg_assoc_list() const
-{
-  assert_choice_type(types::ue_tx_teg_assoc_list, type_, "Value");
-  return c.get<ue_tx_teg_assoc_list_l>();
-}
-const srs_tx_status_e& positioning_info_upd_ies_o::value_c::srs_tx_status() const
-{
-  assert_choice_type(types::srs_tx_status, type_, "Value");
-  return c.get<srs_tx_status_e>();
-}
-const cgi_nr_s& positioning_info_upd_ies_o::value_c::new_cell_id() const
-{
-  assert_choice_type(types::new_cell_id, type_, "Value");
-  return c.get<cgi_nr_s>();
-}
-const remote_ue_status_e& positioning_info_upd_ies_o::value_c::remote_ue_status() const
-{
-  assert_choice_type(types::remote_ue_status, type_, "Value");
-  return c.get<remote_ue_status_e>();
-}
-void positioning_info_upd_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::srs_cfg:
-      c.get<srs_configuration_s>().to_json(j);
-      break;
-    case types::sfn_initisation_time:
-      c.get<fixed_bitstring<64, false, true>>().to_json(j);
-      break;
-    case types::ue_tx_teg_assoc_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<ue_tx_teg_assoc_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::srs_tx_status:
-      j.write_str(c.get<srs_tx_status_e>().to_string());
-      break;
-    case types::new_cell_id:
-      c.get<cgi_nr_s>().to_json(j);
-      break;
-    case types::remote_ue_status:
-      j.write_str(c.get<remote_ue_status_e>().to_string());
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_upd_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE positioning_info_upd_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().pack(bref));
-      break;
-    case types::sfn_initisation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().pack(bref)));
-      break;
-    case types::ue_tx_teg_assoc_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<ue_tx_teg_assoc_list_l>(), 1, 256, true));
-      break;
-    case types::srs_tx_status:
-      HANDLE_CODE(c.get<srs_tx_status_e>().pack(bref));
-      break;
-    case types::new_cell_id:
-      HANDLE_CODE(c.get<cgi_nr_s>().pack(bref));
-      break;
-    case types::remote_ue_status:
-      HANDLE_CODE(c.get<remote_ue_status_e>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_upd_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE positioning_info_upd_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_cfg:
-      HANDLE_CODE(c.get<srs_configuration_s>().unpack(bref));
-      break;
-    case types::sfn_initisation_time:
-      HANDLE_CODE((c.get<fixed_bitstring<64, false, true>>().unpack(bref)));
-      break;
-    case types::ue_tx_teg_assoc_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<ue_tx_teg_assoc_list_l>(), bref, 1, 256, true));
-      break;
-    case types::srs_tx_status:
-      HANDLE_CODE(c.get<srs_tx_status_e>().unpack(bref));
-      break;
-    case types::new_cell_id:
-      HANDLE_CODE(c.get<cgi_nr_s>().unpack(bref));
-      break;
-    case types::remote_ue_status:
-      HANDLE_CODE(c.get<remote_ue_status_e>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "positioning_info_upd_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* positioning_info_upd_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"SRSConfiguration",
-                                "BIT STRING",
-                                "UETxTEGAssociationList",
-                                "SRSTransmissionStatus",
-                                "CGI-NR",
-                                "Remote-UE-Status"};
-  return convert_enum_idx(names, 6, value, "positioning_info_upd_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<positioning_info_upd_ies_o>;
 
 OCUDUASN_CODE positioning_info_upd_ies_container::pack(bit_ref& bref) const
 {
@@ -10973,24 +6114,6 @@ crit_e srs_info_reserv_notif_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-srs_info_reserv_notif_ies_o::value_c srs_info_reserv_notif_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 129:
-      ret.set(value_c::types::srs_reserv_type);
-      break;
-    case 138:
-      ret.set(value_c::types::srs_info);
-      break;
-    case 163:
-      ret.set(value_c::types::precfg_srs_info);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e srs_info_reserv_notif_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -11005,125 +6128,6 @@ presence_e srs_info_reserv_notif_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void srs_info_reserv_notif_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::srs_reserv_type:
-      c = srs_reserv_type_e{};
-      break;
-    case types::srs_info:
-      c = requested_srs_tx_characteristics_s{};
-      break;
-    case types::precfg_srs_info:
-      c = requested_srs_precfg_characteristics_list_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "srs_info_reserv_notif_ies_o::value_c");
-  }
-}
-srs_reserv_type_e& srs_info_reserv_notif_ies_o::value_c::srs_reserv_type()
-{
-  assert_choice_type(types::srs_reserv_type, type_, "Value");
-  return c.get<srs_reserv_type_e>();
-}
-requested_srs_tx_characteristics_s& srs_info_reserv_notif_ies_o::value_c::srs_info()
-{
-  assert_choice_type(types::srs_info, type_, "Value");
-  return c.get<requested_srs_tx_characteristics_s>();
-}
-requested_srs_precfg_characteristics_list_l& srs_info_reserv_notif_ies_o::value_c::precfg_srs_info()
-{
-  assert_choice_type(types::precfg_srs_info, type_, "Value");
-  return c.get<requested_srs_precfg_characteristics_list_l>();
-}
-const srs_reserv_type_e& srs_info_reserv_notif_ies_o::value_c::srs_reserv_type() const
-{
-  assert_choice_type(types::srs_reserv_type, type_, "Value");
-  return c.get<srs_reserv_type_e>();
-}
-const requested_srs_tx_characteristics_s& srs_info_reserv_notif_ies_o::value_c::srs_info() const
-{
-  assert_choice_type(types::srs_info, type_, "Value");
-  return c.get<requested_srs_tx_characteristics_s>();
-}
-const requested_srs_precfg_characteristics_list_l& srs_info_reserv_notif_ies_o::value_c::precfg_srs_info() const
-{
-  assert_choice_type(types::precfg_srs_info, type_, "Value");
-  return c.get<requested_srs_precfg_characteristics_list_l>();
-}
-void srs_info_reserv_notif_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::srs_reserv_type:
-      j.write_str(c.get<srs_reserv_type_e>().to_string());
-      break;
-    case types::srs_info:
-      c.get<requested_srs_tx_characteristics_s>().to_json(j);
-      break;
-    case types::precfg_srs_info:
-      j.start_array("");
-      for (const auto& e1 : c.get<requested_srs_precfg_characteristics_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "srs_info_reserv_notif_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE srs_info_reserv_notif_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_reserv_type:
-      HANDLE_CODE(c.get<srs_reserv_type_e>().pack(bref));
-      break;
-    case types::srs_info:
-      HANDLE_CODE(c.get<requested_srs_tx_characteristics_s>().pack(bref));
-      break;
-    case types::precfg_srs_info:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<requested_srs_precfg_characteristics_list_l>(), 1, 16, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "srs_info_reserv_notif_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE srs_info_reserv_notif_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::srs_reserv_type:
-      HANDLE_CODE(c.get<srs_reserv_type_e>().unpack(bref));
-      break;
-    case types::srs_info:
-      HANDLE_CODE(c.get<requested_srs_tx_characteristics_s>().unpack(bref));
-      break;
-    case types::precfg_srs_info:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<requested_srs_precfg_characteristics_list_l>(), bref, 1, 16, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "srs_info_reserv_notif_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* srs_info_reserv_notif_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"SRSReservationType",
-                                "RequestedSRSTransmissionCharacteristics",
-                                "RequestedSRSPreconfigurationCharacteristics-List"};
-  return convert_enum_idx(names, 3, value, "srs_info_reserv_notif_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<srs_info_reserv_notif_ies_o>;
 
 OCUDUASN_CODE srs_info_reserv_notif_ies_container::pack(bit_ref& bref) const
 {
@@ -11258,21 +6262,6 @@ crit_e trp_info_fail_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-trp_info_fail_ies_o::value_c trp_info_fail_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 0:
-      ret.set(value_c::types::cause);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e trp_info_fail_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -11285,97 +6274,6 @@ presence_e trp_info_fail_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void trp_info_fail_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::cause:
-      c = cause_c{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_fail_ies_o::value_c");
-  }
-}
-cause_c& trp_info_fail_ies_o::value_c::cause()
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-crit_diagnostics_s& trp_info_fail_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const cause_c& trp_info_fail_ies_o::value_c::cause() const
-{
-  assert_choice_type(types::cause, type_, "Value");
-  return c.get<cause_c>();
-}
-const crit_diagnostics_s& trp_info_fail_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void trp_info_fail_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::cause:
-      c.get<cause_c>().to_json(j);
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_fail_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE trp_info_fail_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().pack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE trp_info_fail_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::cause:
-      HANDLE_CODE(c.get<cause_c>().unpack(bref));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_fail_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* trp_info_fail_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"Cause", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "trp_info_fail_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<trp_info_fail_ies_o>;
 
 OCUDUASN_CODE trp_info_fail_ies_container::pack(bit_ref& bref) const
 {
@@ -11487,21 +6385,6 @@ crit_e trp_info_request_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-trp_info_request_ies_o::value_c trp_info_request_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 47:
-      ret.set(value_c::types::trp_list);
-      break;
-    case 29:
-      ret.set(value_c::types::trp_info_type_list_trp_req);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e trp_info_request_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -11514,105 +6397,6 @@ presence_e trp_info_request_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void trp_info_request_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::trp_list:
-      c = trp_list_l{};
-      break;
-    case types::trp_info_type_list_trp_req:
-      c = trp_info_type_list_trp_req_l{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_request_ies_o::value_c");
-  }
-}
-trp_list_l& trp_info_request_ies_o::value_c::trp_list()
-{
-  assert_choice_type(types::trp_list, type_, "Value");
-  return c.get<trp_list_l>();
-}
-trp_info_type_list_trp_req_l& trp_info_request_ies_o::value_c::trp_info_type_list_trp_req()
-{
-  assert_choice_type(types::trp_info_type_list_trp_req, type_, "Value");
-  return c.get<trp_info_type_list_trp_req_l>();
-}
-const trp_list_l& trp_info_request_ies_o::value_c::trp_list() const
-{
-  assert_choice_type(types::trp_list, type_, "Value");
-  return c.get<trp_list_l>();
-}
-const trp_info_type_list_trp_req_l& trp_info_request_ies_o::value_c::trp_info_type_list_trp_req() const
-{
-  assert_choice_type(types::trp_info_type_list_trp_req, type_, "Value");
-  return c.get<trp_info_type_list_trp_req_l>();
-}
-void trp_info_request_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::trp_list:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_list_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::trp_info_type_list_trp_req:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_info_type_list_trp_req_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_request_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE trp_info_request_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::trp_list:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_list_l>(), 1, 65535, true));
-      break;
-    case types::trp_info_type_list_trp_req:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_info_type_list_trp_req_l>(), 1, 64, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_request_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE trp_info_request_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::trp_list:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_list_l>(), bref, 1, 65535, true));
-      break;
-    case types::trp_info_type_list_trp_req:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_info_type_list_trp_req_l>(), bref, 1, 64, true));
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_request_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* trp_info_request_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"TRPList", "TRPInformationTypeListTRPReq"};
-  return convert_enum_idx(names, 2, value, "trp_info_request_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<trp_info_request_ies_o>;
 
 OCUDUASN_CODE trp_info_request_ies_container::pack(bit_ref& bref) const
 {
@@ -11730,21 +6514,6 @@ crit_e trp_info_resp_ies_o::get_crit(const uint32_t& id)
   }
   return {};
 }
-trp_info_resp_ies_o::value_c trp_info_resp_ies_o::get_value(const uint32_t& id)
-{
-  value_c ret{};
-  switch (id) {
-    case 30:
-      ret.set(value_c::types::trp_info_list_trp_resp);
-      break;
-    case 1:
-      ret.set(value_c::types::crit_diagnostics);
-      break;
-    default:
-      asn1::log_error("The id={} is not recognized", id);
-  }
-  return ret;
-}
 presence_e trp_info_resp_ies_o::get_presence(const uint32_t& id)
 {
   switch (id) {
@@ -11757,101 +6526,6 @@ presence_e trp_info_resp_ies_o::get_presence(const uint32_t& id)
   }
   return {};
 }
-
-// Value ::= OPEN TYPE
-void trp_info_resp_ies_o::value_c::set(types::options e)
-{
-  type_ = e;
-  switch (type_) {
-    case types::trp_info_list_trp_resp:
-      c = trp_info_list_trp_resp_l{};
-      break;
-    case types::crit_diagnostics:
-      c = crit_diagnostics_s{};
-      break;
-    case types::nulltype:
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_resp_ies_o::value_c");
-  }
-}
-trp_info_list_trp_resp_l& trp_info_resp_ies_o::value_c::trp_info_list_trp_resp()
-{
-  assert_choice_type(types::trp_info_list_trp_resp, type_, "Value");
-  return c.get<trp_info_list_trp_resp_l>();
-}
-crit_diagnostics_s& trp_info_resp_ies_o::value_c::crit_diagnostics()
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-const trp_info_list_trp_resp_l& trp_info_resp_ies_o::value_c::trp_info_list_trp_resp() const
-{
-  assert_choice_type(types::trp_info_list_trp_resp, type_, "Value");
-  return c.get<trp_info_list_trp_resp_l>();
-}
-const crit_diagnostics_s& trp_info_resp_ies_o::value_c::crit_diagnostics() const
-{
-  assert_choice_type(types::crit_diagnostics, type_, "Value");
-  return c.get<crit_diagnostics_s>();
-}
-void trp_info_resp_ies_o::value_c::to_json(json_writer& j) const
-{
-  switch (type_) {
-    case types::trp_info_list_trp_resp:
-      j.start_array("");
-      for (const auto& e1 : c.get<trp_info_list_trp_resp_l>()) {
-        e1.to_json(j);
-      }
-      j.end_array();
-      break;
-    case types::crit_diagnostics:
-      c.get<crit_diagnostics_s>().to_json(j);
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_resp_ies_o::value_c");
-  }
-}
-OCUDUASN_CODE trp_info_resp_ies_o::value_c::pack(bit_ref& bref) const
-{
-  varlength_field_pack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::trp_info_list_trp_resp:
-      HANDLE_CODE(pack_dyn_seq_of(bref, c.get<trp_info_list_trp_resp_l>(), 1, 65535, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().pack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_ENCODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-OCUDUASN_CODE trp_info_resp_ies_o::value_c::unpack(cbit_ref& bref)
-{
-  varlength_field_unpack_guard varlen_scope(bref, true);
-  switch (type_) {
-    case types::trp_info_list_trp_resp:
-      HANDLE_CODE(unpack_dyn_seq_of(c.get<trp_info_list_trp_resp_l>(), bref, 1, 65535, true));
-      break;
-    case types::crit_diagnostics:
-      HANDLE_CODE(c.get<crit_diagnostics_s>().unpack(bref));
-      break;
-    default:
-      log_invalid_choice_id(type_, "trp_info_resp_ies_o::value_c");
-      return OCUDUASN_ERROR_DECODE_FAIL;
-  }
-  return OCUDUASN_SUCCESS;
-}
-
-const char* trp_info_resp_ies_o::value_c::types_opts::to_string() const
-{
-  static const char* names[] = {"TRPInformationListTRPResp", "CriticalityDiagnostics"};
-  return convert_enum_idx(names, 2, value, "trp_info_resp_ies_o::value_c::types");
-}
-
-template struct asn1::protocol_ie_field_s<trp_info_resp_ies_o>;
 
 OCUDUASN_CODE trp_info_resp_ies_container::pack(bit_ref& bref) const
 {

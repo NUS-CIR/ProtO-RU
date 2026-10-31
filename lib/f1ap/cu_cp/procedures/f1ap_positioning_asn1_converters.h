@@ -219,24 +219,21 @@ asn1_to_geographical_coordinates(const asn1::f1ap::geographical_coordinates_s& a
   }
 
   // Fill IE exts.
-  for (const auto& asn1_ie_exts_container : asn1_geo_coords.ie_exts) {
-    if (asn1_ie_exts_container->type() ==
-        asn1::f1ap::geographical_coordinates_ext_ies_o::ext_c::types_opts::options::arp_location_info) {
-      for (const auto& asn1_arp_location_info_item : asn1_ie_exts_container->arp_location_info()) {
-        arp_location_info_item_t arp_location_info_item;
-        arp_location_info_item.arp_id = asn1_arp_location_info_item.arp_id;
+  if (asn1_geo_coords.ie_exts_present and asn1_geo_coords.ie_exts.arp_location_info_present) {
+    for (const auto& asn1_arp_location_info_item : asn1_geo_coords.ie_exts.arp_location_info) {
+      arp_location_info_item_t arp_location_info_item;
+      arp_location_info_item.arp_id = asn1_arp_location_info_item.arp_id;
 
-        if (asn1_arp_location_info_item.arp_location_type.type() ==
-            asn1::f1ap::arp_location_type_c::types_opts::options::arp_position_relative_geodetic) {
-          arp_location_info_item.arp_location_type = asn1_to_relative_geodetic_location(
-              asn1_arp_location_info_item.arp_location_type.arp_position_relative_geodetic());
-        } else {
-          arp_location_info_item.arp_location_type = asn1_to_relative_cartesian_location(
-              asn1_arp_location_info_item.arp_location_type.arp_position_relative_cartesian());
-        }
-
-        geo_coords.arp_location_info.push_back(arp_location_info_item);
+      if (asn1_arp_location_info_item.arp_location_type.type() ==
+          asn1::f1ap::arp_location_type_c::types_opts::options::arp_position_relative_geodetic) {
+        arp_location_info_item.arp_location_type = asn1_to_relative_geodetic_location(
+            asn1_arp_location_info_item.arp_location_type.arp_position_relative_geodetic());
+      } else {
+        arp_location_info_item.arp_location_type = asn1_to_relative_cartesian_location(
+            asn1_arp_location_info_item.arp_location_type.arp_position_relative_cartesian());
       }
+
+      geo_coords.arp_location_info.push_back(arp_location_info_item);
     }
   }
 

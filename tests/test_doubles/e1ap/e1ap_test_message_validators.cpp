@@ -43,11 +43,8 @@ bool ocudu::test_helpers::is_valid_security_indication_with_bearer_context_setup
 
   TRUE_OR_RETURN(asn1::e1ap::sys_bearer_context_setup_request_c::types_opts::ng_ran_bearer_context_setup_request ==
                  req_ies->sys_bearer_context_setup_request.type());
-  const asn1::protocol_ie_container_l<asn1::e1ap::ng_ran_bearer_context_setup_request_o>& ng_ran_bearer_ctxt =
-      req_ies->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request();
-
-  asn1::e1ap::pdu_session_res_to_setup_list_l asn1_pdu_session_res_item =
-      ng_ran_bearer_ctxt[0]->pdu_session_res_to_setup_list();
+  const asn1::e1ap::pdu_session_res_to_setup_list_l& asn1_pdu_session_res_item =
+      req_ies->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request().pdu_session_res_to_setup_list;
 
   for (const asn1::e1ap::pdu_session_res_to_setup_item_s& pdu_session : asn1_pdu_session_res_item) {
     if (pdu_session.pdu_session_id != to_underlying(psi)) {

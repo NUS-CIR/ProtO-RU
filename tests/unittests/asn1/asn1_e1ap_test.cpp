@@ -127,15 +127,9 @@ TEST_F(asn1_e1ap_test, when_bearer_context_setup_request_correct_then_unpacking_
             asn1::e1ap::sys_bearer_context_setup_request_c::types_opts::options::ng_ran_bearer_context_setup_request);
 
   const auto& bearer_cont = msg->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request();
-  ASSERT_EQ(bearer_cont.size(), 1);
-  for (const auto& item : bearer_cont) {
-    const auto& bearer = item.value();
-    ASSERT_EQ(bearer.type(),
-              asn1::e1ap::ng_ran_bearer_context_setup_request_o::value_c::types_opts::pdu_session_res_to_setup_list);
-  }
 
   // Get session list.
-  const auto& session_list = bearer_cont[0].value().pdu_session_res_to_setup_list();
+  const auto& session_list = bearer_cont.pdu_session_res_to_setup_list;
   ASSERT_EQ(1, session_list.size());
 
   // Get first session item and check basic fields.

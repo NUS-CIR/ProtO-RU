@@ -96,7 +96,7 @@ private:
     f1ap_message resp;
     resp.pdu.set_successful_outcome().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
     f1_removal_resp_s& ie = resp.pdu.successful_outcome().value.f1_removal_resp();
-    ie->transaction_id    = (*req_msg.pdu.init_msg().value.f1_removal_request())[0]->transaction_id();
+    ie->transaction_id    = req_msg.pdu.init_msg().value.f1_removal_request()->transaction_id;
 
     return resp;
   }

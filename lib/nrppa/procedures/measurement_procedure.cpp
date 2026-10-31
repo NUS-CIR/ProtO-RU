@@ -547,10 +547,11 @@ asn1::nrppa::nr_ppa_pdu_c measurement_procedure::create_measurement_response()
       }
 
       if (trp_measurement_response_item.cgi_nr.has_value()) {
-        asn1::protocol_ext_field_s<asn1::nrppa::trp_meas_resp_item_ext_ies_o> asn1_ie_exts_container;
-        asn1_ie_exts_container->cell_id().nr_cell_id.from_number(trp_measurement_response_item.cgi_nr->nci.value());
-        asn1_ie_exts_container->cell_id().plmn_id = trp_measurement_response_item.cgi_nr->plmn_id.to_bytes();
-        asn1_trp_meas_resp_item.ie_exts.push_back(asn1_ie_exts_container);
+        asn1_trp_meas_resp_item.ie_exts_present         = true;
+        asn1_trp_meas_resp_item.ie_exts.cell_id_present = true;
+        asn1_trp_meas_resp_item.ie_exts.cell_id.nr_cell_id.from_number(
+            trp_measurement_response_item.cgi_nr->nci.value());
+        asn1_trp_meas_resp_item.ie_exts.cell_id.plmn_id = trp_measurement_response_item.cgi_nr->plmn_id.to_bytes();
       }
 
       asn1_meas_resp->trp_meas_resp_list.push_back(asn1_trp_meas_resp_item);

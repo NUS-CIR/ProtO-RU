@@ -278,8 +278,7 @@ TEST_F(f1ap_cu_test, when_f1_removal_request_received_then_f1_removal_response_i
   f1ap_message removal_request = {};
   removal_request.pdu.set_init_msg();
   removal_request.pdu.init_msg().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
-  removal_request.pdu.init_msg().value.f1_removal_request()->resize(1);
-  (*removal_request.pdu.init_msg().value.f1_removal_request())[0]->transaction_id() = 5;
+  removal_request.pdu.init_msg().value.f1_removal_request()->transaction_id = 5;
 
   // Pass message to F1AP.
   f1ap->handle_message(removal_request);
@@ -290,31 +289,15 @@ TEST_F(f1ap_cu_test, when_f1_removal_request_received_then_f1_removal_response_i
   ASSERT_EQ(f1ap_pdu_notifier.last_f1ap_msg.pdu.successful_outcome().value.f1_removal_resp()->transaction_id, 5);
 }
 
-TEST_F(f1ap_cu_test, when_f1_removal_request_without_transaction_id_received_then_message_is_discarded)
+TEST_F(f1ap_cu_test, when_f1_removal_request_without_transaction_id_received_then_decoding_fails)
 {
-  // Generate F1 Removal Request Message with an empty IE container.
-  f1ap_message removal_request = {};
-  removal_request.pdu.set_init_msg();
-  removal_request.pdu.init_msg().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
+  // F1 Removal Request with an empty IE container.
+  const uint8_t rx_msg[] = {0x00, 0x1a, 0x00, 0x03, 0x00, 0x00, 0x00};
+  byte_buffer   buffer   = byte_buffer::create(rx_msg).value();
 
-  // Make sure that the ASN.1 decoder accepts the message.
-  byte_buffer buffer;
-  {
-    asn1::bit_ref bref(buffer);
-    ASSERT_EQ(removal_request.pdu.pack(bref), asn1::OCUDUASN_SUCCESS);
-  }
-  f1ap_message rx_removal_request = {};
-  {
-    asn1::cbit_ref bref(buffer);
-    ASSERT_EQ(rx_removal_request.pdu.unpack(bref), asn1::OCUDUASN_SUCCESS);
-  }
-  ASSERT_EQ(rx_removal_request.pdu.init_msg().value.f1_removal_request()->size(), 0);
-
-  // Pass message to F1AP.
-  f1ap->handle_message(rx_removal_request);
-
-  // F1AP does not send a response.
-  ASSERT_EQ(f1ap_pdu_notifier.last_f1ap_msg.pdu.type().value, asn1::f1ap::f1ap_pdu_c::types::nulltype);
+  f1ap_message   rx_removal_request = {};
+  asn1::cbit_ref bref(buffer);
+  ASSERT_NE(rx_removal_request.pdu.unpack(bref), asn1::OCUDUASN_SUCCESS);
 }
 
 TEST_F(f1ap_cu_test, redcap_initial_ul_rrc_identity_reaches_ue_creation)

@@ -113,10 +113,7 @@ ngap_message ocudu::ocucp::generate_amf_status_indication(const guami_t&        
     item.backup_amf_name.from_string(*backup_amf_name);
   }
 
-  auto& ies = *msg.pdu.init_msg().value.amf_status_ind();
-  ies.resize(1);
-  ies[0].load_info_obj(ASN1_NGAP_ID_UNAVAILABLE_GUAMI_LIST);
-  ies[0].value().unavailable_guami_list().push_back(item);
+  msg.pdu.init_msg().value.amf_status_ind()->unavailable_guami_list.push_back(item);
   return msg;
 }
 

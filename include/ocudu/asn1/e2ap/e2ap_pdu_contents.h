@@ -22,42 +22,10 @@ namespace e2ap {
 
 // E2RemovalFailureIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_removal_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -78,77 +46,31 @@ using e2_removal_fail_s = elementary_procedure_option<e2_removal_fail_ies_contai
 
 // E2RemovalRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_removal_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::transaction_id; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&       transaction_id() { return c; }
-    const uint16_t& transaction_id() const { return c; }
-
-  private:
-    uint16_t c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct e2_removal_request_ies_container {
+  uint16_t transaction_id;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // E2RemovalRequest ::= SEQUENCE
-using e2_removal_request_s = elementary_procedure_option<protocol_ie_container_l<e2_removal_request_ies_o>>;
+using e2_removal_request_s = elementary_procedure_option<e2_removal_request_ies_container>;
 
 // E2RemovalResponseIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_removal_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -168,44 +90,10 @@ using e2_removal_resp_s = elementary_procedure_option<e2_removal_resp_ies_contai
 
 // E2ResourceStatusFailureIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_res_status_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, ric_load_meas_id, e2node_load_meas_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    uint16_t&                 ric_load_meas_id();
-    uint16_t&                 e2node_load_meas_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const uint16_t&           ric_load_meas_id() const;
-    const uint16_t&           e2node_load_meas_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -228,54 +116,10 @@ using e2_res_status_fail_s = elementary_procedure_option<e2_res_status_fail_ies_
 
 // E2ResourceStatusRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_res_status_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        ric_load_meas_id,
-        e2node_load_meas_id,
-        regist_request_e2,
-        report_characteristics,
-        report_periodicity_e2,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                              transaction_id();
-    uint16_t&                              ric_load_meas_id();
-    uint16_t&                              e2node_load_meas_id();
-    regist_request_e2_e&                   regist_request_e2();
-    fixed_bitstring<8, false, true>&       report_characteristics();
-    report_periodicity_e2_e&               report_periodicity_e2();
-    const uint16_t&                        transaction_id() const;
-    const uint16_t&                        ric_load_meas_id() const;
-    const uint16_t&                        e2node_load_meas_id() const;
-    const regist_request_e2_e&             regist_request_e2() const;
-    const fixed_bitstring<8, false, true>& report_characteristics() const;
-    const report_periodicity_e2_e&         report_periodicity_e2() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -301,42 +145,10 @@ using e2_res_status_request_s = elementary_procedure_option<e2_res_status_reques
 
 // E2ResourceStatusResponseIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_res_status_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, ric_load_meas_id, e2node_load_meas_id, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    uint16_t&                 ric_load_meas_id();
-    uint16_t&                 e2node_load_meas_id();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const uint16_t&           ric_load_meas_id() const;
-    const uint16_t&           e2node_load_meas_id() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -358,47 +170,10 @@ using e2_res_status_resp_s = elementary_procedure_option<e2_res_status_resp_ies_
 
 // E2ResourceStatusUpdateIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2_res_status_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        ric_load_meas_id,
-        e2node_load_meas_id,
-        tnl_capacity_ind,
-        hardware_load_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&       transaction_id();
-    uint16_t&       ric_load_meas_id();
-    uint16_t&       e2node_load_meas_id();
-    const uint16_t& transaction_id() const;
-    const uint16_t& ric_load_meas_id() const;
-    const uint16_t& e2node_load_meas_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -568,42 +343,10 @@ using e2conn_upd_rem_list_l = bounded_array<protocol_ie_single_container_s<e2con
 
 // E2connectionUpdate-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2conn_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, e2conn_upd_add, e2conn_upd_rem, e2conn_upd_modify, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                    transaction_id();
-    e2conn_upd_list_l&           e2conn_upd_add();
-    e2conn_upd_rem_list_l&       e2conn_upd_rem();
-    e2conn_upd_list_l&           e2conn_upd_modify();
-    const uint16_t&              transaction_id() const;
-    const e2conn_upd_list_l&     e2conn_upd_add() const;
-    const e2conn_upd_rem_list_l& e2conn_upd_rem() const;
-    const e2conn_upd_list_l&     e2conn_upd_modify() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -627,40 +370,10 @@ using e2conn_upd_s = elementary_procedure_option<e2conn_upd_ies_container>;
 
 // E2connectionUpdateAck-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2conn_upd_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, e2conn_setup, e2conn_setup_failed, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                         transaction_id();
-    e2conn_upd_list_l&                e2conn_setup();
-    e2conn_setup_failed_list_l&       e2conn_setup_failed();
-    const uint16_t&                   transaction_id() const;
-    const e2conn_upd_list_l&          e2conn_setup() const;
-    const e2conn_setup_failed_list_l& e2conn_setup_failed() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -682,44 +395,10 @@ using e2conn_upd_ack_s = elementary_procedure_option<e2conn_upd_ack_ies_containe
 
 // E2connectionUpdateFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2conn_upd_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, cause, time_to_wait, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    cause_c&                  cause();
-    time_to_wait_e&           time_to_wait();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const cause_c&            cause() const;
-    const time_to_wait_e&     time_to_wait() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1100,54 +779,10 @@ using e2node_tnl_assoc_removal_list_l =
 
 // E2nodeConfigurationUpdate-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2node_cfg_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        global_e2node_id,
-        e2node_component_cfg_addition,
-        e2node_component_cfg_upd,
-        e2node_component_cfg_removal,
-        e2node_tnl_assoc_removal,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                   transaction_id();
-    global_e2node_id_c&                         global_e2node_id();
-    e2node_component_cfg_addition_list_l&       e2node_component_cfg_addition();
-    e2node_component_cfg_upd_list_l&            e2node_component_cfg_upd();
-    e2node_component_cfg_removal_list_l&        e2node_component_cfg_removal();
-    e2node_tnl_assoc_removal_list_l&            e2node_tnl_assoc_removal();
-    const uint16_t&                             transaction_id() const;
-    const global_e2node_id_c&                   global_e2node_id() const;
-    const e2node_component_cfg_addition_list_l& e2node_component_cfg_addition() const;
-    const e2node_component_cfg_upd_list_l&      e2node_component_cfg_upd() const;
-    const e2node_component_cfg_removal_list_l&  e2node_component_cfg_removal() const;
-    const e2node_tnl_assoc_removal_list_l&      e2node_tnl_assoc_removal() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1175,48 +810,10 @@ using e2node_cfg_upd_s = elementary_procedure_option<e2node_cfg_upd_ies_containe
 
 // E2nodeConfigurationUpdateAcknowledge-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2node_cfg_upd_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        e2node_component_cfg_addition_ack,
-        e2node_component_cfg_upd_ack,
-        e2node_component_cfg_removal_ack,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                       transaction_id();
-    e2node_component_cfg_addition_ack_list_l&       e2node_component_cfg_addition_ack();
-    e2node_component_cfg_upd_ack_list_l&            e2node_component_cfg_upd_ack();
-    e2node_component_cfg_removal_ack_list_l&        e2node_component_cfg_removal_ack();
-    const uint16_t&                                 transaction_id() const;
-    const e2node_component_cfg_addition_ack_list_l& e2node_component_cfg_addition_ack() const;
-    const e2node_component_cfg_upd_ack_list_l&      e2node_component_cfg_upd_ack() const;
-    const e2node_component_cfg_removal_ack_list_l&  e2node_component_cfg_removal_ack() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1240,44 +837,10 @@ using e2node_cfg_upd_ack_s = elementary_procedure_option<e2node_cfg_upd_ack_ies_
 
 // E2nodeConfigurationUpdateFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2node_cfg_upd_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, cause, time_to_wait, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    cause_c&                  cause();
-    time_to_wait_e&           time_to_wait();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const cause_c&            cause() const;
-    const time_to_wait_e&     time_to_wait() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1300,46 +863,10 @@ using e2node_cfg_upd_fail_s = elementary_procedure_option<e2node_cfg_upd_fail_ie
 
 // E2setupFailureIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2setup_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, cause, time_to_wait, crit_diagnostics, tnl_info, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    cause_c&                  cause();
-    time_to_wait_e&           time_to_wait();
-    crit_diagnostics_s&       crit_diagnostics();
-    tnl_info_s&               tnl_info();
-    const uint16_t&           transaction_id() const;
-    const cause_c&            cause() const;
-    const time_to_wait_e&     time_to_wait() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const tnl_info_s&         tnl_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1413,48 +940,10 @@ using ran_functions_list_l = dyn_array<protocol_ie_single_container_s<ran_functi
 
 // E2setupRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2setup_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        global_e2node_id,
-        ran_functions_added,
-        e2node_component_cfg_addition,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                   transaction_id();
-    global_e2node_id_c&                         global_e2node_id();
-    ran_functions_list_l&                       ran_functions_added();
-    e2node_component_cfg_addition_list_l&       e2node_component_cfg_addition();
-    const uint16_t&                             transaction_id() const;
-    const global_e2node_id_c&                   global_e2node_id() const;
-    const ran_functions_list_l&                 ran_functions_added() const;
-    const e2node_component_cfg_addition_list_l& e2node_component_cfg_addition() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1618,56 +1107,10 @@ using ran_functions_accept_modified_list_l =
 
 // E2setupResponseIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct e2setup_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        global_ric_id,
-        ran_functions_accepted,
-        ran_functions_rejected,
-        e2node_component_cfg_addition_ack,
-        ran_functions_accept_modified_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                       transaction_id();
-    global_ric_id_s&                                global_ric_id();
-    ran_functions_id_list_l&                        ran_functions_accepted();
-    ran_functions_id_cause_list_l&                  ran_functions_rejected();
-    e2node_component_cfg_addition_ack_list_l&       e2node_component_cfg_addition_ack();
-    ran_functions_accept_modified_list_l&           ran_functions_accept_modified_list();
-    const uint16_t&                                 transaction_id() const;
-    const global_ric_id_s&                          global_ric_id() const;
-    const ran_functions_id_list_l&                  ran_functions_accepted() const;
-    const ran_functions_id_cause_list_l&            ran_functions_rejected() const;
-    const e2node_component_cfg_addition_ack_list_l& e2node_component_cfg_addition_ack() const;
-    const ran_functions_accept_modified_list_l&     ran_functions_accept_modified_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1693,44 +1136,10 @@ using e2setup_resp_s = elementary_procedure_option<e2setup_resp_ies_container>;
 
 // ErrorIndication-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct error_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, ric_request_id, ran_function_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    ric_request_id_s&         ric_request_id();
-    uint16_t&                 ran_function_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const ric_request_id_s&   ric_request_id() const;
-    const uint16_t&           ran_function_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3282,40 +2691,10 @@ using ric_actions_to_be_setup_list_l =
 
 // RICassistanceFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_assist_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3336,79 +2715,31 @@ using ric_assist_fail_s = elementary_procedure_option<ric_assist_fail_ies_contai
 
 // RICassistanceHalt-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_assist_halt_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::ric_request_id; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&       ric_request_id() { return c; }
-    const ric_request_id_s& ric_request_id() const { return c; }
-
-  private:
-    ric_request_id_s c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct ric_assist_halt_ies_container {
+  ric_request_id_s ric_request_id;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // RICassistanceHalt ::= SEQUENCE
-using ric_assist_halt_s = elementary_procedure_option<protocol_ie_container_l<ric_assist_halt_ies_o>>;
+using ric_assist_halt_s = elementary_procedure_option<ric_assist_halt_ies_container>;
 
 // RICassistanceIndication-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_assist_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ric_assist_sn, ric_assist_hdr, ric_assist_outcome, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint32_t&                        ric_assist_sn();
-    unbounded_octstring<true>&       ric_assist_hdr();
-    unbounded_octstring<true>&       ric_assist_outcome();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint32_t&                  ric_assist_sn() const;
-    const unbounded_octstring<true>& ric_assist_hdr() const;
-    const unbounded_octstring<true>& ric_assist_outcome() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3429,53 +2760,10 @@ using ric_assist_ind_s = elementary_procedure_option<ric_assist_ind_ies_containe
 
 // RICassistanceRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_assist_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ric_assist_hdr,
-        ric_assist_msg,
-        ric_assist_upd,
-        ric_assist_upd_num,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    unbounded_octstring<true>&       ric_assist_hdr();
-    unbounded_octstring<true>&       ric_assist_msg();
-    ric_assist_upd_e&                ric_assist_upd();
-    uint32_t&                        ric_assist_upd_num();
-    const ric_request_id_s&          ric_request_id() const;
-    const unbounded_octstring<true>& ric_assist_hdr() const;
-    const unbounded_octstring<true>& ric_assist_msg() const;
-    const ric_assist_upd_e&          ric_assist_upd() const;
-    const uint32_t&                  ric_assist_upd_num() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3499,40 +2787,10 @@ using ric_assist_request_s = elementary_procedure_option<ric_assist_request_ies_
 
 // RICassistanceResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_assist_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ric_assist_hdr, ric_assist_outcome, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    unbounded_octstring<true>&       ric_assist_hdr();
-    unbounded_octstring<true>&       ric_assist_outcome();
-    const ric_request_id_s&          ric_request_id() const;
-    const unbounded_octstring<true>& ric_assist_hdr() const;
-    const unbounded_octstring<true>& ric_assist_outcome() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3552,44 +2810,10 @@ using ric_assist_resp_s = elementary_procedure_option<ric_assist_resp_ies_contai
 
 // RICcontrolAcknowledge-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_ctrl_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, ric_call_process_id, ric_ctrl_outcome, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint16_t&                        ran_function_id();
-    unbounded_octstring<true>&       ric_call_process_id();
-    unbounded_octstring<true>&       ric_ctrl_outcome();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint16_t&                  ran_function_id() const;
-    const unbounded_octstring<true>& ric_call_process_id() const;
-    const unbounded_octstring<true>& ric_ctrl_outcome() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3612,56 +2836,10 @@ using ric_ctrl_ack_s = elementary_procedure_option<ric_ctrl_ack_ies_container>;
 
 // RICcontrolFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_ctrl_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_call_process_id,
-        cause,
-        ric_ctrl_outcome,
-        crit_diagnostics,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint16_t&                        ran_function_id();
-    unbounded_octstring<true>&       ric_call_process_id();
-    cause_c&                         cause();
-    unbounded_octstring<true>&       ric_ctrl_outcome();
-    crit_diagnostics_s&              crit_diagnostics();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint16_t&                  ran_function_id() const;
-    const unbounded_octstring<true>& ric_call_process_id() const;
-    const cause_c&                   cause() const;
-    const unbounded_octstring<true>& ric_ctrl_outcome() const;
-    const crit_diagnostics_s&        crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3687,56 +2865,10 @@ using ric_ctrl_fail_s = elementary_procedure_option<ric_ctrl_fail_ies_container>
 
 // RICcontrolRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_ctrl_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_call_process_id,
-        ric_ctrl_hdr,
-        ric_ctrl_msg,
-        ric_ctrl_ack_request,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint16_t&                        ran_function_id();
-    unbounded_octstring<true>&       ric_call_process_id();
-    unbounded_octstring<true>&       ric_ctrl_hdr();
-    unbounded_octstring<true>&       ric_ctrl_msg();
-    ric_ctrl_ack_request_e&          ric_ctrl_ack_request();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint16_t&                  ran_function_id() const;
-    const unbounded_octstring<true>& ric_call_process_id() const;
-    const unbounded_octstring<true>& ric_ctrl_hdr() const;
-    const unbounded_octstring<true>& ric_ctrl_msg() const;
-    const ric_ctrl_ack_request_e&    ric_ctrl_ack_request() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3761,60 +2893,10 @@ using ric_ctrl_request_s = elementary_procedure_option<ric_ctrl_request_ies_cont
 
 // RICindication-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_action_id,
-        ric_ind_sn,
-        ric_ind_type,
-        ric_ind_hdr,
-        ric_ind_msg,
-        ric_call_process_id,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint16_t&                        ran_function_id();
-    uint16_t&                        ric_action_id();
-    uint32_t&                        ric_ind_sn();
-    ric_ind_type_e&                  ric_ind_type();
-    unbounded_octstring<true>&       ric_ind_hdr();
-    unbounded_octstring<true>&       ric_ind_msg();
-    unbounded_octstring<true>&       ric_call_process_id();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint16_t&                  ran_function_id() const;
-    const uint16_t&                  ric_action_id() const;
-    const uint32_t&                  ric_ind_sn() const;
-    const ric_ind_type_e&            ric_ind_type() const;
-    const unbounded_octstring<true>& ric_ind_hdr() const;
-    const unbounded_octstring<true>& ric_ind_msg() const;
-    const unbounded_octstring<true>& ric_call_process_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3841,44 +2923,10 @@ using ric_ind_s = elementary_procedure_option<ric_ind_ies_container>;
 
 // RICqueryFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_query_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    uint16_t&                 ran_function_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const uint16_t&           ran_function_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3900,44 +2948,10 @@ using ric_query_fail_s = elementary_procedure_option<ric_query_fail_ies_containe
 
 // RICqueryRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_query_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, ric_query_hdr, ric_query_definition, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint16_t&                        ran_function_id();
-    unbounded_octstring<true>&       ric_query_hdr();
-    unbounded_octstring<true>&       ric_query_definition();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint16_t&                  ran_function_id() const;
-    const unbounded_octstring<true>& ric_query_hdr() const;
-    const unbounded_octstring<true>& ric_query_definition() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3958,42 +2972,10 @@ using ric_query_request_s = elementary_procedure_option<ric_query_request_ies_co
 
 // RICqueryResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_query_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, ric_query_outcome, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                ric_request_id();
-    uint16_t&                        ran_function_id();
-    unbounded_octstring<true>&       ric_query_outcome();
-    const ric_request_id_s&          ric_request_id() const;
-    const uint16_t&                  ran_function_id() const;
-    const unbounded_octstring<true>& ric_query_outcome() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4013,42 +2995,10 @@ using ric_query_resp_s = elementary_procedure_option<ric_query_resp_ies_containe
 
 // RICserviceLoadStatusFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_load_status_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_load_meas_id, e2node_load_meas_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 ric_load_meas_id();
-    uint16_t&                 e2node_load_meas_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           ric_load_meas_id() const;
-    const uint16_t&           e2node_load_meas_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4070,51 +3020,10 @@ using ric_service_load_status_fail_s = elementary_procedure_option<ric_service_l
 
 // RICserviceLoadStatusRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_load_status_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_load_meas_id,
-        e2node_load_meas_id,
-        regist_request,
-        ran_function_load_request_list,
-        report_periodicity,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                               ric_load_meas_id();
-    uint16_t&                               e2node_load_meas_id();
-    regist_request_e&                       regist_request();
-    ran_function_load_request_list_l&       ran_function_load_request_list();
-    report_periodicity_e&                   report_periodicity();
-    const uint16_t&                         ric_load_meas_id() const;
-    const uint16_t&                         e2node_load_meas_id() const;
-    const regist_request_e&                 regist_request() const;
-    const ran_function_load_request_list_l& ran_function_load_request_list() const;
-    const report_periodicity_e&             report_periodicity() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4139,40 +3048,10 @@ using ric_service_load_status_request_s = elementary_procedure_option<ric_servic
 
 // RICserviceLoadStatusResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_load_status_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_load_meas_id, e2node_load_meas_id, ran_function_load_confirm_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                               ric_load_meas_id();
-    uint16_t&                               e2node_load_meas_id();
-    ran_function_load_confirm_list_l&       ran_function_load_confirm_list();
-    const uint16_t&                         ric_load_meas_id() const;
-    const uint16_t&                         e2node_load_meas_id() const;
-    const ran_function_load_confirm_list_l& ran_function_load_confirm_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4193,40 +3072,10 @@ using ric_service_load_status_resp_s = elementary_procedure_option<ric_service_l
 
 // RICserviceLoadUpdate-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_load_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_load_meas_id, e2node_load_meas_id, ran_function_load_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                       ric_load_meas_id();
-    uint16_t&                       e2node_load_meas_id();
-    ran_function_load_list_l&       ran_function_load_list();
-    const uint16_t&                 ric_load_meas_id() const;
-    const uint16_t&                 e2node_load_meas_id() const;
-    const ran_function_load_list_l& ran_function_load_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4246,40 +3095,10 @@ using ric_service_load_upd_s = elementary_procedure_option<ric_service_load_upd_
 
 // RICserviceQuery-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_query_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, ran_functions_accepted, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                      transaction_id();
-    ran_functions_id_list_l&       ran_functions_accepted();
-    const uint16_t&                transaction_id() const;
-    const ran_functions_id_list_l& ran_functions_accepted() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4299,50 +3118,10 @@ using ric_service_query_s = elementary_procedure_option<ric_service_query_ies_co
 
 // RICserviceUpdate-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        ran_functions_added,
-        ran_functions_modified,
-        ran_functions_deleted,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                      transaction_id();
-    ran_functions_list_l&          ran_functions_added();
-    ran_functions_list_l&          ran_functions_modified();
-    ran_functions_id_list_l&       ran_functions_deleted();
-    const uint16_t&                transaction_id() const;
-    const ran_functions_list_l&    ran_functions_added() const;
-    const ran_functions_list_l&    ran_functions_modified() const;
-    const ran_functions_id_list_l& ran_functions_deleted() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4366,50 +3145,10 @@ using ric_service_upd_s = elementary_procedure_option<ric_service_upd_ies_contai
 
 // RICserviceUpdateAcknowledge-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_upd_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        transaction_id,
-        ran_functions_accepted,
-        ran_functions_rejected,
-        ran_functions_accept_modified_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                   transaction_id();
-    ran_functions_id_list_l&                    ran_functions_accepted();
-    ran_functions_id_cause_list_l&              ran_functions_rejected();
-    ran_functions_accept_modified_list_l&       ran_functions_accept_modified_list();
-    const uint16_t&                             transaction_id() const;
-    const ran_functions_id_list_l&              ran_functions_accepted() const;
-    const ran_functions_id_cause_list_l&        ran_functions_rejected() const;
-    const ran_functions_accept_modified_list_l& ran_functions_accept_modified_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4433,44 +3172,10 @@ using ric_service_upd_ack_s = elementary_procedure_option<ric_service_upd_ack_ie
 
 // RICserviceUpdateFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_service_upd_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, cause, time_to_wait, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    cause_c&                  cause();
-    time_to_wait_e&           time_to_wait();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const cause_c&            cause() const;
-    const time_to_wait_e&     time_to_wait() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4634,40 +3339,10 @@ using ric_sub_audit_action_list_l = dyn_array<protocol_ie_single_container_s<ric
 
 // RICsubscriptionAuditFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_audit_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4691,40 +3366,10 @@ using ric_sub_audit_list_l = dyn_array<protocol_ie_single_container_s<ric_sub_au
 
 // RICsubscriptionAuditRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_audit_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ric_sub_audit_flag, ric_sub_audit_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&           ric_request_id();
-    ric_sub_audit_flag_s&       ric_sub_audit_flag();
-    ric_sub_audit_list_l&       ric_sub_audit_list();
-    const ric_request_id_s&     ric_request_id() const;
-    const ric_sub_audit_flag_s& ric_sub_audit_flag() const;
-    const ric_sub_audit_list_l& ric_sub_audit_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4746,48 +3391,10 @@ using ric_sub_audit_request_s = elementary_procedure_option<ric_sub_audit_reques
 
 // RICsubscriptionAuditResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_audit_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ric_sub_audit_confirmed_list,
-        ric_sub_audit_unkown_list,
-        ric_sub_audit_missing_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                  ric_request_id();
-    ric_sub_audit_action_list_l&       ric_sub_audit_confirmed_list();
-    ric_sub_audit_list_l&              ric_sub_audit_unkown_list();
-    ric_sub_audit_action_list_l&       ric_sub_audit_missing_list();
-    const ric_request_id_s&            ric_request_id() const;
-    const ric_sub_audit_action_list_l& ric_sub_audit_confirmed_list() const;
-    const ric_sub_audit_list_l&        ric_sub_audit_unkown_list() const;
-    const ric_sub_audit_action_list_l& ric_sub_audit_missing_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4810,44 +3417,10 @@ using ric_sub_audit_resp_s = elementary_procedure_option<ric_sub_audit_resp_ies_
 
 // RICsubscriptionDeleteFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_delete_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    uint16_t&                 ran_function_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const uint16_t&           ran_function_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4869,40 +3442,10 @@ using ric_sub_delete_fail_s = elementary_procedure_option<ric_sub_delete_fail_ie
 
 // RICsubscriptionDeleteRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_delete_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&       ric_request_id();
-    uint16_t&               ran_function_id();
-    const ric_request_id_s& ric_request_id() const;
-    const uint16_t&         ran_function_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4921,75 +3464,31 @@ using ric_sub_delete_request_s = elementary_procedure_option<ric_sub_delete_requ
 
 // RICsubscriptionDeleteRequired-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_delete_required_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_sub_to_be_remd, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::ric_sub_to_be_remd; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_sub_list_with_cause_l&       ric_sub_to_be_remd() { return c; }
-    const ric_sub_list_with_cause_l& ric_sub_to_be_remd() const { return c; }
-
-  private:
-    ric_sub_list_with_cause_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct ric_sub_delete_required_ies_container {
+  ric_sub_list_with_cause_l ric_sub_to_be_remd;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // RICsubscriptionDeleteRequired ::= SEQUENCE
-using ric_sub_delete_required_s = elementary_procedure_option<protocol_ie_container_l<ric_sub_delete_required_ies_o>>;
+using ric_sub_delete_required_s = elementary_procedure_option<ric_sub_delete_required_ies_container>;
 
 // RICsubscriptionDeleteResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_delete_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&       ric_request_id();
-    uint16_t&               ran_function_id();
-    const ric_request_id_s& ric_request_id() const;
-    const uint16_t&         ran_function_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5020,44 +3519,10 @@ struct ric_sub_details_s {
 
 // RICsubscriptionFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    uint16_t&                 ran_function_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const uint16_t&           ran_function_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5079,56 +3544,10 @@ using ric_sub_fail_s = elementary_procedure_option<ric_sub_fail_ies_container>;
 
 // RICsubscriptionModificationConfirm-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_mod_confirm_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_actions_confirmed_for_mod_list,
-        ric_actions_refused_to_be_modified_list,
-        ric_actions_confirmed_for_removal_list,
-        ric_actions_refused_to_be_remd_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                                ric_request_id();
-    uint16_t&                                        ran_function_id();
-    ric_actions_confirmed_for_mod_list_l&            ric_actions_confirmed_for_mod_list();
-    ric_actions_refused_to_be_modified_list_l&       ric_actions_refused_to_be_modified_list();
-    ric_actions_confirmed_for_removal_list_l&        ric_actions_confirmed_for_removal_list();
-    ric_actions_refused_to_be_remd_list_l&           ric_actions_refused_to_be_remd_list();
-    const ric_request_id_s&                          ric_request_id() const;
-    const uint16_t&                                  ran_function_id() const;
-    const ric_actions_confirmed_for_mod_list_l&      ric_actions_confirmed_for_mod_list() const;
-    const ric_actions_refused_to_be_modified_list_l& ric_actions_refused_to_be_modified_list() const;
-    const ric_actions_confirmed_for_removal_list_l&  ric_actions_confirmed_for_removal_list() const;
-    const ric_actions_refused_to_be_remd_list_l&     ric_actions_refused_to_be_remd_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5155,44 +3574,10 @@ using ric_sub_mod_confirm_s = elementary_procedure_option<ric_sub_mod_confirm_ie
 
 // RICsubscriptionModificationFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_mod_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    uint16_t&                 ran_function_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const uint16_t&           ran_function_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5214,44 +3599,10 @@ using ric_sub_mod_fail_s = elementary_procedure_option<ric_sub_mod_fail_ies_cont
 
 // RICsubscriptionModificationRefuse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_mod_refuse_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    uint16_t&                 ran_function_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const uint16_t&           ran_function_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5273,56 +3624,10 @@ using ric_sub_mod_refuse_s = elementary_procedure_option<ric_sub_mod_refuse_ies_
 
 // RICsubscriptionModificationRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_mod_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_event_trigger_definition_to_be_modified,
-        ric_actions_to_be_remd_for_mod_list,
-        ric_actions_to_be_modified_for_mod_list,
-        ric_actions_to_be_added_for_mod_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                                ric_request_id();
-    uint16_t&                                        ran_function_id();
-    unbounded_octstring<true>&                       ric_event_trigger_definition_to_be_modified();
-    ric_actions_to_be_remd_for_mod_list_l&           ric_actions_to_be_remd_for_mod_list();
-    ric_actions_to_be_modified_for_mod_list_l&       ric_actions_to_be_modified_for_mod_list();
-    ric_actions_to_be_added_for_mod_list_l&          ric_actions_to_be_added_for_mod_list();
-    const ric_request_id_s&                          ric_request_id() const;
-    const uint16_t&                                  ran_function_id() const;
-    const unbounded_octstring<true>&                 ric_event_trigger_definition_to_be_modified() const;
-    const ric_actions_to_be_remd_for_mod_list_l&     ric_actions_to_be_remd_for_mod_list() const;
-    const ric_actions_to_be_modified_for_mod_list_l& ric_actions_to_be_modified_for_mod_list() const;
-    const ric_actions_to_be_added_for_mod_list_l&    ric_actions_to_be_added_for_mod_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5349,50 +3654,10 @@ using ric_sub_mod_request_s = elementary_procedure_option<ric_sub_mod_request_ie
 
 // RICsubscriptionModificationRequired-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_mod_required_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_actions_required_to_be_modified_list,
-        ric_actions_required_to_be_remd_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                                 ric_request_id();
-    uint16_t&                                         ran_function_id();
-    ric_actions_required_to_be_modified_list_l&       ric_actions_required_to_be_modified_list();
-    ric_actions_required_to_be_remd_list_l&           ric_actions_required_to_be_remd_list();
-    const ric_request_id_s&                           ric_request_id() const;
-    const uint16_t&                                   ran_function_id() const;
-    const ric_actions_required_to_be_modified_list_l& ric_actions_required_to_be_modified_list() const;
-    const ric_actions_required_to_be_remd_list_l&     ric_actions_required_to_be_remd_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5415,62 +3680,10 @@ using ric_sub_mod_required_s = elementary_procedure_option<ric_sub_mod_required_
 
 // RICsubscriptionModificationResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_mod_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_actions_remd_for_mod_list,
-        ric_actions_failed_to_be_remd_for_mod_list,
-        ric_actions_modified_for_mod_list,
-        ric_actions_failed_to_be_modified_for_mod_list,
-        ric_actions_added_for_mod_list,
-        ric_actions_failed_to_be_added_for_mod_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                                       ric_request_id();
-    uint16_t&                                               ran_function_id();
-    ric_actions_remd_for_mod_list_l&                        ric_actions_remd_for_mod_list();
-    ric_actions_failed_to_be_remd_for_mod_list_l&           ric_actions_failed_to_be_remd_for_mod_list();
-    ric_actions_modified_for_mod_list_l&                    ric_actions_modified_for_mod_list();
-    ric_actions_failed_to_be_modified_for_mod_list_l&       ric_actions_failed_to_be_modified_for_mod_list();
-    ric_actions_added_for_mod_list_l&                       ric_actions_added_for_mod_list();
-    ric_actions_failed_to_be_added_for_mod_list_l&          ric_actions_failed_to_be_added_for_mod_list();
-    const ric_request_id_s&                                 ric_request_id() const;
-    const uint16_t&                                         ran_function_id() const;
-    const ric_actions_remd_for_mod_list_l&                  ric_actions_remd_for_mod_list() const;
-    const ric_actions_failed_to_be_remd_for_mod_list_l&     ric_actions_failed_to_be_remd_for_mod_list() const;
-    const ric_actions_modified_for_mod_list_l&              ric_actions_modified_for_mod_list() const;
-    const ric_actions_failed_to_be_modified_for_mod_list_l& ric_actions_failed_to_be_modified_for_mod_list() const;
-    const ric_actions_added_for_mod_list_l&                 ric_actions_added_for_mod_list() const;
-    const ric_actions_failed_to_be_added_for_mod_list_l&    ric_actions_failed_to_be_added_for_mod_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5501,53 +3714,10 @@ using ric_sub_mod_resp_s = elementary_procedure_option<ric_sub_mod_resp_ies_cont
 
 // RICsubscriptionRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ric_request_id,
-        ran_function_id,
-        ric_sub_details,
-        ric_sub_start_time,
-        ric_sub_end_time,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&               ric_request_id();
-    uint16_t&                       ran_function_id();
-    ric_sub_details_s&              ric_sub_details();
-    fixed_octstring<8, true>&       ric_sub_start_time();
-    fixed_octstring<8, true>&       ric_sub_end_time();
-    const ric_request_id_s&         ric_request_id() const;
-    const uint16_t&                 ran_function_id() const;
-    const ric_sub_details_s&        ric_sub_details() const;
-    const fixed_octstring<8, true>& ric_sub_start_time() const;
-    const fixed_octstring<8, true>& ric_sub_end_time() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5571,44 +3741,10 @@ using ric_sub_request_s = elementary_procedure_option<ric_sub_request_ies_contai
 
 // RICsubscriptionResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_id, ric_actions_admitted, ric_actions_not_admitted, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                     ric_request_id();
-    uint16_t&                             ran_function_id();
-    ric_action_admitted_list_l&           ric_actions_admitted();
-    ric_action_not_admitted_list_l&       ric_actions_not_admitted();
-    const ric_request_id_s&               ric_request_id() const;
-    const uint16_t&                       ran_function_id() const;
-    const ric_action_admitted_list_l&     ric_actions_admitted() const;
-    const ric_action_not_admitted_list_l& ric_actions_not_admitted() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5630,40 +3766,10 @@ using ric_sub_resp_s = elementary_procedure_option<ric_sub_resp_ies_container>;
 
 // RICsubscriptionStateControlFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_state_ctrl_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&         ric_request_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const ric_request_id_s&   ric_request_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5684,38 +3790,10 @@ using ric_sub_state_ctrl_fail_s = elementary_procedure_option<ric_sub_state_ctrl
 
 // RICsubscriptionStateControlRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_state_ctrl_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_state_ctrl_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                     ric_request_id();
-    ran_function_state_ctrl_list_l&       ran_function_state_ctrl_list();
-    const ric_request_id_s&               ric_request_id() const;
-    const ran_function_state_ctrl_list_l& ran_function_state_ctrl_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5734,38 +3812,10 @@ using ric_sub_state_ctrl_request_s = elementary_procedure_option<ric_sub_state_c
 
 // RICsubscriptionStateControlResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct ric_sub_state_ctrl_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ric_request_id, ran_function_state_confirm_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ric_request_id_s&                        ric_request_id();
-    ran_function_state_confirm_list_l&       ran_function_state_confirm_list();
-    const ric_request_id_s&                  ric_request_id() const;
-    const ran_function_state_confirm_list_l& ran_function_state_confirm_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5784,40 +3834,10 @@ using ric_sub_state_ctrl_resp_s = elementary_procedure_option<ric_sub_state_ctrl
 
 // ResetRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct reset_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, cause, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&       transaction_id();
-    cause_c&        cause();
-    const uint16_t& transaction_id() const;
-    const cause_c&  cause() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5836,40 +3856,10 @@ using reset_request_s = elementary_procedure_option<reset_request_ies_container>
 
 // ResetResponseIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
 struct reset_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { transaction_id, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 transaction_id();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           transaction_id() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5889,59 +3879,3 @@ using reset_resp_s = elementary_procedure_option<reset_resp_ies_container>;
 
 } // namespace e2ap
 } // namespace asn1
-
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2_removal_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2_removal_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2_res_status_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2_res_status_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2_res_status_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2_res_status_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2conn_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2conn_upd_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2conn_upd_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2node_cfg_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2node_cfg_upd_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2node_cfg_upd_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2setup_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2setup_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::e2setup_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::error_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_assist_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_assist_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_assist_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_assist_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_ctrl_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_ctrl_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_ctrl_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_query_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_query_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_query_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_load_status_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_load_status_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_load_status_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_load_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_query_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_upd_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_service_upd_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_audit_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_audit_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_audit_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_delete_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_delete_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_delete_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_mod_confirm_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_mod_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_mod_refuse_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_mod_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_mod_required_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_mod_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_state_ctrl_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_state_ctrl_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::ric_sub_state_ctrl_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::reset_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::e2ap::reset_resp_ies_o>;

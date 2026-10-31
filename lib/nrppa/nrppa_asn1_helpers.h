@@ -47,13 +47,11 @@ inline void fill_nrppa_e_cid_meas_initiation_request(nrppa_e_cid_meas_initiation
 inline void fill_nrppa_otdoa_information_request(nrppa_otdoa_information_request&         request,
                                                  const asn1::nrppa::otdoa_info_request_s& asn1_request)
 {
-  for (const auto& asn1_item : *asn1_request) {
-    for (const auto& asn1_info_type_item : asn1_item.value().otdoa_info_type_group()) {
-      if (asn1_info_type_item.value().otdoa_info_type_item().otdoa_info_item.value !=
-          asn1::nrppa::otdoa_info_item_opts::nulltype) {
-        request.otdoa_info_type.push_back({static_cast<nrppa_otdoa_info_item>(
-            asn1_info_type_item.value().otdoa_info_type_item().otdoa_info_item.value)});
-      }
+  for (const auto& asn1_info_type_item : asn1_request->otdoa_info_type_group) {
+    if (asn1_info_type_item.value().otdoa_info_type_item().otdoa_info_item.value !=
+        asn1::nrppa::otdoa_info_item_opts::nulltype) {
+      request.otdoa_info_type.push_back({static_cast<nrppa_otdoa_info_item>(
+          asn1_info_type_item.value().otdoa_info_type_item().otdoa_info_item.value)});
     }
   }
 }

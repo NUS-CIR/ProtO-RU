@@ -23,48 +23,10 @@ namespace xnap {
 
 // AccessAndMobilityIndication-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct access_and_mob_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ra_report,
-        successful_ho_report_info,
-        successful_pscell_change_report_info,
-        dl_lbt_fail_info_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ra_report_l&                                  ra_report();
-    successful_ho_report_info_l&                  successful_ho_report_info();
-    successful_pscell_change_report_info_l&       successful_pscell_change_report_info();
-    dl_lbt_fail_info_list_l&                      dl_lbt_fail_info_list();
-    const ra_report_l&                            ra_report() const;
-    const successful_ho_report_info_l&            successful_ho_report_info() const;
-    const successful_pscell_change_report_info_l& successful_pscell_change_report_info() const;
-    const dl_lbt_fail_info_list_l&                dl_lbt_fail_info_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -273,51 +235,10 @@ using pdu_session_res_activity_notify_list_l = dyn_array<pdu_session_res_activit
 
 // ActivityNotification-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct activity_notif_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        user_plane_traffic_activity_report,
-        pdu_session_res_activity_notify_list,
-        ran_paging_fail,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                     m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                     s_ng_ran_node_ue_xnap_id();
-    user_plane_traffic_activity_report_e&         user_plane_traffic_activity_report();
-    pdu_session_res_activity_notify_list_l&       pdu_session_res_activity_notify_list();
-    ran_paging_fail_e&                            ran_paging_fail();
-    const uint64_t&                               m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                               s_ng_ran_node_ue_xnap_id() const;
-    const user_plane_traffic_activity_report_e&   user_plane_traffic_activity_report() const;
-    const pdu_session_res_activity_notify_list_l& pdu_session_res_activity_notify_list() const;
-    const ran_paging_fail_e&                      ran_paging_fail() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -394,48 +315,10 @@ using boundary_node_cells_list_l = dyn_array<boundary_node_cells_list_item_s>;
 
 // CPCCancel-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cp_c_cancel_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        cause,
-        target_s_ng_ran_node_id,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                      m_ng_ran_node_ue_xnap_id();
-    uint64_t&                      s_ng_ran_node_ue_xnap_id();
-    cause_c&                       cause();
-    global_ng_ran_node_id_c&       target_s_ng_ran_node_id();
-    const uint64_t&                m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                 cause() const;
-    const global_ng_ran_node_id_c& target_s_ng_ran_node_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -457,48 +340,10 @@ using cp_c_cancel_s = elementary_procedure_option<cp_c_cancel_ies_container>;
 
 // CellActivationFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cell_activation_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        activation_id_for_cell_activation,
-        cause,
-        crit_diagnostics,
-        interface_instance_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 activation_id_for_cell_activation();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    uint16_t&                 interface_instance_ind();
-    const uint16_t&           activation_id_for_cell_activation() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const uint16_t&           interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -659,40 +504,10 @@ private:
 
 // CellActivationRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cell_activation_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { served_cells_to_activ, activation_id_for_cell_activation, interface_instance_ind, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    served_cells_to_activ_c&       served_cells_to_activ();
-    uint16_t&                      activation_id_for_cell_activation();
-    uint16_t&                      interface_instance_ind();
-    const served_cells_to_activ_c& served_cells_to_activ() const;
-    const uint16_t&                activation_id_for_cell_activation() const;
-    const uint16_t&                interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -713,48 +528,10 @@ using cell_activation_request_s = elementary_procedure_option<cell_activation_re
 
 // CellActivationResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cell_activation_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        activ_served_cells,
-        activation_id_for_cell_activation,
-        crit_diagnostics,
-        interface_instance_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    activ_served_cells_c&       activ_served_cells();
-    uint16_t&                   activation_id_for_cell_activation();
-    crit_diagnostics_s&         crit_diagnostics();
-    uint16_t&                   interface_instance_ind();
-    const activ_served_cells_c& activ_served_cells() const;
-    const uint16_t&             activation_id_for_cell_activation() const;
-    const crit_diagnostics_s&   crit_diagnostics() const;
-    const uint16_t&             interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -777,54 +554,10 @@ using cell_activation_resp_s = elementary_procedure_option<cell_activation_resp_
 
 // CellTrafficTraceIEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cell_traffic_trace_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        ng_ran_trace_id,
-        trace_collection_entity_ip_address,
-        privacy_ind,
-        trace_collection_entity_uri,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                                    m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                                    s_ng_ran_node_ue_xnap_id();
-    fixed_octstring<8, true>&                                    ng_ran_trace_id();
-    bounded_bitstring<1, 160, true, true>&                       trace_collection_entity_ip_address();
-    privacy_ind_e&                                               privacy_ind();
-    visible_string<0, MAX_ASN_STRING_LENGTH, false, true>&       trace_collection_entity_uri();
-    const uint64_t&                                              m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                              s_ng_ran_node_ue_xnap_id() const;
-    const fixed_octstring<8, true>&                              ng_ran_trace_id() const;
-    const bounded_bitstring<1, 160, true, true>&                 trace_collection_entity_ip_address() const;
-    const privacy_ind_e&                                         privacy_ind() const;
-    const visible_string<0, MAX_ASN_STRING_LENGTH, false, true>& trace_collection_entity_uri() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -849,51 +582,10 @@ using cell_traffic_trace_s = elementary_procedure_option<cell_traffic_trace_ies_
 
 // ConditionalHandoverCancel-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct conditional_ho_cancel_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        target_ng_ran_node_ue_xnap_id,
-        cause,
-        target_cells_to_cancel,
-        conditional_recfg_to_cancel_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                       source_ng_ran_node_ue_xnap_id();
-    uint64_t&                       target_ng_ran_node_ue_xnap_id();
-    cause_c&                        cause();
-    target_cell_list_l&             target_cells_to_cancel();
-    conditional_recfg_list_l&       conditional_recfg_to_cancel_list();
-    const uint64_t&                 source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                 target_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                  cause() const;
-    const target_cell_list_l&       target_cells_to_cancel() const;
-    const conditional_recfg_list_l& conditional_recfg_to_cancel_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -936,42 +628,28 @@ struct cfg_rejected_by_m_ng_ran_node_s {
 
 // Configuration-successfully-applied-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct cfg_successfully_applied_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { sk_counter, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::sk_counter; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&       sk_counter() { return c; }
-    const uint32_t& sk_counter() const { return c; }
-
-  private:
-    uint32_t c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
+};
+
+struct cfg_successfully_applied_ext_ies_container {
+  bool     sk_counter_present = false;
+  uint32_t sk_counter;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
 };
 
 // Configuration-successfully-applied ::= SEQUENCE
 struct cfg_successfully_applied_s {
-  unbounded_octstring<true>                                    m_ng_ran_node_to_s_ng_ran_node_container;
-  protocol_ext_container_l<cfg_successfully_applied_ext_ies_o> ie_exts;
+  bool                                       ie_exts_present = false;
+  unbounded_octstring<true>                  m_ng_ran_node_to_s_ng_ran_node_container;
+  cfg_successfully_applied_ext_ies_container ie_exts;
   // ...
 
   // sequence methods
@@ -982,87 +660,19 @@ struct cfg_successfully_applied_s {
 
 // ConfigurationUpdate-gNB ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cfg_upd_gnb_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        served_cells_to_upd_nr,
-        cell_assist_info_nr,
-        cell_assist_info_eutra,
-        served_cell_specific_info_req_nr,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    served_cells_to_upd_nr_s&                 served_cells_to_upd_nr();
-    cell_assist_info_nr_c&                    cell_assist_info_nr();
-    cell_assist_info_eutra_c&                 cell_assist_info_eutra();
-    served_cell_specific_info_req_nr_l&       served_cell_specific_info_req_nr();
-    const served_cells_to_upd_nr_s&           served_cells_to_upd_nr() const;
-    const cell_assist_info_nr_c&              cell_assist_info_nr() const;
-    const cell_assist_info_eutra_c&           cell_assist_info_eutra() const;
-    const served_cell_specific_info_req_nr_l& served_cell_specific_info_req_nr() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
 // ConfigurationUpdate-ng-eNB ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct cfg_upd_ng_enb_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { served_cells_to_upd_e_utra, cell_assist_info_nr, cell_assist_info_eutra, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    served_cells_to_upd_e_utra_s&       served_cells_to_upd_e_utra();
-    cell_assist_info_nr_c&              cell_assist_info_nr();
-    cell_assist_info_eutra_c&           cell_assist_info_eutra();
-    const served_cells_to_upd_e_utra_s& served_cells_to_upd_e_utra() const;
-    const cell_assist_info_nr_c&        cell_assist_info_nr() const;
-    const cell_assist_info_eutra_c&     cell_assist_info_eutra() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1183,42 +793,10 @@ struct dl_discarding_s {
 
 // DataCollectionFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct data_collection_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ngran_node1_meas_id, ngran_node2_meas_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 ngran_node1_meas_id();
-    uint16_t&                 ngran_node2_meas_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           ngran_node1_meas_id() const;
-    const uint16_t&           ngran_node2_meas_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1240,63 +818,10 @@ using data_collection_fail_s = elementary_procedure_option<data_collection_fail_
 
 // DataCollectionRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct data_collection_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ngran_node1_meas_id,
-        ngran_node2_meas_id,
-        regist_request_for_data_collection,
-        report_characteristics_for_data_collection,
-        cell_to_report_for_data_collection_list,
-        report_periodicity_for_data_collection,
-        requested_prediction_time,
-        ue_trajectory_collection_cfg,
-        ue_performance_collection_cfg,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                        ngran_node1_meas_id();
-    uint16_t&                                        ngran_node2_meas_id();
-    regist_request_for_data_collection_e&            regist_request_for_data_collection();
-    fixed_bitstring<32, false, true>&                report_characteristics_for_data_collection();
-    cell_to_report_for_data_collection_list_l&       cell_to_report_for_data_collection_list();
-    report_periodicity_for_data_collection_e&        report_periodicity_for_data_collection();
-    uint8_t&                                         requested_prediction_time();
-    ue_trajectory_collection_cfg_s&                  ue_trajectory_collection_cfg();
-    ue_performance_collection_cfg_s&                 ue_performance_collection_cfg();
-    const uint16_t&                                  ngran_node1_meas_id() const;
-    const uint16_t&                                  ngran_node2_meas_id() const;
-    const regist_request_for_data_collection_e&      regist_request_for_data_collection() const;
-    const fixed_bitstring<32, false, true>&          report_characteristics_for_data_collection() const;
-    const cell_to_report_for_data_collection_list_l& cell_to_report_for_data_collection_list() const;
-    const report_periodicity_for_data_collection_e&  report_periodicity_for_data_collection() const;
-    const uint8_t&                                   requested_prediction_time() const;
-    const ue_trajectory_collection_cfg_s&            ue_trajectory_collection_cfg() const;
-    const ue_performance_collection_cfg_s&           ue_performance_collection_cfg() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1329,51 +854,10 @@ using data_collection_request_s = elementary_procedure_option<data_collection_re
 
 // DataCollectionResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct data_collection_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ngran_node1_meas_id,
-        ngran_node2_meas_id,
-        node_meas_initiation_result_list,
-        cell_meas_initiation_result_list,
-        crit_diagnostics,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                 ngran_node1_meas_id();
-    uint16_t&                                 ngran_node2_meas_id();
-    node_meas_initiation_result_list_l&       node_meas_initiation_result_list();
-    cell_meas_initiation_result_list_l&       cell_meas_initiation_result_list();
-    crit_diagnostics_s&                       crit_diagnostics();
-    const uint16_t&                           ngran_node1_meas_id() const;
-    const uint16_t&                           ngran_node2_meas_id() const;
-    const node_meas_initiation_result_list_l& node_meas_initiation_result_list() const;
-    const cell_meas_initiation_result_list_l& cell_meas_initiation_result_list() const;
-    const crit_diagnostics_s&                 crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1398,51 +882,10 @@ using data_collection_resp_s = elementary_procedure_option<data_collection_resp_
 
 // DataCollectionUpdate-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct data_collection_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ngran_node1_meas_id,
-        ngran_node2_meas_id,
-        cell_meas_result_for_data_collection_list,
-        ue_associated_info_result_list,
-        node_associated_info_result,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                                          ngran_node1_meas_id();
-    uint16_t&                                          ngran_node2_meas_id();
-    cell_meas_result_for_data_collection_list_l&       cell_meas_result_for_data_collection_list();
-    ue_associated_info_result_list_l&                  ue_associated_info_result_list();
-    node_associated_info_result_s&                     node_associated_info_result();
-    const uint16_t&                                    ngran_node1_meas_id() const;
-    const uint16_t&                                    ngran_node2_meas_id() const;
-    const cell_meas_result_for_data_collection_list_l& cell_meas_result_for_data_collection_list() const;
-    const ue_associated_info_result_list_l&            ue_associated_info_result_list() const;
-    const node_associated_info_result_s&               node_associated_info_result() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1467,40 +910,10 @@ using data_collection_upd_s = elementary_procedure_option<data_collection_upd_ie
 
 // DeactivateTraceIEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct deactiv_trace_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, ng_ran_trace_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                       m_ng_ran_node_ue_xnap_id();
-    uint64_t&                       s_ng_ran_node_ue_xnap_id();
-    fixed_octstring<8, true>&       ng_ran_trace_id();
-    const uint64_t&                 m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                 s_ng_ran_node_ue_xnap_id() const;
-    const fixed_octstring<8, true>& ng_ran_trace_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1635,40 +1048,10 @@ private:
 
 // E-UTRA-NR-CellResourceCoordinationRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct e_utra_nr_cell_res_coordination_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { init_node_type_res_coord_request, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    init_node_type_res_coord_request_c&       init_node_type_res_coord_request();
-    uint16_t&                                 interface_instance_ind();
-    const init_node_type_res_coord_request_c& init_node_type_res_coord_request() const;
-    const uint16_t&                           interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1802,40 +1185,10 @@ private:
 
 // E-UTRA-NR-CellResourceCoordinationResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct e_utra_nr_cell_res_coordination_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { responding_node_type_res_coord_resp, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    responding_node_type_res_coord_resp_c&       responding_node_type_res_coord_resp();
-    uint16_t&                                    interface_instance_ind();
-    const responding_node_type_res_coord_resp_c& responding_node_type_res_coord_resp() const;
-    const uint16_t&                              interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1938,40 +1291,10 @@ private:
 
 // EarlyStatusTransfer-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct early_status_transfer_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { source_ng_ran_node_ue_xnap_id, target_ng_ran_node_ue_xnap_id, proc_stage, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                  source_ng_ran_node_ue_xnap_id();
-    uint64_t&                  target_ng_ran_node_ue_xnap_id();
-    proc_stage_choice_c&       proc_stage();
-    const uint64_t&            source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&            target_ng_ran_node_ue_xnap_id() const;
-    const proc_stage_choice_c& proc_stage() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1991,51 +1314,10 @@ using early_status_transfer_s = elementary_procedure_option<early_status_transfe
 
 // ErrorIndication-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct error_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        old_ng_ran_node_ue_xnap_id,
-        new_ng_ran_node_ue_xnap_id,
-        cause,
-        crit_diagnostics,
-        interface_instance_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 old_ng_ran_node_ue_xnap_id();
-    uint64_t&                 new_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    uint16_t&                 interface_instance_ind();
-    const uint64_t&           old_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           new_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const uint16_t&           interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2062,40 +1344,10 @@ using error_ind_s = elementary_procedure_option<error_ind_ies_container>;
 
 // F1CTrafficTransfer-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct f1_c_traffic_transfer_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, f1_c_traffic_container, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                        m_ng_ran_node_ue_xnap_id();
-    uint64_t&                        s_ng_ran_node_ue_xnap_id();
-    unbounded_octstring<true>&       f1_c_traffic_container();
-    const uint64_t&                  m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                  s_ng_ran_node_ue_xnap_id() const;
-    const unbounded_octstring<true>& f1_c_traffic_container() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2115,38 +1367,24 @@ using f1_c_traffic_transfer_s = elementary_procedure_option<f1_c_traffic_transfe
 
 // FailureIndication-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct fail_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { init_condition_fail_ind, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::init_condition_fail_ind; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    init_condition_fail_ind_c&       init_condition_fail_ind() { return c; }
-    const init_condition_fail_ind_c& init_condition_fail_ind() const { return c; }
-
-  private:
-    init_condition_fail_ind_c c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct fail_ind_ies_container {
+  init_condition_fail_ind_c init_condition_fail_ind;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // FailureIndication ::= SEQUENCE
-using fail_ind_s = elementary_procedure_option<protocol_ie_container_l<fail_ind_ies_o>>;
+using fail_ind_s = elementary_procedure_option<fail_ind_ies_container>;
 
 // FastMCGRecoveryRRCTransfer-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 using fast_mcg_recovery_rrc_transfer_ext_ies_o = protocol_ext_empty_o;
@@ -2168,48 +1406,10 @@ struct fast_mcg_recovery_rrc_transfer_s {
 
 // HandoverCancel-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ho_cancel_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        target_ng_ran_node_ue_xnap_id,
-        cause,
-        target_cells_to_cancel,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 source_ng_ran_node_ue_xnap_id();
-    uint64_t&                 target_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    target_cell_list_l&       target_cells_to_cancel();
-    const uint64_t&           source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           target_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const target_cell_list_l& target_cells_to_cancel() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2232,50 +1432,10 @@ using ho_cancel_s = elementary_procedure_option<ho_cancel_ies_container>;
 
 // HandoverPreparationFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ho_prep_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        cause,
-        crit_diagnostics,
-        requested_target_cell_global_id,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 source_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    target_cgi_c&             requested_target_cell_global_id();
-    const uint64_t&           source_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const target_cgi_c&       requested_target_cell_global_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2298,74 +1458,10 @@ using ho_prep_fail_s = elementary_procedure_option<ho_prep_fail_ies_container>;
 
 // HandoverReport-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ho_report_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ho_report_type,
-        ho_cause,
-        source_cell_cgi,
-        target_cell_cgi,
-        re_establishment_cell_cgi,
-        target_cellin_eutran,
-        source_cell_c_rnti,
-        mob_info,
-        ue_rlf_report_container,
-        cho_cfg,
-        target_cell_c_rnti,
-        time_since_fail,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ho_report_type_e&                       ho_report_type();
-    cause_c&                                ho_cause();
-    global_ng_ran_cell_id_s&                source_cell_cgi();
-    global_ng_ran_cell_id_s&                target_cell_cgi();
-    global_cell_id_s&                       re_establishment_cell_cgi();
-    unbounded_octstring<true>&              target_cellin_eutran();
-    fixed_bitstring<16, false, true>&       source_cell_c_rnti();
-    fixed_bitstring<32, false, true>&       mob_info();
-    ue_rlf_report_container_c&              ue_rlf_report_container();
-    cho_cfg_s&                              cho_cfg();
-    fixed_bitstring<16, false, true>&       target_cell_c_rnti();
-    uint32_t&                               time_since_fail();
-    const ho_report_type_e&                 ho_report_type() const;
-    const cause_c&                          ho_cause() const;
-    const global_ng_ran_cell_id_s&          source_cell_cgi() const;
-    const global_ng_ran_cell_id_s&          target_cell_cgi() const;
-    const global_cell_id_s&                 re_establishment_cell_cgi() const;
-    const unbounded_octstring<true>&        target_cellin_eutran() const;
-    const fixed_bitstring<16, false, true>& source_cell_c_rnti() const;
-    const fixed_bitstring<32, false, true>& mob_info() const;
-    const ue_rlf_report_container_c&        ue_rlf_report_container() const;
-    const cho_cfg_s&                        cho_cfg() const;
-    const fixed_bitstring<16, false, true>& target_cell_c_rnti() const;
-    const uint32_t&                         time_since_fail() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2402,66 +1498,10 @@ using ho_report_s = elementary_procedure_option<ho_report_ies_container>;
 
 // UEContextInfoHORequest-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct ue_context_info_ho_request_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options {
-        five_gc_mob_restrict_list_container,
-        nr_ue_sidelink_aggr_max_bit_rate,
-        lte_ue_sidelink_aggr_max_bit_rate,
-        mdt_plmn_list,
-        ue_radio_cap_id,
-        mbs_session_info_list,
-        five_g_pro_se_ue_pc5_aggr_max_bit_rate,
-        ue_slice_max_bit_rate_list,
-        nr_a2_x_ue_pc5_aggr_max_bit_rate,
-        ltea2_x_ue_pc5_aggr_max_bit_rate,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    ext_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    unbounded_octstring<true>&                 five_gc_mob_restrict_list_container();
-    nr_ue_sidelink_aggr_max_bit_rate_s&        nr_ue_sidelink_aggr_max_bit_rate();
-    lte_ue_sidelink_aggr_max_bit_rate_s&       lte_ue_sidelink_aggr_max_bit_rate();
-    mdt_plmn_list_l&                           mdt_plmn_list();
-    unbounded_octstring<true>&                 ue_radio_cap_id();
-    mbs_session_info_list_l&                   mbs_session_info_list();
-    nr_ue_sidelink_aggr_max_bit_rate_s&        five_g_pro_se_ue_pc5_aggr_max_bit_rate();
-    ue_slice_max_bit_rate_list_l&              ue_slice_max_bit_rate_list();
-    nr_ue_sidelink_aggr_max_bit_rate_s&        nr_a2_x_ue_pc5_aggr_max_bit_rate();
-    lte_ue_sidelink_aggr_max_bit_rate_s&       ltea2_x_ue_pc5_aggr_max_bit_rate();
-    const unbounded_octstring<true>&           five_gc_mob_restrict_list_container() const;
-    const nr_ue_sidelink_aggr_max_bit_rate_s&  nr_ue_sidelink_aggr_max_bit_rate() const;
-    const lte_ue_sidelink_aggr_max_bit_rate_s& lte_ue_sidelink_aggr_max_bit_rate() const;
-    const mdt_plmn_list_l&                     mdt_plmn_list() const;
-    const unbounded_octstring<true>&           ue_radio_cap_id() const;
-    const mbs_session_info_list_l&             mbs_session_info_list() const;
-    const nr_ue_sidelink_aggr_max_bit_rate_s&  five_g_pro_se_ue_pc5_aggr_max_bit_rate() const;
-    const ue_slice_max_bit_rate_list_l&        ue_slice_max_bit_rate_list() const;
-    const nr_ue_sidelink_aggr_max_bit_rate_s&  nr_a2_x_ue_pc5_aggr_max_bit_rate() const;
-    const lte_ue_sidelink_aggr_max_bit_rate_s& ltea2_x_ue_pc5_aggr_max_bit_rate() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2539,135 +1579,10 @@ struct ue_context_ref_at_sn_ho_request_s {
 
 // HandoverRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ho_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        cause,
-        target_cell_global_id,
-        guami,
-        ue_context_info_ho_request,
-        trace_activation,
-        masked_imeisv,
-        ue_history_info,
-        ue_context_ref_at_sn_ho_request,
-        ch_oinfo_req,
-        nr_v2x_services_authorized,
-        ltev2x_services_authorized,
-        pc5_qos_params,
-        mob_info,
-        ue_history_info_from_the_ue,
-        iab_node_ind,
-        no_pdu_session_ind,
-        time_sync_assist_info,
-        q_mcc_onfig_info,
-        five_g_pro_se_authorized,
-        five_g_pro_se_pc5_qos_params,
-        iab_authorization_status,
-        dl_lbt_fail_info_request,
-        aerial_ue_sub_info,
-        nr_a2_x_services_authorized,
-        ltea2_x_services_authorized,
-        a2_xpc5_qos_params,
-        cell_based_ue_trajectory_prediction,
-        data_collection_id,
-        candidate_relay_ue_info_list,
-        source_sn_to_target_sn_qmc_info,
-        mobile_iab_authorization_status,
-        sl_positioning_ranging_services_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                     source_ng_ran_node_ue_xnap_id();
-    cause_c&                                      cause();
-    target_cgi_c&                                 target_cell_global_id();
-    guami_s&                                      guami();
-    ue_context_info_ho_request_s&                 ue_context_info_ho_request();
-    trace_activation_s&                           trace_activation();
-    fixed_bitstring<64, false, true>&             masked_imeisv();
-    ue_history_info_l&                            ue_history_info();
-    ue_context_ref_at_sn_ho_request_s&            ue_context_ref_at_sn_ho_request();
-    ch_oinfo_req_s&                               ch_oinfo_req();
-    nr_v2x_services_authorized_s&                 nr_v2x_services_authorized();
-    ltev2x_services_authorized_s&                 ltev2x_services_authorized();
-    pc5_qos_params_s&                             pc5_qos_params();
-    fixed_bitstring<32, false, true>&             mob_info();
-    ue_history_info_from_the_ue_c&                ue_history_info_from_the_ue();
-    iab_node_ind_e&                               iab_node_ind();
-    no_pdu_session_ind_e&                         no_pdu_session_ind();
-    time_sync_assist_info_s&                      time_sync_assist_info();
-    q_mcc_onfig_info_s&                           q_mcc_onfig_info();
-    five_g_pro_se_authorized_s&                   five_g_pro_se_authorized();
-    five_g_pro_se_pc5_qos_params_s&               five_g_pro_se_pc5_qos_params();
-    iab_authorization_status_e&                   iab_authorization_status();
-    dl_lbt_fail_info_request_e&                   dl_lbt_fail_info_request();
-    aerial_ue_sub_info_e&                         aerial_ue_sub_info();
-    nr_a2_x_services_authorized_s&                nr_a2_x_services_authorized();
-    ltea2_x_services_authorized_s&                ltea2_x_services_authorized();
-    a2_xpc5_qos_params_s&                         a2_xpc5_qos_params();
-    cell_based_ue_trajectory_prediction_l&        cell_based_ue_trajectory_prediction();
-    data_collection_id_s&                         data_collection_id();
-    candidate_relay_ue_info_list_l&               candidate_relay_ue_info_list();
-    q_mcc_onfig_info_s&                           source_sn_to_target_sn_qmc_info();
-    mobile_iab_authorization_status_e&            mobile_iab_authorization_status();
-    sl_positioning_ranging_services_info_s&       sl_positioning_ranging_services_info();
-    const uint64_t&                               source_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                                cause() const;
-    const target_cgi_c&                           target_cell_global_id() const;
-    const guami_s&                                guami() const;
-    const ue_context_info_ho_request_s&           ue_context_info_ho_request() const;
-    const trace_activation_s&                     trace_activation() const;
-    const fixed_bitstring<64, false, true>&       masked_imeisv() const;
-    const ue_history_info_l&                      ue_history_info() const;
-    const ue_context_ref_at_sn_ho_request_s&      ue_context_ref_at_sn_ho_request() const;
-    const ch_oinfo_req_s&                         ch_oinfo_req() const;
-    const nr_v2x_services_authorized_s&           nr_v2x_services_authorized() const;
-    const ltev2x_services_authorized_s&           ltev2x_services_authorized() const;
-    const pc5_qos_params_s&                       pc5_qos_params() const;
-    const fixed_bitstring<32, false, true>&       mob_info() const;
-    const ue_history_info_from_the_ue_c&          ue_history_info_from_the_ue() const;
-    const iab_node_ind_e&                         iab_node_ind() const;
-    const no_pdu_session_ind_e&                   no_pdu_session_ind() const;
-    const time_sync_assist_info_s&                time_sync_assist_info() const;
-    const q_mcc_onfig_info_s&                     q_mcc_onfig_info() const;
-    const five_g_pro_se_authorized_s&             five_g_pro_se_authorized() const;
-    const five_g_pro_se_pc5_qos_params_s&         five_g_pro_se_pc5_qos_params() const;
-    const iab_authorization_status_e&             iab_authorization_status() const;
-    const dl_lbt_fail_info_request_e&             dl_lbt_fail_info_request() const;
-    const aerial_ue_sub_info_e&                   aerial_ue_sub_info() const;
-    const nr_a2_x_services_authorized_s&          nr_a2_x_services_authorized() const;
-    const ltea2_x_services_authorized_s&          ltea2_x_services_authorized() const;
-    const a2_xpc5_qos_params_s&                   a2_xpc5_qos_params() const;
-    const cell_based_ue_trajectory_prediction_l&  cell_based_ue_trajectory_prediction() const;
-    const data_collection_id_s&                   data_collection_id() const;
-    const candidate_relay_ue_info_list_l&         candidate_relay_ue_info_list() const;
-    const q_mcc_onfig_info_s&                     source_sn_to_target_sn_qmc_info() const;
-    const mobile_iab_authorization_status_e&      mobile_iab_authorization_status() const;
-    const sl_positioning_ranging_services_info_s& sl_positioning_ranging_services_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2744,75 +1659,10 @@ using ho_request_s = elementary_procedure_option<ho_request_ies_container>;
 
 // HandoverRequestAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ho_request_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        target_ng_ran_node_ue_xnap_id,
-        pdu_session_res_admitted_list,
-        pdu_session_res_not_admitted_list,
-        target2_source_ng_ran_node_transp_container,
-        ue_context_kept_ind,
-        crit_diagnostics,
-        drbs_transferred_to_mn,
-        daps_resp_info_list,
-        ch_oinfo_ack,
-        mbs_session_info_resp_list,
-        rrc_cfg_ind,
-        pdu_setbased_handling_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                  source_ng_ran_node_ue_xnap_id();
-    uint64_t&                                  target_ng_ran_node_ue_xnap_id();
-    pdu_session_res_admitted_list_l&           pdu_session_res_admitted_list();
-    pdu_session_res_not_admitted_list_l&       pdu_session_res_not_admitted_list();
-    unbounded_octstring<true>&                 target2_source_ng_ran_node_transp_container();
-    ue_context_kept_ind_e&                     ue_context_kept_ind();
-    crit_diagnostics_s&                        crit_diagnostics();
-    drb_list_l&                                drbs_transferred_to_mn();
-    daps_resp_info_list_l&                     daps_resp_info_list();
-    ch_oinfo_ack_s&                            ch_oinfo_ack();
-    mbs_session_info_resp_list_l&              mbs_session_info_resp_list();
-    rrc_cfg_ind_e&                             rrc_cfg_ind();
-    pdu_setbased_handling_ind_e&               pdu_setbased_handling_ind();
-    const uint64_t&                            source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                            target_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_res_admitted_list_l&     pdu_session_res_admitted_list() const;
-    const pdu_session_res_not_admitted_list_l& pdu_session_res_not_admitted_list() const;
-    const unbounded_octstring<true>&           target2_source_ng_ran_node_transp_container() const;
-    const ue_context_kept_ind_e&               ue_context_kept_ind() const;
-    const crit_diagnostics_s&                  crit_diagnostics() const;
-    const drb_list_l&                          drbs_transferred_to_mn() const;
-    const daps_resp_info_list_l&               daps_resp_info_list() const;
-    const ch_oinfo_ack_s&                      ch_oinfo_ack() const;
-    const mbs_session_info_resp_list_l&        mbs_session_info_resp_list() const;
-    const rrc_cfg_ind_e&                       rrc_cfg_ind() const;
-    const pdu_setbased_handling_ind_e&         pdu_setbased_handling_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2851,48 +1701,10 @@ using ho_request_ack_s = elementary_procedure_option<ho_request_ack_ies_containe
 
 // HandoverSuccess-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ho_success_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        target_ng_ran_node_ue_xnap_id,
-        requested_target_cell_global_id,
-        accessed_pscell_id,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&           source_ng_ran_node_ue_xnap_id();
-    uint64_t&           target_ng_ran_node_ue_xnap_id();
-    target_cgi_c&       requested_target_cell_global_id();
-    nr_cgi_s&           accessed_pscell_id();
-    const uint64_t&     source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&     target_ng_ran_node_ue_xnap_id() const;
-    const target_cgi_c& requested_target_cell_global_id() const;
-    const nr_cgi_s&     accessed_pscell_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2935,48 +1747,10 @@ using parent_node_cells_list_l = dyn_array<parent_node_cells_list_item_s>;
 
 // IABResourceCoordinationRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_res_coordination_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        boundary_node_cells_list,
-        parent_node_cells_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                         f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                         non_f1_terminating_iab_donor_ue_xnap_id();
-    boundary_node_cells_list_l&       boundary_node_cells_list();
-    parent_node_cells_list_l&         parent_node_cells_list();
-    const uint64_t&                   f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&                   non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const boundary_node_cells_list_l& boundary_node_cells_list() const;
-    const parent_node_cells_list_l&   parent_node_cells_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2999,48 +1773,10 @@ using iab_res_coordination_request_s = elementary_procedure_option<iab_res_coord
 
 // IABResourceCoordinationResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_res_coordination_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        boundary_node_cells_list,
-        parent_node_cells_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                         f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                         non_f1_terminating_iab_donor_ue_xnap_id();
-    boundary_node_cells_list_l&       boundary_node_cells_list();
-    parent_node_cells_list_l&         parent_node_cells_list();
-    const uint64_t&                   f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&                   non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const boundary_node_cells_list_l& boundary_node_cells_list() const;
-    const parent_node_cells_list_l&   parent_node_cells_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3084,48 +1820,10 @@ using iab_tnl_address_to_be_released_list_l = dyn_array<iab_tnl_address_to_be_re
 
 // IABTransportMigrationManagementReject-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_transport_migration_management_reject_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        cause,
-        crit_diagnostics,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                 non_f1_terminating_iab_donor_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint64_t&           f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&           non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3197,60 +1895,10 @@ using traffic_to_be_modified_list_l = dyn_array<traffic_to_be_modified_item_s>;
 
 // IABTransportMigrationManagementRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_transport_migration_management_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        traffic_to_be_added_list,
-        traffic_to_be_modified_list,
-        traffic_to_be_release_info,
-        iab_tnl_address_request,
-        iab_tnl_address_exception,
-        miab_mt_bap_address,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                               f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                               non_f1_terminating_iab_donor_ue_xnap_id();
-    traffic_to_be_added_list_l&             traffic_to_be_added_list();
-    traffic_to_be_modified_list_l&          traffic_to_be_modified_list();
-    traffic_to_be_release_info_s&           traffic_to_be_release_info();
-    iab_tnl_address_request_s&              iab_tnl_address_request();
-    iab_tnl_address_exception_l&            iab_tnl_address_exception();
-    fixed_bitstring<10, false, true>&       miab_mt_bap_address();
-    const uint64_t&                         f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&                         non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const traffic_to_be_added_list_l&       traffic_to_be_added_list() const;
-    const traffic_to_be_modified_list_l&    traffic_to_be_modified_list() const;
-    const traffic_to_be_release_info_s&     traffic_to_be_release_info() const;
-    const iab_tnl_address_request_s&        iab_tnl_address_request() const;
-    const iab_tnl_address_exception_l&      iab_tnl_address_exception() const;
-    const fixed_bitstring<10, false, true>& miab_mt_bap_address() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3394,60 +2042,10 @@ using traffic_released_list_l = dyn_array<traffic_released_item_s>;
 
 // IABTransportMigrationManagementResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_transport_migration_management_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        traffic_added_list,
-        traffic_modified_list,
-        traffic_not_added_list,
-        traffic_not_modified_list,
-        iab_tnl_address_resp,
-        traffic_released_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                          f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                          non_f1_terminating_iab_donor_ue_xnap_id();
-    traffic_added_list_l&              traffic_added_list();
-    traffic_modified_list_l&           traffic_modified_list();
-    traffic_not_added_list_l&          traffic_not_added_list();
-    traffic_not_modified_list_l&       traffic_not_modified_list();
-    iab_tnl_address_resp_s&            iab_tnl_address_resp();
-    traffic_released_list_l&           traffic_released_list();
-    const uint64_t&                    f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&                    non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const traffic_added_list_l&        traffic_added_list() const;
-    const traffic_modified_list_l&     traffic_modified_list() const;
-    const traffic_not_added_list_l&    traffic_not_added_list() const;
-    const traffic_not_modified_list_l& traffic_not_modified_list() const;
-    const iab_tnl_address_resp_s&      iab_tnl_address_resp() const;
-    const traffic_released_list_l&     traffic_released_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3501,60 +2099,10 @@ using traffic_required_to_be_modified_list_l = dyn_array<traffic_required_to_be_
 
 // IABTransportMigrationModificationRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_transport_migration_mod_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        traffic_required_to_be_modified_list,
-        traffic_to_be_release_info,
-        iab_tnl_address_to_be_added,
-        iab_tnl_address_to_be_released_list,
-        iab_authorization_status,
-        mobile_iab_authorization_status,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                     f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                                     non_f1_terminating_iab_donor_ue_xnap_id();
-    traffic_required_to_be_modified_list_l&       traffic_required_to_be_modified_list();
-    traffic_to_be_release_info_s&                 traffic_to_be_release_info();
-    iab_tnl_address_resp_s&                       iab_tnl_address_to_be_added();
-    iab_tnl_address_to_be_released_list_l&        iab_tnl_address_to_be_released_list();
-    iab_authorization_status_e&                   iab_authorization_status();
-    mobile_iab_authorization_status_e&            mobile_iab_authorization_status();
-    const uint64_t&                               f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&                               non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const traffic_required_to_be_modified_list_l& traffic_required_to_be_modified_list() const;
-    const traffic_to_be_release_info_s&           traffic_to_be_release_info() const;
-    const iab_tnl_address_resp_s&                 iab_tnl_address_to_be_added() const;
-    const iab_tnl_address_to_be_released_list_l&  iab_tnl_address_to_be_released_list() const;
-    const iab_authorization_status_e&             iab_authorization_status() const;
-    const mobile_iab_authorization_status_e&      mobile_iab_authorization_status() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3607,48 +2155,10 @@ using traffic_required_modified_list_l = dyn_array<traffic_required_modified_ite
 
 // IABTransportMigrationModificationResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct iab_transport_migration_mod_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        f1_terminating_iab_donor_ue_xnap_id,
-        non_f1_terminating_iab_donor_ue_xnap_id,
-        traffic_required_modified_list,
-        traffic_released_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                               f1_terminating_iab_donor_ue_xnap_id();
-    uint64_t&                               non_f1_terminating_iab_donor_ue_xnap_id();
-    traffic_required_modified_list_l&       traffic_required_modified_list();
-    traffic_released_list_l&                traffic_released_list();
-    const uint64_t&                         f1_terminating_iab_donor_ue_xnap_id() const;
-    const uint64_t&                         non_f1_terminating_iab_donor_ue_xnap_id() const;
-    const traffic_required_modified_list_l& traffic_required_modified_list() const;
-    const traffic_released_list_l&          traffic_released_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3671,40 +2181,10 @@ using iab_transport_migration_mod_resp_s = elementary_procedure_option<iab_trans
 
 // MobilityChangeAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct mob_change_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ng_ran_node1_cell_id, ng_ran_node2_cell_id, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_cell_id_s&       ng_ran_node1_cell_id();
-    global_ng_ran_cell_id_s&       ng_ran_node2_cell_id();
-    crit_diagnostics_s&            crit_diagnostics();
-    const global_ng_ran_cell_id_s& ng_ran_node1_cell_id() const;
-    const global_ng_ran_cell_id_s& ng_ran_node2_cell_id() const;
-    const crit_diagnostics_s&      crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3725,56 +2205,10 @@ using mob_change_ack_s = elementary_procedure_option<mob_change_ack_ies_containe
 
 // MobilityChangeFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct mob_change_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ng_ran_node1_cell_id,
-        ng_ran_node2_cell_id,
-        cause,
-        mob_params_mod_range,
-        crit_diagnostics,
-        ng_ran_node2_ssb_offsets_mod_range,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_cell_id_s&                    ng_ran_node1_cell_id();
-    global_ng_ran_cell_id_s&                    ng_ran_node2_cell_id();
-    cause_c&                                    cause();
-    mob_params_mod_range_s&                     mob_params_mod_range();
-    crit_diagnostics_s&                         crit_diagnostics();
-    ng_ran_node2_ssb_offsets_mod_range_l&       ng_ran_node2_ssb_offsets_mod_range();
-    const global_ng_ran_cell_id_s&              ng_ran_node1_cell_id() const;
-    const global_ng_ran_cell_id_s&              ng_ran_node2_cell_id() const;
-    const cause_c&                              cause() const;
-    const mob_params_mod_range_s&               mob_params_mod_range() const;
-    const crit_diagnostics_s&                   crit_diagnostics() const;
-    const ng_ran_node2_ssb_offsets_mod_range_l& ng_ran_node2_ssb_offsets_mod_range() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3800,54 +2234,10 @@ using mob_change_fail_s = elementary_procedure_option<mob_change_fail_ies_contai
 
 // MobilityChangeRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct mob_change_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ng_ran_node1_cell_id,
-        ng_ran_node2_cell_id,
-        ng_ran_node1_mob_params,
-        ng_ran_node2_proposed_mob_params,
-        cause,
-        ssb_offsets_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_cell_id_s&       ng_ran_node1_cell_id();
-    global_ng_ran_cell_id_s&       ng_ran_node2_cell_id();
-    mob_params_info_s&             ng_ran_node1_mob_params();
-    mob_params_info_s&             ng_ran_node2_proposed_mob_params();
-    cause_c&                       cause();
-    ssb_offsets_list_l&            ssb_offsets_list();
-    const global_ng_ran_cell_id_s& ng_ran_node1_cell_id() const;
-    const global_ng_ran_cell_id_s& ng_ran_node2_cell_id() const;
-    const mob_params_info_s&       ng_ran_node1_mob_params() const;
-    const mob_params_info_s&       ng_ran_node2_proposed_mob_params() const;
-    const cause_c&                 cause() const;
-    const ssb_offsets_list_l&      ssb_offsets_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3872,80 +2262,10 @@ using mob_change_request_s = elementary_procedure_option<mob_change_request_ies_
 
 // NGRANNodeConfigurationUpdate-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ngran_node_cfg_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        tai_support_list,
-        cfg_upd_init_node_choice,
-        tnl_a_to_add_list,
-        tnl_a_to_rem_list,
-        tnl_a_to_upd_list,
-        global_ng_ran_node_id,
-        amf_region_info_to_add,
-        amf_region_info_to_delete,
-        interface_instance_ind,
-        tnl_cfg_info,
-        coverage_mod_list,
-        local_ng_ran_node_id,
-        neighbour_ng_ran_node_list,
-        local_ng_ran_node_id_removal,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    tai_support_list_l&                 tai_support_list();
-    cfg_upd_init_node_choice_c&         cfg_upd_init_node_choice();
-    tnl_a_to_add_list_l&                tnl_a_to_add_list();
-    tnl_a_to_rem_list_l&                tnl_a_to_rem_list();
-    tnl_a_to_upd_list_l&                tnl_a_to_upd_list();
-    global_ng_ran_node_id_c&            global_ng_ran_node_id();
-    amf_region_info_l&                  amf_region_info_to_add();
-    amf_region_info_l&                  amf_region_info_to_delete();
-    uint16_t&                           interface_instance_ind();
-    tnl_cfg_info_s&                     tnl_cfg_info();
-    coverage_mod_list_l&                coverage_mod_list();
-    local_ng_ran_node_id_c&             local_ng_ran_node_id();
-    neighbour_ng_ran_node_list_l&       neighbour_ng_ran_node_list();
-    local_ng_ran_node_id_c&             local_ng_ran_node_id_removal();
-    const tai_support_list_l&           tai_support_list() const;
-    const cfg_upd_init_node_choice_c&   cfg_upd_init_node_choice() const;
-    const tnl_a_to_add_list_l&          tnl_a_to_add_list() const;
-    const tnl_a_to_rem_list_l&          tnl_a_to_rem_list() const;
-    const tnl_a_to_upd_list_l&          tnl_a_to_upd_list() const;
-    const global_ng_ran_node_id_c&      global_ng_ran_node_id() const;
-    const amf_region_info_l&            amf_region_info_to_add() const;
-    const amf_region_info_l&            amf_region_info_to_delete() const;
-    const uint16_t&                     interface_instance_ind() const;
-    const tnl_cfg_info_s&               tnl_cfg_info() const;
-    const coverage_mod_list_l&          coverage_mod_list() const;
-    const local_ng_ran_node_id_c&       local_ng_ran_node_id() const;
-    const neighbour_ng_ran_node_list_l& neighbour_ng_ran_node_list() const;
-    const local_ng_ran_node_id_c&       local_ng_ran_node_id_removal() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -3989,45 +2309,10 @@ using ngran_node_cfg_upd_s = elementary_procedure_option<ngran_node_cfg_upd_ies_
 
 // RespondingNodeTypeConfigUpdateAck-ng-eNB-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct responding_node_type_cfg_upd_ack_ng_enb_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options {
-        list_of_served_cells_e_utra,
-        partial_list_ind_eutra,
-        cell_and_capacity_assist_info_eutra,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    ext_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    served_cells_e_utra_l&                       list_of_served_cells_e_utra();
-    partial_list_ind_e&                          partial_list_ind_eutra();
-    cell_and_capacity_assist_info_eutra_s&       cell_and_capacity_assist_info_eutra();
-    const served_cells_e_utra_l&                 list_of_served_cells_e_utra() const;
-    const partial_list_ind_e&                    partial_list_ind_eutra() const;
-    const cell_and_capacity_assist_info_eutra_s& cell_and_capacity_assist_info_eutra() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4059,38 +2344,10 @@ struct responding_node_type_cfg_upd_ack_ng_enb_s {
 
 // RespondingNodeTypeConfigUpdateAck-gNB-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct responding_node_type_cfg_upd_ack_gnb_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { partial_list_ind_nr, cell_and_capacity_assist_info_nr, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    ext_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    partial_list_ind_e&                       partial_list_ind_nr();
-    cell_and_capacity_assist_info_nr_s&       cell_and_capacity_assist_info_nr();
-    const partial_list_ind_e&                 partial_list_ind_nr() const;
-    const cell_and_capacity_assist_info_nr_s& cell_and_capacity_assist_info_nr() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4188,65 +2445,10 @@ private:
 
 // NGRANNodeConfigurationUpdateAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ngran_node_cfg_upd_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        responding_node_type_cfg_upd_ack,
-        tnl_a_setup_list,
-        tnl_a_failed_to_setup_list,
-        crit_diagnostics,
-        interface_instance_ind,
-        tnl_cfg_info,
-        local_ng_ran_node_id,
-        neighbour_ng_ran_node_list,
-        local_ng_ran_node_id_removal,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    responding_node_type_cfg_upd_ack_c&       responding_node_type_cfg_upd_ack();
-    tnl_a_setup_list_l&                       tnl_a_setup_list();
-    tnl_a_failed_to_setup_list_l&             tnl_a_failed_to_setup_list();
-    crit_diagnostics_s&                       crit_diagnostics();
-    uint16_t&                                 interface_instance_ind();
-    tnl_cfg_info_s&                           tnl_cfg_info();
-    local_ng_ran_node_id_c&                   local_ng_ran_node_id();
-    neighbour_ng_ran_node_list_l&             neighbour_ng_ran_node_list();
-    local_ng_ran_node_id_c&                   local_ng_ran_node_id_removal();
-    const responding_node_type_cfg_upd_ack_c& responding_node_type_cfg_upd_ack() const;
-    const tnl_a_setup_list_l&                 tnl_a_setup_list() const;
-    const tnl_a_failed_to_setup_list_l&       tnl_a_failed_to_setup_list() const;
-    const crit_diagnostics_s&                 crit_diagnostics() const;
-    const uint16_t&                           interface_instance_ind() const;
-    const tnl_cfg_info_s&                     tnl_cfg_info() const;
-    const local_ng_ran_node_id_c&             local_ng_ran_node_id() const;
-    const neighbour_ng_ran_node_list_l&       neighbour_ng_ran_node_list() const;
-    const local_ng_ran_node_id_c&             local_ng_ran_node_id_removal() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4280,44 +2482,10 @@ using ngran_node_cfg_upd_ack_s = elementary_procedure_option<ngran_node_cfg_upd_
 
 // NGRANNodeConfigurationUpdateFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ngran_node_cfg_upd_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, time_to_wait, crit_diagnostics, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    time_to_wait_e&           time_to_wait();
-    crit_diagnostics_s&       crit_diagnostics();
-    uint16_t&                 interface_instance_ind();
-    const cause_c&            cause() const;
-    const time_to_wait_e&     time_to_wait() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const uint16_t&           interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4363,40 +2531,10 @@ using pdu_session_res_notify_list_l = dyn_array<pdu_session_res_notify_item_s>;
 
 // NotificationControlIndication-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct notif_ctrl_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, pdu_session_res_notify_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                            m_ng_ran_node_ue_xnap_id();
-    uint64_t&                            s_ng_ran_node_ue_xnap_id();
-    pdu_session_res_notify_list_l&       pdu_session_res_notify_list();
-    const uint64_t&                      m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                      s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_res_notify_list_l& pdu_session_res_notify_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -4417,52 +2555,33 @@ using notif_ctrl_ind_s = elementary_procedure_option<notif_ctrl_ind_ies_containe
 
 // PDUSession-SNChangeConfirm-Item-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct pdu_session_sn_change_confirm_item_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { add_listof_pdu_session_res_change_confirm_info_sn_terminated, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::add_listof_pdu_session_res_change_confirm_info_sn_terminated; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    add_listof_pdu_session_res_change_confirm_info_sn_terminated_l&
-    add_listof_pdu_session_res_change_confirm_info_sn_terminated()
-    {
-      return c;
-    }
-    const add_listof_pdu_session_res_change_confirm_info_sn_terminated_l&
-    add_listof_pdu_session_res_change_confirm_info_sn_terminated() const
-    {
-      return c;
-    }
-
-  private:
-    add_listof_pdu_session_res_change_confirm_info_sn_terminated_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
+};
+
+struct pdu_session_sn_change_confirm_item_ext_ies_container {
+  bool add_listof_pdu_session_res_change_confirm_info_sn_terminated_present = false;
+  add_listof_pdu_session_res_change_confirm_info_sn_terminated_l
+      add_listof_pdu_session_res_change_confirm_info_sn_terminated;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
 };
 
 // PDUSession-SNChangeConfirm-Item ::= SEQUENCE
 struct pdu_session_sn_change_confirm_item_s {
-  bool                                                                   sn_terminated_present = false;
-  bool                                                                   mn_terminated_present = false;
-  uint16_t                                                               pdu_session_id        = 0;
-  pdu_session_res_change_confirm_info_sn_terminated_s                    sn_terminated;
-  pdu_session_res_change_confirm_info_m_nterminated_s                    mn_terminated;
-  protocol_ext_container_l<pdu_session_sn_change_confirm_item_ext_ies_o> ie_ext;
+  bool                                                 sn_terminated_present = false;
+  bool                                                 mn_terminated_present = false;
+  bool                                                 ie_ext_present        = false;
+  uint16_t                                             pdu_session_id        = 0;
+  pdu_session_res_change_confirm_info_sn_terminated_s  sn_terminated;
+  pdu_session_res_change_confirm_info_m_nterminated_s  mn_terminated;
+  pdu_session_sn_change_confirm_item_ext_ies_container ie_ext;
   // ...
 
   // sequence methods
@@ -4665,40 +2784,28 @@ struct pdu_session_data_forwarding_sn_mod_resp_s {
 
 // PDUSessionNotAdmitted-SNModResponse-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct pdu_session_not_admitted_sn_mod_resp_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { pdu_session_res_not_admitted_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::pdu_session_res_not_admitted_list; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    pdu_session_res_not_admitted_list_l&       pdu_session_res_not_admitted_list() { return c; }
-    const pdu_session_res_not_admitted_list_l& pdu_session_res_not_admitted_list() const { return c; }
-
-  private:
-    pdu_session_res_not_admitted_list_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
+};
+
+struct pdu_session_not_admitted_sn_mod_resp_ext_ies_container {
+  bool                                pdu_session_res_not_admitted_list_present = false;
+  pdu_session_res_not_admitted_list_l pdu_session_res_not_admitted_list;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
 };
 
 // PDUSessionNotAdmitted-SNModResponse ::= SEQUENCE
 struct pdu_session_not_admitted_sn_mod_resp_s {
-  pdu_session_list_l                                                       pdu_session_list;
-  protocol_ext_container_l<pdu_session_not_admitted_sn_mod_resp_ext_ies_o> ie_ext;
+  bool                                                   ie_ext_present = false;
+  pdu_session_list_l                                     pdu_session_list;
+  pdu_session_not_admitted_sn_mod_resp_ext_ies_container ie_ext;
   // ...
 
   // sequence methods
@@ -4870,47 +2977,35 @@ struct pdu_session_to_be_released_sn_mod_required_s {
 
 // PDUSessionsToBeAdded-SNModRequest-Item-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct pdu_sessions_to_be_added_sn_mod_request_item_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { pdu_session_expected_ue_activity_behaviour, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::pdu_session_expected_ue_activity_behaviour; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    expected_ue_activity_behaviour_s&       pdu_session_expected_ue_activity_behaviour() { return c; }
-    const expected_ue_activity_behaviour_s& pdu_session_expected_ue_activity_behaviour() const { return c; }
-
-  private:
-    expected_ue_activity_behaviour_s c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
+};
+
+struct pdu_sessions_to_be_added_sn_mod_request_item_ext_ies_container {
+  bool                             pdu_session_expected_ue_activity_behaviour_present = false;
+  expected_ue_activity_behaviour_s pdu_session_expected_ue_activity_behaviour;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
 };
 
 // PDUSessionsToBeAdded-SNModRequest-Item ::= SEQUENCE
 struct pdu_sessions_to_be_added_sn_mod_request_item_s {
-  bool                                                                             sn_pdu_session_ambr_present = false;
-  bool                                                                             sn_terminated_present       = false;
-  bool                                                                             mn_terminated_present       = false;
-  uint16_t                                                                         pdu_session_id              = 0;
-  s_nssai_s                                                                        s_nssai;
-  pdu_session_aggr_max_bit_rate_s                                                  sn_pdu_session_ambr;
-  pdu_session_res_setup_info_sn_terminated_s                                       sn_terminated;
-  pdu_session_res_setup_info_m_nterminated_s                                       mn_terminated;
-  protocol_ext_container_l<pdu_sessions_to_be_added_sn_mod_request_item_ext_ies_o> ie_ext;
+  bool                                                           sn_pdu_session_ambr_present = false;
+  bool                                                           sn_terminated_present       = false;
+  bool                                                           mn_terminated_present       = false;
+  bool                                                           ie_ext_present              = false;
+  uint16_t                                                       pdu_session_id              = 0;
+  s_nssai_s                                                      s_nssai;
+  pdu_session_aggr_max_bit_rate_s                                sn_pdu_session_ambr;
+  pdu_session_res_setup_info_sn_terminated_s                     sn_terminated;
+  pdu_session_res_setup_info_m_nterminated_s                     mn_terminated;
+  pdu_sessions_to_be_added_sn_mod_request_item_ext_ies_container ie_ext;
   // ...
 
   // sequence methods
@@ -4924,40 +3019,10 @@ using pdu_sessions_to_be_added_sn_mod_request_list_l = dyn_array<pdu_sessions_to
 
 // PDUSessionsToBeModified-SNModRequest-Item-ExtIEs ::= OBJECT SET OF XNAP-PROTOCOL-EXTENSION
 struct pdu_sessions_to_be_modified_sn_mod_request_item_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { s_nssai, pdu_session_expected_ue_activity_behaviour, user_plane_fail_ind, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    ext_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    s_nssai_s&                              s_nssai();
-    expected_ue_activity_behaviour_s&       pdu_session_expected_ue_activity_behaviour();
-    user_plane_fail_ind_s&                  user_plane_fail_ind();
-    const s_nssai_s&                        s_nssai() const;
-    const expected_ue_activity_behaviour_s& pdu_session_expected_ue_activity_behaviour() const;
-    const user_plane_fail_ind_s&            user_plane_fail_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5017,48 +3082,10 @@ struct pdu_sessions_to_be_released_sn_mod_request_list_s {
 
 // PartialUEContextTransfer-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct partial_ue_context_transfer_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        new_ng_ran_node_ue_xnap_id,
-        old_ng_ran_node_ue_xnap_id,
-        sdt_partial_ue_context_info,
-        pos_partial_ue_context_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                            new_ng_ran_node_ue_xnap_id();
-    uint64_t&                            old_ng_ran_node_ue_xnap_id();
-    sdt_partial_ue_context_info_s&       sdt_partial_ue_context_info();
-    pos_partial_ue_context_info_s&       pos_partial_ue_context_info();
-    const uint64_t&                      new_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                      old_ng_ran_node_ue_xnap_id() const;
-    const sdt_partial_ue_context_info_s& sdt_partial_ue_context_info() const;
-    const pos_partial_ue_context_info_s& pos_partial_ue_context_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5080,51 +3107,10 @@ using partial_ue_context_transfer_s = elementary_procedure_option<partial_ue_con
 
 // PartialUEContextTransferAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct partial_ue_context_transfer_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        new_ng_ran_node_ue_xnap_id,
-        old_ng_ran_node_ue_xnap_id,
-        sdt_data_forwarding_drb_list,
-        crit_diagnostics,
-        srs_cfg,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                             new_ng_ran_node_ue_xnap_id();
-    uint64_t&                             old_ng_ran_node_ue_xnap_id();
-    sdt_data_forwarding_drb_list_l&       sdt_data_forwarding_drb_list();
-    crit_diagnostics_s&                   crit_diagnostics();
-    unbounded_octstring<true>&            srs_cfg();
-    const uint64_t&                       new_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                       old_ng_ran_node_ue_xnap_id() const;
-    const sdt_data_forwarding_drb_list_l& sdt_data_forwarding_drb_list() const;
-    const crit_diagnostics_s&             crit_diagnostics() const;
-    const unbounded_octstring<true>&      srs_cfg() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5149,42 +3135,10 @@ using partial_ue_context_transfer_ack_s = elementary_procedure_option<partial_ue
 
 // PartialUEContextTransferFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct partial_ue_context_transfer_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { new_ng_ran_node_ue_xnap_id, old_ng_ran_node_ue_xnap_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 new_ng_ran_node_ue_xnap_id();
-    uint64_t&                 old_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint64_t&           new_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           old_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5275,40 +3229,10 @@ struct qo_e_meas_results_s {
 
 // RANMulticastGroupPaging-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ran_multicast_group_paging_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { mbs_session_id, ue_id_idx_list_mbs_group_paging, multicast_ran_paging_area, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    mbs_session_id_s&                        mbs_session_id();
-    ue_id_idx_list_mbs_group_paging_l&       ue_id_idx_list_mbs_group_paging();
-    ran_paging_area_s&                       multicast_ran_paging_area();
-    const mbs_session_id_s&                  mbs_session_id() const;
-    const ue_id_idx_list_mbs_group_paging_l& ue_id_idx_list_mbs_group_paging() const;
-    const ran_paging_area_s&                 multicast_ran_paging_area() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5328,87 +3252,10 @@ using ran_multicast_group_paging_s = elementary_procedure_option<ran_multicast_g
 
 // RANPaging-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ran_paging_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ue_id_idx_value,
-        ue_ran_paging_id,
-        paging_drx,
-        ran_paging_area,
-        paging_prio,
-        assist_data_for_ran_paging,
-        ue_radio_cap_for_paging,
-        extended_ue_id_idx_value,
-        eutra_paginge_drx_info,
-        ue_specific_drx,
-        nr_paginge_drx_info,
-        nr_paginge_drx_infofor_rrc_inactive,
-        paging_cause,
-        pe_ip_sassist_info,
-        hashed_ue_id_idx_value,
-        mt_sdt_info,
-        nr_paging_longe_drx_infofor_rrc_inactive,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ue_id_idx_value_c&                                ue_id_idx_value();
-    ue_ran_paging_id_c&                               ue_ran_paging_id();
-    paging_drx_e&                                     paging_drx();
-    ran_paging_area_s&                                ran_paging_area();
-    paging_prio_e&                                    paging_prio();
-    assist_data_for_ran_paging_s&                     assist_data_for_ran_paging();
-    ue_radio_cap_for_paging_s&                        ue_radio_cap_for_paging();
-    fixed_bitstring<16, false, true>&                 extended_ue_id_idx_value();
-    eutra_paginge_drx_info_s&                         eutra_paginge_drx_info();
-    ue_specific_drx_e&                                ue_specific_drx();
-    nr_paginge_drx_info_s&                            nr_paginge_drx_info();
-    nr_paginge_drx_infofor_rrc_inactive_s&            nr_paginge_drx_infofor_rrc_inactive();
-    paging_cause_e&                                   paging_cause();
-    pe_ip_sassist_info_s&                             pe_ip_sassist_info();
-    fixed_bitstring<13, true, true>&                  hashed_ue_id_idx_value();
-    mt_sdt_info_s&                                    mt_sdt_info();
-    nr_paging_longe_drx_infofor_rrc_inactive_s&       nr_paging_longe_drx_infofor_rrc_inactive();
-    const ue_id_idx_value_c&                          ue_id_idx_value() const;
-    const ue_ran_paging_id_c&                         ue_ran_paging_id() const;
-    const paging_drx_e&                               paging_drx() const;
-    const ran_paging_area_s&                          ran_paging_area() const;
-    const paging_prio_e&                              paging_prio() const;
-    const assist_data_for_ran_paging_s&               assist_data_for_ran_paging() const;
-    const ue_radio_cap_for_paging_s&                  ue_radio_cap_for_paging() const;
-    const fixed_bitstring<16, false, true>&           extended_ue_id_idx_value() const;
-    const eutra_paginge_drx_info_s&                   eutra_paginge_drx_info() const;
-    const ue_specific_drx_e&                          ue_specific_drx() const;
-    const nr_paginge_drx_info_s&                      nr_paginge_drx_info() const;
-    const nr_paginge_drx_infofor_rrc_inactive_s&      nr_paginge_drx_infofor_rrc_inactive() const;
-    const paging_cause_e&                             paging_cause() const;
-    const pe_ip_sassist_info_s&                       pe_ip_sassist_info() const;
-    const fixed_bitstring<13, true, true>&            hashed_ue_id_idx_value() const;
-    const mt_sdt_info_s&                              mt_sdt_info() const;
-    const nr_paging_longe_drx_infofor_rrc_inactive_s& nr_paging_longe_drx_infofor_rrc_inactive() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5523,60 +3370,10 @@ struct sdt_srb_between_new_node_old_node_s {
 
 // RRCTransfer-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct rrc_transfer_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        split_srb_rrc_transfer,
-        ue_report_rrc_transfer,
-        fast_mcg_recovery_rrc_transfer_sn_to_mn,
-        fast_mcg_recovery_rrc_transfer_mn_to_sn,
-        sdt_srb_between_new_node_old_node,
-        qo_e_meas_results,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                  m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                  s_ng_ran_node_ue_xnap_id();
-    split_srb_rrc_transfer_s&                  split_srb_rrc_transfer();
-    ue_report_rrc_transfer_s&                  ue_report_rrc_transfer();
-    fast_mcg_recovery_rrc_transfer_s&          fast_mcg_recovery_rrc_transfer_sn_to_mn();
-    fast_mcg_recovery_rrc_transfer_s&          fast_mcg_recovery_rrc_transfer_mn_to_sn();
-    sdt_srb_between_new_node_old_node_s&       sdt_srb_between_new_node_old_node();
-    qo_e_meas_results_s&                       qo_e_meas_results();
-    const uint64_t&                            m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                            s_ng_ran_node_ue_xnap_id() const;
-    const split_srb_rrc_transfer_s&            split_srb_rrc_transfer() const;
-    const ue_report_rrc_transfer_s&            ue_report_rrc_transfer() const;
-    const fast_mcg_recovery_rrc_transfer_s&    fast_mcg_recovery_rrc_transfer_sn_to_mn() const;
-    const fast_mcg_recovery_rrc_transfer_s&    fast_mcg_recovery_rrc_transfer_mn_to_sn() const;
-    const sdt_srb_between_new_node_old_node_s& sdt_srb_between_new_node_old_node() const;
-    const qo_e_meas_results_s&                 qo_e_meas_results() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5607,38 +3404,24 @@ using rrc_transfer_s = elementary_procedure_option<rrc_transfer_ies_container>;
 
 // RachIndication-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct rach_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ra_report_ind_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::ra_report_ind_list; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    ra_report_ind_list_l&       ra_report_ind_list() { return c; }
-    const ra_report_ind_list_l& ra_report_ind_list() const { return c; }
-
-  private:
-    ra_report_ind_list_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct rach_ind_ies_container {
+  ra_report_ind_list_l ra_report_ind_list;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // RachIndication ::= SEQUENCE
-using rach_ind_s = elementary_procedure_option<protocol_ie_container_l<rach_ind_ies_o>>;
+using rach_ind_s = elementary_procedure_option<rach_ind_ies_container>;
 
 // ReleaseFastMCGRecoveryViaSRB3 ::= ENUMERATED
 struct release_fast_mcg_recovery_via_srb3_opts {
@@ -5667,42 +3450,10 @@ using requested_fast_mcg_recovery_via_srb3_release_e =
 
 // ResetRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct reset_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { reset_request_type_info, cause, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    reset_request_type_info_c&       reset_request_type_info();
-    cause_c&                         cause();
-    uint16_t&                        interface_instance_ind();
-    const reset_request_type_info_c& reset_request_type_info() const;
-    const cause_c&                   cause() const;
-    const uint16_t&                  interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5723,42 +3474,10 @@ using reset_request_s = elementary_procedure_option<reset_request_ies_container>
 
 // ResetResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct reset_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { reset_resp_type_info, crit_diagnostics, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    reset_resp_type_info_c&       reset_resp_type_info();
-    crit_diagnostics_s&           crit_diagnostics();
-    uint16_t&                     interface_instance_ind();
-    const reset_resp_type_info_c& reset_resp_type_info() const;
-    const crit_diagnostics_s&     crit_diagnostics() const;
-    const uint16_t&               interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5780,42 +3499,10 @@ using reset_resp_s = elementary_procedure_option<reset_resp_ies_container>;
 
 // ResourceStatusFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct res_status_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ngran_node1_meas_id, ngran_node2_meas_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 ngran_node1_meas_id();
-    uint16_t&                 ngran_node2_meas_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           ngran_node1_meas_id() const;
-    const uint16_t&           ngran_node2_meas_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5837,54 +3524,10 @@ using res_status_fail_s = elementary_procedure_option<res_status_fail_ies_contai
 
 // ResourceStatusRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct res_status_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        ngran_node1_meas_id,
-        ngran_node2_meas_id,
-        regist_request,
-        report_characteristics,
-        cell_to_report,
-        report_periodicity,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                               ngran_node1_meas_id();
-    uint16_t&                               ngran_node2_meas_id();
-    regist_request_e&                       regist_request();
-    fixed_bitstring<32, false, true>&       report_characteristics();
-    cell_to_report_l&                       cell_to_report();
-    report_periodicity_e&                   report_periodicity();
-    const uint16_t&                         ngran_node1_meas_id() const;
-    const uint16_t&                         ngran_node2_meas_id() const;
-    const regist_request_e&                 regist_request() const;
-    const fixed_bitstring<32, false, true>& report_characteristics() const;
-    const cell_to_report_l&                 cell_to_report() const;
-    const report_periodicity_e&             report_periodicity() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5911,40 +3554,10 @@ using res_status_request_s = elementary_procedure_option<res_status_request_ies_
 
 // ResourceStatusResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct res_status_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ngran_node1_meas_id, ngran_node2_meas_id, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 ngran_node1_meas_id();
-    uint16_t&                 ngran_node2_meas_id();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint16_t&           ngran_node1_meas_id() const;
-    const uint16_t&           ngran_node2_meas_id() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -5965,40 +3578,10 @@ using res_status_resp_s = elementary_procedure_option<res_status_resp_ies_contai
 
 // ResourceStatusUpdate-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct res_status_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { ngran_node1_meas_id, ngran_node2_meas_id, cell_meas_result, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint16_t&                 ngran_node1_meas_id();
-    uint16_t&                 ngran_node2_meas_id();
-    cell_meas_result_l&       cell_meas_result();
-    const uint16_t&           ngran_node1_meas_id() const;
-    const uint16_t&           ngran_node2_meas_id() const;
-    const cell_meas_result_l& cell_meas_result() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6103,48 +3686,10 @@ struct resp_info_reconf_compl_s {
 
 // RetrieveUEContextConfirm-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct retrieve_ue_context_confirm_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        old_ng_ran_node_ue_xnap_id,
-        new_ng_ran_node_ue_xnap_id,
-        ue_context_kept_ind,
-        sdt_termination_request,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                        old_ng_ran_node_ue_xnap_id();
-    uint64_t&                        new_ng_ran_node_ue_xnap_id();
-    ue_context_kept_ind_e&           ue_context_kept_ind();
-    sdt_termination_request_e&       sdt_termination_request();
-    const uint64_t&                  old_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                  new_ng_ran_node_ue_xnap_id() const;
-    const ue_context_kept_ind_e&     ue_context_kept_ind() const;
-    const sdt_termination_request_e& sdt_termination_request() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6167,53 +3712,10 @@ using retrieve_ue_context_confirm_s = elementary_procedure_option<retrieve_ue_co
 
 // RetrieveUEContextFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct retrieve_ue_context_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        new_ng_ran_node_ue_xnap_id,
-        oldto_new_ng_ran_node_resume_container,
-        cause,
-        crit_diagnostics,
-        semipersistent_positioning_info,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                new_ng_ran_node_ue_xnap_id();
-    unbounded_octstring<true>&               oldto_new_ng_ran_node_resume_container();
-    cause_c&                                 cause();
-    crit_diagnostics_s&                      crit_diagnostics();
-    semipersistent_positioning_info_s&       semipersistent_positioning_info();
-    const uint64_t&                          new_ng_ran_node_ue_xnap_id() const;
-    const unbounded_octstring<true>&         oldto_new_ng_ran_node_resume_container() const;
-    const cause_c&                           cause() const;
-    const crit_diagnostics_s&                crit_diagnostics() const;
-    const semipersistent_positioning_info_s& semipersistent_positioning_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6238,59 +3740,10 @@ using retrieve_ue_context_fail_s = elementary_procedure_option<retrieve_ue_conte
 
 // RetrieveUEContextRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct retrieve_ue_context_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        new_ng_ran_node_ue_xnap_id,
-        ue_context_id,
-        mac_i,
-        new_ng_ran_cell_id,
-        rrc_resume_cause,
-        sdt_support_request,
-        srs_positioning_cfg_or_activation_request,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                          new_ng_ran_node_ue_xnap_id();
-    ue_context_id_c&                                   ue_context_id();
-    fixed_bitstring<16, false, true>&                  mac_i();
-    ng_ran_cell_id_c&                                  new_ng_ran_cell_id();
-    rrc_resume_cause_e&                                rrc_resume_cause();
-    sdt_support_request_s&                             sdt_support_request();
-    srs_positioning_cfg_or_activation_request_e&       srs_positioning_cfg_or_activation_request();
-    const uint64_t&                                    new_ng_ran_node_ue_xnap_id() const;
-    const ue_context_id_c&                             ue_context_id() const;
-    const fixed_bitstring<16, false, true>&            mac_i() const;
-    const ng_ran_cell_id_c&                            new_ng_ran_cell_id() const;
-    const rrc_resume_cause_e&                          rrc_resume_cause() const;
-    const sdt_support_request_s&                       sdt_support_request() const;
-    const srs_positioning_cfg_or_activation_request_e& srs_positioning_cfg_or_activation_request() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6317,114 +3770,10 @@ using retrieve_ue_context_request_s = elementary_procedure_option<retrieve_ue_co
 
 // RetrieveUEContextResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct retrieve_ue_context_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        new_ng_ran_node_ue_xnap_id,
-        old_ng_ran_node_ue_xnap_id,
-        guami,
-        ue_context_info_retr_ue_ctxt_resp,
-        trace_activation,
-        masked_imeisv,
-        location_report_info,
-        crit_diagnostics,
-        nr_v2x_services_authorized,
-        ltev2x_services_authorized,
-        pc5_qos_params,
-        ue_history_info,
-        ue_history_info_from_the_ue,
-        mdt_plmn_list,
-        iab_node_ind,
-        ue_context_ref_at_sn_ho_request,
-        time_sync_assist_info,
-        q_mcc_onfig_info,
-        five_g_pro_se_authorized,
-        five_g_pro_se_pc5_qos_params,
-        aerial_ue_sub_info,
-        nr_a2_x_services_authorized,
-        ltea2_x_services_authorized,
-        a2_xpc5_qos_params,
-        mobile_iab_authorization_status,
-        sl_positioning_ranging_services_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                     new_ng_ran_node_ue_xnap_id();
-    uint64_t&                                     old_ng_ran_node_ue_xnap_id();
-    guami_s&                                      guami();
-    ue_context_info_retr_ue_ctxt_resp_s&          ue_context_info_retr_ue_ctxt_resp();
-    trace_activation_s&                           trace_activation();
-    fixed_bitstring<64, false, true>&             masked_imeisv();
-    location_report_info_s&                       location_report_info();
-    crit_diagnostics_s&                           crit_diagnostics();
-    nr_v2x_services_authorized_s&                 nr_v2x_services_authorized();
-    ltev2x_services_authorized_s&                 ltev2x_services_authorized();
-    pc5_qos_params_s&                             pc5_qos_params();
-    ue_history_info_l&                            ue_history_info();
-    ue_history_info_from_the_ue_c&                ue_history_info_from_the_ue();
-    mdt_plmn_list_l&                              mdt_plmn_list();
-    iab_node_ind_e&                               iab_node_ind();
-    ue_context_ref_at_sn_ho_request_s&            ue_context_ref_at_sn_ho_request();
-    time_sync_assist_info_s&                      time_sync_assist_info();
-    q_mcc_onfig_info_s&                           q_mcc_onfig_info();
-    five_g_pro_se_authorized_s&                   five_g_pro_se_authorized();
-    five_g_pro_se_pc5_qos_params_s&               five_g_pro_se_pc5_qos_params();
-    aerial_ue_sub_info_e&                         aerial_ue_sub_info();
-    nr_a2_x_services_authorized_s&                nr_a2_x_services_authorized();
-    ltea2_x_services_authorized_s&                ltea2_x_services_authorized();
-    a2_xpc5_qos_params_s&                         a2_xpc5_qos_params();
-    mobile_iab_authorization_status_e&            mobile_iab_authorization_status();
-    sl_positioning_ranging_services_info_s&       sl_positioning_ranging_services_info();
-    const uint64_t&                               new_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                               old_ng_ran_node_ue_xnap_id() const;
-    const guami_s&                                guami() const;
-    const ue_context_info_retr_ue_ctxt_resp_s&    ue_context_info_retr_ue_ctxt_resp() const;
-    const trace_activation_s&                     trace_activation() const;
-    const fixed_bitstring<64, false, true>&       masked_imeisv() const;
-    const location_report_info_s&                 location_report_info() const;
-    const crit_diagnostics_s&                     crit_diagnostics() const;
-    const nr_v2x_services_authorized_s&           nr_v2x_services_authorized() const;
-    const ltev2x_services_authorized_s&           ltev2x_services_authorized() const;
-    const pc5_qos_params_s&                       pc5_qos_params() const;
-    const ue_history_info_l&                      ue_history_info() const;
-    const ue_history_info_from_the_ue_c&          ue_history_info_from_the_ue() const;
-    const mdt_plmn_list_l&                        mdt_plmn_list() const;
-    const iab_node_ind_e&                         iab_node_ind() const;
-    const ue_context_ref_at_sn_ho_request_s&      ue_context_ref_at_sn_ho_request() const;
-    const time_sync_assist_info_s&                time_sync_assist_info() const;
-    const q_mcc_onfig_info_s&                     q_mcc_onfig_info() const;
-    const five_g_pro_se_authorized_s&             five_g_pro_se_authorized() const;
-    const five_g_pro_se_pc5_qos_params_s&         five_g_pro_se_pc5_qos_params() const;
-    const aerial_ue_sub_info_e&                   aerial_ue_sub_info() const;
-    const nr_a2_x_services_authorized_s&          nr_a2_x_services_authorized() const;
-    const ltea2_x_services_authorized_s&          ltea2_x_services_authorized() const;
-    const a2_xpc5_qos_params_s&                   a2_xpc5_qos_params() const;
-    const mobile_iab_authorization_status_e&      mobile_iab_authorization_status() const;
-    const sl_positioning_ranging_services_info_s& sl_positioning_ranging_services_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6489,51 +3838,10 @@ using retrieve_ue_context_resp_s = elementary_procedure_option<retrieve_ue_conte
 
 // SNStatusTransfer-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_status_transfer_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        source_ng_ran_node_ue_xnap_id,
-        target_ng_ran_node_ue_xnap_id,
-        drbs_subject_to_status_transfer_list,
-        cho_cfg,
-        mob_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                     source_ng_ran_node_ue_xnap_id();
-    uint64_t&                                     target_ng_ran_node_ue_xnap_id();
-    drbs_subject_to_status_transfer_list_l&       drbs_subject_to_status_transfer_list();
-    cho_cfg_s&                                    cho_cfg();
-    fixed_bitstring<32, false, true>&             mob_info();
-    const uint64_t&                               source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                               target_ng_ran_node_ue_xnap_id() const;
-    const drbs_subject_to_status_transfer_list_l& drbs_subject_to_status_transfer_list() const;
-    const cho_cfg_s&                              cho_cfg() const;
-    const fixed_bitstring<32, false, true>&       mob_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6557,162 +3865,10 @@ using sn_status_transfer_s = elementary_procedure_option<sn_status_transfer_ies_
 
 // SNodeAdditionRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_addition_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        ue_security_cap,
-        s_ng_ra_nnode_security_key,
-        s_ng_ran_node_ue_ambr,
-        sel_plmn,
-        mob_restrict_list,
-        idx_to_rat_frequ_sel_prio,
-        pdu_session_to_be_added_add_req,
-        mn_to_sn_container,
-        s_ng_ran_node_ue_xnap_id,
-        expected_ue_behaviour,
-        requested_split_srb,
-        pcell_id,
-        desired_act_notif_level,
-        available_drb_ids,
-        s_ng_ran_node_max_ip_data_rate_ul,
-        s_ng_ran_node_max_ip_data_rate_dl,
-        location_info_snr_eporting,
-        mr_dc_res_coordination_info,
-        masked_imeisv,
-        ne_dc_tdm_pattern,
-        s_ng_ran_node_addition_trigger_ind,
-        trace_activation,
-        requested_fast_mcg_recovery_via_srb3,
-        ue_radio_cap_id,
-        source_ng_ran_node_id,
-        management_based_mdt_plmn_list,
-        ue_history_info,
-        ue_history_info_from_the_ue,
-        pscell_change_history,
-        iab_node_ind,
-        no_pdu_session_ind,
-        ch_oinfo_add_req,
-        scg_activation_request,
-        cp_a_info_request,
-        s_ng_ran_node_ue_slice_mbr,
-        f1_terminating_iab_donor_ind,
-        sel_n_id,
-        q_mcc_oordination_request,
-        source_sn_to_target_sn_qmc_info,
-        iab_authorization_status,
-        source_m_ng_ran_node_id,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                     m_ng_ran_node_ue_xnap_id();
-    ue_security_cap_s&                            ue_security_cap();
-    fixed_bitstring<256, false, true>&            s_ng_ra_nnode_security_key();
-    ue_aggr_max_bit_rate_s&                       s_ng_ran_node_ue_ambr();
-    fixed_octstring<3, true>&                     sel_plmn();
-    mob_restrict_list_s&                          mob_restrict_list();
-    uint16_t&                                     idx_to_rat_frequ_sel_prio();
-    pdu_session_to_be_added_add_req_l&            pdu_session_to_be_added_add_req();
-    unbounded_octstring<true>&                    mn_to_sn_container();
-    uint64_t&                                     s_ng_ran_node_ue_xnap_id();
-    expected_ue_behaviour_s&                      expected_ue_behaviour();
-    split_srbs_types_e&                           requested_split_srb();
-    global_ng_ran_cell_id_s&                      pcell_id();
-    desired_act_notif_level_e&                    desired_act_notif_level();
-    drb_list_l&                                   available_drb_ids();
-    uint64_t&                                     s_ng_ran_node_max_ip_data_rate_ul();
-    uint64_t&                                     s_ng_ran_node_max_ip_data_rate_dl();
-    location_info_snr_eporting_e&                 location_info_snr_eporting();
-    mr_dc_res_coordination_info_s&                mr_dc_res_coordination_info();
-    fixed_bitstring<64, false, true>&             masked_imeisv();
-    ne_dc_tdm_pattern_s&                          ne_dc_tdm_pattern();
-    s_ng_ran_node_addition_trigger_ind_e&         s_ng_ran_node_addition_trigger_ind();
-    trace_activation_s&                           trace_activation();
-    requested_fast_mcg_recovery_via_srb3_e&       requested_fast_mcg_recovery_via_srb3();
-    unbounded_octstring<true>&                    ue_radio_cap_id();
-    global_ng_ran_node_id_c&                      source_ng_ran_node_id();
-    mdt_plmn_list_l&                              management_based_mdt_plmn_list();
-    ue_history_info_l&                            ue_history_info();
-    ue_history_info_from_the_ue_c&                ue_history_info_from_the_ue();
-    pscell_change_history_e&                      pscell_change_history();
-    iab_node_ind_e&                               iab_node_ind();
-    no_pdu_session_ind_e&                         no_pdu_session_ind();
-    ch_oinfo_add_req_s&                           ch_oinfo_add_req();
-    scg_activation_request_e&                     scg_activation_request();
-    cp_a_info_request_s&                          cp_a_info_request();
-    ue_slice_max_bit_rate_list_l&                 s_ng_ran_node_ue_slice_mbr();
-    f1_terminating_iab_donor_ind_e&               f1_terminating_iab_donor_ind();
-    fixed_bitstring<44, false, true>&             sel_n_id();
-    q_mcc_oordination_request_s&                  q_mcc_oordination_request();
-    q_mcc_onfig_info_s&                           source_sn_to_target_sn_qmc_info();
-    iab_authorization_status_e&                   iab_authorization_status();
-    global_ng_ran_node_id_c&                      source_m_ng_ran_node_id();
-    const uint64_t&                               m_ng_ran_node_ue_xnap_id() const;
-    const ue_security_cap_s&                      ue_security_cap() const;
-    const fixed_bitstring<256, false, true>&      s_ng_ra_nnode_security_key() const;
-    const ue_aggr_max_bit_rate_s&                 s_ng_ran_node_ue_ambr() const;
-    const fixed_octstring<3, true>&               sel_plmn() const;
-    const mob_restrict_list_s&                    mob_restrict_list() const;
-    const uint16_t&                               idx_to_rat_frequ_sel_prio() const;
-    const pdu_session_to_be_added_add_req_l&      pdu_session_to_be_added_add_req() const;
-    const unbounded_octstring<true>&              mn_to_sn_container() const;
-    const uint64_t&                               s_ng_ran_node_ue_xnap_id() const;
-    const expected_ue_behaviour_s&                expected_ue_behaviour() const;
-    const split_srbs_types_e&                     requested_split_srb() const;
-    const global_ng_ran_cell_id_s&                pcell_id() const;
-    const desired_act_notif_level_e&              desired_act_notif_level() const;
-    const drb_list_l&                             available_drb_ids() const;
-    const uint64_t&                               s_ng_ran_node_max_ip_data_rate_ul() const;
-    const uint64_t&                               s_ng_ran_node_max_ip_data_rate_dl() const;
-    const location_info_snr_eporting_e&           location_info_snr_eporting() const;
-    const mr_dc_res_coordination_info_s&          mr_dc_res_coordination_info() const;
-    const fixed_bitstring<64, false, true>&       masked_imeisv() const;
-    const ne_dc_tdm_pattern_s&                    ne_dc_tdm_pattern() const;
-    const s_ng_ran_node_addition_trigger_ind_e&   s_ng_ran_node_addition_trigger_ind() const;
-    const trace_activation_s&                     trace_activation() const;
-    const requested_fast_mcg_recovery_via_srb3_e& requested_fast_mcg_recovery_via_srb3() const;
-    const unbounded_octstring<true>&              ue_radio_cap_id() const;
-    const global_ng_ran_node_id_c&                source_ng_ran_node_id() const;
-    const mdt_plmn_list_l&                        management_based_mdt_plmn_list() const;
-    const ue_history_info_l&                      ue_history_info() const;
-    const ue_history_info_from_the_ue_c&          ue_history_info_from_the_ue() const;
-    const pscell_change_history_e&                pscell_change_history() const;
-    const iab_node_ind_e&                         iab_node_ind() const;
-    const no_pdu_session_ind_e&                   no_pdu_session_ind() const;
-    const ch_oinfo_add_req_s&                     ch_oinfo_add_req() const;
-    const scg_activation_request_e&               scg_activation_request() const;
-    const cp_a_info_request_s&                    cp_a_info_request() const;
-    const ue_slice_max_bit_rate_list_l&           s_ng_ran_node_ue_slice_mbr() const;
-    const f1_terminating_iab_donor_ind_e&         f1_terminating_iab_donor_ind() const;
-    const fixed_bitstring<44, false, true>&       sel_n_id() const;
-    const q_mcc_oordination_request_s&            q_mcc_oordination_request() const;
-    const q_mcc_onfig_info_s&                     source_sn_to_target_sn_qmc_info() const;
-    const iab_authorization_status_e&             iab_authorization_status() const;
-    const global_ng_ran_node_id_c&                source_m_ng_ran_node_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6807,91 +3963,10 @@ using sn_ode_addition_request_s = elementary_procedure_option<sn_ode_addition_re
 
 // SNodeAdditionRequestAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_addition_request_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_admitted_added_add_req_ack,
-        pdu_session_not_admitted_add_req_ack,
-        sn_to_mn_container,
-        admitted_split_srb,
-        rrc_cfg_ind,
-        crit_diagnostics,
-        location_info_sn,
-        mr_dc_res_coordination_info,
-        available_fast_mcg_recovery_via_srb3,
-        direct_forwarding_path_availability,
-        scg_activation_status,
-        cp_a_info_ack,
-        sn_mob_info,
-        q_mcc_oordination_resp,
-        ch_oinfo_add_req_ack,
-        direct_forwarding_path_availability_with_source_mn,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                             m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                             s_ng_ran_node_ue_xnap_id();
-    pdu_session_admitted_added_add_req_ack_l&             pdu_session_admitted_added_add_req_ack();
-    pdu_session_not_admitted_add_req_ack_s&               pdu_session_not_admitted_add_req_ack();
-    unbounded_octstring<true>&                            sn_to_mn_container();
-    split_srbs_types_e&                                   admitted_split_srb();
-    rrc_cfg_ind_e&                                        rrc_cfg_ind();
-    crit_diagnostics_s&                                   crit_diagnostics();
-    target_cgi_c&                                         location_info_sn();
-    mr_dc_res_coordination_info_s&                        mr_dc_res_coordination_info();
-    available_fast_mcg_recovery_via_srb3_e&               available_fast_mcg_recovery_via_srb3();
-    direct_forwarding_path_availability_e&                direct_forwarding_path_availability();
-    scg_activation_status_e&                              scg_activation_status();
-    cp_a_info_ack_s&                                      cp_a_info_ack();
-    fixed_bitstring<32, false, true>&                     sn_mob_info();
-    q_mcc_oordination_resp_s&                             q_mcc_oordination_resp();
-    ch_oinfo_add_req_ack_s&                               ch_oinfo_add_req_ack();
-    direct_forwarding_path_availability_with_source_mn_e& direct_forwarding_path_availability_with_source_mn();
-    const uint64_t&                                       m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                       s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_admitted_added_add_req_ack_l&       pdu_session_admitted_added_add_req_ack() const;
-    const pdu_session_not_admitted_add_req_ack_s&         pdu_session_not_admitted_add_req_ack() const;
-    const unbounded_octstring<true>&                      sn_to_mn_container() const;
-    const split_srbs_types_e&                             admitted_split_srb() const;
-    const rrc_cfg_ind_e&                                  rrc_cfg_ind() const;
-    const crit_diagnostics_s&                             crit_diagnostics() const;
-    const target_cgi_c&                                   location_info_sn() const;
-    const mr_dc_res_coordination_info_s&                  mr_dc_res_coordination_info() const;
-    const available_fast_mcg_recovery_via_srb3_e&         available_fast_mcg_recovery_via_srb3() const;
-    const direct_forwarding_path_availability_e&          direct_forwarding_path_availability() const;
-    const scg_activation_status_e&                        scg_activation_status() const;
-    const cp_a_info_ack_s&                                cp_a_info_ack() const;
-    const fixed_bitstring<32, false, true>&               sn_mob_info() const;
-    const q_mcc_oordination_resp_s&                       q_mcc_oordination_resp() const;
-    const ch_oinfo_add_req_ack_s&                         ch_oinfo_add_req_ack() const;
-    const direct_forwarding_path_availability_with_source_mn_e&
-    direct_forwarding_path_availability_with_source_mn() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -6940,51 +4015,10 @@ using sn_ode_addition_request_ack_s = elementary_procedure_option<sn_ode_additio
 
 // SNodeAdditionRequestReject-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_addition_request_reject_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        cause,
-        crit_diagnostics,
-        pcell_id,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                      m_ng_ran_node_ue_xnap_id();
-    uint64_t&                      s_ng_ran_node_ue_xnap_id();
-    cause_c&                       cause();
-    crit_diagnostics_s&            crit_diagnostics();
-    global_ng_ran_cell_id_s&       pcell_id();
-    const uint64_t&                m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                 cause() const;
-    const crit_diagnostics_s&      crit_diagnostics() const;
-    const global_ng_ran_cell_id_s& pcell_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7008,54 +4042,10 @@ using sn_ode_addition_request_reject_s = elementary_procedure_option<sn_ode_addi
 
 // SNodeChangeConfirm-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_change_confirm_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_sn_change_confirm_list,
-        crit_diagnostics,
-        c_pci_nformation_confirm,
-        mn_to_sn_container,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                   m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                   s_ng_ran_node_ue_xnap_id();
-    pdu_session_sn_change_confirm_list_l&       pdu_session_sn_change_confirm_list();
-    crit_diagnostics_s&                         crit_diagnostics();
-    c_pci_nformation_confirm_s&                 c_pci_nformation_confirm();
-    unbounded_octstring<true>&                  mn_to_sn_container();
-    const uint64_t&                             m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                             s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_sn_change_confirm_list_l& pdu_session_sn_change_confirm_list() const;
-    const crit_diagnostics_s&                   crit_diagnostics() const;
-    const c_pci_nformation_confirm_s&           c_pci_nformation_confirm() const;
-    const unbounded_octstring<true>&            mn_to_sn_container() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7082,42 +4072,10 @@ using sn_ode_change_confirm_s = elementary_procedure_option<sn_ode_change_confir
 
 // SNodeChangeRefuse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_change_refuse_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 m_ng_ran_node_ue_xnap_id();
-    uint64_t&                 s_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint64_t&           m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7139,69 +4097,10 @@ using sn_ode_change_refuse_s = elementary_procedure_option<sn_ode_change_refuse_
 
 // SNodeChangeRequired-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_change_required_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        target_s_ng_ran_node_id,
-        cause,
-        pdu_session_sn_change_required_list,
-        sn_to_mn_container,
-        scg_ue_history_info,
-        sn_mob_info,
-        source_pscell_id,
-        c_pci_nformation_required,
-        source_sn_to_target_sn_qmc_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                    m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                    s_ng_ran_node_ue_xnap_id();
-    global_ng_ran_node_id_c&                     target_s_ng_ran_node_id();
-    cause_c&                                     cause();
-    pdu_session_sn_change_required_list_l&       pdu_session_sn_change_required_list();
-    unbounded_octstring<true>&                   sn_to_mn_container();
-    scg_ue_history_info_s&                       scg_ue_history_info();
-    fixed_bitstring<32, false, true>&            sn_mob_info();
-    global_ng_ran_cell_id_s&                     source_pscell_id();
-    c_pci_nformation_required_s&                 c_pci_nformation_required();
-    q_mcc_onfig_info_s&                          source_sn_to_target_sn_qmc_info();
-    const uint64_t&                              m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                              s_ng_ran_node_ue_xnap_id() const;
-    const global_ng_ran_node_id_c&               target_s_ng_ran_node_id() const;
-    const cause_c&                               cause() const;
-    const pdu_session_sn_change_required_list_l& pdu_session_sn_change_required_list() const;
-    const unbounded_octstring<true>&             sn_to_mn_container() const;
-    const scg_ue_history_info_s&                 scg_ue_history_info() const;
-    const fixed_bitstring<32, false, true>&      sn_mob_info() const;
-    const global_ng_ran_cell_id_s&               source_pscell_id() const;
-    const c_pci_nformation_required_s&           c_pci_nformation_required() const;
-    const q_mcc_onfig_info_s&                    source_sn_to_target_sn_qmc_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7235,45 +4134,10 @@ using sn_ode_change_required_s = elementary_procedure_option<sn_ode_change_requi
 
 // SNodeCounterCheckRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_counter_check_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        bearers_subject_to_counter_check,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                      m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                      s_ng_ran_node_ue_xnap_id();
-    bearers_subject_to_counter_check_list_l&       bearers_subject_to_counter_check();
-    const uint64_t&                                m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                s_ng_ran_node_ue_xnap_id() const;
-    const bearers_subject_to_counter_check_list_l& bearers_subject_to_counter_check() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7293,63 +4157,10 @@ using sn_ode_counter_check_request_s = elementary_procedure_option<sn_ode_counte
 
 // SNodeModificationConfirm-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_mod_confirm_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_admitted_mod_sn_mod_confirm,
-        pdu_session_released_sn_mod_confirm,
-        mn_to_sn_container,
-        add_drb_ids,
-        crit_diagnostics,
-        mr_dc_res_coordination_info,
-        q_mcc_oordination_resp,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                        m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                        s_ng_ran_node_ue_xnap_id();
-    pdu_session_admitted_mod_sn_mod_confirm_l&       pdu_session_admitted_mod_sn_mod_confirm();
-    pdu_session_released_sn_mod_confirm_s&           pdu_session_released_sn_mod_confirm();
-    unbounded_octstring<true>&                       mn_to_sn_container();
-    drb_list_l&                                      add_drb_ids();
-    crit_diagnostics_s&                              crit_diagnostics();
-    mr_dc_res_coordination_info_s&                   mr_dc_res_coordination_info();
-    q_mcc_oordination_resp_s&                        q_mcc_oordination_resp();
-    const uint64_t&                                  m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                  s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_admitted_mod_sn_mod_confirm_l& pdu_session_admitted_mod_sn_mod_confirm() const;
-    const pdu_session_released_sn_mod_confirm_s&     pdu_session_released_sn_mod_confirm() const;
-    const unbounded_octstring<true>&                 mn_to_sn_container() const;
-    const drb_list_l&                                add_drb_ids() const;
-    const crit_diagnostics_s&                        crit_diagnostics() const;
-    const mr_dc_res_coordination_info_s&             mr_dc_res_coordination_info() const;
-    const q_mcc_oordination_resp_s&                  q_mcc_oordination_resp() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7382,51 +4193,10 @@ using sn_ode_mod_confirm_s = elementary_procedure_option<sn_ode_mod_confirm_ies_
 
 // SNodeModificationRefuse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_mod_refuse_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        cause,
-        mn_to_sn_container,
-        crit_diagnostics,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                        m_ng_ran_node_ue_xnap_id();
-    uint64_t&                        s_ng_ran_node_ue_xnap_id();
-    cause_c&                         cause();
-    unbounded_octstring<true>&       mn_to_sn_container();
-    crit_diagnostics_s&              crit_diagnostics();
-    const uint64_t&                  m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                  s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                   cause() const;
-    const unbounded_octstring<true>& mn_to_sn_container() const;
-    const crit_diagnostics_s&        crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7489,141 +4259,10 @@ using src_sn_to_tgt_sn_qmc_info_inquiry_e = enumerated<src_sn_to_tgt_sn_qmc_info
 
 // SNodeModificationRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_mod_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        cause,
-        pdcp_change_ind,
-        sel_plmn,
-        mob_restrict_list,
-        scg_cfg_query,
-        ue_context_info_sn_mod_request,
-        mn_to_sn_container,
-        requested_split_srb,
-        requested_split_srb_release,
-        desired_act_notif_level,
-        add_drb_ids,
-        s_ng_ran_node_max_ip_data_rate_ul,
-        s_ng_ran_node_max_ip_data_rate_dl,
-        location_info_snr_eporting,
-        mr_dc_res_coordination_info,
-        pcell_id,
-        ne_dc_tdm_pattern,
-        requested_fast_mcg_recovery_via_srb3,
-        requested_fast_mcg_recovery_via_srb3_release,
-        sn_triggered,
-        target_node_id,
-        pscell_history_info_retrieve,
-        ue_history_info_from_the_ue,
-        ch_oinfo_mod_req,
-        scg_activation_request,
-        cp_a_info_mod_req,
-        c_pci_nformation_upd,
-        s_ng_ran_node_ue_slice_mbr,
-        management_based_mdt_plmn_mod_list,
-        sel_n_id,
-        q_mcc_oordination_request,
-        src_sn_to_tgt_sn_qmc_info_inquiry,
-        iab_authorization_status,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                             m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                             s_ng_ran_node_ue_xnap_id();
-    cause_c&                                              cause();
-    pdcp_change_ind_c&                                    pdcp_change_ind();
-    fixed_octstring<3, true>&                             sel_plmn();
-    mob_restrict_list_s&                                  mob_restrict_list();
-    scg_cfg_query_e&                                      scg_cfg_query();
-    ue_context_info_sn_mod_request_s&                     ue_context_info_sn_mod_request();
-    unbounded_octstring<true>&                            mn_to_sn_container();
-    split_srbs_types_e&                                   requested_split_srb();
-    split_srbs_types_e&                                   requested_split_srb_release();
-    desired_act_notif_level_e&                            desired_act_notif_level();
-    drb_list_l&                                           add_drb_ids();
-    uint64_t&                                             s_ng_ran_node_max_ip_data_rate_ul();
-    uint64_t&                                             s_ng_ran_node_max_ip_data_rate_dl();
-    location_info_snr_eporting_e&                         location_info_snr_eporting();
-    mr_dc_res_coordination_info_s&                        mr_dc_res_coordination_info();
-    global_ng_ran_cell_id_s&                              pcell_id();
-    ne_dc_tdm_pattern_s&                                  ne_dc_tdm_pattern();
-    requested_fast_mcg_recovery_via_srb3_e&               requested_fast_mcg_recovery_via_srb3();
-    requested_fast_mcg_recovery_via_srb3_release_e&       requested_fast_mcg_recovery_via_srb3_release();
-    sn_triggered_e&                                       sn_triggered();
-    global_ng_ran_node_id_c&                              target_node_id();
-    pscell_history_info_retrieve_e&                       pscell_history_info_retrieve();
-    ue_history_info_from_the_ue_c&                        ue_history_info_from_the_ue();
-    ch_oinfo_mod_req_s&                                   ch_oinfo_mod_req();
-    scg_activation_request_e&                             scg_activation_request();
-    cp_a_info_mod_req_s&                                  cp_a_info_mod_req();
-    c_pci_nformation_upd_s&                               c_pci_nformation_upd();
-    ue_slice_max_bit_rate_list_l&                         s_ng_ran_node_ue_slice_mbr();
-    mdt_plmn_mod_list_l&                                  management_based_mdt_plmn_mod_list();
-    fixed_bitstring<44, false, true>&                     sel_n_id();
-    q_mcc_oordination_request_s&                          q_mcc_oordination_request();
-    src_sn_to_tgt_sn_qmc_info_inquiry_e&                  src_sn_to_tgt_sn_qmc_info_inquiry();
-    iab_authorization_status_e&                           iab_authorization_status();
-    const uint64_t&                                       m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                       s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                                        cause() const;
-    const pdcp_change_ind_c&                              pdcp_change_ind() const;
-    const fixed_octstring<3, true>&                       sel_plmn() const;
-    const mob_restrict_list_s&                            mob_restrict_list() const;
-    const scg_cfg_query_e&                                scg_cfg_query() const;
-    const ue_context_info_sn_mod_request_s&               ue_context_info_sn_mod_request() const;
-    const unbounded_octstring<true>&                      mn_to_sn_container() const;
-    const split_srbs_types_e&                             requested_split_srb() const;
-    const split_srbs_types_e&                             requested_split_srb_release() const;
-    const desired_act_notif_level_e&                      desired_act_notif_level() const;
-    const drb_list_l&                                     add_drb_ids() const;
-    const uint64_t&                                       s_ng_ran_node_max_ip_data_rate_ul() const;
-    const uint64_t&                                       s_ng_ran_node_max_ip_data_rate_dl() const;
-    const location_info_snr_eporting_e&                   location_info_snr_eporting() const;
-    const mr_dc_res_coordination_info_s&                  mr_dc_res_coordination_info() const;
-    const global_ng_ran_cell_id_s&                        pcell_id() const;
-    const ne_dc_tdm_pattern_s&                            ne_dc_tdm_pattern() const;
-    const requested_fast_mcg_recovery_via_srb3_e&         requested_fast_mcg_recovery_via_srb3() const;
-    const requested_fast_mcg_recovery_via_srb3_release_e& requested_fast_mcg_recovery_via_srb3_release() const;
-    const sn_triggered_e&                                 sn_triggered() const;
-    const global_ng_ran_node_id_c&                        target_node_id() const;
-    const pscell_history_info_retrieve_e&                 pscell_history_info_retrieve() const;
-    const ue_history_info_from_the_ue_c&                  ue_history_info_from_the_ue() const;
-    const ch_oinfo_mod_req_s&                             ch_oinfo_mod_req() const;
-    const scg_activation_request_e&                       scg_activation_request() const;
-    const cp_a_info_mod_req_s&                            cp_a_info_mod_req() const;
-    const c_pci_nformation_upd_s&                         c_pci_nformation_upd() const;
-    const ue_slice_max_bit_rate_list_l&                   s_ng_ran_node_ue_slice_mbr() const;
-    const mdt_plmn_mod_list_l&                            management_based_mdt_plmn_mod_list() const;
-    const fixed_bitstring<44, false, true>&               sel_n_id() const;
-    const q_mcc_oordination_request_s&                    q_mcc_oordination_request() const;
-    const src_sn_to_tgt_sn_qmc_info_inquiry_e&            src_sn_to_tgt_sn_qmc_info_inquiry() const;
-    const iab_authorization_status_e&                     iab_authorization_status() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7707,96 +4346,10 @@ using sn_ode_mod_request_s = elementary_procedure_option<sn_ode_mod_request_ies_
 
 // SNodeModificationRequestAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_mod_request_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_admitted_sn_mod_resp,
-        pdu_session_not_admitted_sn_mod_resp,
-        sn_to_mn_container,
-        admitted_split_srb,
-        admitted_split_srb_release,
-        crit_diagnostics,
-        location_info_sn,
-        mr_dc_res_coordination_info,
-        pdu_session_data_forwarding_sn_mod_resp,
-        rrc_cfg_ind,
-        available_fast_mcg_recovery_via_srb3,
-        release_fast_mcg_recovery_via_srb3,
-        direct_forwarding_path_availability,
-        scg_ue_history_info,
-        scg_activation_status,
-        cp_a_info_mod_req_ack,
-        q_mcc_oordination_resp,
-        source_sn_to_target_sn_qmc_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                        m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                        s_ng_ran_node_ue_xnap_id();
-    pdu_session_admitted_sn_mod_resp_s&              pdu_session_admitted_sn_mod_resp();
-    pdu_session_not_admitted_sn_mod_resp_s&          pdu_session_not_admitted_sn_mod_resp();
-    unbounded_octstring<true>&                       sn_to_mn_container();
-    split_srbs_types_e&                              admitted_split_srb();
-    split_srbs_types_e&                              admitted_split_srb_release();
-    crit_diagnostics_s&                              crit_diagnostics();
-    target_cgi_c&                                    location_info_sn();
-    mr_dc_res_coordination_info_s&                   mr_dc_res_coordination_info();
-    pdu_session_data_forwarding_sn_mod_resp_s&       pdu_session_data_forwarding_sn_mod_resp();
-    rrc_cfg_ind_e&                                   rrc_cfg_ind();
-    available_fast_mcg_recovery_via_srb3_e&          available_fast_mcg_recovery_via_srb3();
-    release_fast_mcg_recovery_via_srb3_e&            release_fast_mcg_recovery_via_srb3();
-    direct_forwarding_path_availability_e&           direct_forwarding_path_availability();
-    scg_ue_history_info_s&                           scg_ue_history_info();
-    scg_activation_status_e&                         scg_activation_status();
-    cp_a_info_mod_req_ack_s&                         cp_a_info_mod_req_ack();
-    q_mcc_oordination_resp_s&                        q_mcc_oordination_resp();
-    q_mcc_onfig_info_s&                              source_sn_to_target_sn_qmc_info();
-    const uint64_t&                                  m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                  s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_admitted_sn_mod_resp_s&        pdu_session_admitted_sn_mod_resp() const;
-    const pdu_session_not_admitted_sn_mod_resp_s&    pdu_session_not_admitted_sn_mod_resp() const;
-    const unbounded_octstring<true>&                 sn_to_mn_container() const;
-    const split_srbs_types_e&                        admitted_split_srb() const;
-    const split_srbs_types_e&                        admitted_split_srb_release() const;
-    const crit_diagnostics_s&                        crit_diagnostics() const;
-    const target_cgi_c&                              location_info_sn() const;
-    const mr_dc_res_coordination_info_s&             mr_dc_res_coordination_info() const;
-    const pdu_session_data_forwarding_sn_mod_resp_s& pdu_session_data_forwarding_sn_mod_resp() const;
-    const rrc_cfg_ind_e&                             rrc_cfg_ind() const;
-    const available_fast_mcg_recovery_via_srb3_e&    available_fast_mcg_recovery_via_srb3() const;
-    const release_fast_mcg_recovery_via_srb3_e&      release_fast_mcg_recovery_via_srb3() const;
-    const direct_forwarding_path_availability_e&     direct_forwarding_path_availability() const;
-    const scg_ue_history_info_s&                     scg_ue_history_info() const;
-    const scg_activation_status_e&                   scg_activation_status() const;
-    const cp_a_info_mod_req_ack_s&                   cp_a_info_mod_req_ack() const;
-    const q_mcc_oordination_resp_s&                  q_mcc_oordination_resp() const;
-    const q_mcc_onfig_info_s&                        source_sn_to_target_sn_qmc_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7851,42 +4404,10 @@ using sn_ode_mod_request_ack_s = elementary_procedure_option<sn_ode_mod_request_
 
 // SNodeModificationRequestReject-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_mod_request_reject_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 m_ng_ran_node_ue_xnap_id();
-    uint64_t&                 s_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint64_t&           m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -7908,105 +4429,10 @@ using sn_ode_mod_request_reject_s = elementary_procedure_option<sn_ode_mod_reque
 
 // SNodeModificationRequired-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_mod_required_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        cause,
-        pdcp_change_ind,
-        pdu_session_to_be_modified_sn_mod_required,
-        pdu_session_to_be_released_sn_mod_required,
-        sn_to_mn_container,
-        spare_drb_ids,
-        required_nof_drb_ids,
-        location_info_sn,
-        mr_dc_res_coordination_info,
-        rrc_cfg_ind,
-        available_fast_mcg_recovery_via_srb3,
-        release_fast_mcg_recovery_via_srb3,
-        scg_ind,
-        scg_ue_history_info,
-        scg_activation_request,
-        cp_ac_info_mod_required,
-        sc_grecfg_notif,
-        spr_availability,
-        q_mcc_oordination_request,
-        s_cp_ac_request,
-        pdu_sessions_list_to_be_released_up_error,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                           m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                           s_ng_ran_node_ue_xnap_id();
-    cause_c&                                            cause();
-    pdcp_change_ind_c&                                  pdcp_change_ind();
-    pdu_session_to_be_modified_sn_mod_required_l&       pdu_session_to_be_modified_sn_mod_required();
-    pdu_session_to_be_released_sn_mod_required_s&       pdu_session_to_be_released_sn_mod_required();
-    unbounded_octstring<true>&                          sn_to_mn_container();
-    drb_list_l&                                         spare_drb_ids();
-    uint8_t&                                            required_nof_drb_ids();
-    target_cgi_c&                                       location_info_sn();
-    mr_dc_res_coordination_info_s&                      mr_dc_res_coordination_info();
-    rrc_cfg_ind_e&                                      rrc_cfg_ind();
-    available_fast_mcg_recovery_via_srb3_e&             available_fast_mcg_recovery_via_srb3();
-    release_fast_mcg_recovery_via_srb3_e&               release_fast_mcg_recovery_via_srb3();
-    scg_ind_e&                                          scg_ind();
-    scg_ue_history_info_s&                              scg_ue_history_info();
-    scg_activation_request_e&                           scg_activation_request();
-    cp_ac_info_mod_required_s&                          cp_ac_info_mod_required();
-    sc_grecfg_notif_e&                                  sc_grecfg_notif();
-    spr_availability_e&                                 spr_availability();
-    q_mcc_oordination_request_s&                        q_mcc_oordination_request();
-    s_cp_ac_request_e&                                  s_cp_ac_request();
-    pdu_sessions_list_to_be_released_up_error_l&        pdu_sessions_list_to_be_released_up_error();
-    const uint64_t&                                     m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                     s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                                      cause() const;
-    const pdcp_change_ind_c&                            pdcp_change_ind() const;
-    const pdu_session_to_be_modified_sn_mod_required_l& pdu_session_to_be_modified_sn_mod_required() const;
-    const pdu_session_to_be_released_sn_mod_required_s& pdu_session_to_be_released_sn_mod_required() const;
-    const unbounded_octstring<true>&                    sn_to_mn_container() const;
-    const drb_list_l&                                   spare_drb_ids() const;
-    const uint8_t&                                      required_nof_drb_ids() const;
-    const target_cgi_c&                                 location_info_sn() const;
-    const mr_dc_res_coordination_info_s&                mr_dc_res_coordination_info() const;
-    const rrc_cfg_ind_e&                                rrc_cfg_ind() const;
-    const available_fast_mcg_recovery_via_srb3_e&       available_fast_mcg_recovery_via_srb3() const;
-    const release_fast_mcg_recovery_via_srb3_e&         release_fast_mcg_recovery_via_srb3() const;
-    const scg_ind_e&                                    scg_ind() const;
-    const scg_ue_history_info_s&                        scg_ue_history_info() const;
-    const scg_activation_request_e&                     scg_activation_request() const;
-    const cp_ac_info_mod_required_s&                    cp_ac_info_mod_required() const;
-    const sc_grecfg_notif_e&                            sc_grecfg_notif() const;
-    const spr_availability_e&                           spr_availability() const;
-    const q_mcc_oordination_request_s&                  q_mcc_oordination_request() const;
-    const s_cp_ac_request_e&                            s_cp_ac_request() const;
-    const pdu_sessions_list_to_be_released_up_error_l&  pdu_sessions_list_to_be_released_up_error() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8066,40 +4492,10 @@ using sn_ode_mod_required_s = elementary_procedure_option<sn_ode_mod_required_ie
 
 // SNodeReconfigurationComplete-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_recfg_complete_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, resp_info_reconf_compl, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                       m_ng_ran_node_ue_xnap_id();
-    uint64_t&                       s_ng_ran_node_ue_xnap_id();
-    resp_info_reconf_compl_s&       resp_info_reconf_compl();
-    const uint64_t&                 m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                 s_ng_ran_node_ue_xnap_id() const;
-    const resp_info_reconf_compl_s& resp_info_reconf_compl() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8119,48 +4515,10 @@ using sn_ode_recfg_complete_s = elementary_procedure_option<sn_ode_recfg_complet
 
 // SNodeReleaseConfirm-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_release_confirm_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_released_list_rel_conf,
-        crit_diagnostics,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                   m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                   s_ng_ran_node_ue_xnap_id();
-    pdu_session_released_list_rel_conf_s&       pdu_session_released_list_rel_conf();
-    crit_diagnostics_s&                         crit_diagnostics();
-    const uint64_t&                             m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                             s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_released_list_rel_conf_s& pdu_session_released_list_rel_conf() const;
-    const crit_diagnostics_s&                   crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8183,42 +4541,10 @@ using sn_ode_release_confirm_s = elementary_procedure_option<sn_ode_release_conf
 
 // SNodeReleaseReject-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_release_reject_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 m_ng_ran_node_ue_xnap_id();
-    uint64_t&                 s_ng_ran_node_ue_xnap_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint64_t&           m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8241,57 +4567,10 @@ using sn_ode_release_reject_s = elementary_procedure_option<sn_ode_release_rejec
 
 // SNodeReleaseRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_release_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        cause,
-        pdu_session_to_be_released_rel_req,
-        ue_context_kept_ind,
-        mn_to_sn_container,
-        drbs_transferred_to_mn,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                            m_ng_ran_node_ue_xnap_id();
-    uint64_t&                            s_ng_ran_node_ue_xnap_id();
-    cause_c&                             cause();
-    pdu_session_list_with_cause_l&       pdu_session_to_be_released_rel_req();
-    ue_context_kept_ind_e&               ue_context_kept_ind();
-    unbounded_octstring<true>&           mn_to_sn_container();
-    drb_list_l&                          drbs_transferred_to_mn();
-    const uint64_t&                      m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                      s_ng_ran_node_ue_xnap_id() const;
-    const cause_c&                       cause() const;
-    const pdu_session_list_with_cause_l& pdu_session_to_be_released_rel_req() const;
-    const ue_context_kept_ind_e&         ue_context_kept_ind() const;
-    const unbounded_octstring<true>&     mn_to_sn_container() const;
-    const drb_list_l&                    drbs_transferred_to_mn() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8320,54 +4599,10 @@ using sn_ode_release_request_s = elementary_procedure_option<sn_ode_release_requ
 
 // SNodeReleaseRequestAcknowledge-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_release_request_ack_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_to_be_released_rel_req_ack,
-        crit_diagnostics,
-        scg_ue_history_info,
-        sn_mob_info,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                            m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                            s_ng_ran_node_ue_xnap_id();
-    pdu_session_to_be_released_list_rel_req_ack_s&       pdu_session_to_be_released_rel_req_ack();
-    crit_diagnostics_s&                                  crit_diagnostics();
-    scg_ue_history_info_s&                               scg_ue_history_info();
-    fixed_bitstring<32, false, true>&                    sn_mob_info();
-    const uint64_t&                                      m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                      s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_to_be_released_list_rel_req_ack_s& pdu_session_to_be_released_rel_req_ack() const;
-    const crit_diagnostics_s&                            crit_diagnostics() const;
-    const scg_ue_history_info_s&                         scg_ue_history_info() const;
-    const fixed_bitstring<32, false, true>&              sn_mob_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8395,57 +4630,10 @@ using sn_ode_release_request_ack_s = elementary_procedure_option<sn_ode_release_
 
 // SNodeReleaseRequired-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct sn_ode_release_required_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_to_be_released_list_rel_rqd,
-        cause,
-        sn_to_mn_container,
-        scg_ue_history_info,
-        pdu_sessions_list_to_be_released_up_error,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                          m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                          s_ng_ran_node_ue_xnap_id();
-    pdu_session_to_be_released_list_rel_rqd_s&         pdu_session_to_be_released_list_rel_rqd();
-    cause_c&                                           cause();
-    unbounded_octstring<true>&                         sn_to_mn_container();
-    scg_ue_history_info_s&                             scg_ue_history_info();
-    pdu_sessions_list_to_be_released_up_error_l&       pdu_sessions_list_to_be_released_up_error();
-    const uint64_t&                                    m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                    s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_to_be_released_list_rel_rqd_s&   pdu_session_to_be_released_list_rel_rqd() const;
-    const cause_c&                                     cause() const;
-    const unbounded_octstring<true>&                   sn_to_mn_container() const;
-    const scg_ue_history_info_s&                       scg_ue_history_info() const;
-    const pdu_sessions_list_to_be_released_up_error_l& pdu_sessions_list_to_be_released_up_error() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8473,57 +4661,10 @@ using sn_ode_release_required_s = elementary_procedure_option<sn_ode_release_req
 
 // ScgFailureInformationReport-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct scg_fail_info_report_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        source_pscell_cgi,
-        failed_pscell_cgi,
-        scg_fail_report_container,
-        sn_mob_info,
-        cp_ac_cfg,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                               m_ng_ran_node_ue_xnap_id();
-    uint64_t&                               s_ng_ran_node_ue_xnap_id();
-    global_ng_ran_cell_id_s&                source_pscell_cgi();
-    global_ng_ran_cell_id_s&                failed_pscell_cgi();
-    unbounded_octstring<true>&              scg_fail_report_container();
-    fixed_bitstring<32, false, true>&       sn_mob_info();
-    cp_ac_cfg_s&                            cp_ac_cfg();
-    const uint64_t&                         m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                         s_ng_ran_node_ue_xnap_id() const;
-    const global_ng_ran_cell_id_s&          source_pscell_cgi() const;
-    const global_ng_ran_cell_id_s&          failed_pscell_cgi() const;
-    const unbounded_octstring<true>&        scg_fail_report_container() const;
-    const fixed_bitstring<32, false, true>& sn_mob_info() const;
-    const cp_ac_cfg_s&                      cp_ac_cfg() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8551,38 +4692,10 @@ using scg_fail_info_report_s = elementary_procedure_option<scg_fail_info_report_
 
 // ScgFailureTransfer-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct scg_fail_transfer_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&       m_ng_ran_node_ue_xnap_id();
-    uint64_t&       s_ng_ran_node_ue_xnap_id();
-    const uint64_t& m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t& s_ng_ran_node_ue_xnap_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8601,45 +4714,10 @@ using scg_fail_transfer_s = elementary_procedure_option<scg_fail_transfer_ies_co
 
 // SecondaryRATDataUsageReport-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct secondary_rat_data_usage_report_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        m_ng_ran_node_ue_xnap_id,
-        s_ng_ran_node_ue_xnap_id,
-        pdu_session_res_secondary_rat_usage_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                         m_ng_ran_node_ue_xnap_id();
-    uint64_t&                                         s_ng_ran_node_ue_xnap_id();
-    pdu_session_res_secondary_rat_usage_list_l&       pdu_session_res_secondary_rat_usage_list();
-    const uint64_t&                                   m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                   s_ng_ran_node_ue_xnap_id() const;
-    const pdu_session_res_secondary_rat_usage_list_l& pdu_session_res_secondary_rat_usage_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8659,40 +4737,10 @@ using secondary_rat_data_usage_report_s = elementary_procedure_option<secondary_
 
 // TraceStartIEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct trace_start_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { m_ng_ran_node_ue_xnap_id, s_ng_ran_node_ue_xnap_id, trace_activation, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                 m_ng_ran_node_ue_xnap_id();
-    uint64_t&                 s_ng_ran_node_ue_xnap_id();
-    trace_activation_s&       trace_activation();
-    const uint64_t&           m_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&           s_ng_ran_node_ue_xnap_id() const;
-    const trace_activation_s& trace_activation() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8713,38 +4761,10 @@ using trace_start_s = elementary_procedure_option<trace_start_ies_container>;
 
 // UEContextRelease-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct ue_context_release_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { source_ng_ran_node_ue_xnap_id, target_ng_ran_node_ue_xnap_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&       source_ng_ran_node_ue_xnap_id();
-    uint64_t&       target_ng_ran_node_ue_xnap_id();
-    const uint64_t& source_ng_ran_node_ue_xnap_id() const;
-    const uint64_t& target_ng_ran_node_ue_xnap_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8763,42 +4783,10 @@ using ue_context_release_s = elementary_procedure_option<ue_context_release_ies_
 
 // XnRemovalFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_removal_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    uint16_t&                 interface_instance_ind();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const uint16_t&           interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8820,42 +4808,10 @@ using xn_removal_fail_s = elementary_procedure_option<xn_removal_fail_ies_contai
 
 // XnRemovalRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_removal_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { global_ng_ran_node_id, xn_removal_thres, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_node_id_c&       global_ng_ran_node_id();
-    uint8_t&                       xn_removal_thres();
-    uint16_t&                      interface_instance_ind();
-    const global_ng_ran_node_id_c& global_ng_ran_node_id() const;
-    const uint8_t&                 xn_removal_thres() const;
-    const uint16_t&                interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8877,42 +4833,10 @@ using xn_removal_request_s = elementary_procedure_option<xn_removal_request_ies_
 
 // XnRemovalResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_removal_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { global_ng_ran_node_id, crit_diagnostics, interface_instance_ind, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_node_id_c&       global_ng_ran_node_id();
-    crit_diagnostics_s&            crit_diagnostics();
-    uint16_t&                      interface_instance_ind();
-    const global_ng_ran_node_id_c& global_ng_ran_node_id() const;
-    const crit_diagnostics_s&      crit_diagnostics() const;
-    const uint16_t&                interface_instance_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -8934,53 +4858,10 @@ using xn_removal_resp_s = elementary_procedure_option<xn_removal_resp_ies_contai
 
 // XnSetupFailure-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_setup_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        cause,
-        time_to_wait,
-        crit_diagnostics,
-        interface_instance_ind,
-        msg_oversize_notif,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                    cause();
-    time_to_wait_e&             time_to_wait();
-    crit_diagnostics_s&         crit_diagnostics();
-    uint16_t&                   interface_instance_ind();
-    msg_oversize_notif_s&       msg_oversize_notif();
-    const cause_c&              cause() const;
-    const time_to_wait_e&       time_to_wait() const;
-    const crit_diagnostics_s&   crit_diagnostics() const;
-    const uint16_t&             interface_instance_ind() const;
-    const msg_oversize_notif_s& msg_oversize_notif() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -9006,77 +4887,10 @@ using xn_setup_fail_s = elementary_procedure_option<xn_setup_fail_ies_container>
 
 // XnSetupRequest-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_setup_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        global_ng_ran_node_id,
-        tai_support_list,
-        amf_region_info,
-        list_of_served_cells_nr,
-        list_of_served_cells_e_utra,
-        interface_instance_ind,
-        tnl_cfg_info,
-        partial_list_ind_nr,
-        cell_and_capacity_assist_info_nr,
-        partial_list_ind_eutra,
-        cell_and_capacity_assist_info_eutra,
-        local_ng_ran_node_id,
-        neighbour_ng_ran_node_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_node_id_c&                     global_ng_ran_node_id();
-    tai_support_list_l&                          tai_support_list();
-    amf_region_info_l&                           amf_region_info();
-    served_cells_nr_l&                           list_of_served_cells_nr();
-    served_cells_e_utra_l&                       list_of_served_cells_e_utra();
-    uint16_t&                                    interface_instance_ind();
-    tnl_cfg_info_s&                              tnl_cfg_info();
-    partial_list_ind_e&                          partial_list_ind_nr();
-    cell_and_capacity_assist_info_nr_s&          cell_and_capacity_assist_info_nr();
-    partial_list_ind_e&                          partial_list_ind_eutra();
-    cell_and_capacity_assist_info_eutra_s&       cell_and_capacity_assist_info_eutra();
-    local_ng_ran_node_id_c&                      local_ng_ran_node_id();
-    neighbour_ng_ran_node_list_l&                neighbour_ng_ran_node_list();
-    const global_ng_ran_node_id_c&               global_ng_ran_node_id() const;
-    const tai_support_list_l&                    tai_support_list() const;
-    const amf_region_info_l&                     amf_region_info() const;
-    const served_cells_nr_l&                     list_of_served_cells_nr() const;
-    const served_cells_e_utra_l&                 list_of_served_cells_e_utra() const;
-    const uint16_t&                              interface_instance_ind() const;
-    const tnl_cfg_info_s&                        tnl_cfg_info() const;
-    const partial_list_ind_e&                    partial_list_ind_nr() const;
-    const cell_and_capacity_assist_info_nr_s&    cell_and_capacity_assist_info_nr() const;
-    const partial_list_ind_e&                    partial_list_ind_eutra() const;
-    const cell_and_capacity_assist_info_eutra_s& cell_and_capacity_assist_info_eutra() const;
-    const local_ng_ran_node_id_c&                local_ng_ran_node_id() const;
-    const neighbour_ng_ran_node_list_l&          neighbour_ng_ran_node_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -9116,80 +4930,10 @@ using xn_setup_request_s = elementary_procedure_option<xn_setup_request_ies_cont
 
 // XnSetupResponse-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_setup_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        global_ng_ran_node_id,
-        tai_support_list,
-        list_of_served_cells_nr,
-        list_of_served_cells_e_utra,
-        crit_diagnostics,
-        amf_region_info,
-        interface_instance_ind,
-        tnl_cfg_info,
-        partial_list_ind_nr,
-        cell_and_capacity_assist_info_nr,
-        partial_list_ind_eutra,
-        cell_and_capacity_assist_info_eutra,
-        local_ng_ran_node_id,
-        neighbour_ng_ran_node_list,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    global_ng_ran_node_id_c&                     global_ng_ran_node_id();
-    tai_support_list_l&                          tai_support_list();
-    served_cells_nr_l&                           list_of_served_cells_nr();
-    served_cells_e_utra_l&                       list_of_served_cells_e_utra();
-    crit_diagnostics_s&                          crit_diagnostics();
-    amf_region_info_l&                           amf_region_info();
-    uint16_t&                                    interface_instance_ind();
-    tnl_cfg_info_s&                              tnl_cfg_info();
-    partial_list_ind_e&                          partial_list_ind_nr();
-    cell_and_capacity_assist_info_nr_s&          cell_and_capacity_assist_info_nr();
-    partial_list_ind_e&                          partial_list_ind_eutra();
-    cell_and_capacity_assist_info_eutra_s&       cell_and_capacity_assist_info_eutra();
-    local_ng_ran_node_id_c&                      local_ng_ran_node_id();
-    neighbour_ng_ran_node_list_l&                neighbour_ng_ran_node_list();
-    const global_ng_ran_node_id_c&               global_ng_ran_node_id() const;
-    const tai_support_list_l&                    tai_support_list() const;
-    const served_cells_nr_l&                     list_of_served_cells_nr() const;
-    const served_cells_e_utra_l&                 list_of_served_cells_e_utra() const;
-    const crit_diagnostics_s&                    crit_diagnostics() const;
-    const amf_region_info_l&                     amf_region_info() const;
-    const uint16_t&                              interface_instance_ind() const;
-    const tnl_cfg_info_s&                        tnl_cfg_info() const;
-    const partial_list_ind_e&                    partial_list_ind_nr() const;
-    const cell_and_capacity_assist_info_nr_s&    cell_and_capacity_assist_info_nr() const;
-    const partial_list_ind_e&                    partial_list_ind_eutra() const;
-    const cell_and_capacity_assist_info_eutra_s& cell_and_capacity_assist_info_eutra() const;
-    const local_ng_ran_node_id_c&                local_ng_ran_node_id() const;
-    const neighbour_ng_ran_node_list_l&          neighbour_ng_ran_node_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -9232,63 +4976,10 @@ using xn_setup_resp_s = elementary_procedure_option<xn_setup_resp_ies_container>
 
 // XnUAddressIndication-IEs ::= OBJECT SET OF XNAP-PROTOCOL-IES
 struct xn_u_address_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        new_ng_ran_node_ue_xnap_id,
-        old_ng_ran_node_ue_xnap_id,
-        xn_u_address_infoper_pdu_session_list,
-        cho_mrdc_ind,
-        cho_mrdc_early_data_forwarding,
-        cp_c_data_forwarding_ind,
-        mbs_data_forwarding_ind,
-        mbs_session_info_resp_list,
-        pdu_setbased_handling_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint64_t&                                      new_ng_ran_node_ue_xnap_id();
-    uint64_t&                                      old_ng_ran_node_ue_xnap_id();
-    xn_u_address_infoper_pdu_session_list_l&       xn_u_address_infoper_pdu_session_list();
-    cho_mrdc_ind_e&                                cho_mrdc_ind();
-    cho_mrdc_early_data_forwarding_e&              cho_mrdc_early_data_forwarding();
-    cp_c_data_forwarding_ind_e&                    cp_c_data_forwarding_ind();
-    mbs_data_forwarding_ind_e&                     mbs_data_forwarding_ind();
-    mbs_session_info_resp_list_l&                  mbs_session_info_resp_list();
-    pdu_setbased_handling_ind_e&                   pdu_setbased_handling_ind();
-    const uint64_t&                                new_ng_ran_node_ue_xnap_id() const;
-    const uint64_t&                                old_ng_ran_node_ue_xnap_id() const;
-    const xn_u_address_infoper_pdu_session_list_l& xn_u_address_infoper_pdu_session_list() const;
-    const cho_mrdc_ind_e&                          cho_mrdc_ind() const;
-    const cho_mrdc_early_data_forwarding_e&        cho_mrdc_early_data_forwarding() const;
-    const cp_c_data_forwarding_ind_e&              cp_c_data_forwarding_ind() const;
-    const mbs_data_forwarding_ind_e&               mbs_data_forwarding_ind() const;
-    const mbs_session_info_resp_list_l&            mbs_session_info_resp_list() const;
-    const pdu_setbased_handling_ind_e&             pdu_setbased_handling_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -9320,97 +5011,3 @@ using xn_u_address_ind_s = elementary_procedure_option<xn_u_address_ind_ies_cont
 
 } // namespace xnap
 } // namespace asn1
-
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::access_and_mob_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::activity_notif_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cp_c_cancel_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cell_activation_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cell_activation_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cell_activation_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cell_traffic_trace_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::conditional_ho_cancel_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cfg_upd_gnb_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::cfg_upd_ng_enb_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::data_collection_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::data_collection_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::data_collection_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::data_collection_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::deactiv_trace_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::e_utra_nr_cell_res_coordination_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::e_utra_nr_cell_res_coordination_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::early_status_transfer_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::error_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::f1_c_traffic_transfer_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ho_cancel_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ho_prep_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ho_report_ies_o>;
-extern template struct asn1::protocol_ext_field_s<asn1::xnap::ue_context_info_ho_request_ext_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ho_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ho_request_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ho_success_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_res_coordination_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_res_coordination_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_transport_migration_management_reject_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_transport_migration_management_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_transport_migration_management_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_transport_migration_mod_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::iab_transport_migration_mod_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::mob_change_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::mob_change_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::mob_change_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ngran_node_cfg_upd_ies_o>;
-extern template struct asn1::protocol_ext_field_s<asn1::xnap::responding_node_type_cfg_upd_ack_ng_enb_ext_ies_o>;
-extern template struct asn1::protocol_ext_field_s<asn1::xnap::responding_node_type_cfg_upd_ack_gnb_ext_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ngran_node_cfg_upd_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ngran_node_cfg_upd_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::notif_ctrl_ind_ies_o>;
-extern template struct asn1::protocol_ext_field_s<
-    asn1::xnap::pdu_sessions_to_be_modified_sn_mod_request_item_ext_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::partial_ue_context_transfer_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::partial_ue_context_transfer_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::partial_ue_context_transfer_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ran_multicast_group_paging_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ran_paging_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::rrc_transfer_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::reset_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::reset_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::res_status_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::res_status_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::res_status_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::res_status_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::retrieve_ue_context_confirm_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::retrieve_ue_context_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::retrieve_ue_context_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::retrieve_ue_context_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_status_transfer_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_addition_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_addition_request_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_addition_request_reject_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_change_confirm_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_change_refuse_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_change_required_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_counter_check_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_mod_confirm_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_mod_refuse_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_mod_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_mod_request_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_mod_request_reject_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_mod_required_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_recfg_complete_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_release_confirm_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_release_reject_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_release_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_release_request_ack_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::sn_ode_release_required_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::scg_fail_info_report_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::scg_fail_transfer_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::secondary_rat_data_usage_report_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::trace_start_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::ue_context_release_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_removal_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_removal_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_removal_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_setup_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_setup_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_setup_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::xnap::xn_u_address_ind_ies_o>;

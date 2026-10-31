@@ -201,68 +201,66 @@ inline bool fill_e1ap_bearer_context_setup_request(e1ap_bearer_context_setup_req
   }
 
   // Fill PDU session resource to setup list.
-  for (const auto& asn1_pdu_session_res_list_item :
-       asn1_request->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request()) {
-    for (const auto& asn1_pdu_session_res_item : asn1_pdu_session_res_list_item->pdu_session_res_to_setup_list()) {
-      e1ap_pdu_session_res_to_setup_item pdu_session_res_item;
+  for (const auto& asn1_pdu_session_res_item :
+       asn1_request->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request()
+           .pdu_session_res_to_setup_list) {
+    e1ap_pdu_session_res_to_setup_item pdu_session_res_item;
 
-      // Fill PDU session ID.
-      pdu_session_res_item.pdu_session_id = uint_to_pdu_session_id(asn1_pdu_session_res_item.pdu_session_id);
+    // Fill PDU session ID.
+    pdu_session_res_item.pdu_session_id = uint_to_pdu_session_id(asn1_pdu_session_res_item.pdu_session_id);
 
-      // Fill PDU session type.
-      if (!asn1_to_pdu_session_type(pdu_session_res_item.pdu_session_type,
-                                    asn1_pdu_session_res_item.pdu_session_type)) {
-        return false;
-      }
-
-      // Fill S-NSSAI.
-      pdu_session_res_item.snssai = e1ap_asn1_to_snssai(asn1_pdu_session_res_item.snssai);
-
-      // Fill NG UL UP transport layer information.
-      pdu_session_res_item.ng_ul_up_tnl_info =
-          asn1_to_up_transport_layer_info(asn1_pdu_session_res_item.ng_ul_up_tnl_info);
-
-      // Fill security indication.
-      asn1_to_security_indication(pdu_session_res_item.security_ind, asn1_pdu_session_res_item.security_ind);
-
-      // Fill DRB to set up list NG-RAN.
-      for (const auto& asn1_drb_to_setup_item : asn1_pdu_session_res_item.drb_to_setup_list_ng_ran) {
-        e1ap_drb_to_setup_item_ng_ran drb_to_setup_item;
-        fill_e1ap_drb_to_setup_item(drb_to_setup_item, asn1_drb_to_setup_item);
-        pdu_session_res_item.drb_to_setup_list_ng_ran.emplace(uint_to_drb_id(asn1_drb_to_setup_item.drb_id),
-                                                              drb_to_setup_item);
-      }
-
-      // Fill PDU session resource DL aggregate maximum bit rate.
-      if (asn1_pdu_session_res_item.pdu_session_res_dl_ambr_present) {
-        pdu_session_res_item.pdu_session_res_dl_ambr = asn1_pdu_session_res_item.pdu_session_res_dl_ambr;
-      }
-
-      // Fill PDU session data forwarding info request.
-      if (asn1_pdu_session_res_item.pdu_session_data_forwarding_info_request_present) {
-        pdu_session_res_item.pdu_session_data_forwarding_info_request = e1ap_asn1_to_data_forwarding_info_request(
-            asn1_pdu_session_res_item.pdu_session_data_forwarding_info_request);
-      }
-
-      // Fill PDU session inactivity timer.
-      if (asn1_pdu_session_res_item.pdu_session_inactivity_timer_present) {
-        pdu_session_res_item.pdu_session_inactivity_timer =
-            std::chrono::seconds(asn1_pdu_session_res_item.pdu_session_inactivity_timer);
-      }
-
-      // Fill existing allocated NG DL UP TNL info.
-      if (asn1_pdu_session_res_item.existing_allocated_ng_dl_up_tnl_info_present) {
-        pdu_session_res_item.existing_allocated_ng_dl_up_tnl_info =
-            asn1_to_up_transport_layer_info(asn1_pdu_session_res_item.existing_allocated_ng_dl_up_tnl_info);
-      }
-
-      // Fill network instance.
-      if (asn1_pdu_session_res_item.network_instance_present) {
-        pdu_session_res_item.network_instance = asn1_pdu_session_res_item.network_instance;
-      }
-      request.pdu_session_res_to_setup_list.emplace(uint_to_pdu_session_id(asn1_pdu_session_res_item.pdu_session_id),
-                                                    pdu_session_res_item);
+    // Fill PDU session type.
+    if (!asn1_to_pdu_session_type(pdu_session_res_item.pdu_session_type, asn1_pdu_session_res_item.pdu_session_type)) {
+      return false;
     }
+
+    // Fill S-NSSAI.
+    pdu_session_res_item.snssai = e1ap_asn1_to_snssai(asn1_pdu_session_res_item.snssai);
+
+    // Fill NG UL UP transport layer information.
+    pdu_session_res_item.ng_ul_up_tnl_info =
+        asn1_to_up_transport_layer_info(asn1_pdu_session_res_item.ng_ul_up_tnl_info);
+
+    // Fill security indication.
+    asn1_to_security_indication(pdu_session_res_item.security_ind, asn1_pdu_session_res_item.security_ind);
+
+    // Fill DRB to set up list NG-RAN.
+    for (const auto& asn1_drb_to_setup_item : asn1_pdu_session_res_item.drb_to_setup_list_ng_ran) {
+      e1ap_drb_to_setup_item_ng_ran drb_to_setup_item;
+      fill_e1ap_drb_to_setup_item(drb_to_setup_item, asn1_drb_to_setup_item);
+      pdu_session_res_item.drb_to_setup_list_ng_ran.emplace(uint_to_drb_id(asn1_drb_to_setup_item.drb_id),
+                                                            drb_to_setup_item);
+    }
+
+    // Fill PDU session resource DL aggregate maximum bit rate.
+    if (asn1_pdu_session_res_item.pdu_session_res_dl_ambr_present) {
+      pdu_session_res_item.pdu_session_res_dl_ambr = asn1_pdu_session_res_item.pdu_session_res_dl_ambr;
+    }
+
+    // Fill PDU session data forwarding info request.
+    if (asn1_pdu_session_res_item.pdu_session_data_forwarding_info_request_present) {
+      pdu_session_res_item.pdu_session_data_forwarding_info_request =
+          e1ap_asn1_to_data_forwarding_info_request(asn1_pdu_session_res_item.pdu_session_data_forwarding_info_request);
+    }
+
+    // Fill PDU session inactivity timer.
+    if (asn1_pdu_session_res_item.pdu_session_inactivity_timer_present) {
+      pdu_session_res_item.pdu_session_inactivity_timer =
+          std::chrono::seconds(asn1_pdu_session_res_item.pdu_session_inactivity_timer);
+    }
+
+    // Fill existing allocated NG DL UP TNL info.
+    if (asn1_pdu_session_res_item.existing_allocated_ng_dl_up_tnl_info_present) {
+      pdu_session_res_item.existing_allocated_ng_dl_up_tnl_info =
+          asn1_to_up_transport_layer_info(asn1_pdu_session_res_item.existing_allocated_ng_dl_up_tnl_info);
+    }
+
+    // Fill network instance.
+    if (asn1_pdu_session_res_item.network_instance_present) {
+      pdu_session_res_item.network_instance = asn1_pdu_session_res_item.network_instance;
+    }
+    request.pdu_session_res_to_setup_list.emplace(uint_to_pdu_session_id(asn1_pdu_session_res_item.pdu_session_id),
+                                                  pdu_session_res_item);
   }
 
   // Fill UE DL maximum integrity protection data rate.

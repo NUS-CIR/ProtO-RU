@@ -167,7 +167,7 @@ void f1c_du_test_mode_adapter::handle_tx_init(const f1ap_message& msg)
       f1ap_message resp;
       resp.pdu.set_successful_outcome().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
       auto& removal_resp           = resp.pdu.successful_outcome().value.f1_removal_resp();
-      removal_resp->transaction_id = ie->begin()->value().transaction_id();
+      removal_resp->transaction_id = ie->transaction_id;
 
       logger.info("TEST_MODE: Injected F1 Removal Response");
       rx_notifier->on_new_message(resp);

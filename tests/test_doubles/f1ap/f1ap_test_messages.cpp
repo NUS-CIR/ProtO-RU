@@ -340,9 +340,7 @@ f1ap_message ocudu::test_helpers::generate_f1_removal_request(unsigned transacti
   req.pdu.set_init_msg().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
   f1_removal_request_s& ie = req.pdu.init_msg().value.f1_removal_request();
 
-  ie->resize(1);
-  (*ie)[0].load_info_obj(ASN1_F1AP_ID_TRANSACTION_ID);
-  (*ie)[0]->transaction_id() = transaction_id;
+  ie->transaction_id = transaction_id;
 
   return req;
 }
@@ -357,7 +355,7 @@ f1ap_message ocudu::test_helpers::generate_f1_removal_response(const f1ap_messag
   f1ap_message resp;
   resp.pdu.set_successful_outcome().load_info_obj(ASN1_F1AP_ID_F1_REMOVAL);
   f1_removal_resp_s& ie = resp.pdu.successful_outcome().value.f1_removal_resp();
-  ie->transaction_id    = (*f1_removal_request.pdu.init_msg().value.f1_removal_request())[0]->transaction_id();
+  ie->transaction_id    = f1_removal_request.pdu.init_msg().value.f1_removal_request()->transaction_id;
 
   return resp;
 }

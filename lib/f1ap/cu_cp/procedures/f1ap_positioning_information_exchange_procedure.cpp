@@ -231,17 +231,14 @@ static void fill_asn1_positioning_information_request(asn1::f1ap::positioning_in
       }
       // Fill spatial relation per SRS res list.
       for (const auto& spatial_relation_per_srs_res : srs_res_set_item.spatial_relation_per_srs_res_list) {
-        asn1::protocol_ext_field_s<asn1::f1ap::srs_res_set_item_ext_ies_o> asn1_ie_exts_item;
-        asn1::f1ap::spatial_relation_per_srs_res_s&                        asn1_spatial_relation_per_srs_res =
-            asn1_ie_exts_item->srs_spatial_relation_per_srs_res();
+        asn1_srs_res_set_item.ie_exts_present                                  = true;
+        asn1_srs_res_set_item.ie_exts.srs_spatial_relation_per_srs_res_present = true;
         for (const auto& ref_sig : spatial_relation_per_srs_res.reference_signals) {
           asn1::f1ap::spatial_relation_per_srs_res_item_s asn1_spatial_relation_per_srs_res_item;
           asn1_spatial_relation_per_srs_res_item.ref_sig = ref_sig_to_asn1(ref_sig);
-          asn1_spatial_relation_per_srs_res.spatial_relation_per_srs_res_list.push_back(
+          asn1_srs_res_set_item.ie_exts.srs_spatial_relation_per_srs_res.spatial_relation_per_srs_res_list.push_back(
               asn1_spatial_relation_per_srs_res_item);
         }
-
-        asn1_srs_res_set_item.ie_exts.push_back(asn1_ie_exts_item);
       }
 
       asn1_request->requested_srs_tx_characteristics.srs_res_set_list.push_back(asn1_srs_res_set_item);

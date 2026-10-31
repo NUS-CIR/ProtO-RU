@@ -304,11 +304,8 @@ trp_information_response_t create_trp_info_response(const asn1::f1ap::trp_info_r
             prs_angle_item.nr_prs_azimuth_fine   = asn1_prs_angle.nr_prs_azimuth_fine;
             prs_angle_item.nr_prs_elevation      = asn1_prs_angle.nr_prs_elevation;
             prs_angle_item.nr_prs_elevation_fine = asn1_prs_angle.nr_prs_elevation_fine;
-            for (const auto& asn1_prs_angle_ext_ies : asn1_prs_angle.ie_exts) {
-              if (asn1_prs_angle_ext_ies->type() ==
-                  asn1::f1ap::prs_angle_item_item_ext_ies_o::ext_c::types_opts::options::prs_res_id) {
-                prs_angle_item.prs_res_id = asn1_prs_angle_ext_ies->prs_res_id();
-              }
+            if (asn1_prs_angle.ie_exts_present and asn1_prs_angle.ie_exts.prs_res_id_present) {
+              prs_angle_item.prs_res_id = asn1_prs_angle.ie_exts.prs_res_id;
             }
             nr_prs_beam_info_item.prs_angle.push_back(prs_angle_item);
           }

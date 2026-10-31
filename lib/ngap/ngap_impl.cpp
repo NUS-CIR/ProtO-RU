@@ -418,33 +418,31 @@ void ngap_impl::handle_amf_configuration_update(const asn1::ngap::amf_cfg_upd_s&
 void ngap_impl::handle_amf_status_indication(const asn1::ngap::amf_status_ind_s& msg)
 {
   // The NG-RAN node considers the indicated GUAMIs unavailable for further AMF selection (TS 38.413 section 8.7.6.2).
-  for (const auto& ie : *msg) {
-    for (const auto& asn1_item : ie.value().unavailable_guami_list()) {
-      expected<guami_t, std::string> guami = asn1_to_guami(asn1_item.guami);
-      if (not guami.has_value()) {
-        logger.warning("Ignoring unavailable GUAMI. Cause: {}", guami.error());
-        continue;
-      }
+  for (const auto& asn1_item : msg->unavailable_guami_list) {
+    expected<guami_t, std::string> guami = asn1_to_guami(asn1_item.guami);
+    if (not guami.has_value()) {
+      logger.warning("Ignoring unavailable GUAMI. Cause: {}", guami.error());
+      continue;
+    }
 
-      ngap_unavailable_guami_item item;
-      item.guami = guami.value();
-      if (asn1_item.backup_amf_name_present) {
-        item.backup_amf_name = asn1_item.backup_amf_name.to_string();
-      }
-      logger.info("GUAMI with AMF Set ID {} and AMF Pointer {} is unavailable. Backup AMF: {}",
-                  item.guami.amf_set_id,
-                  item.guami.amf_pointer,
-                  item.backup_amf_name.value_or("none"));
+    ngap_unavailable_guami_item item;
+    item.guami = guami.value();
+    if (asn1_item.backup_amf_name_present) {
+      item.backup_amf_name = asn1_item.backup_amf_name.to_string();
+    }
+    logger.info("GUAMI with AMF Set ID {} and AMF Pointer {} is unavailable. Backup AMF: {}",
+                item.guami.amf_set_id,
+                item.guami.amf_pointer,
+                item.backup_amf_name.value_or("none"));
 
-      // A new indication for a GUAMI replaces the stored one.
-      auto it = std::find_if(context.unavailable_guami_list.begin(),
-                             context.unavailable_guami_list.end(),
-                             [&item](const ngap_unavailable_guami_item& stored) { return stored.guami == item.guami; });
-      if (it != context.unavailable_guami_list.end()) {
-        *it = std::move(item);
-      } else {
-        context.unavailable_guami_list.push_back(std::move(item));
-      }
+    // A new indication for a GUAMI replaces the stored one.
+    auto it = std::find_if(context.unavailable_guami_list.begin(),
+                           context.unavailable_guami_list.end(),
+                           [&item](const ngap_unavailable_guami_item& stored) { return stored.guami == item.guami; });
+    if (it != context.unavailable_guami_list.end()) {
+      *it = std::move(item);
+    } else {
+      context.unavailable_guami_list.push_back(std::move(item));
     }
   }
 }

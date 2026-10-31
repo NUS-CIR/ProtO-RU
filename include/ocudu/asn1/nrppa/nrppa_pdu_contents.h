@@ -23,34 +23,21 @@ namespace nrppa {
 
 // AperiodicSRS-ExtIEs ::= OBJECT SET OF NRPPA-PROTOCOL-EXTENSION
 struct aperiodic_srs_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options { pos_srs_res_set_aggregation_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::pos_srs_res_set_aggregation_list; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    pos_srs_res_set_aggregation_list_l&       pos_srs_res_set_aggregation_list() { return c; }
-    const pos_srs_res_set_aggregation_list_l& pos_srs_res_set_aggregation_list() const { return c; }
-
-  private:
-    pos_srs_res_set_aggregation_list_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
+};
+
+struct aperiodic_srs_ext_ies_container {
+  bool                               pos_srs_res_set_aggregation_list_present = false;
+  pos_srs_res_set_aggregation_list_l pos_srs_res_set_aggregation_list;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
 };
 
 // AperiodicSRS ::= SEQUENCE
@@ -63,10 +50,11 @@ struct aperiodic_srs_s {
   using aperiodic_e_ = enumerated<aperiodic_opts, true>;
 
   // member variables
-  bool                                              srs_res_trigger_present = false;
-  aperiodic_e_                                      aperiodic;
-  srs_res_trigger_s                                 srs_res_trigger;
-  protocol_ext_container_l<aperiodic_srs_ext_ies_o> ie_exts;
+  bool                            srs_res_trigger_present = false;
+  bool                            ie_exts_present         = false;
+  aperiodic_e_                    aperiodic;
+  srs_res_trigger_s               srs_res_trigger;
+  aperiodic_srs_ext_ies_container ie_exts;
   // ...
 
   // sequence methods
@@ -77,40 +65,10 @@ struct aperiodic_srs_s {
 
 // AssistanceInformationControl-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct assist_info_ctrl_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { assist_info, broadcast, positioning_broadcast_cells, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    assist_info_s&                       assist_info();
-    broadcast_e&                         broadcast();
-    positioning_broadcast_cells_l&       positioning_broadcast_cells();
-    const assist_info_s&                 assist_info() const;
-    const broadcast_e&                   broadcast() const;
-    const positioning_broadcast_cells_l& positioning_broadcast_cells() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -133,40 +91,10 @@ using assist_info_ctrl_s = elementary_procedure_option<assist_info_ctrl_ies_cont
 
 // AssistanceInformationFeedback-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct assist_info_feedback_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { assist_info_fail_list, positioning_broadcast_cells, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    assist_info_fail_list_l&             assist_info_fail_list();
-    positioning_broadcast_cells_l&       positioning_broadcast_cells();
-    crit_diagnostics_s&                  crit_diagnostics();
-    const assist_info_fail_list_l&       assist_info_fail_list() const;
-    const positioning_broadcast_cells_l& positioning_broadcast_cells() const;
-    const crit_diagnostics_s&            crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -189,40 +117,10 @@ using assist_info_feedback_s = elementary_procedure_option<assist_info_feedback_
 
 // E-CIDMeasurementFailureIndication-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct e_c_id_meas_fail_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_ue_meas_id, ran_ue_meas_id, cause, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint8_t&       lmf_ue_meas_id();
-    uint8_t&       ran_ue_meas_id();
-    cause_c&       cause();
-    const uint8_t& lmf_ue_meas_id() const;
-    const uint8_t& ran_ue_meas_id() const;
-    const cause_c& cause() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -242,42 +140,10 @@ using e_c_id_meas_fail_ind_s = elementary_procedure_option<e_c_id_meas_fail_ind_
 
 // E-CIDMeasurementInitiationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct e_c_id_meas_initiation_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_ue_meas_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint8_t&                  lmf_ue_meas_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint8_t&            lmf_ue_meas_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -298,59 +164,10 @@ using e_c_id_meas_initiation_fail_s = elementary_procedure_option<e_c_id_meas_in
 
 // E-CIDMeasurementInitiationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct e_c_id_meas_initiation_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        lmf_ue_meas_id,
-        report_characteristics,
-        meas_periodicity,
-        meas_quantities,
-        other_rat_meas_quantities,
-        wlan_meas_quantities,
-        meas_periodicity_nr_ao_a,
-        nulltype
-      } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint8_t&                           lmf_ue_meas_id();
-    report_characteristics_e&          report_characteristics();
-    meas_periodicity_e&                meas_periodicity();
-    meas_quantities_l&                 meas_quantities();
-    other_rat_meas_quantities_l&       other_rat_meas_quantities();
-    wlan_meas_quantities_l&            wlan_meas_quantities();
-    meas_periodicity_nr_ao_a_e&        meas_periodicity_nr_ao_a();
-    const uint8_t&                     lmf_ue_meas_id() const;
-    const report_characteristics_e&    report_characteristics() const;
-    const meas_periodicity_e&          meas_periodicity() const;
-    const meas_quantities_l&           meas_quantities() const;
-    const other_rat_meas_quantities_l& other_rat_meas_quantities() const;
-    const wlan_meas_quantities_l&      wlan_meas_quantities() const;
-    const meas_periodicity_nr_ao_a_e&  meas_periodicity_nr_ao_a() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -378,57 +195,10 @@ using e_c_id_meas_initiation_request_s = elementary_procedure_option<e_c_id_meas
 
 // E-CIDMeasurementInitiationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct e_c_id_meas_initiation_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        lmf_ue_meas_id,
-        ran_ue_meas_id,
-        e_c_id_meas_result,
-        crit_diagnostics,
-        cell_portion_id,
-        other_rat_meas_result,
-        wlan_meas_result,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint8_t&                       lmf_ue_meas_id();
-    uint8_t&                       ran_ue_meas_id();
-    e_c_id_meas_result_s&          e_c_id_meas_result();
-    crit_diagnostics_s&            crit_diagnostics();
-    uint16_t&                      cell_portion_id();
-    other_rat_meas_result_l&       other_rat_meas_result();
-    wlan_meas_result_l&            wlan_meas_result();
-    const uint8_t&                 lmf_ue_meas_id() const;
-    const uint8_t&                 ran_ue_meas_id() const;
-    const e_c_id_meas_result_s&    e_c_id_meas_result() const;
-    const crit_diagnostics_s&      crit_diagnostics() const;
-    const uint16_t&                cell_portion_id() const;
-    const other_rat_meas_result_l& other_rat_meas_result() const;
-    const wlan_meas_result_l&      wlan_meas_result() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -457,42 +227,10 @@ using e_c_id_meas_initiation_resp_s = elementary_procedure_option<e_c_id_meas_in
 
 // E-CIDMeasurementReport-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct e_c_id_meas_report_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_ue_meas_id, ran_ue_meas_id, e_c_id_meas_result, cell_portion_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint8_t&                    lmf_ue_meas_id();
-    uint8_t&                    ran_ue_meas_id();
-    e_c_id_meas_result_s&       e_c_id_meas_result();
-    uint16_t&                   cell_portion_id();
-    const uint8_t&              lmf_ue_meas_id() const;
-    const uint8_t&              ran_ue_meas_id() const;
-    const e_c_id_meas_result_s& e_c_id_meas_result() const;
-    const uint16_t&             cell_portion_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -514,38 +252,10 @@ using e_c_id_meas_report_s = elementary_procedure_option<e_c_id_meas_report_ies_
 
 // E-CIDMeasurementTerminationCommand-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct e_c_id_meas_termination_cmd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_ue_meas_id, ran_ue_meas_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint8_t&       lmf_ue_meas_id();
-    uint8_t&       ran_ue_meas_id();
-    const uint8_t& lmf_ue_meas_id() const;
-    const uint8_t& ran_ue_meas_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -564,38 +274,10 @@ using e_c_id_meas_termination_cmd_s = elementary_procedure_option<e_c_id_meas_te
 
 // ErrorIndication-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct error_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -616,38 +298,10 @@ using error_ind_s = elementary_procedure_option<error_ind_ies_container>;
 
 // MeasurementAbort-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_abort_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_meas_id, ran_meas_id, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&       lmf_meas_id();
-    uint32_t&       ran_meas_id();
-    const uint32_t& lmf_meas_id() const;
-    const uint32_t& ran_meas_id() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -666,38 +320,10 @@ using meas_abort_s = elementary_procedure_option<meas_abort_ies_container>;
 
 // MeasurementActivation-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_activation_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { request_type, prs_meass_info_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    request_type_e&              request_type();
-    prs_meass_info_list_l&       prs_meass_info_list();
-    const request_type_e&        request_type() const;
-    const prs_meass_info_list_l& prs_meass_info_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -717,42 +343,10 @@ using meas_activation_s = elementary_procedure_option<meas_activation_ies_contai
 
 // MeasurementFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_meas_id, cause, crit_diagnostics, nulltype } value;
-      typedef uint8_t number_type;
-
-      const char* to_string() const;
-      uint8_t     to_number() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&                 lmf_meas_id();
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const uint32_t&           lmf_meas_id() const;
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -773,40 +367,10 @@ using meas_fail_s = elementary_procedure_option<meas_fail_ies_container>;
 
 // MeasurementFailureIndication-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_fail_ind_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_meas_id, ran_meas_id, cause, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&       lmf_meas_id();
-    uint32_t&       ran_meas_id();
-    cause_c&        cause();
-    const uint32_t& lmf_meas_id() const;
-    const uint32_t& ran_meas_id() const;
-    const cause_c&  cause() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -826,38 +390,10 @@ using meas_fail_ind_s = elementary_procedure_option<meas_fail_ind_ies_container>
 
 // MeasurementPreconfigurationConfirm-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_precfg_confirm_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { precfg_result, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    fixed_bitstring<8, false, true>&       precfg_result();
-    crit_diagnostics_s&                    crit_diagnostics();
-    const fixed_bitstring<8, false, true>& precfg_result() const;
-    const crit_diagnostics_s&              crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -877,38 +413,10 @@ using meas_precfg_confirm_s = elementary_procedure_option<meas_precfg_confirm_ie
 
 // MeasurementPreconfigurationRefuse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_precfg_refuse_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -928,75 +436,31 @@ using meas_precfg_refuse_s = elementary_procedure_option<meas_precfg_refuse_ies_
 
 // MeasurementPreconfigurationRequired-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_precfg_required_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { trp_prs_info_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::trp_prs_info_list; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    trp_prs_info_list_l&       trp_prs_info_list() { return c; }
-    const trp_prs_info_list_l& trp_prs_info_list() const { return c; }
-
-  private:
-    trp_prs_info_list_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct meas_precfg_required_ies_container {
+  trp_prs_info_list_l trp_prs_info_list;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // MeasurementPreconfigurationRequired ::= SEQUENCE
-using meas_precfg_required_s = elementary_procedure_option<protocol_ie_container_l<meas_precfg_required_ies_o>>;
+using meas_precfg_required_s = elementary_procedure_option<meas_precfg_required_ies_container>;
 
 // MeasurementReport-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_report_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_meas_id, ran_meas_id, trp_meas_report_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&                   lmf_meas_id();
-    uint32_t&                   ran_meas_id();
-    trp_meas_resp_list_l&       trp_meas_report_list();
-    const uint32_t&             lmf_meas_id() const;
-    const uint32_t&             ran_meas_id() const;
-    const trp_meas_resp_list_l& trp_meas_report_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1016,84 +480,10 @@ using meas_report_s = elementary_procedure_option<meas_report_ies_container>;
 
 // MeasurementRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        lmf_meas_id,
-        trp_meas_request_list,
-        report_characteristics,
-        meas_periodicity,
-        trp_meas_quantities,
-        sfn_initisation_time,
-        srs_cfg,
-        meas_beam_info_request,
-        sys_frame_num,
-        slot_num,
-        meas_periodicity_extended,
-        resp_time,
-        meas_characteristics_request_ind,
-        meas_time_occasion,
-        meas_amount,
-        time_win_info_meas_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&                               lmf_meas_id();
-    trp_meas_request_list_l&                trp_meas_request_list();
-    report_characteristics_e&               report_characteristics();
-    meas_periodicity_e&                     meas_periodicity();
-    trp_meas_quantities_l&                  trp_meas_quantities();
-    fixed_bitstring<64, false, true>&       sfn_initisation_time();
-    srs_configuration_s&                    srs_cfg();
-    meas_beam_info_request_e&               meas_beam_info_request();
-    uint16_t&                               sys_frame_num();
-    uint8_t&                                slot_num();
-    meas_periodicity_extended_e&            meas_periodicity_extended();
-    resp_time_s&                            resp_time();
-    fixed_bitstring<16, false, true>&       meas_characteristics_request_ind();
-    meas_time_occasion_e&                   meas_time_occasion();
-    meas_amount_e&                          meas_amount();
-    time_win_info_meas_list_l&              time_win_info_meas_list();
-    const uint32_t&                         lmf_meas_id() const;
-    const trp_meas_request_list_l&          trp_meas_request_list() const;
-    const report_characteristics_e&         report_characteristics() const;
-    const meas_periodicity_e&               meas_periodicity() const;
-    const trp_meas_quantities_l&            trp_meas_quantities() const;
-    const fixed_bitstring<64, false, true>& sfn_initisation_time() const;
-    const srs_configuration_s&              srs_cfg() const;
-    const meas_beam_info_request_e&         meas_beam_info_request() const;
-    const uint16_t&                         sys_frame_num() const;
-    const uint8_t&                          slot_num() const;
-    const meas_periodicity_extended_e&      meas_periodicity_extended() const;
-    const resp_time_s&                      resp_time() const;
-    const fixed_bitstring<16, false, true>& meas_characteristics_request_ind() const;
-    const meas_time_occasion_e&             meas_time_occasion() const;
-    const meas_amount_e&                    meas_amount() const;
-    const time_win_info_meas_list_l&        time_win_info_meas_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1138,42 +528,10 @@ using meas_request_s = elementary_procedure_option<meas_request_ies_container>;
 
 // MeasurementResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { lmf_meas_id, ran_meas_id, trp_meas_resp_list, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&                   lmf_meas_id();
-    uint32_t&                   ran_meas_id();
-    trp_meas_resp_list_l&       trp_meas_resp_list();
-    crit_diagnostics_s&         crit_diagnostics();
-    const uint32_t&             lmf_meas_id() const;
-    const uint32_t&             ran_meas_id() const;
-    const trp_meas_resp_list_l& trp_meas_resp_list() const;
-    const crit_diagnostics_s&   crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1196,54 +554,10 @@ using meas_resp_s = elementary_procedure_option<meas_resp_ies_container>;
 
 // MeasurementUpdate-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct meas_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        lmf_meas_id,
-        ran_meas_id,
-        srs_cfg,
-        trp_meas_upd_list,
-        meas_characteristics_request_ind,
-        meas_time_occasion,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    uint32_t&                               lmf_meas_id();
-    uint32_t&                               ran_meas_id();
-    srs_configuration_s&                    srs_cfg();
-    trp_meas_upd_list_l&                    trp_meas_upd_list();
-    fixed_bitstring<16, false, true>&       meas_characteristics_request_ind();
-    meas_time_occasion_e&                   meas_time_occasion();
-    const uint32_t&                         lmf_meas_id() const;
-    const uint32_t&                         ran_meas_id() const;
-    const srs_configuration_s&              srs_cfg() const;
-    const trp_meas_upd_list_l&              trp_meas_upd_list() const;
-    const fixed_bitstring<16, false, true>& meas_characteristics_request_ind() const;
-    const meas_time_occasion_e&             meas_time_occasion() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1323,38 +637,10 @@ using otdoa_info_type_l = dyn_array<protocol_ie_single_container_s<otdoa_info_ty
 
 // OTDOAInformationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct otdoa_info_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1374,73 +660,31 @@ using otdoa_info_fail_s = elementary_procedure_option<otdoa_info_fail_ies_contai
 
 // OTDOAInformationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct otdoa_info_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { otdoa_info_type_group, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::otdoa_info_type_group; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    otdoa_info_type_l&       otdoa_info_type_group() { return c; }
-    const otdoa_info_type_l& otdoa_info_type_group() const { return c; }
-
-  private:
-    otdoa_info_type_l c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct otdoa_info_request_ies_container {
+  otdoa_info_type_l otdoa_info_type_group;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // OTDOAInformationRequest ::= SEQUENCE
-using otdoa_info_request_s = elementary_procedure_option<protocol_ie_container_l<otdoa_info_request_ies_o>>;
+using otdoa_info_request_s = elementary_procedure_option<otdoa_info_request_ies_container>;
 
 // OTDOAInformationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct otdoa_info_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { otdoa_cells, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    otdoa_cells_l&            otdoa_cells();
-    crit_diagnostics_s&       crit_diagnostics();
-    const otdoa_cells_l&      otdoa_cells() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1460,38 +704,10 @@ using otdoa_info_resp_s = elementary_procedure_option<otdoa_info_resp_ies_contai
 
 // PRSConfigurationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct prs_cfg_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1511,38 +727,10 @@ using prs_cfg_fail_s = elementary_procedure_option<prs_cfg_fail_ies_container>;
 
 // PRSConfigurationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct prs_cfg_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { prs_cfg_request_type, prstrp_list, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    prs_cfg_request_type_e&       prs_cfg_request_type();
-    prstrp_list_l&                prstrp_list();
-    const prs_cfg_request_type_e& prs_cfg_request_type() const;
-    const prstrp_list_l&          prstrp_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1561,38 +749,10 @@ using prs_cfg_request_s = elementary_procedure_option<prs_cfg_request_ies_contai
 
 // PRSConfigurationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct prs_cfg_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { prs_tx_trp_list, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    prs_tx_trp_list_l&        prs_tx_trp_list();
-    crit_diagnostics_s&       crit_diagnostics();
-    const prs_tx_trp_list_l&  prs_tx_trp_list() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1613,38 +773,10 @@ using prs_cfg_resp_s = elementary_procedure_option<prs_cfg_resp_ies_container>;
 
 // PositioningActivationFailureIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_activation_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1664,45 +796,10 @@ using positioning_activation_fail_s = elementary_procedure_option<positioning_ac
 
 // SemipersistentSRS-ExtIEs ::= OBJECT SET OF NRPPA-PROTOCOL-EXTENSION
 struct semipersistent_srs_ext_ies_o {
-  // Extension ::= OPEN TYPE
-  struct ext_c {
-    struct types_opts {
-      enum options {
-        srs_spatial_relation,
-        srs_spatial_relation_per_srs_res,
-        pos_srs_res_set_aggregation_list,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    ext_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    spatial_relation_info_s&                  srs_spatial_relation();
-    spatial_relation_per_srs_res_s&           srs_spatial_relation_per_srs_res();
-    pos_srs_res_set_aggregation_list_l&       pos_srs_res_set_aggregation_list();
-    const spatial_relation_info_s&            srs_spatial_relation() const;
-    const spatial_relation_per_srs_res_s&     srs_spatial_relation_per_srs_res() const;
-    const pos_srs_res_set_aggregation_list_l& pos_srs_res_set_aggregation_list() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static ext_c      get_ext(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1799,38 +896,10 @@ private:
 
 // PositioningActivationRequestIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_activation_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { srs_type, activation_time, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    srs_type_c&                             srs_type();
-    fixed_bitstring<64, false, true>&       activation_time();
-    const srs_type_c&                       srs_type() const;
-    const fixed_bitstring<64, false, true>& activation_time() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1850,40 +919,10 @@ using positioning_activation_request_s = elementary_procedure_option<positioning
 
 // PositioningActivationResponseIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_activation_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { crit_diagnostics, sys_frame_num, slot_num, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    crit_diagnostics_s&       crit_diagnostics();
-    uint16_t&                 sys_frame_num();
-    uint8_t&                  slot_num();
-    const crit_diagnostics_s& crit_diagnostics() const;
-    const uint16_t&           sys_frame_num() const;
-    const uint8_t&            slot_num() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1906,73 +945,31 @@ using positioning_activation_resp_s = elementary_procedure_option<positioning_ac
 
 // PositioningDeactivationIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_deactivation_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { abort_tx, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    types         type() const { return types::abort_tx; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    abort_tx_c&       abort_tx() { return c; }
-    const abort_tx_c& abort_tx() const { return c; }
-
-  private:
-    abort_tx_c c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
+struct positioning_deactivation_ies_container {
+  abort_tx_c abort_tx;
+
+  // sequence methods
+  OCUDUASN_CODE pack(bit_ref& bref) const;
+  OCUDUASN_CODE unpack(cbit_ref& bref);
+  void          to_json(json_writer& j) const;
+};
+
 // PositioningDeactivation ::= SEQUENCE
-using positioning_deactivation_s = elementary_procedure_option<protocol_ie_container_l<positioning_deactivation_ies_o>>;
+using positioning_deactivation_s = elementary_procedure_option<positioning_deactivation_ies_container>;
 
 // PositioningInformationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_info_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -1992,57 +989,10 @@ using positioning_info_fail_s = elementary_procedure_option<positioning_info_fai
 
 // PositioningInformationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_info_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        requested_srs_tx_characteristics,
-        ue_report_info,
-        ue_teg_info_request,
-        ue_teg_report_periodicity,
-        time_win_info_srs_list,
-        requested_srs_precfg_characteristics_list,
-        remote_ue_ind_request,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    requested_srs_tx_characteristics_s&                requested_srs_tx_characteristics();
-    ue_report_info_s&                                  ue_report_info();
-    ue_teg_info_request_e&                             ue_teg_info_request();
-    ue_teg_report_periodicity_e&                       ue_teg_report_periodicity();
-    time_win_info_srs_list_l&                          time_win_info_srs_list();
-    requested_srs_precfg_characteristics_list_l&       requested_srs_precfg_characteristics_list();
-    remote_ue_ind_request_e&                           remote_ue_ind_request();
-    const requested_srs_tx_characteristics_s&          requested_srs_tx_characteristics() const;
-    const ue_report_info_s&                            ue_report_info() const;
-    const ue_teg_info_request_e&                       ue_teg_info_request() const;
-    const ue_teg_report_periodicity_e&                 ue_teg_report_periodicity() const;
-    const time_win_info_srs_list_l&                    time_win_info_srs_list() const;
-    const requested_srs_precfg_characteristics_list_l& requested_srs_precfg_characteristics_list() const;
-    const remote_ue_ind_request_e&                     remote_ue_ind_request() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2073,60 +1023,10 @@ using positioning_info_request_s = elementary_procedure_option<positioning_info_
 
 // PositioningInformationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_info_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        srs_cfg,
-        sfn_initisation_time,
-        crit_diagnostics,
-        ue_tx_teg_assoc_list,
-        new_nr_cgi,
-        pos_validity_area_cell_list,
-        srs_precfg_list,
-        remote_ue_ind,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    srs_configuration_s&                    srs_cfg();
-    fixed_bitstring<64, false, true>&       sfn_initisation_time();
-    crit_diagnostics_s&                     crit_diagnostics();
-    ue_tx_teg_assoc_list_l&                 ue_tx_teg_assoc_list();
-    cgi_nr_s&                               new_nr_cgi();
-    pos_validity_area_cell_list_l&          pos_validity_area_cell_list();
-    srs_precfg_list_l&                      srs_precfg_list();
-    remote_ue_ind_e&                        remote_ue_ind();
-    const srs_configuration_s&              srs_cfg() const;
-    const fixed_bitstring<64, false, true>& sfn_initisation_time() const;
-    const crit_diagnostics_s&               crit_diagnostics() const;
-    const ue_tx_teg_assoc_list_l&           ue_tx_teg_assoc_list() const;
-    const cgi_nr_s&                         new_nr_cgi() const;
-    const pos_validity_area_cell_list_l&    pos_validity_area_cell_list() const;
-    const srs_precfg_list_l&                srs_precfg_list() const;
-    const remote_ue_ind_e&                  remote_ue_ind() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2159,54 +1059,10 @@ using positioning_info_resp_s = elementary_procedure_option<positioning_info_res
 
 // PositioningInformationUpdate-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct positioning_info_upd_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options {
-        srs_cfg,
-        sfn_initisation_time,
-        ue_tx_teg_assoc_list,
-        srs_tx_status,
-        new_cell_id,
-        remote_ue_status,
-        nulltype
-      } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    srs_configuration_s&                    srs_cfg();
-    fixed_bitstring<64, false, true>&       sfn_initisation_time();
-    ue_tx_teg_assoc_list_l&                 ue_tx_teg_assoc_list();
-    srs_tx_status_e&                        srs_tx_status();
-    cgi_nr_s&                               new_cell_id();
-    remote_ue_status_e&                     remote_ue_status();
-    const srs_configuration_s&              srs_cfg() const;
-    const fixed_bitstring<64, false, true>& sfn_initisation_time() const;
-    const ue_tx_teg_assoc_list_l&           ue_tx_teg_assoc_list() const;
-    const srs_tx_status_e&                  srs_tx_status() const;
-    const cgi_nr_s&                         new_cell_id() const;
-    const remote_ue_status_e&               remote_ue_status() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2274,40 +1130,10 @@ struct private_msg_s {
 
 // SRSInformationReservationNotification-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct srs_info_reserv_notif_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { srs_reserv_type, srs_info, precfg_srs_info, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    srs_reserv_type_e&                                 srs_reserv_type();
-    requested_srs_tx_characteristics_s&                srs_info();
-    requested_srs_precfg_characteristics_list_l&       precfg_srs_info();
-    const srs_reserv_type_e&                           srs_reserv_type() const;
-    const requested_srs_tx_characteristics_s&          srs_info() const;
-    const requested_srs_precfg_characteristics_list_l& precfg_srs_info() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2329,38 +1155,10 @@ using srs_info_reserv_notif_s = elementary_procedure_option<srs_info_reserv_noti
 
 // TRPInformationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct trp_info_fail_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { cause, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    cause_c&                  cause();
-    crit_diagnostics_s&       crit_diagnostics();
-    const cause_c&            cause() const;
-    const crit_diagnostics_s& crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2380,38 +1178,10 @@ using trp_info_fail_s = elementary_procedure_option<trp_info_fail_ies_container>
 
 // TRPInformationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct trp_info_request_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { trp_list, trp_info_type_list_trp_req, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    trp_list_l&                         trp_list();
-    trp_info_type_list_trp_req_l&       trp_info_type_list_trp_req();
-    const trp_list_l&                   trp_list() const;
-    const trp_info_type_list_trp_req_l& trp_info_type_list_trp_req() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2431,38 +1201,10 @@ using trp_info_request_s = elementary_procedure_option<trp_info_request_ies_cont
 
 // TRPInformationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
 struct trp_info_resp_ies_o {
-  // Value ::= OPEN TYPE
-  struct value_c {
-    struct types_opts {
-      enum options { trp_info_list_trp_resp, crit_diagnostics, nulltype } value;
-
-      const char* to_string() const;
-    };
-    using types = enumerated<types_opts>;
-
-    // choice methods
-    value_c() = default;
-    void          set(types::options e = types::nulltype);
-    types         type() const { return type_; }
-    OCUDUASN_CODE pack(bit_ref& bref) const;
-    OCUDUASN_CODE unpack(cbit_ref& bref);
-    void          to_json(json_writer& j) const;
-    // getters
-    trp_info_list_trp_resp_l&       trp_info_list_trp_resp();
-    crit_diagnostics_s&             crit_diagnostics();
-    const trp_info_list_trp_resp_l& trp_info_list_trp_resp() const;
-    const crit_diagnostics_s&       crit_diagnostics() const;
-
-  private:
-    types             type_;
-    choice_buffer_ptr c;
-  };
-
   // members lookup methods
   static uint32_t   idx_to_id(uint32_t idx);
   static bool       is_id_valid(const uint32_t& id);
   static crit_e     get_crit(const uint32_t& id);
-  static value_c    get_value(const uint32_t& id);
   static presence_e get_presence(const uint32_t& id);
 };
 
@@ -2482,40 +1224,3 @@ using trp_info_resp_s = elementary_procedure_option<trp_info_resp_ies_container>
 
 } // namespace nrppa
 } // namespace asn1
-
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::assist_info_ctrl_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::assist_info_feedback_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::e_c_id_meas_fail_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::e_c_id_meas_initiation_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::e_c_id_meas_initiation_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::e_c_id_meas_initiation_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::e_c_id_meas_report_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::e_c_id_meas_termination_cmd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::error_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_abort_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_activation_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_fail_ind_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_precfg_confirm_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_precfg_refuse_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_report_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::meas_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::otdoa_info_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::otdoa_info_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::prs_cfg_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::prs_cfg_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::prs_cfg_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_activation_fail_ies_o>;
-extern template struct asn1::protocol_ext_field_s<asn1::nrppa::semipersistent_srs_ext_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_activation_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_activation_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_info_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_info_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_info_resp_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::positioning_info_upd_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::srs_info_reserv_notif_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::trp_info_fail_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::trp_info_request_ies_o>;
-extern template struct asn1::protocol_ie_field_s<asn1::nrppa::trp_info_resp_ies_o>;

@@ -550,12 +550,9 @@ create_positioning_measurement_response(const asn1::f1ap::positioning_meas_resp_
       // Fill TRP ID.
       trp_meas_resp_item.trp_id = uint_to_trp_id(asn1_trp_meas_resp_item.trp_id);
 
-      for (const auto& asn1_ie_exts_container : asn1_trp_meas_resp_item.ie_exts) {
-        // Fill CGI NR.
-        if (asn1_ie_exts_container->type() ==
-            asn1::f1ap::pos_meas_result_list_item_ext_ies_o::ext_c::types_opts::options::nr_cgi) {
-          trp_meas_resp_item.cgi_nr = cgi_from_asn1(asn1_ie_exts_container->nr_cgi()).value();
-        }
+      // Fill CGI NR.
+      if (asn1_trp_meas_resp_item.ie_exts_present and asn1_trp_meas_resp_item.ie_exts.nr_cgi_present) {
+        trp_meas_resp_item.cgi_nr = cgi_from_asn1(asn1_trp_meas_resp_item.ie_exts.nr_cgi).value();
       }
 
       resp.trp_meas_resp_list.push_back(trp_meas_resp_item);

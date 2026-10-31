@@ -73,13 +73,8 @@ inline std::optional<uint8_t> get_transaction_id(const asn1::f1ap::init_msg_s& o
       return out.value.pws_cancel_request()->transaction_id;
     case init_types::gnb_du_res_coordination_request:
       return out.value.gnb_du_res_coordination_request()->transaction_id;
-    case init_types::f1_removal_request: {
-      const auto& list = *out.value.f1_removal_request();
-      if (list.size() == 0) {
-        return std::nullopt;
-      }
-      return list[0]->transaction_id();
-    }
+    case init_types::f1_removal_request:
+      return out.value.f1_removal_request()->transaction_id;
       // TODO: Remaining cases.
     case init_types::error_ind:
       return out.value.error_ind()->transaction_id;

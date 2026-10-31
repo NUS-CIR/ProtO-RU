@@ -271,13 +271,11 @@ inline void fill_asn1_bearer_context_setup_request(asn1::e1ap::bearer_context_se
 
   // Fill PDU session resource to setup list.
   asn1_request->sys_bearer_context_setup_request.set_ng_ran_bearer_context_setup_request();
-  auto& ng_ran_bearer_context_setup_request =
-      asn1_request->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request();
+  auto& asn1_pdu_session_res_items =
+      asn1_request->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request()
+          .pdu_session_res_to_setup_list;
 
   for (const auto& pdu_session_res_item : request.pdu_session_res_to_setup_list) {
-    asn1::protocol_ie_field_s<asn1::e1ap::ng_ran_bearer_context_setup_request_o> bearer_request_item;
-    auto& asn1_pdu_session_res_items = bearer_request_item.value().pdu_session_res_to_setup_list();
-
     asn1::e1ap::pdu_session_res_to_setup_item_s asn1_pdu_session_res_item;
 
     // Fill PDU session ID.
@@ -337,8 +335,6 @@ inline void fill_asn1_bearer_context_setup_request(asn1::e1ap::bearer_context_se
     }
 
     asn1_pdu_session_res_items.push_back(asn1_pdu_session_res_item);
-
-    ng_ran_bearer_context_setup_request.push_back(bearer_request_item);
   }
 
   // UE DL maximum integrity protection data rate.

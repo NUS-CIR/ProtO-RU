@@ -47,11 +47,8 @@ void e2ap_removal_procedure::send_e2_removal_request()
   e2_message msg = {};
   msg.pdu.set_init_msg();
   msg.pdu.init_msg().load_info_obj(ASN1_E2AP_ID_E2REMOVAL);
-  auto& rem_req = msg.pdu.init_msg().value.e2_removal_request();
-
-  asn1::protocol_ie_field_s<e2_removal_request_ies_o> ie;
-  ie.value().transaction_id() = expected_transaction_id;
-  rem_req->push_back(ie);
+  auto& rem_req           = msg.pdu.init_msg().value.e2_removal_request();
+  rem_req->transaction_id = expected_transaction_id;
 
   notifier.on_new_message(msg);
 }

@@ -60,8 +60,6 @@ e1ap_message ocudu::ocuup::generate_bearer_context_setup_request(unsigned cu_cp_
   auto& ng_ran_bearer_context_setup_req =
       bearer_context_setup_req->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request();
 
-  ng_ran_bearer_context_setup_req.resize(1);
-
   asn1::e1ap::pdu_session_res_to_setup_item_s pdu_session_res_to_setup_item;
   pdu_session_res_to_setup_item.pdu_session_id   = 1;
   pdu_session_res_to_setup_item.pdu_session_type = asn1::e1ap::pdu_session_type_e::ipv4;
@@ -114,7 +112,7 @@ e1ap_message ocudu::ocuup::generate_bearer_context_setup_request(unsigned cu_cp_
 
   pdu_session_res_to_setup_item.drb_to_setup_list_ng_ran.push_back(drb_to_setup_item_ng_ran);
 
-  ng_ran_bearer_context_setup_req[0].value().pdu_session_res_to_setup_list().push_back(pdu_session_res_to_setup_item);
+  ng_ran_bearer_context_setup_req.pdu_session_res_to_setup_list.push_back(pdu_session_res_to_setup_item);
 
   return bearer_context_setup_request;
 }

@@ -954,7 +954,7 @@ TEST_F(cu_cp_inter_cu_xn_handover_test, when_source_proposes_dl_data_forwarding_
                                        .value.bearer_context_setup_request()
                                        ->sys_bearer_context_setup_request.ng_ran_bearer_context_setup_request();
   const asn1::e1ap::pdu_session_res_to_setup_item_s& e1ap_pdu_session =
-      ng_ran_bearer_ctxt[0]->pdu_session_res_to_setup_list()[0];
+      ng_ran_bearer_ctxt.pdu_session_res_to_setup_list[0];
 
   // The source forwards straight to this target over Xn, and it reused the source's DRB ID for every proposed QoS
   // flow of the DRB, so the DRB gets its own tunnel and keeps the PDCP sequence numbers.

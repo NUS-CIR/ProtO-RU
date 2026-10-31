@@ -657,9 +657,9 @@ spatial_direction_info_to_asn1(const spatial_direction_info_t& spatial_direction
         asn1_prs_angle_item.nr_prs_elevation_fine         = prs_angle.nr_prs_elevation_fine.value();
       }
 
-      asn1::protocol_ext_field_s<asn1::nrppa::prs_angle_item_ext_ies_o> asn1_ie_exts_item;
-      asn1_ie_exts_item.value().prs_res_id() = prs_angle.prs_res_id;
-      asn1_prs_angle_item.ie_exts.push_back(asn1_ie_exts_item);
+      asn1_prs_angle_item.ie_exts_present            = true;
+      asn1_prs_angle_item.ie_exts.prs_res_id_present = true;
+      asn1_prs_angle_item.ie_exts.prs_res_id         = prs_angle.prs_res_id;
 
       asn1_nr_prs_beam_info_item.prs_angle.push_back(asn1_prs_angle_item);
     }

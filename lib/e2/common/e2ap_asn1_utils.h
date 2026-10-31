@@ -20,13 +20,8 @@ inline expected<uint8_t> get_transaction_id(const asn1::e2ap::init_msg_s& out)
   switch (out.value.type().value) {
     case e2ap_elem_procs_o::init_msg_c::types_opts::e2setup_request:
       return out.value.e2setup_request()->transaction_id;
-    case e2ap_elem_procs_o::init_msg_c::types_opts::e2_removal_request: {
-      const auto& ies = *out.value.e2_removal_request();
-      if (ies.size() > 0) {
-        return ies[0].value().transaction_id();
-      }
-      break;
-    }
+    case e2ap_elem_procs_o::init_msg_c::types_opts::e2_removal_request:
+      return out.value.e2_removal_request()->transaction_id;
     default:
       break;
   }
