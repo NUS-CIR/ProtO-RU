@@ -951,7 +951,8 @@ void sl_precfg_general_r16_s::to_json(json_writer& j) const
     sl_tdd_cfg_r16.to_json(j);
   }
   if (reserved_bits_r16_present) {
-    j.write_str("reservedBits-r16", reserved_bits_r16.to_string());
+    j.write_fieldname("reservedBits-r16");
+    reserved_bits_r16.to_json(j);
   }
   j.end_obj();
 }

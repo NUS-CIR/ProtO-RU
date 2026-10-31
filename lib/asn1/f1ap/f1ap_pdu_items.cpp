@@ -50,10 +50,7 @@ presence_e activ_cells_map_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void activ_cells_map_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Activated-Cells-Mapping-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE activ_cells_map_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -112,10 +109,7 @@ presence_e associated_scell_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void associated_scell_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Associated-SCell-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE associated_scell_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -174,10 +168,7 @@ presence_e bap_hdr_rewriting_added_list_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void bap_hdr_rewriting_added_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BAP-Header-Rewriting-Added-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bap_hdr_rewriting_added_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -236,10 +227,7 @@ presence_e bap_hdr_rewriting_remd_list_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void bap_hdr_rewriting_remd_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BAP-Header-Rewriting-Removed-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bap_hdr_rewriting_remd_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -298,10 +286,7 @@ presence_e bh_routing_info_added_list_item_ies_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void bh_routing_info_added_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BH-Routing-Information-Added-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_routing_info_added_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -360,10 +345,7 @@ presence_e bh_routing_info_remd_list_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void bh_routing_info_remd_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BH-Routing-Information-Removed-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_routing_info_remd_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -422,10 +404,7 @@ presence_e bh_chs_failed_to_be_modified_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void bh_chs_failed_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-FailedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_failed_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -484,10 +463,7 @@ presence_e bh_chs_failed_to_be_setup_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void bh_chs_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -547,10 +523,7 @@ presence_e bh_chs_failed_to_be_setup_mod_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void bh_chs_failed_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-FailedToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_failed_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -609,10 +582,7 @@ presence_e bh_chs_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-Modified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -672,10 +642,7 @@ presence_e bh_chs_required_to_be_released_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void bh_chs_required_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-Required-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_required_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -734,10 +701,7 @@ presence_e bh_chs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -796,10 +760,7 @@ presence_e bh_chs_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-SetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -858,10 +819,7 @@ presence_e bh_chs_to_be_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -920,10 +878,7 @@ presence_e bh_chs_to_be_released_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -982,10 +937,7 @@ presence_e bh_chs_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1044,10 +996,7 @@ presence_e bh_chs_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void bh_chs_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BHChannels-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE bh_chs_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1107,10 +1056,7 @@ presence_e broadcast_m_rbs_transport_request_item_ies_o::get_presence(const uint
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_transport_request_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Broadcast-MRBs-Transport-Request-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_transport_request_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1170,10 +1116,7 @@ presence_e broadcast_to_be_cancelled_list_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void broadcast_to_be_cancelled_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Broadcast-To-Be-Cancelled-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_to_be_cancelled_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1233,10 +1176,7 @@ presence_e broadcast_m_rbs_to_be_setup_mod_item_ies_o::get_presence(const uint32
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1296,10 +1236,7 @@ presence_e broadcast_m_rbs_to_be_modified_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1359,10 +1296,7 @@ presence_e broadcast_m_rbs_to_be_released_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1421,10 +1355,7 @@ presence_e broadcast_m_rbs_setup_mod_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-SetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1484,10 +1415,7 @@ presence_e broadcast_m_rbs_failed_to_be_setup_mod_item_ies_o::get_presence(const
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_failed_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-FailedToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_failed_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1546,10 +1474,7 @@ presence_e broadcast_m_rbs_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-Modified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1609,10 +1534,7 @@ presence_e broadcast_m_rbs_failed_to_be_modified_item_ies_o::get_presence(const 
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_failed_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-FailedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_failed_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1671,10 +1593,7 @@ presence_e broadcast_m_rbs_to_be_setup_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1733,10 +1652,7 @@ presence_e broadcast_m_rbs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1796,10 +1712,7 @@ presence_e broadcast_m_rbs_failed_to_be_setup_item_ies_o::get_presence(const uin
 // Value ::= OPEN TYPE
 void broadcast_m_rbs_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("BroadcastMRBs-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE broadcast_m_rbs_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1858,10 +1771,7 @@ presence_e candidate_sp_cell_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void candidate_sp_cell_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Candidate-SpCell-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE candidate_sp_cell_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1921,10 +1831,7 @@ presence_e cells_allowed_to_be_deactiv_list_item_ies_o::get_presence(const uint3
 // Value ::= OPEN TYPE
 void cells_allowed_to_be_deactiv_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-Allowed-to-be-Deactivated-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_allowed_to_be_deactiv_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1984,10 +1891,7 @@ presence_e cells_broadcast_cancelled_list_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void cells_broadcast_cancelled_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-Broadcast-Cancelled-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_broadcast_cancelled_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2047,10 +1951,7 @@ presence_e cells_broadcast_completed_list_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void cells_broadcast_completed_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-Broadcast-Completed-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_broadcast_completed_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2110,10 +2011,7 @@ presence_e cells_failed_to_be_activ_list_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void cells_failed_to_be_activ_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-Failed-to-be-Activated-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_failed_to_be_activ_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2172,10 +2070,7 @@ presence_e cells_status_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void cells_status_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-Status-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_status_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2234,10 +2129,7 @@ presence_e cells_to_be_broadcast_list_item_ies_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void cells_to_be_broadcast_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-To-Be-Broadcast-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_to_be_broadcast_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2296,10 +2188,7 @@ presence_e cells_to_be_activ_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void cells_to_be_activ_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-to-be-Activated-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_to_be_activ_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2358,10 +2247,7 @@ presence_e cells_to_be_barred_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void cells_to_be_barred_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-to-be-Barred-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_to_be_barred_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2420,10 +2306,7 @@ presence_e cells_to_be_deactiv_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void cells_to_be_deactiv_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Cells-to-be-Deactivated-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE cells_to_be_deactiv_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2483,10 +2366,7 @@ presence_e dl_up_tnl_address_to_upd_list_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void dl_up_tnl_address_to_upd_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DL-UP-TNL-Address-to-Update-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE dl_up_tnl_address_to_upd_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2545,10 +2425,7 @@ presence_e drb_activity_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drb_activity_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRB-Activity-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drb_activity_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2607,10 +2484,7 @@ presence_e drb_notify_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drb_notify_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRB-Notify-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drb_notify_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2669,10 +2543,7 @@ presence_e drbs_failed_to_be_modified_item_ies_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void drbs_failed_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-FailedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_failed_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2731,10 +2602,7 @@ presence_e drbs_failed_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2793,10 +2661,7 @@ presence_e drbs_failed_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void drbs_failed_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-FailedToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_failed_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2855,10 +2720,7 @@ presence_e drbs_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-Modified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2917,10 +2779,7 @@ presence_e drbs_modified_conf_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_modified_conf_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-ModifiedConf-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_modified_conf_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2979,10 +2838,7 @@ presence_e drbs_required_to_be_modified_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void drbs_required_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-Required-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_required_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3041,10 +2897,7 @@ presence_e drbs_required_to_be_released_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void drbs_required_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-Required-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_required_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3103,10 +2956,7 @@ presence_e drbs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3165,10 +3015,7 @@ presence_e drbs_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-SetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3227,10 +3074,7 @@ presence_e drbs_to_be_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3289,10 +3133,7 @@ presence_e drbs_to_be_released_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3351,10 +3192,7 @@ presence_e drbs_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3413,10 +3251,7 @@ presence_e drbs_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void drbs_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("DRBs-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE drbs_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3475,10 +3310,7 @@ presence_e ded_si_delivery_needed_ue_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void ded_si_delivery_needed_ue_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Dedicated-SIDelivery-NeededUE-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ded_si_delivery_needed_ue_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3537,10 +3369,7 @@ presence_e gnb_du_served_cells_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void gnb_du_served_cells_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-DU-Served-Cells-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_du_served_cells_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3599,10 +3428,7 @@ presence_e ncgi_to_be_upd_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ncgi_to_be_upd_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("NCGI-to-be-Updated-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ncgi_to_be_upd_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3662,10 +3488,7 @@ presence_e gnb_cu_tnl_assoc_failed_to_setup_item_ies_o::get_presence(const uint3
 // Value ::= OPEN TYPE
 void gnb_cu_tnl_assoc_failed_to_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-CU-TNL-Association-Failed-To-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_tnl_assoc_failed_to_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3724,10 +3547,7 @@ presence_e gnb_cu_tnl_assoc_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void gnb_cu_tnl_assoc_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-CU-TNL-Association-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_tnl_assoc_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3786,10 +3606,7 @@ presence_e gnb_cu_tnl_assoc_to_add_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void gnb_cu_tnl_assoc_to_add_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-CU-TNL-Association-To-Add-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_tnl_assoc_to_add_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3848,10 +3665,7 @@ presence_e gnb_cu_tnl_assoc_to_rem_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void gnb_cu_tnl_assoc_to_rem_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-CU-TNL-Association-To-Remove-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_tnl_assoc_to_rem_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3910,10 +3724,7 @@ presence_e gnb_cu_tnl_assoc_to_upd_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void gnb_cu_tnl_assoc_to_upd_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-CU-TNL-Association-To-Update-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_tnl_assoc_to_upd_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3972,10 +3783,7 @@ presence_e gnb_du_tnl_assoc_to_rem_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void gnb_du_tnl_assoc_to_rem_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("GNB-DU-TNL-Association-To-Remove-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_du_tnl_assoc_to_rem_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4034,10 +3842,7 @@ presence_e protected_eutra_res_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void protected_eutra_res_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Protected-EUTRA-Resources-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE protected_eutra_res_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4096,10 +3901,7 @@ presence_e neighbour_cell_info_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void neighbour_cell_info_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Neighbour-Cell-Information-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE neighbour_cell_info_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4158,10 +3960,7 @@ presence_e served_cells_to_add_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void served_cells_to_add_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Served-Cells-To-Add-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE served_cells_to_add_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4220,10 +4019,7 @@ presence_e served_cells_to_modify_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void served_cells_to_modify_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Served-Cells-To-Modify-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE served_cells_to_modify_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4282,10 +4078,7 @@ presence_e served_cells_to_delete_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void served_cells_to_delete_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Served-Cells-To-Delete-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE served_cells_to_delete_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4345,10 +4138,7 @@ presence_e iab_allocated_tnl_address_list_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void iab_allocated_tnl_address_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("IAB-Allocated-TNL-Address-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE iab_allocated_tnl_address_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4407,10 +4197,7 @@ presence_e iab_tnl_addresses_to_rem_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void iab_tnl_addresses_to_rem_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("IAB-TNL-Addresses-To-Remove-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE iab_tnl_addresses_to_rem_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4469,10 +4256,7 @@ presence_e ul_up_tnl_info_to_upd_list_item_ies_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void ul_up_tnl_info_to_upd_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UL-UP-TNL-Information-to-Update-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ul_up_tnl_info_to_upd_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4532,10 +4316,7 @@ presence_e ul_up_tnl_address_to_upd_list_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void ul_up_tnl_address_to_upd_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UL-UP-TNL-Address-to-Update-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ul_up_tnl_address_to_upd_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4594,10 +4375,7 @@ presence_e mc_paging_cell_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void mc_paging_cell_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MC-PagingCell-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE mc_paging_cell_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4657,10 +4435,7 @@ presence_e multicast_m_rbs_to_be_setup_mod_item_ies_o::get_presence(const uint32
 // Value ::= OPEN TYPE
 void multicast_m_rbs_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4720,10 +4495,7 @@ presence_e multicast_m_rbs_to_be_modified_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void multicast_m_rbs_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4783,10 +4555,7 @@ presence_e multicast_m_rbs_to_be_released_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void multicast_m_rbs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4845,10 +4614,7 @@ presence_e multicast_m_rbs_setup_mod_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void multicast_m_rbs_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-SetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4908,10 +4674,7 @@ presence_e multicast_m_rbs_failed_to_be_setup_mod_item_ies_o::get_presence(const
 // Value ::= OPEN TYPE
 void multicast_m_rbs_failed_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-FailedToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_failed_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4970,10 +4733,7 @@ presence_e multicast_m_rbs_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void multicast_m_rbs_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-Modified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5033,10 +4793,7 @@ presence_e multicast_m_rbs_failed_to_be_modified_item_ies_o::get_presence(const 
 // Value ::= OPEN TYPE
 void multicast_m_rbs_failed_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-FailedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_failed_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5095,10 +4852,7 @@ presence_e multicast_m_rbs_to_be_setup_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void multicast_m_rbs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5157,10 +4911,7 @@ presence_e multicast_m_rbs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void multicast_m_rbs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5220,10 +4971,7 @@ presence_e multicast_m_rbs_failed_to_be_setup_item_ies_o::get_presence(const uin
 // Value ::= OPEN TYPE
 void multicast_m_rbs_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastMRBs-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_m_rbs_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5283,10 +5031,7 @@ presence_e multicast_f1_u_context_to_be_setup_item_ies_o::get_presence(const uin
 // Value ::= OPEN TYPE
 void multicast_f1_u_context_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastF1UContext-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_f1_u_context_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5350,10 +5095,7 @@ presence_e multicast_f1_u_context_setup_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void multicast_f1_u_context_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastF1UContext-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_f1_u_context_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5418,10 +5160,7 @@ presence_e multicast_f1_u_context_failed_to_be_setup_item_ies_o::get_presence(co
 // Value ::= OPEN TYPE
 void multicast_f1_u_context_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MulticastF1UContext-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE multicast_f1_u_context_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5485,10 +5224,7 @@ presence_e ue_id_list_for_paging_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ue_id_list_for_paging_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UEIdentity-List-For-Paging-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_id_list_for_paging_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5547,10 +5283,7 @@ presence_e nr_cgi_list_for_restart_list_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void nr_cgi_list_for_restart_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("NR-CGI-List-For-Restart-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE nr_cgi_list_for_restart_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5609,10 +5342,7 @@ presence_e pws_failed_nr_cgi_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void pws_failed_nr_cgi_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("PWS-Failed-NR-CGI-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE pws_failed_nr_cgi_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5671,10 +5401,7 @@ presence_e paging_cell_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void paging_cell_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("PagingCell-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE paging_cell_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5733,10 +5460,7 @@ presence_e potential_sp_cell_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void potential_sp_cell_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("Potential-SpCell-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE potential_sp_cell_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5795,10 +5519,7 @@ presence_e scell_failedto_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void scell_failedto_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SCell-FailedtoSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE scell_failedto_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5857,10 +5578,7 @@ presence_e scell_failedto_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void scell_failedto_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SCell-FailedtoSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE scell_failedto_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5919,10 +5637,7 @@ presence_e scell_to_be_remd_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void scell_to_be_remd_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SCell-ToBeRemoved-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE scell_to_be_remd_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5981,10 +5696,7 @@ presence_e scell_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void scell_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SCell-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE scell_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6043,10 +5755,7 @@ presence_e scell_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void scell_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SCell-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE scell_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6106,10 +5815,7 @@ presence_e sl_drbs_failed_to_be_modified_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void sl_drbs_failed_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-FailedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_failed_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6168,10 +5874,7 @@ presence_e sl_drbs_failed_to_be_setup_item_ies_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void sl_drbs_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6231,10 +5934,7 @@ presence_e sl_drbs_failed_to_be_setup_mod_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void sl_drbs_failed_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-FailedToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_failed_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6293,10 +5993,7 @@ presence_e sl_drbs_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-Modified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6355,10 +6052,7 @@ presence_e sl_drbs_modified_conf_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_modified_conf_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-ModifiedConf-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_modified_conf_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6418,10 +6112,7 @@ presence_e sl_drbs_required_to_be_modified_item_ies_o::get_presence(const uint32
 // Value ::= OPEN TYPE
 void sl_drbs_required_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-Required-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_required_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6481,10 +6172,7 @@ presence_e sl_drbs_required_to_be_released_item_ies_o::get_presence(const uint32
 // Value ::= OPEN TYPE
 void sl_drbs_required_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-Required-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_required_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6543,10 +6231,7 @@ presence_e sl_drbs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6605,10 +6290,7 @@ presence_e sl_drbs_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-SetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6667,10 +6349,7 @@ presence_e sl_drbs_to_be_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-ToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6729,10 +6408,7 @@ presence_e sl_drbs_to_be_released_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6791,10 +6467,7 @@ presence_e sl_drbs_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6853,10 +6526,7 @@ presence_e sl_drbs_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void sl_drbs_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SLDRBs-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE sl_drbs_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6915,10 +6585,7 @@ presence_e srbs_failed_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_failed_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-FailedToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_failed_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6977,10 +6644,7 @@ presence_e srbs_failed_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void srbs_failed_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-FailedToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_failed_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7039,10 +6703,7 @@ presence_e srbs_modified_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-Modified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7101,10 +6762,7 @@ presence_e srbs_required_to_be_released_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void srbs_required_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-Required-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_required_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7163,10 +6821,7 @@ presence_e srbs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7225,10 +6880,7 @@ presence_e srbs_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-SetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7287,10 +6939,7 @@ presence_e srbs_to_be_released_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7349,10 +6998,7 @@ presence_e srbs_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7411,10 +7057,7 @@ presence_e srbs_to_be_setup_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void srbs_to_be_setup_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SRBs-ToBeSetupMod-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srbs_to_be_setup_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7473,10 +7116,7 @@ presence_e serving_cell_mo_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void serving_cell_mo_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("ServingCellMO-List-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE serving_cell_mo_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7536,10 +7176,7 @@ presence_e ue_multicast_m_rbs_confirmed_to_be_modified_item_ies_o::get_presence(
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_confirmed_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-ConfirmedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_confirmed_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7599,10 +7236,7 @@ presence_e ue_multicast_m_rbs_required_to_be_modified_item_ies_o::get_presence(c
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_required_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-RequiredToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_required_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7662,10 +7296,7 @@ presence_e ue_multicast_m_rbs_required_to_be_released_item_ies_o::get_presence(c
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_required_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-RequiredToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_required_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7724,10 +7355,7 @@ presence_e ue_multicast_m_rbs_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-Setup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7786,10 +7414,7 @@ presence_e ue_multicast_m_rbs_setupnew_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_setupnew_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-Setupnew-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_setupnew_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7849,10 +7474,7 @@ presence_e ue_multicast_m_rbs_to_be_released_item_ies_o::get_presence(const uint
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_to_be_released_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-ToBeReleased-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_to_be_released_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7912,10 +7534,7 @@ presence_e ue_multicast_m_rbs_to_be_setup_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7975,10 +7594,7 @@ presence_e ue_multicast_m_rbs_to_be_setup_at_modify_item_ies_o::get_presence(con
 // Value ::= OPEN TYPE
 void ue_multicast_m_rbs_to_be_setup_at_modify_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-MulticastMRBs-ToBeSetup-atModify-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_multicast_m_rbs_to_be_setup_at_modify_item_ies_o::value_c::pack(bit_ref& bref) const
 {

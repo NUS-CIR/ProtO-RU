@@ -50,13 +50,11 @@ presence_e aperiodic_srs_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void aperiodic_srs_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("PosSRSResourceSet-Aggregation-List");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE aperiodic_srs_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -126,6 +124,7 @@ void aperiodic_srs_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -251,17 +250,15 @@ const positioning_broadcast_cells_l& assist_info_ctrl_ies_o::value_c::positionin
 }
 void assist_info_ctrl_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::assist_info:
-      j.write_fieldname("Assistance-Information");
       c.get<assist_info_s>().to_json(j);
       break;
     case types::broadcast:
-      j.write_str("Broadcast", c.get<broadcast_e>().to_string());
+      j.write_str(c.get<broadcast_e>().to_string());
       break;
     case types::positioning_broadcast_cells:
-      j.start_array("PositioningBroadcastCells");
+      j.start_array("");
       for (const auto& e1 : c.get<positioning_broadcast_cells_l>()) {
         e1.to_json(j);
       }
@@ -270,7 +267,6 @@ void assist_info_ctrl_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "assist_info_ctrl_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE assist_info_ctrl_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -391,27 +387,34 @@ OCUDUASN_CODE assist_info_ctrl_ies_container::unpack(cbit_ref& bref)
 }
 void assist_info_ctrl_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (assist_info_present) {
+    j.start_obj();
     j.write_int("id", 23);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     assist_info.to_json(j);
+    j.end_obj();
   }
   if (broadcast_present) {
+    j.start_obj();
     j.write_int("id", 24);
     j.write_str("criticality", "reject");
-    j.write_str("Value", broadcast.to_string());
+    j.write_str("value", broadcast.to_string());
+    j.end_obj();
   }
   if (positioning_broadcast_cells_present) {
+    j.start_obj();
     j.write_int("id", 38);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : positioning_broadcast_cells) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // AssistanceInformationFeedback-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -529,30 +532,27 @@ const crit_diagnostics_s& assist_info_feedback_ies_o::value_c::crit_diagnostics(
 }
 void assist_info_feedback_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::assist_info_fail_list:
-      j.start_array("AssistanceInformationFailureList");
+      j.start_array("");
       for (const auto& e1 : c.get<assist_info_fail_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::positioning_broadcast_cells:
-      j.start_array("PositioningBroadcastCells");
+      j.start_array("");
       for (const auto& e1 : c.get<positioning_broadcast_cells_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "assist_info_feedback_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE assist_info_feedback_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -674,31 +674,38 @@ OCUDUASN_CODE assist_info_feedback_ies_container::unpack(cbit_ref& bref)
 }
 void assist_info_feedback_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (assist_info_fail_list_present) {
+    j.start_obj();
     j.write_int("id", 25);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : assist_info_fail_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (positioning_broadcast_cells_present) {
+    j.start_obj();
     j.write_int("id", 38);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : positioning_broadcast_cells) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E-CIDMeasurementFailureIndication-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -816,22 +823,19 @@ const cause_c& e_c_id_meas_fail_ind_ies_o::value_c::cause() const
 }
 void e_c_id_meas_fail_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::ran_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_fail_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_fail_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -955,17 +959,24 @@ OCUDUASN_CODE e_c_id_meas_fail_ind_ies_container::unpack(cbit_ref& bref)
 }
 void e_c_id_meas_fail_ind_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_ue_meas_id);
+  j.write_int("value", lmf_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 6);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_ue_meas_id);
+  j.write_int("value", ran_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // E-CIDMeasurementInitiationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -1083,23 +1094,19 @@ const crit_diagnostics_s& e_c_id_meas_initiation_fail_ies_o::value_c::crit_diagn
 }
 void e_c_id_meas_initiation_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_initiation_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_initiation_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1229,19 +1236,27 @@ OCUDUASN_CODE e_c_id_meas_initiation_fail_ies_container::unpack(cbit_ref& bref)
 }
 void e_c_id_meas_initiation_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_ue_meas_id);
+  j.write_int("value", lmf_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E-CIDMeasurementInitiationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -1439,45 +1454,43 @@ const meas_periodicity_nr_ao_a_e& e_c_id_meas_initiation_request_ies_o::value_c:
 }
 void e_c_id_meas_initiation_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::report_characteristics:
-      j.write_str("ReportCharacteristics", c.get<report_characteristics_e>().to_string());
+      j.write_str(c.get<report_characteristics_e>().to_string());
       break;
     case types::meas_periodicity:
-      j.write_str("MeasurementPeriodicity", c.get<meas_periodicity_e>().to_string());
+      j.write_str(c.get<meas_periodicity_e>().to_string());
       break;
     case types::meas_quantities:
-      j.start_array("MeasurementQuantities");
+      j.start_array("");
       for (const auto& e1 : c.get<meas_quantities_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::other_rat_meas_quantities:
-      j.start_array("OtherRATMeasurementQuantities");
+      j.start_array("");
       for (const auto& e1 : c.get<other_rat_meas_quantities_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::wlan_meas_quantities:
-      j.start_array("WLANMeasurementQuantities");
+      j.start_array("");
       for (const auto& e1 : c.get<wlan_meas_quantities_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::meas_periodicity_nr_ao_a:
-      j.write_str("MeasurementPeriodicityNR-AoA", c.get<meas_periodicity_nr_ao_a_e>().to_string());
+      j.write_str(c.get<meas_periodicity_nr_ao_a_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_initiation_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_initiation_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1688,49 +1701,63 @@ OCUDUASN_CODE e_c_id_meas_initiation_request_ies_container::unpack(cbit_ref& bre
 }
 void e_c_id_meas_initiation_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_ue_meas_id);
+  j.write_int("value", lmf_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_str("Value", report_characteristics.to_string());
+  j.write_str("value", report_characteristics.to_string());
+  j.end_obj();
   if (meas_periodicity_present) {
+    j.start_obj();
     j.write_int("id", 4);
     j.write_str("criticality", "reject");
-    j.write_str("Value", meas_periodicity.to_string());
+    j.write_str("value", meas_periodicity.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : meas_quantities) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (other_rat_meas_quantities_present) {
+    j.start_obj();
     j.write_int("id", 15);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : other_rat_meas_quantities) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (wlan_meas_quantities_present) {
+    j.start_obj();
     j.write_int("id", 19);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : wlan_meas_quantities) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (meas_periodicity_nr_ao_a_present) {
+    j.start_obj();
     j.write_int("id", 105);
     j.write_str("criticality", "reject");
-    j.write_str("Value", meas_periodicity_nr_ao_a.to_string());
+    j.write_str("value", meas_periodicity_nr_ao_a.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E-CIDMeasurementInitiationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -1928,34 +1955,31 @@ const wlan_meas_result_l& e_c_id_meas_initiation_resp_ies_o::value_c::wlan_meas_
 }
 void e_c_id_meas_initiation_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::ran_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::e_c_id_meas_result:
-      j.write_fieldname("E-CID-MeasurementResult");
       c.get<e_c_id_meas_result_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::cell_portion_id:
-      j.write_int("INTEGER (0..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::other_rat_meas_result:
-      j.start_array("OtherRATMeasurementResult");
+      j.start_array("");
       for (const auto& e1 : c.get<other_rat_meas_result_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::wlan_meas_result:
-      j.start_array("WLANMeasurementResult");
+      j.start_array("");
       for (const auto& e1 : c.get<wlan_meas_result_l>()) {
         e1.to_json(j);
       }
@@ -1964,7 +1988,6 @@ void e_c_id_meas_initiation_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_initiation_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_initiation_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2171,47 +2194,63 @@ OCUDUASN_CODE e_c_id_meas_initiation_resp_ies_container::unpack(cbit_ref& bref)
 }
 void e_c_id_meas_initiation_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_ue_meas_id);
+  j.write_int("value", lmf_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 6);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_ue_meas_id);
+  j.write_int("value", ran_ue_meas_id);
+  j.end_obj();
   if (e_c_id_meas_result_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     e_c_id_meas_result.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (cell_portion_id_present) {
+    j.start_obj();
     j.write_int("id", 14);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", cell_portion_id);
+    j.write_int("value", cell_portion_id);
+    j.end_obj();
   }
   if (other_rat_meas_result_present) {
+    j.start_obj();
     j.write_int("id", 17);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : other_rat_meas_result) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (wlan_meas_result_present) {
+    j.start_obj();
     j.write_int("id", 21);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : wlan_meas_result) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E-CIDMeasurementReport-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -2349,25 +2388,22 @@ const uint16_t& e_c_id_meas_report_ies_o::value_c::cell_portion_id() const
 }
 void e_c_id_meas_report_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::ran_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::e_c_id_meas_result:
-      j.write_fieldname("E-CID-MeasurementResult");
       c.get<e_c_id_meas_result_s>().to_json(j);
       break;
     case types::cell_portion_id:
-      j.write_int("INTEGER (0..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_report_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_report_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2511,22 +2547,31 @@ OCUDUASN_CODE e_c_id_meas_report_ies_container::unpack(cbit_ref& bref)
 }
 void e_c_id_meas_report_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_ue_meas_id);
+  j.write_int("value", lmf_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 6);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_ue_meas_id);
+  j.write_int("value", ran_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 7);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   e_c_id_meas_result.to_json(j);
+  j.end_obj();
   if (cell_portion_id_present) {
+    j.start_obj();
     j.write_int("id", 14);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", cell_portion_id);
+    j.write_int("value", cell_portion_id);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E-CIDMeasurementTerminationCommand-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -2624,18 +2669,16 @@ const uint8_t& e_c_id_meas_termination_cmd_ies_o::value_c::ran_ue_meas_id() cons
 }
 void e_c_id_meas_termination_cmd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::ran_ue_meas_id:
-      j.write_int("INTEGER (1..15,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_termination_cmd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_termination_cmd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2741,14 +2784,18 @@ OCUDUASN_CODE e_c_id_meas_termination_cmd_ies_container::unpack(cbit_ref& bref)
 }
 void e_c_id_meas_termination_cmd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_ue_meas_id);
+  j.write_int("value", lmf_ue_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 6);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_ue_meas_id);
+  j.write_int("value", ran_ue_meas_id);
   j.end_obj();
+  j.end_array();
 }
 
 // ErrorIndication-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -2846,20 +2893,16 @@ const crit_diagnostics_s& error_ind_ies_o::value_c::crit_diagnostics() const
 }
 void error_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE error_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2961,18 +3004,24 @@ OCUDUASN_CODE error_ind_ies_container::unpack(cbit_ref& bref)
 }
 void error_ind_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (cause_present) {
+    j.start_obj();
     j.write_int("id", 0);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     cause.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementAbort-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -3070,18 +3119,16 @@ const uint32_t& meas_abort_ies_o::value_c::ran_meas_id() const
 }
 void meas_abort_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ran_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "meas_abort_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_abort_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3187,14 +3234,18 @@ OCUDUASN_CODE meas_abort_ies_container::unpack(cbit_ref& bref)
 }
 void meas_abort_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_meas_id);
+  j.write_int("value", ran_meas_id);
   j.end_obj();
+  j.end_array();
 }
 
 // MeasurementActivation-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -3292,13 +3343,12 @@ const prs_meass_info_list_l& meas_activation_ies_o::value_c::prs_meass_info_list
 }
 void meas_activation_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::request_type:
-      j.write_str("RequestType", c.get<request_type_e>().to_string());
+      j.write_str(c.get<request_type_e>().to_string());
       break;
     case types::prs_meass_info_list:
-      j.start_array("PRS-Measurements-Info-List");
+      j.start_array("");
       for (const auto& e1 : c.get<prs_meass_info_list_l>()) {
         e1.to_json(j);
       }
@@ -3307,7 +3357,6 @@ void meas_activation_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "meas_activation_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_activation_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3414,20 +3463,24 @@ OCUDUASN_CODE meas_activation_ies_container::unpack(cbit_ref& bref)
 }
 void meas_activation_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 98);
   j.write_str("criticality", "reject");
-  j.write_str("Value", request_type.to_string());
+  j.write_str("value", request_type.to_string());
+  j.end_obj();
   if (prs_meass_info_list_present) {
+    j.start_obj();
     j.write_int("id", 88);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : prs_meass_info_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -3545,23 +3598,19 @@ const crit_diagnostics_s& meas_fail_ies_o::value_c::crit_diagnostics() const
 }
 void meas_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "meas_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3691,19 +3740,27 @@ OCUDUASN_CODE meas_fail_ies_container::unpack(cbit_ref& bref)
 }
 void meas_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementFailureIndication-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -3821,22 +3878,19 @@ const cause_c& meas_fail_ind_ies_o::value_c::cause() const
 }
 void meas_fail_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ran_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "meas_fail_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_fail_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3960,17 +4014,24 @@ OCUDUASN_CODE meas_fail_ind_ies_container::unpack(cbit_ref& bref)
 }
 void meas_fail_ind_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_meas_id);
+  j.write_int("value", ran_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MeasurementPreconfigurationConfirm-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -4068,19 +4129,16 @@ const crit_diagnostics_s& meas_precfg_confirm_ies_o::value_c::crit_diagnostics()
 }
 void meas_precfg_confirm_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::precfg_result:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<8, false, true>>().to_string());
+      c.get<fixed_bitstring<8, false, true>>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "meas_precfg_confirm_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_precfg_confirm_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4187,16 +4245,22 @@ OCUDUASN_CODE meas_precfg_confirm_ies_container::unpack(cbit_ref& bref)
 }
 void meas_precfg_confirm_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 97);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", precfg_result.to_string());
+  j.write_fieldname("value");
+  precfg_result.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementPreconfigurationRefuse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -4294,20 +4358,16 @@ const crit_diagnostics_s& meas_precfg_refuse_ies_o::value_c::crit_diagnostics() 
 }
 void meas_precfg_refuse_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "meas_precfg_refuse_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_precfg_refuse_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4414,16 +4474,22 @@ OCUDUASN_CODE meas_precfg_refuse_ies_container::unpack(cbit_ref& bref)
 }
 void meas_precfg_refuse_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementPreconfigurationRequired-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -4464,13 +4530,11 @@ presence_e meas_precfg_required_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void meas_precfg_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("TRP-PRS-Information-List");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE meas_precfg_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4606,16 +4670,15 @@ const trp_meas_resp_list_l& meas_report_ies_o::value_c::trp_meas_report_list() c
 }
 void meas_report_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ran_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::trp_meas_report_list:
-      j.start_array("TRP-MeasurementResponseList");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_meas_resp_list_l>()) {
         e1.to_json(j);
       }
@@ -4624,7 +4687,6 @@ void meas_report_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "meas_report_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_report_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4748,21 +4810,27 @@ OCUDUASN_CODE meas_report_ies_container::unpack(cbit_ref& bref)
 }
 void meas_report_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_meas_id);
+  j.write_int("value", ran_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 43);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : trp_meas_report_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // MeasurementRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -5140,65 +5208,62 @@ const time_win_info_meas_list_l& meas_request_ies_o::value_c::time_win_info_meas
 }
 void meas_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::trp_meas_request_list:
-      j.start_array("TRP-MeasurementRequestList");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_meas_request_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::report_characteristics:
-      j.write_str("ReportCharacteristics", c.get<report_characteristics_e>().to_string());
+      j.write_str(c.get<report_characteristics_e>().to_string());
       break;
     case types::meas_periodicity:
-      j.write_str("MeasurementPeriodicity", c.get<meas_periodicity_e>().to_string());
+      j.write_str(c.get<meas_periodicity_e>().to_string());
       break;
     case types::trp_meas_quantities:
-      j.start_array("TRPMeasurementQuantities");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_meas_quantities_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sfn_initisation_time:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<64, false, true>>().to_string());
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::srs_cfg:
-      j.write_fieldname("SRSConfiguration");
       c.get<srs_configuration_s>().to_json(j);
       break;
     case types::meas_beam_info_request:
-      j.write_str("MeasurementBeamInfoRequest", "true");
+      j.write_str("true");
       break;
     case types::sys_frame_num:
-      j.write_int("INTEGER (0..1023)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::slot_num:
-      j.write_int("INTEGER (0..79)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::meas_periodicity_extended:
-      j.write_str("MeasurementPeriodicityExtended", c.get<meas_periodicity_extended_e>().to_string());
+      j.write_str(c.get<meas_periodicity_extended_e>().to_string());
       break;
     case types::resp_time:
-      j.write_fieldname("ResponseTime");
       c.get<resp_time_s>().to_json(j);
       break;
     case types::meas_characteristics_request_ind:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<16, false, true>>().to_string());
+      c.get<fixed_bitstring<16, false, true>>().to_json(j);
       break;
     case types::meas_time_occasion:
-      j.write_str("MeasurementTimeOccasion", c.get<meas_time_occasion_e>().to_string());
+      j.write_str(c.get<meas_time_occasion_e>().to_string());
       break;
     case types::meas_amount:
-      j.write_str("MeasurementAmount", c.get<meas_amount_e>().to_string());
+      j.write_str(c.get<meas_amount_e>().to_string());
       break;
     case types::time_win_info_meas_list:
-      j.start_array("TimeWindowInformation-Measurement-List");
+      j.start_array("");
       for (const auto& e1 : c.get<time_win_info_meas_list_l>()) {
         e1.to_json(j);
       }
@@ -5207,7 +5272,6 @@ void meas_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "meas_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5592,92 +5656,128 @@ OCUDUASN_CODE meas_request_ies_container::unpack(cbit_ref& bref)
 }
 void meas_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : trp_meas_request_list) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_str("Value", report_characteristics.to_string());
+  j.write_str("value", report_characteristics.to_string());
+  j.end_obj();
   if (meas_periodicity_present) {
+    j.start_obj();
     j.write_int("id", 4);
     j.write_str("criticality", "reject");
-    j.write_str("Value", meas_periodicity.to_string());
+    j.write_str("value", meas_periodicity.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 52);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : trp_meas_quantities) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (sfn_initisation_time_present) {
+    j.start_obj();
     j.write_int("id", 54);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", sfn_initisation_time.to_string());
+    j.write_fieldname("value");
+    sfn_initisation_time.to_json(j);
+    j.end_obj();
   }
   if (srs_cfg_present) {
+    j.start_obj();
     j.write_int("id", 26);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     srs_cfg.to_json(j);
+    j.end_obj();
   }
   if (meas_beam_info_request_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (sys_frame_num_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sys_frame_num);
+    j.write_int("value", sys_frame_num);
+    j.end_obj();
   }
   if (slot_num_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", slot_num);
+    j.write_int("value", slot_num);
+    j.end_obj();
   }
   if (meas_periodicity_extended_present) {
+    j.start_obj();
     j.write_int("id", 64);
     j.write_str("criticality", "reject");
-    j.write_str("Value", meas_periodicity_extended.to_string());
+    j.write_str("value", meas_periodicity_extended.to_string());
+    j.end_obj();
   }
   if (resp_time_present) {
+    j.start_obj();
     j.write_int("id", 72);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     resp_time.to_json(j);
+    j.end_obj();
   }
   if (meas_characteristics_request_ind_present) {
+    j.start_obj();
     j.write_int("id", 92);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", meas_characteristics_request_ind.to_string());
+    j.write_fieldname("value");
+    meas_characteristics_request_ind.to_json(j);
+    j.end_obj();
   }
   if (meas_time_occasion_present) {
+    j.start_obj();
     j.write_int("id", 91);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", meas_time_occasion.to_string());
+    j.write_str("value", meas_time_occasion.to_string());
+    j.end_obj();
   }
   if (meas_amount_present) {
+    j.start_obj();
     j.write_int("id", 95);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", meas_amount.to_string());
+    j.write_str("value", meas_amount.to_string());
+    j.end_obj();
   }
   if (time_win_info_meas_list_present) {
+    j.start_obj();
     j.write_int("id", 125);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : time_win_info_meas_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -5815,29 +5915,26 @@ const crit_diagnostics_s& meas_resp_ies_o::value_c::crit_diagnostics() const
 }
 void meas_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ran_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::trp_meas_resp_list:
-      j.start_array("TRP-MeasurementResponseList");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_meas_resp_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "meas_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5982,28 +6079,37 @@ OCUDUASN_CODE meas_resp_ies_container::unpack(cbit_ref& bref)
 }
 void meas_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_meas_id);
+  j.write_int("value", ran_meas_id);
+  j.end_obj();
   if (trp_meas_resp_list_present) {
+    j.start_obj();
     j.write_int("id", 42);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : trp_meas_resp_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MeasurementUpdate-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -6181,35 +6287,32 @@ const meas_time_occasion_e& meas_upd_ies_o::value_c::meas_time_occasion() const
 }
 void meas_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::lmf_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ran_meas_id:
-      j.write_int("INTEGER (1..65536,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::srs_cfg:
-      j.write_fieldname("SRSConfiguration");
       c.get<srs_configuration_s>().to_json(j);
       break;
     case types::trp_meas_upd_list:
-      j.start_array("TRP-MeasurementUpdateList");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_meas_upd_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::meas_characteristics_request_ind:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<16, false, true>>().to_string());
+      c.get<fixed_bitstring<16, false, true>>().to_json(j);
       break;
     case types::meas_time_occasion:
-      j.write_str("MeasurementTimeOccasion", c.get<meas_time_occasion_e>().to_string());
+      j.write_str(c.get<meas_time_occasion_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "meas_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE meas_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6396,38 +6499,52 @@ OCUDUASN_CODE meas_upd_ies_container::unpack(cbit_ref& bref)
 }
 void meas_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
-  j.write_int("Value", lmf_meas_id);
+  j.write_int("value", lmf_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_meas_id);
+  j.write_int("value", ran_meas_id);
+  j.end_obj();
   if (srs_cfg_present) {
+    j.start_obj();
     j.write_int("id", 26);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     srs_cfg.to_json(j);
+    j.end_obj();
   }
   if (trp_meas_upd_list_present) {
+    j.start_obj();
     j.write_int("id", 70);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : trp_meas_upd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (meas_characteristics_request_ind_present) {
+    j.start_obj();
     j.write_int("id", 92);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", meas_characteristics_request_ind.to_string());
+    j.write_fieldname("value");
+    meas_characteristics_request_ind.to_json(j);
+    j.end_obj();
   }
   if (meas_time_occasion_present) {
+    j.start_obj();
     j.write_int("id", 91);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", meas_time_occasion.to_string());
+    j.write_str("value", meas_time_occasion.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // OTDOA-Information-Type-Item ::= SEQUENCE
@@ -6509,10 +6626,7 @@ presence_e otdoa_info_type_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void otdoa_info_type_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("OTDOA-Information-Type-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE otdoa_info_type_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6628,20 +6742,16 @@ const crit_diagnostics_s& otdoa_info_fail_ies_o::value_c::crit_diagnostics() con
 }
 void otdoa_info_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "otdoa_info_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE otdoa_info_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6748,16 +6858,22 @@ OCUDUASN_CODE otdoa_info_fail_ies_container::unpack(cbit_ref& bref)
 }
 void otdoa_info_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // OTDOAInformationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -6798,13 +6914,11 @@ presence_e otdoa_info_request_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void otdoa_info_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("OTDOA-Information-Type");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE otdoa_info_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6920,23 +7034,20 @@ const crit_diagnostics_s& otdoa_info_resp_ies_o::value_c::crit_diagnostics() con
 }
 void otdoa_info_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::otdoa_cells:
-      j.start_array("OTDOACells");
+      j.start_array("");
       for (const auto& e1 : c.get<otdoa_cells_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "otdoa_info_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE otdoa_info_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7043,20 +7154,25 @@ OCUDUASN_CODE otdoa_info_resp_ies_container::unpack(cbit_ref& bref)
 }
 void otdoa_info_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 8);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : otdoa_cells) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PRSConfigurationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -7154,20 +7270,16 @@ const crit_diagnostics_s& prs_cfg_fail_ies_o::value_c::crit_diagnostics() const
 }
 void prs_cfg_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "prs_cfg_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE prs_cfg_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7274,16 +7386,22 @@ OCUDUASN_CODE prs_cfg_fail_ies_container::unpack(cbit_ref& bref)
 }
 void prs_cfg_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PRSConfigurationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -7381,13 +7499,12 @@ const prstrp_list_l& prs_cfg_request_ies_o::value_c::prstrp_list() const
 }
 void prs_cfg_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::prs_cfg_request_type:
-      j.write_str("PRSConfigRequestType", c.get<prs_cfg_request_type_e>().to_string());
+      j.write_str(c.get<prs_cfg_request_type_e>().to_string());
       break;
     case types::prstrp_list:
-      j.start_array("PRSTRPList");
+      j.start_array("");
       for (const auto& e1 : c.get<prstrp_list_l>()) {
         e1.to_json(j);
       }
@@ -7396,7 +7513,6 @@ void prs_cfg_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "prs_cfg_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE prs_cfg_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7502,18 +7618,22 @@ OCUDUASN_CODE prs_cfg_request_ies_container::unpack(cbit_ref& bref)
 }
 void prs_cfg_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 89);
   j.write_str("criticality", "reject");
-  j.write_str("Value", prs_cfg_request_type.to_string());
+  j.write_str("value", prs_cfg_request_type.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 66);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : prstrp_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // PRSConfigurationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -7611,23 +7731,20 @@ const crit_diagnostics_s& prs_cfg_resp_ies_o::value_c::crit_diagnostics() const
 }
 void prs_cfg_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::prs_tx_trp_list:
-      j.start_array("PRSTransmissionTRPList");
+      j.start_array("");
       for (const auto& e1 : c.get<prs_tx_trp_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "prs_cfg_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE prs_cfg_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7729,22 +7846,27 @@ OCUDUASN_CODE prs_cfg_resp_ies_container::unpack(cbit_ref& bref)
 }
 void prs_cfg_resp_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (prs_tx_trp_list_present) {
+    j.start_obj();
     j.write_int("id", 67);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : prs_tx_trp_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PositioningActivationFailureIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -7842,20 +7964,16 @@ const crit_diagnostics_s& positioning_activation_fail_ies_o::value_c::crit_diagn
 }
 void positioning_activation_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "positioning_activation_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_activation_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7962,16 +8080,22 @@ OCUDUASN_CODE positioning_activation_fail_ies_container::unpack(cbit_ref& bref)
 }
 void positioning_activation_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // SemipersistentSRS-ExtIEs ::= OBJECT SET OF NRPPA-PROTOCOL-EXTENSION
@@ -8089,18 +8213,15 @@ const pos_srs_res_set_aggregation_list_l& semipersistent_srs_ext_ies_o::ext_c::p
 }
 void semipersistent_srs_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_spatial_relation:
-      j.write_fieldname("SpatialRelationInfo");
       c.get<spatial_relation_info_s>().to_json(j);
       break;
     case types::srs_spatial_relation_per_srs_res:
-      j.write_fieldname("SpatialRelationPerSRSResource");
       c.get<spatial_relation_per_srs_res_s>().to_json(j);
       break;
     case types::pos_srs_res_set_aggregation_list:
-      j.start_array("PosSRSResourceSet-Aggregation-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pos_srs_res_set_aggregation_list_l>()) {
         e1.to_json(j);
       }
@@ -8109,7 +8230,6 @@ void semipersistent_srs_ext_ies_o::ext_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "semipersistent_srs_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE semipersistent_srs_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -8231,27 +8351,35 @@ OCUDUASN_CODE semipersistent_srs_ext_ies_container::unpack(cbit_ref& bref)
 }
 void semipersistent_srs_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (srs_spatial_relation_present) {
+    j.start_obj();
     j.write_int("id", 48);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     srs_spatial_relation.to_json(j);
+    j.end_obj();
   }
   if (srs_spatial_relation_per_srs_res_present) {
+    j.start_obj();
     j.write_int("id", 63);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     srs_spatial_relation_per_srs_res.to_json(j);
+    j.end_obj();
   }
   if (pos_srs_res_set_aggregation_list_present) {
+    j.start_obj();
     j.write_int("id", 122);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : pos_srs_res_set_aggregation_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // SemipersistentSRS ::= SEQUENCE
@@ -8553,19 +8681,16 @@ const fixed_bitstring<64, false, true>& positioning_activation_request_ies_o::va
 }
 void positioning_activation_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_type:
-      j.write_fieldname("SRSType");
       c.get<srs_type_c>().to_json(j);
       break;
     case types::activation_time:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<64, false, true>>().to_string());
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "positioning_activation_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_activation_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8672,16 +8797,22 @@ OCUDUASN_CODE positioning_activation_request_ies_container::unpack(cbit_ref& bre
 }
 void positioning_activation_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 44);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   srs_type.to_json(j);
+  j.end_obj();
   if (activation_time_present) {
+    j.start_obj();
     j.write_int("id", 45);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", activation_time.to_string());
+    j.write_fieldname("value");
+    activation_time.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PositioningActivationResponseIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -8799,22 +8930,19 @@ const uint8_t& positioning_activation_resp_ies_o::value_c::slot_num() const
 }
 void positioning_activation_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::sys_frame_num:
-      j.write_int("INTEGER (0..1023)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::slot_num:
-      j.write_int("INTEGER (0..79)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     default:
       log_invalid_choice_id(type_, "positioning_activation_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_activation_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8935,23 +9063,30 @@ OCUDUASN_CODE positioning_activation_resp_ies_container::unpack(cbit_ref& bref)
 }
 void positioning_activation_resp_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (sys_frame_num_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sys_frame_num);
+    j.write_int("value", sys_frame_num);
+    j.end_obj();
   }
   if (slot_num_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", slot_num);
+    j.write_int("value", slot_num);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PositioningDeactivationIEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -8992,10 +9127,7 @@ presence_e positioning_deactivation_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void positioning_deactivation_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("AbortTransmission");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_deactivation_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9111,20 +9243,16 @@ const crit_diagnostics_s& positioning_info_fail_ies_o::value_c::crit_diagnostics
 }
 void positioning_info_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "positioning_info_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_info_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9231,16 +9359,22 @@ OCUDUASN_CODE positioning_info_fail_ies_container::unpack(cbit_ref& bref)
 }
 void positioning_info_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PositioningInformationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -9441,43 +9575,39 @@ const remote_ue_ind_request_e& positioning_info_request_ies_o::value_c::remote_u
 }
 void positioning_info_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::requested_srs_tx_characteristics:
-      j.write_fieldname("RequestedSRSTransmissionCharacteristics");
       c.get<requested_srs_tx_characteristics_s>().to_json(j);
       break;
     case types::ue_report_info:
-      j.write_fieldname("UEReportingInformation");
       c.get<ue_report_info_s>().to_json(j);
       break;
     case types::ue_teg_info_request:
-      j.write_str("UE-TEG-Info-Request", c.get<ue_teg_info_request_e>().to_string());
+      j.write_str(c.get<ue_teg_info_request_e>().to_string());
       break;
     case types::ue_teg_report_periodicity:
-      j.write_str("UE-TEG-ReportingPeriodicity", c.get<ue_teg_report_periodicity_e>().to_string());
+      j.write_str(c.get<ue_teg_report_periodicity_e>().to_string());
       break;
     case types::time_win_info_srs_list:
-      j.start_array("TimeWindowInformation-SRS-List");
+      j.start_array("");
       for (const auto& e1 : c.get<time_win_info_srs_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::requested_srs_precfg_characteristics_list:
-      j.start_array("RequestedSRSPreconfigurationCharacteristics-List");
+      j.start_array("");
       for (const auto& e1 : c.get<requested_srs_precfg_characteristics_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::remote_ue_ind_request:
-      j.write_str("Remote-UE-Indication-Request", "true");
+      j.write_str("true");
       break;
     default:
       log_invalid_choice_id(type_, "positioning_info_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_info_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9680,51 +9810,67 @@ OCUDUASN_CODE positioning_info_request_ies_container::unpack(cbit_ref& bref)
 }
 void positioning_info_request_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (requested_srs_tx_characteristics_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     requested_srs_tx_characteristics.to_json(j);
+    j.end_obj();
   }
   if (ue_report_info_present) {
+    j.start_obj();
     j.write_int("id", 73);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ue_report_info.to_json(j);
+    j.end_obj();
   }
   if (ue_teg_info_request_present) {
+    j.start_obj();
     j.write_int("id", 90);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ue_teg_info_request.to_string());
+    j.write_str("value", ue_teg_info_request.to_string());
+    j.end_obj();
   }
   if (ue_teg_report_periodicity_present) {
+    j.start_obj();
     j.write_int("id", 99);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ue_teg_report_periodicity.to_string());
+    j.write_str("value", ue_teg_report_periodicity.to_string());
+    j.end_obj();
   }
   if (time_win_info_srs_list_present) {
+    j.start_obj();
     j.write_int("id", 124);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : time_win_info_srs_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (requested_srs_precfg_characteristics_list_present) {
+    j.start_obj();
     j.write_int("id", 136);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : requested_srs_precfg_characteristics_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (remote_ue_ind_request_present) {
+    j.start_obj();
     j.write_int("id", 159);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PositioningInformationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -9942,51 +10088,46 @@ const remote_ue_ind_e& positioning_info_resp_ies_o::value_c::remote_ue_ind() con
 }
 void positioning_info_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_cfg:
-      j.write_fieldname("SRSConfiguration");
       c.get<srs_configuration_s>().to_json(j);
       break;
     case types::sfn_initisation_time:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<64, false, true>>().to_string());
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::ue_tx_teg_assoc_list:
-      j.start_array("UETxTEGAssociationList");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_tx_teg_assoc_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::new_nr_cgi:
-      j.write_fieldname("CGI-NR");
       c.get<cgi_nr_s>().to_json(j);
       break;
     case types::pos_validity_area_cell_list:
-      j.start_array("PosValidityAreaCellList");
+      j.start_array("");
       for (const auto& e1 : c.get<pos_validity_area_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srs_precfg_list:
-      j.start_array("SRSPreconfiguration-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srs_precfg_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::remote_ue_ind:
-      j.write_str("Remote-UE-Indication", "l2-u2n-remote-ue");
+      j.write_str("l2-u2n-remote-ue");
       break;
     default:
       log_invalid_choice_id(type_, "positioning_info_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_info_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10209,60 +10350,80 @@ OCUDUASN_CODE positioning_info_resp_ies_container::unpack(cbit_ref& bref)
 }
 void positioning_info_resp_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (srs_cfg_present) {
+    j.start_obj();
     j.write_int("id", 26);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     srs_cfg.to_json(j);
+    j.end_obj();
   }
   if (sfn_initisation_time_present) {
+    j.start_obj();
     j.write_int("id", 54);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", sfn_initisation_time.to_string());
+    j.write_fieldname("value");
+    sfn_initisation_time.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (ue_tx_teg_assoc_list_present) {
+    j.start_obj();
     j.write_int("id", 81);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_tx_teg_assoc_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (new_nr_cgi_present) {
+    j.start_obj();
     j.write_int("id", 113);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     new_nr_cgi.to_json(j);
+    j.end_obj();
   }
   if (pos_validity_area_cell_list_present) {
+    j.start_obj();
     j.write_int("id", 128);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pos_validity_area_cell_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srs_precfg_list_present) {
+    j.start_obj();
     j.write_int("id", 137);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srs_precfg_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (remote_ue_ind_present) {
+    j.start_obj();
     j.write_int("id", 160);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "l2-u2n-remote-ue");
+    j.write_str("value", "l2-u2n-remote-ue");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // PositioningInformationUpdate-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -10440,36 +10601,32 @@ const remote_ue_status_e& positioning_info_upd_ies_o::value_c::remote_ue_status(
 }
 void positioning_info_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_cfg:
-      j.write_fieldname("SRSConfiguration");
       c.get<srs_configuration_s>().to_json(j);
       break;
     case types::sfn_initisation_time:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<64, false, true>>().to_string());
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::ue_tx_teg_assoc_list:
-      j.start_array("UETxTEGAssociationList");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_tx_teg_assoc_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srs_tx_status:
-      j.write_str("SRSTransmissionStatus", c.get<srs_tx_status_e>().to_string());
+      j.write_str(c.get<srs_tx_status_e>().to_string());
       break;
     case types::new_cell_id:
-      j.write_fieldname("CGI-NR");
       c.get<cgi_nr_s>().to_json(j);
       break;
     case types::remote_ue_status:
-      j.write_str("Remote-UE-Status", c.get<remote_ue_status_e>().to_string());
+      j.write_str(c.get<remote_ue_status_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "positioning_info_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE positioning_info_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10652,42 +10809,57 @@ OCUDUASN_CODE positioning_info_upd_ies_container::unpack(cbit_ref& bref)
 }
 void positioning_info_upd_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (srs_cfg_present) {
+    j.start_obj();
     j.write_int("id", 26);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     srs_cfg.to_json(j);
+    j.end_obj();
   }
   if (sfn_initisation_time_present) {
+    j.start_obj();
     j.write_int("id", 54);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", sfn_initisation_time.to_string());
+    j.write_fieldname("value");
+    sfn_initisation_time.to_json(j);
+    j.end_obj();
   }
   if (ue_tx_teg_assoc_list_present) {
+    j.start_obj();
     j.write_int("id", 81);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_tx_teg_assoc_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srs_tx_status_present) {
+    j.start_obj();
     j.write_int("id", 106);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", srs_tx_status.to_string());
+    j.write_str("value", srs_tx_status.to_string());
+    j.end_obj();
   }
   if (new_cell_id_present) {
+    j.start_obj();
     j.write_int("id", 134);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     new_cell_id.to_json(j);
+    j.end_obj();
   }
   if (remote_ue_status_present) {
+    j.start_obj();
     j.write_int("id", 161);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", remote_ue_status.to_string());
+    j.write_str("value", remote_ue_status.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // Value ::= OPEN TYPE
@@ -10731,8 +10903,8 @@ OCUDUASN_CODE private_ie_container_empty_l::unpack(cbit_ref& bref)
 }
 void private_ie_container_empty_l::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.end_obj();
+  j.start_array();
+  j.end_array();
 }
 
 // PrivateMessage ::= SEQUENCE
@@ -10886,17 +11058,15 @@ const requested_srs_precfg_characteristics_list_l& srs_info_reserv_notif_ies_o::
 }
 void srs_info_reserv_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_reserv_type:
-      j.write_str("SRSReservationType", c.get<srs_reserv_type_e>().to_string());
+      j.write_str(c.get<srs_reserv_type_e>().to_string());
       break;
     case types::srs_info:
-      j.write_fieldname("RequestedSRSTransmissionCharacteristics");
       c.get<requested_srs_tx_characteristics_s>().to_json(j);
       break;
     case types::precfg_srs_info:
-      j.start_array("RequestedSRSPreconfigurationCharacteristics-List");
+      j.start_array("");
       for (const auto& e1 : c.get<requested_srs_precfg_characteristics_list_l>()) {
         e1.to_json(j);
       }
@@ -10905,7 +11075,6 @@ void srs_info_reserv_notif_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "srs_info_reserv_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE srs_info_reserv_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11033,25 +11202,32 @@ OCUDUASN_CODE srs_info_reserv_notif_ies_container::unpack(cbit_ref& bref)
 }
 void srs_info_reserv_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 129);
   j.write_str("criticality", "reject");
-  j.write_str("Value", srs_reserv_type.to_string());
+  j.write_str("value", srs_reserv_type.to_string());
+  j.end_obj();
   if (srs_info_present) {
+    j.start_obj();
     j.write_int("id", 138);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     srs_info.to_json(j);
+    j.end_obj();
   }
   if (precfg_srs_info_present) {
+    j.start_obj();
     j.write_int("id", 163);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : precfg_srs_info) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // TRPInformationFailure-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -11149,20 +11325,16 @@ const crit_diagnostics_s& trp_info_fail_ies_o::value_c::crit_diagnostics() const
 }
 void trp_info_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "trp_info_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_info_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11269,16 +11441,22 @@ OCUDUASN_CODE trp_info_fail_ies_container::unpack(cbit_ref& bref)
 }
 void trp_info_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // TRPInformationRequest-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -11376,17 +11554,16 @@ const trp_info_type_list_trp_req_l& trp_info_request_ies_o::value_c::trp_info_ty
 }
 void trp_info_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::trp_list:
-      j.start_array("TRPList");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::trp_info_type_list_trp_req:
-      j.start_array("TRPInformationTypeListTRPReq");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_info_type_list_trp_req_l>()) {
         e1.to_json(j);
       }
@@ -11395,7 +11572,6 @@ void trp_info_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "trp_info_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_info_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11502,24 +11678,28 @@ OCUDUASN_CODE trp_info_request_ies_container::unpack(cbit_ref& bref)
 }
 void trp_info_request_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (trp_list_present) {
+    j.start_obj();
     j.write_int("id", 47);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : trp_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : trp_info_type_list_trp_req) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // TRPInformationResponse-IEs ::= OBJECT SET OF NRPPA-PROTOCOL-IES
@@ -11617,23 +11797,20 @@ const crit_diagnostics_s& trp_info_resp_ies_o::value_c::crit_diagnostics() const
 }
 void trp_info_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::trp_info_list_trp_resp:
-      j.start_array("TRPInformationListTRPResp");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_info_list_trp_resp_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "trp_info_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_info_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11740,18 +11917,23 @@ OCUDUASN_CODE trp_info_resp_ies_container::unpack(cbit_ref& bref)
 }
 void trp_info_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 30);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : trp_info_list_trp_resp) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }

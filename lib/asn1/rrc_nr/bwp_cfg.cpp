@@ -918,6 +918,7 @@ void srs_periodicity_and_offset_r16_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::sl1:
+      j.write_null("sl1");
       break;
     case types::sl2:
       j.write_int("sl2", c.get<uint8_t>());
@@ -3142,7 +3143,7 @@ void ra_prioritization_slice_info_r17_s::to_json(json_writer& j) const
   j.start_obj();
   j.start_array("nsag-ID-List-r17");
   for (const auto& e1 : nsag_id_list_r17) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.write_fieldname("ra-Prioritization-r17");
@@ -3229,7 +3230,7 @@ void feature_combination_r17_s::to_json(json_writer& j) const
   if (nsag_r17.size() > 0) {
     j.start_array("nsag-r17");
     for (const auto& e1 : nsag_r17) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -3474,7 +3475,8 @@ void msg_a_pusch_res_r16_s::to_json(json_writer& j) const
     j.write_str("msgA-IntraSlotFrequencyHopping-r16", "enabled");
   }
   if (msg_a_hop_bits_r16_present) {
-    j.write_str("msgA-HoppingBits-r16", msg_a_hop_bits_r16.to_string());
+    j.write_fieldname("msgA-HoppingBits-r16");
+    msg_a_hop_bits_r16.to_json(j);
   }
   j.write_fieldname("msgA-DMRS-Config-r16");
   msg_a_dmrs_cfg_r16.to_json(j);
@@ -4012,8 +4014,8 @@ void rach_cfg_common_s::to_json(json_writer& j) const
     j.start_obj();
     j.write_fieldname("ra-Prioritization-r16");
     ra_prioritization_for_access_id_r16->ra_prioritization_r16.to_json(j);
-    j.write_str("ra-PrioritizationForAI-r16",
-                ra_prioritization_for_access_id_r16->ra_prioritization_for_ai_r16.to_string());
+    j.write_fieldname("ra-PrioritizationForAI-r16");
+    ra_prioritization_for_access_id_r16->ra_prioritization_for_ai_r16.to_json(j);
     j.end_obj();
   }
   if (prach_root_seq_idx_r16.is_present()) {
@@ -5099,8 +5101,8 @@ void rach_cfg_common_two_step_ra_r16_s::to_json(json_writer& j) const
     j.start_obj();
     j.write_fieldname("ra-Prioritization-r16");
     ra_prioritization_for_access_id_two_step_r16.ra_prioritization_r16.to_json(j);
-    j.write_str("ra-PrioritizationForAI-r16",
-                ra_prioritization_for_access_id_two_step_r16.ra_prioritization_for_ai_r16.to_string());
+    j.write_fieldname("ra-PrioritizationForAI-r16");
+    ra_prioritization_for_access_id_two_step_r16.ra_prioritization_for_ai_r16.to_json(j);
     j.end_obj();
   }
   if (ra_contention_resolution_timer_r16_present) {
@@ -6132,7 +6134,8 @@ void rate_match_pattern_s::pattern_type_c_::to_json(json_writer& j) const
     case types::bitmaps:
       j.write_fieldname("bitmaps");
       j.start_obj();
-      j.write_str("resourceBlocks", c.get<bitmaps_s_>().res_blocks.to_string());
+      j.write_fieldname("resourceBlocks");
+      c.get<bitmaps_s_>().res_blocks.to_json(j);
       j.write_fieldname("symbolsInResourceBlock");
       c.get<bitmaps_s_>().symbols_in_res_block.to_json(j);
       if (c.get<bitmaps_s_>().periodicity_and_pattern_present) {
@@ -6286,10 +6289,12 @@ void rate_match_pattern_s::pattern_type_c_::bitmaps_s_::symbols_in_res_block_c_:
   j.start_obj();
   switch (type_) {
     case types::one_slot:
-      j.write_str("oneSlot", c.get<fixed_bitstring<14>>().to_string());
+      j.write_fieldname("oneSlot");
+      c.get<fixed_bitstring<14>>().to_json(j);
       break;
     case types::two_slots:
-      j.write_str("twoSlots", c.get<fixed_bitstring<28>>().to_string());
+      j.write_fieldname("twoSlots");
+      c.get<fixed_bitstring<28>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "rate_match_pattern_s::pattern_type_c_::bitmaps_s_::symbols_in_res_block_c_");
@@ -6514,25 +6519,32 @@ void rate_match_pattern_s::pattern_type_c_::bitmaps_s_::periodicity_and_pattern_
   j.start_obj();
   switch (type_) {
     case types::n2:
-      j.write_str("n2", c.get<fixed_bitstring<2>>().to_string());
+      j.write_fieldname("n2");
+      c.get<fixed_bitstring<2>>().to_json(j);
       break;
     case types::n4:
-      j.write_str("n4", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("n4");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::n5:
-      j.write_str("n5", c.get<fixed_bitstring<5>>().to_string());
+      j.write_fieldname("n5");
+      c.get<fixed_bitstring<5>>().to_json(j);
       break;
     case types::n8:
-      j.write_str("n8", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("n8");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::n10:
-      j.write_str("n10", c.get<fixed_bitstring<10>>().to_string());
+      j.write_fieldname("n10");
+      c.get<fixed_bitstring<10>>().to_json(j);
       break;
     case types::n20:
-      j.write_str("n20", c.get<fixed_bitstring<20>>().to_string());
+      j.write_fieldname("n20");
+      c.get<fixed_bitstring<20>>().to_json(j);
       break;
     case types::n40:
-      j.write_str("n40", c.get<fixed_bitstring<40>>().to_string());
+      j.write_fieldname("n40");
+      c.get<fixed_bitstring<40>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "rate_match_pattern_s::pattern_type_c_::bitmaps_s_::periodicity_and_pattern_c_");
@@ -6766,7 +6778,8 @@ void coreset_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("controlResourceSetId", coreset_id);
-  j.write_str("frequencyDomainResources", freq_domain_res.to_string());
+  j.write_fieldname("frequencyDomainResources");
+  freq_domain_res.to_json(j);
   j.write_int("duration", dur);
   j.write_fieldname("cce-REG-MappingType");
   cce_reg_map_type.to_json(j);
@@ -6840,6 +6853,7 @@ void coreset_s::cce_reg_map_type_c_::to_json(json_writer& j) const
       j.end_obj();
       break;
     case types::non_interleaved:
+      j.write_null("nonInterleaved");
       break;
     default:
       log_invalid_choice_id(type_, "coreset_s::cce_reg_map_type_c_");
@@ -7023,7 +7037,8 @@ void search_space_s::to_json(json_writer& j) const
     j.write_int("duration", dur);
   }
   if (monitoring_symbols_within_slot_present) {
-    j.write_str("monitoringSymbolsWithinSlot", monitoring_symbols_within_slot.to_string());
+    j.write_fieldname("monitoringSymbolsWithinSlot");
+    monitoring_symbols_within_slot.to_json(j);
   }
   if (nrof_candidates_present) {
     j.write_fieldname("nrofCandidates");
@@ -7243,6 +7258,7 @@ void search_space_s::monitoring_slot_periodicity_and_offset_c_::to_json(json_wri
   j.start_obj();
   switch (type_) {
     case types::sl1:
+      j.write_null("sl1");
       break;
     case types::sl2:
       j.write_int("sl2", c.get<uint8_t>());
@@ -8372,7 +8388,8 @@ void search_space_ext_r16_s::to_json(json_writer& j) const
     j.end_array();
   }
   if (freq_monitor_locations_r16_present) {
-    j.write_str("freqMonitorLocations-r16", freq_monitor_locations_r16.to_string());
+    j.write_fieldname("freqMonitorLocations-r16");
+    freq_monitor_locations_r16.to_json(j);
   }
   j.end_obj();
 }
@@ -9123,10 +9140,12 @@ void search_space_ext_v1700_s::monitoring_slots_within_slot_group_r17_c_::to_jso
   j.start_obj();
   switch (type_) {
     case types::slot_group_len4_r17:
-      j.write_str("slotGroupLength4-r17", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("slotGroupLength4-r17");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::slot_group_len8_r17:
-      j.write_str("slotGroupLength8-r17", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("slotGroupLength8-r17");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "search_space_ext_v1700_s::monitoring_slots_within_slot_group_r17_c_");
@@ -13754,16 +13773,20 @@ void csi_rs_res_map_s::freq_domain_alloc_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::row1:
-      j.write_str("row1", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("row1");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::row2:
-      j.write_str("row2", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("row2");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     case types::row4:
-      j.write_str("row4", c.get<fixed_bitstring<3>>().to_string());
+      j.write_fieldname("row4");
+      c.get<fixed_bitstring<3>>().to_json(j);
       break;
     case types::other:
-      j.write_str("other", c.get<fixed_bitstring<6>>().to_string());
+      j.write_fieldname("other");
+      c.get<fixed_bitstring<6>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "csi_rs_res_map_s::freq_domain_alloc_c_");
@@ -13888,10 +13911,13 @@ void csi_rs_res_map_s::density_c_::to_json(json_writer& j) const
       j.write_str("dot5", c.to_string());
       break;
     case types::one:
+      j.write_null("one");
       break;
     case types::three:
+      j.write_null("three");
       break;
     case types::spare:
+      j.write_null("spare");
       break;
     default:
       log_invalid_choice_id(type_, "csi_rs_res_map_s::density_c_");
@@ -19903,7 +19929,8 @@ void bwp_dl_ded_s::to_json(json_writer& j) const
     sl_v2x_pdcch_cfg_r16->to_json(j);
   }
   if (pre_conf_gap_status_r17_present) {
-    j.write_str("preConfGapStatus-r17", pre_conf_gap_status_r17.to_string());
+    j.write_fieldname("preConfGapStatus-r17");
+    pre_conf_gap_status_r17.to_json(j);
   }
   if (beam_fail_recovery_sp_cell_cfg_r17.is_present()) {
     j.write_fieldname("beamFailureRecoverySpCellConfig-r17");
@@ -20843,10 +20870,13 @@ void sched_request_res_cfg_s::periodicity_and_offset_c_::to_json(json_writer& j)
   j.start_obj();
   switch (type_) {
     case types::sym2:
+      j.write_null("sym2");
       break;
     case types::sym6or7:
+      j.write_null("sym6or7");
       break;
     case types::sl1:
+      j.write_null("sl1");
       break;
     case types::sl2:
       j.write_int("sl2", c.get<uint8_t>());
@@ -25275,10 +25305,12 @@ void invalid_symbol_pattern_r16_s::symbols_r16_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::one_slot:
-      j.write_str("oneSlot", c.get<fixed_bitstring<14>>().to_string());
+      j.write_fieldname("oneSlot");
+      c.get<fixed_bitstring<14>>().to_json(j);
       break;
     case types::two_slots:
-      j.write_str("twoSlots", c.get<fixed_bitstring<28>>().to_string());
+      j.write_fieldname("twoSlots");
+      c.get<fixed_bitstring<28>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "invalid_symbol_pattern_r16_s::symbols_r16_c_");
@@ -25501,25 +25533,32 @@ void invalid_symbol_pattern_r16_s::periodicity_and_pattern_r16_c_::to_json(json_
   j.start_obj();
   switch (type_) {
     case types::n2:
-      j.write_str("n2", c.get<fixed_bitstring<2>>().to_string());
+      j.write_fieldname("n2");
+      c.get<fixed_bitstring<2>>().to_json(j);
       break;
     case types::n4:
-      j.write_str("n4", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("n4");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::n5:
-      j.write_str("n5", c.get<fixed_bitstring<5>>().to_string());
+      j.write_fieldname("n5");
+      c.get<fixed_bitstring<5>>().to_json(j);
       break;
     case types::n8:
-      j.write_str("n8", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("n8");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::n10:
-      j.write_str("n10", c.get<fixed_bitstring<10>>().to_string());
+      j.write_fieldname("n10");
+      c.get<fixed_bitstring<10>>().to_json(j);
       break;
     case types::n20:
-      j.write_str("n20", c.get<fixed_bitstring<20>>().to_string());
+      j.write_fieldname("n20");
+      c.get<fixed_bitstring<20>>().to_json(j);
       break;
     case types::n40:
-      j.write_str("n40", c.get<fixed_bitstring<40>>().to_string());
+      j.write_fieldname("n40");
+      c.get<fixed_bitstring<40>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "invalid_symbol_pattern_r16_s::periodicity_and_pattern_r16_c_");
@@ -26818,10 +26857,13 @@ void codebook_type_ul_r18_c::to_json(json_writer& j) const
       j.write_str("codebook1-r18", c.to_string());
       break;
     case types::codebook2_r18:
+      j.write_str("codebook2-r18", "ng2");
       break;
     case types::codebook3_r18:
+      j.write_str("codebook3-r18", "ng4");
       break;
     case types::codebook4_r18:
+      j.write_str("codebook4-r18", "ng8");
       break;
     default:
       log_invalid_choice_id(type_, "codebook_type_ul_r18_c");
@@ -28528,13 +28570,16 @@ void cg_sdt_cfg_r17_s::sdt_ssb_subset_r17_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::short_bitmap_r17:
-      j.write_str("shortBitmap-r17", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("shortBitmap-r17");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::medium_bitmap_r17:
-      j.write_str("mediumBitmap-r17", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("mediumBitmap-r17");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::long_bitmap_r17:
-      j.write_str("longBitmap-r17", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("longBitmap-r17");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "cg_sdt_cfg_r17_s::sdt_ssb_subset_r17_c_");
@@ -28703,10 +28748,12 @@ void cg_sdt_cfg_r17_s::sdt_dmrs_ports_r17_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::dmrs_type1_r17:
-      j.write_str("dmrsType1-r17", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("dmrsType1-r17");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::dmrs_type2_r17:
-      j.write_str("dmrsType2-r17", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("dmrsType2-r17");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "cg_sdt_cfg_r17_s::sdt_dmrs_ports_r17_c_");
@@ -28975,13 +29022,16 @@ void cg_rrc_cfg_r18_s::rrc_ssb_subset_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::short_bitmap_r18:
-      j.write_str("shortBitmap-r18", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("shortBitmap-r18");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::medium_bitmap_r18:
-      j.write_str("mediumBitmap-r18", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("mediumBitmap-r18");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::long_bitmap_r18:
-      j.write_str("longBitmap-r18", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("longBitmap-r18");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "cg_rrc_cfg_r18_s::rrc_ssb_subset_r18_c_");
@@ -29150,10 +29200,12 @@ void cg_rrc_cfg_r18_s::rrc_dmrs_ports_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::dmrs_type1_r18:
-      j.write_str("dmrsType1-r18", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("dmrsType1-r18");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::dmrs_type2_r18:
-      j.write_str("dmrsType2-r18", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("dmrsType2-r18");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "cg_rrc_cfg_r18_s::rrc_dmrs_ports_r18_c_");
@@ -29298,6 +29350,7 @@ void cg_cot_sharing_r16_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cot_sharing_r16:
+      j.write_null("noCOT-Sharing-r16");
       break;
     case types::cot_sharing_r16:
       j.write_fieldname("cot-Sharing-r16");
@@ -29536,6 +29589,7 @@ void cg_cot_sharing_r17_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cot_sharing_r17:
+      j.write_null("noCOT-Sharing-r17");
       break;
     case types::cot_sharing_r17:
       j.write_fieldname("cot-Sharing-r17");
@@ -30532,7 +30586,8 @@ void cfg_grant_cfg_s::rrc_cfg_ul_grant_s_::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("timeDomainOffset", time_domain_offset);
   j.write_int("timeDomainAllocation", time_domain_alloc);
-  j.write_str("frequencyDomainAllocation", freq_domain_alloc.to_string());
+  j.write_fieldname("frequencyDomainAllocation");
+  freq_domain_alloc.to_json(j);
   j.write_int("antennaPort", ant_port);
   if (dmrs_seq_initization_present) {
     j.write_int("dmrs-SeqInitialization", dmrs_seq_initization);

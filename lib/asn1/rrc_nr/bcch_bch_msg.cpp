@@ -65,7 +65,8 @@ OCUDUASN_CODE mib_s::unpack(cbit_ref& bref)
 void mib_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("systemFrameNumber", sys_frame_num.to_string());
+  j.write_fieldname("systemFrameNumber");
+  sys_frame_num.to_json(j);
   j.write_str("subCarrierSpacingCommon", sub_carrier_spacing_common.to_string());
   j.write_int("ssb-SubcarrierOffset", ssb_subcarrier_offset);
   j.write_str("dmrs-TypeA-Position", dmrs_type_a_position.to_string());
@@ -73,7 +74,8 @@ void mib_s::to_json(json_writer& j) const
   pdcch_cfg_sib1.to_json(j);
   j.write_str("cellBarred", cell_barred.to_string());
   j.write_str("intraFreqReselection", intra_freq_resel.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -134,6 +136,9 @@ void bcch_bch_msg_type_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "bcch_bch_msg_type_c");

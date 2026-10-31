@@ -274,7 +274,7 @@ void srs_pos_rrc_inactive_validity_area_cfg_r18_s::to_json(json_writer& j) const
   j.start_obj();
   j.start_array("srs-PosConfigValidityArea-r18");
   for (const auto& e1 : srs_pos_cfg_validity_area_r18) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   if (srs_pos_cfg_n_ul_r18_present) {
@@ -300,7 +300,7 @@ void srs_pos_rrc_inactive_validity_area_cfg_r18_s::to_json(json_writer& j) const
   if (srs_pos_cfg_validity_area_ext_v1830.is_present()) {
     j.start_array("srs-PosConfigValidityAreaExt-v1830");
     for (const auto& e1 : *srs_pos_cfg_validity_area_ext_v1830) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -470,9 +470,12 @@ OCUDUASN_CODE reestab_ncell_info_s::unpack(cbit_ref& bref)
 void reestab_ncell_info_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("cellIdentity", cell_id.to_string());
-  j.write_str("key-gNodeB-Star", key_g_node_b_star.to_string());
-  j.write_str("shortMAC-I", short_mac_i.to_string());
+  j.write_fieldname("cellIdentity");
+  cell_id.to_json(j);
+  j.write_fieldname("key-gNodeB-Star");
+  key_g_node_b_star.to_json(j);
+  j.write_fieldname("shortMAC-I");
+  short_mac_i.to_json(j);
   j.end_obj();
 }
 
@@ -506,7 +509,8 @@ void reest_info_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("sourcePhysCellId", source_pci);
-  j.write_str("targetCellShortMAC-I", target_cell_short_mac_i.to_string());
+  j.write_fieldname("targetCellShortMAC-I");
+  target_cell_short_mac_i.to_json(j);
   if (add_reestab_info_list.size() > 0) {
     j.start_array("additionalReestabInfoList");
     for (const auto& e1 : add_reestab_info_list) {
@@ -1157,6 +1161,9 @@ void cg_candidate_list_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "cg_candidate_list_s::crit_exts_c_");
@@ -1226,10 +1233,13 @@ void cg_candidate_list_s::crit_exts_c_::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "cg_candidate_list_s::crit_exts_c_::c1_c_");
@@ -2648,6 +2658,9 @@ void cg_cfg_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "cg_cfg_s::crit_exts_c_");
@@ -2717,10 +2730,13 @@ void cg_cfg_s::crit_exts_c_::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "cg_cfg_s::crit_exts_c_::c1_c_");
@@ -2931,6 +2947,9 @@ void ho_cmd_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ho_cmd_s::crit_exts_c_");
@@ -3000,10 +3019,13 @@ void ho_cmd_s::crit_exts_c_::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "ho_cmd_s::crit_exts_c_::c1_c_");
@@ -3275,6 +3297,9 @@ void ho_prep_info_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ho_prep_info_s::crit_exts_c_");
@@ -3344,10 +3369,13 @@ void ho_prep_info_s::crit_exts_c_::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "ho_prep_info_s::crit_exts_c_::c1_c_");
@@ -3675,6 +3703,9 @@ void meas_timing_cfg_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "meas_timing_cfg_s::crit_exts_c_");
@@ -3744,10 +3775,13 @@ void meas_timing_cfg_s::crit_exts_c_::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "meas_timing_cfg_s::crit_exts_c_::c1_c_");
@@ -3884,6 +3918,9 @@ void ue_radio_access_cap_info_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_radio_access_cap_info_s::crit_exts_c_");
@@ -3969,18 +4006,25 @@ void ue_radio_access_cap_info_s::crit_exts_c_::c1_c_::to_json(json_writer& j) co
       c.to_json(j);
       break;
     case types::spare7:
+      j.write_null("spare7");
       break;
     case types::spare6:
+      j.write_null("spare6");
       break;
     case types::spare5:
+      j.write_null("spare5");
       break;
     case types::spare4:
+      j.write_null("spare4");
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "ue_radio_access_cap_info_s::crit_exts_c_::c1_c_");
@@ -4392,6 +4436,9 @@ void ue_radio_paging_info_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_radio_paging_info_s::crit_exts_c_");
@@ -4477,18 +4524,25 @@ void ue_radio_paging_info_s::crit_exts_c_::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare7:
+      j.write_null("spare7");
       break;
     case types::spare6:
+      j.write_null("spare6");
       break;
     case types::spare5:
+      j.write_null("spare5");
       break;
     case types::spare4:
+      j.write_null("spare4");
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "ue_radio_paging_info_s::crit_exts_c_::c1_c_");
@@ -6975,6 +7029,7 @@ void mrb_pdcp_cfg_broadcast_r17_s::hdr_compress_r17_c_::to_json(json_writer& j) 
   j.start_obj();
   switch (type_) {
     case types::not_used:
+      j.write_null("notUsed");
       break;
     case types::rohc:
       j.write_fieldname("rohc");
@@ -7193,7 +7248,8 @@ void mbs_session_info_r17_s::to_json(json_writer& j) const
     j.write_int("mtch-SchedulingInfo-r17", mtch_sched_info_r17);
   }
   if (mtch_neighbour_cell_r17_present) {
-    j.write_str("mtch-NeighbourCell-r17", mtch_neighbour_cell_r17.to_string());
+    j.write_fieldname("mtch-NeighbourCell-r17");
+    mtch_neighbour_cell_r17.to_json(j);
   }
   if (pdsch_cfg_idx_r17_present) {
     j.write_int("pdsch-ConfigIndex-r17", pdsch_cfg_idx_r17);
@@ -7271,6 +7327,7 @@ void mrb_pdcp_cfg_multicast_r18_s::hdr_compress_r18_c_::to_json(json_writer& j) 
   j.start_obj();
   switch (type_) {
     case types::not_used:
+      j.write_null("notUsed");
       break;
     case types::rohc:
       j.write_fieldname("rohc");
@@ -7645,7 +7702,8 @@ void mbs_session_info_multicast_r18_s::to_json(json_writer& j) const
     j.write_int("mtch-SchedulingInfo-r18", mtch_sched_info_r18);
   }
   if (mtch_neighbour_cell_r18_present) {
-    j.write_str("mtch-NeighbourCell-r18", mtch_neighbour_cell_r18.to_string());
+    j.write_fieldname("mtch-NeighbourCell-r18");
+    mtch_neighbour_cell_r18.to_json(j);
   }
   if (pdsch_cfg_idx_r18_present) {
     j.write_int("pdsch-ConfigIndex-r18", pdsch_cfg_idx_r18);
@@ -8018,6 +8076,9 @@ void mbs_broadcast_cfg_r17_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "mbs_broadcast_cfg_r17_s::crit_exts_c_");
@@ -8276,6 +8337,9 @@ void mbs_multicast_cfg_r18_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "mbs_multicast_cfg_r18_s::crit_exts_c_");
@@ -8344,6 +8408,9 @@ void mcch_msg_type_r17_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "mcch_msg_type_r17_c");
@@ -8405,6 +8472,7 @@ void mcch_msg_type_r17_c::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "mcch_msg_type_r17_c::c1_c_");
@@ -8623,6 +8691,9 @@ void multicast_mcch_msg_type_r18_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "multicast_mcch_msg_type_r18_c");
@@ -8684,6 +8755,7 @@ void multicast_mcch_msg_type_r18_c::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "multicast_mcch_msg_type_r18_c::c1_c_");
@@ -10305,7 +10377,8 @@ void trs_res_set_r17_s::to_json(json_writer& j) const
   j.write_int("ssb-Index-r17", ssb_idx_r17);
   j.write_fieldname("periodicityAndOffset-r17");
   periodicity_and_offset_r17.to_json(j);
-  j.write_str("frequencyDomainAllocation-r17", freq_domain_alloc_r17.to_string());
+  j.write_fieldname("frequencyDomainAllocation-r17");
+  freq_domain_alloc_r17.to_json(j);
   j.write_int("indBitID-r17", ind_bit_id_r17);
   j.write_str("nrofResources-r17", nrof_res_r17.to_string());
   j.end_obj();
@@ -10806,7 +10879,8 @@ void trs_res_set_r18_s::to_json(json_writer& j) const
   j.write_int("ssb-Index-r18", ssb_idx_r18);
   j.write_fieldname("periodicityAndOffset-r18");
   periodicity_and_offset_r18.to_json(j);
-  j.write_str("frequencyDomainAllocation-r18", freq_domain_alloc_r18.to_string());
+  j.write_fieldname("frequencyDomainAllocation-r18");
+  freq_domain_alloc_r18.to_json(j);
   j.write_int("indBitID-r18", ind_bit_id_r18);
   j.write_str("nrofResources-r18", nrof_res_r18.to_string());
   j.end_obj();

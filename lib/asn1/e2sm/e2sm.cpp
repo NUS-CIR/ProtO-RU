@@ -101,7 +101,7 @@ OCUDUASN_CODE ran_param_testing_item_s::unpack(cbit_ref& bref)
 void ran_param_testing_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-Type");
   ran_param_type.to_json(j);
   j.end_obj();
@@ -446,7 +446,8 @@ void ran_param_value_c::to_json(json_writer& j) const
       j.write_float("valueReal", c.get<real_s>().value);
       break;
     case types::value_bit_s:
-      j.write_str("valueBitS", c.get<unbounded_bitstring<false, true>>().to_string());
+      j.write_fieldname("valueBitS");
+      c.get<unbounded_bitstring<false, true>>().to_json(j);
       break;
     case types::value_oct_s:
       j.write_str("valueOctS", c.get<unbounded_octstring<true>>().to_string());
@@ -1254,7 +1255,7 @@ OCUDUASN_CODE ran_param_definition_choice_list_item_s::unpack(cbit_ref& bref)
 void ran_param_definition_choice_list_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition_present) {
     j.write_fieldname("ranParameter-Definition");
@@ -1329,7 +1330,7 @@ OCUDUASN_CODE ran_param_definition_choice_structure_item_s::unpack(cbit_ref& bre
 void ran_param_definition_choice_structure_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition_present) {
     j.write_fieldname("ranParameter-Definition");
@@ -1411,7 +1412,7 @@ OCUDUASN_CODE call_process_breakpoint_ran_param_item_s::unpack(cbit_ref& bref)
 void call_process_breakpoint_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -1505,7 +1506,7 @@ OCUDUASN_CODE cell_identif_ran_param_item_s::unpack(cbit_ref& bref)
 void cell_identif_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -1556,7 +1557,7 @@ OCUDUASN_CODE ctrl_action_ran_param_item_s::unpack(cbit_ref& bref)
 void ctrl_action_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -1607,7 +1608,7 @@ OCUDUASN_CODE ctrl_outcome_ran_param_item_s::unpack(cbit_ref& bref)
 void ctrl_outcome_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -1656,7 +1657,7 @@ OCUDUASN_CODE e2sm_rc_action_definition_format1_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_action_definition_format1_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
     ran_param_definition->to_json(j);
@@ -1908,7 +1909,7 @@ OCUDUASN_CODE ran_param_structure_item_s::unpack(cbit_ref& bref)
 void ran_param_structure_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -2068,7 +2069,7 @@ OCUDUASN_CODE ric_policy_action_ran_param_item_s::unpack(cbit_ref& bref)
 void ric_policy_action_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -2282,7 +2283,7 @@ OCUDUASN_CODE e2sm_rc_action_definition_format3_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_action_definition_format3_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
     ran_param_definition->to_json(j);
@@ -2378,7 +2379,7 @@ OCUDUASN_CODE e2sm_rc_action_definition_format4_ranp_item_s::unpack(cbit_ref& br
 void e2sm_rc_action_definition_format4_ranp_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
     ran_param_definition->to_json(j);
@@ -2757,7 +2758,7 @@ OCUDUASN_CODE e2sm_rc_call_process_id_format1_s::unpack(cbit_ref& bref)
 void e2sm_rc_call_process_id_format1_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ric-callProcess-ID", ric_call_process_id);
+  j.write_uint("ric-callProcess-ID", ric_call_process_id);
   j.end_obj();
 }
 
@@ -2968,7 +2969,7 @@ OCUDUASN_CODE ue_group_definition_id_item_s::unpack(cbit_ref& bref)
 void ue_group_definition_id_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   if (lc_or_present) {
@@ -3354,7 +3355,7 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format1_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ctrl_msg_format1_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -3512,7 +3513,7 @@ OCUDUASN_CODE entity_specific_ran_p_ctrl_params_s::unpack(cbit_ref& bref)
 void entity_specific_ran_p_ctrl_params_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -3584,7 +3585,7 @@ OCUDUASN_CODE entity_agnostic_ran_p_ctrl_params_s::unpack(cbit_ref& bref)
 void entity_agnostic_ran_p_ctrl_params_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -3679,7 +3680,7 @@ OCUDUASN_CODE e2sm_rc_ctrl_msg_format4_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ctrl_msg_format4_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_definition_present) {
     j.write_fieldname("ranParameter-Definition");
     ran_param_definition.to_json(j);
@@ -3898,6 +3899,7 @@ void e2sm_rc_ctrl_msg_s::ric_ctrl_msg_formats_c_::to_json(json_writer& j) const
       c.get<e2sm_rc_ctrl_msg_format4_s>().to_json(j);
       break;
     case types::ctrl_msg_format5:
+      j.write_null("controlMessage-Format5");
       break;
     default:
       log_invalid_choice_id(type_, "e2sm_rc_ctrl_msg_s::ric_ctrl_msg_formats_c_");
@@ -4003,7 +4005,7 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format1_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ctrl_outcome_format1_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-value");
   ran_param_value.to_json(j);
   j.end_obj();
@@ -4065,7 +4067,7 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format2_ranp_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ctrl_outcome_format2_ranp_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-value");
   ran_param_value.to_json(j);
   j.end_obj();
@@ -4195,7 +4197,7 @@ OCUDUASN_CODE e2sm_rc_ctrl_outcome_format3_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ctrl_outcome_format3_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -6224,6 +6226,7 @@ void e2sm_rc_event_trigger_s::ric_event_trigger_formats_c_::to_json(json_writer&
       c.get<e2sm_rc_event_trigger_format4_s>().to_json(j);
       break;
     case types::event_trigger_format5:
+      j.write_null("eventTrigger-Format5");
       break;
     default:
       log_invalid_choice_id(type_, "e2sm_rc_event_trigger_s::ric_event_trigger_formats_c_");
@@ -6640,7 +6643,7 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format1_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ind_msg_format1_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -6702,7 +6705,7 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format2_ran_param_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ind_msg_format2_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -7285,7 +7288,7 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format5_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ind_msg_format5_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -7347,7 +7350,7 @@ OCUDUASN_CODE e2sm_rc_ind_msg_format6_ranp_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_ind_msg_format6_ranp_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_fieldname("ranParameter-valueType");
   ran_param_value_type.to_json(j);
   j.end_obj();
@@ -7645,6 +7648,7 @@ void e2sm_rc_ind_msg_s::ric_ind_msg_formats_c_::to_json(json_writer& j) const
       c.get<e2sm_rc_ind_msg_format3_s>().to_json(j);
       break;
     case types::ind_msg_format4:
+      j.write_null("indicationMessage-Format4");
       break;
     case types::ind_msg_format5:
       j.write_fieldname("indicationMessage-Format5");
@@ -7767,7 +7771,7 @@ OCUDUASN_CODE e2sm_rc_query_definition_format1_item_s::unpack(cbit_ref& bref)
 void e2sm_rc_query_definition_format1_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_definition_present) {
     j.write_fieldname("ranParameter-Definition");
     ran_param_definition.to_json(j);
@@ -8024,7 +8028,7 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_params_s::unpack(cbit_ref& bref
 void e2sm_rc_query_outcome_format1_item_params_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_value_type_present) {
     j.write_fieldname("ranParameter-valueType");
     ran_param_value_type.to_json(j);
@@ -8166,7 +8170,7 @@ OCUDUASN_CODE e2sm_rc_query_outcome_format2_item_params_s::unpack(cbit_ref& bref
 void e2sm_rc_query_outcome_format2_item_params_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   if (ran_param_value_type_present) {
     j.write_fieldname("ranParameter-valueType");
     ran_param_value_type.to_json(j);
@@ -8498,7 +8502,7 @@ OCUDUASN_CODE l2_params_ran_param_item_s::unpack(cbit_ref& bref)
 void l2_params_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -8634,7 +8638,7 @@ OCUDUASN_CODE ue_identif_ran_param_item_s::unpack(cbit_ref& bref)
 void ue_identif_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -8782,7 +8786,7 @@ OCUDUASN_CODE report_ran_param_item_s::unpack(cbit_ref& bref)
 void report_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -8924,7 +8928,7 @@ OCUDUASN_CODE insert_ind_ran_param_item_s::unpack(cbit_ref& bref)
 void insert_ind_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -9331,7 +9335,7 @@ OCUDUASN_CODE policy_action_ran_param_item_s::unpack(cbit_ref& bref)
 void policy_action_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -9382,7 +9386,7 @@ OCUDUASN_CODE policy_condition_ran_param_item_s::unpack(cbit_ref& bref)
 void policy_condition_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition.is_present()) {
     j.write_fieldname("ranParameter-Definition");
@@ -9575,7 +9579,7 @@ OCUDUASN_CODE query_ran_param_item_s::unpack(cbit_ref& bref)
 void query_ran_param_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ranParameter-ID", ran_param_id);
+  j.write_uint("ranParameter-ID", ran_param_id);
   j.write_str("ranParameter-name", ran_param_name.to_string());
   if (ran_param_definition_present) {
     j.write_fieldname("ranParameter-Definition");
@@ -9850,6 +9854,7 @@ void e2sm_rc_service_layer_cause_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::ric_request:
+      j.write_null("ricRequest");
       break;
     case types::ric_service:
       j.write_str("ricService", c.get<cause_ri_cservice_e>().to_string());

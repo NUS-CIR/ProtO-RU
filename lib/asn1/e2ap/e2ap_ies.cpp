@@ -627,7 +627,8 @@ void e2node_component_interface_ng_s::to_json(json_writer& j) const
 void gnb_id_choice_c::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("gnb-ID", c.to_string());
+  j.write_fieldname("gnb-ID");
+  c.to_json(j);
   j.end_obj();
 }
 OCUDUASN_CODE gnb_id_choice_c::pack(bit_ref& bref) const
@@ -785,13 +786,16 @@ void enb_id_choice_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::enb_id_macro:
-      j.write_str("enb-ID-macro", c.get<fixed_bitstring<20, false, true>>().to_string());
+      j.write_fieldname("enb-ID-macro");
+      c.get<fixed_bitstring<20, false, true>>().to_json(j);
       break;
     case types::enb_id_shortmacro:
-      j.write_str("enb-ID-shortmacro", c.get<fixed_bitstring<18, false, true>>().to_string());
+      j.write_fieldname("enb-ID-shortmacro");
+      c.get<fixed_bitstring<18, false, true>>().to_json(j);
       break;
     case types::enb_id_longmacro:
-      j.write_str("enb-ID-longmacro", c.get<fixed_bitstring<21, false, true>>().to_string());
+      j.write_fieldname("enb-ID-longmacro");
+      c.get<fixed_bitstring<21, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "enb_id_choice_c");
@@ -1063,7 +1067,7 @@ OCUDUASN_CODE e2node_component_interface_e1_s::unpack(cbit_ref& bref)
 void e2node_component_interface_e1_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("gNB-CU-UP-ID", gnb_cu_up_id);
+  j.write_uint("gNB-CU-UP-ID", gnb_cu_up_id);
   j.end_obj();
 }
 
@@ -1090,7 +1094,7 @@ OCUDUASN_CODE e2node_component_interface_f1_s::unpack(cbit_ref& bref)
 void e2node_component_interface_f1_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("gNB-DU-ID", gnb_du_id);
+  j.write_uint("gNB-DU-ID", gnb_du_id);
   j.end_obj();
 }
 
@@ -1117,7 +1121,7 @@ OCUDUASN_CODE e2node_component_interface_w1_s::unpack(cbit_ref& bref)
 void e2node_component_interface_w1_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ng-eNB-DU-ID", ng_enb_du_id);
+  j.write_uint("ng-eNB-DU-ID", ng_enb_du_id);
   j.end_obj();
 }
 
@@ -1265,16 +1269,20 @@ void enb_id_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::macro_enb_id:
-      j.write_str("macro-eNB-ID", c.get<fixed_bitstring<20, false, true>>().to_string());
+      j.write_fieldname("macro-eNB-ID");
+      c.get<fixed_bitstring<20, false, true>>().to_json(j);
       break;
     case types::home_enb_id:
-      j.write_str("home-eNB-ID", c.get<fixed_bitstring<28, false, true>>().to_string());
+      j.write_fieldname("home-eNB-ID");
+      c.get<fixed_bitstring<28, false, true>>().to_json(j);
       break;
     case types::short_macro_enb_id:
-      j.write_str("short-Macro-eNB-ID", c.get<fixed_bitstring<18, false, true>>().to_string());
+      j.write_fieldname("short-Macro-eNB-ID");
+      c.get<fixed_bitstring<18, false, true>>().to_json(j);
       break;
     case types::long_macro_enb_id:
-      j.write_str("long-Macro-eNB-ID", c.get<fixed_bitstring<21, false, true>>().to_string());
+      j.write_fieldname("long-Macro-eNB-ID");
+      c.get<fixed_bitstring<21, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "enb_id_c");
@@ -1373,7 +1381,8 @@ void global_enb_id_s::to_json(json_writer& j) const
 void en_gnb_id_c::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("gNB-ID", c.to_string());
+  j.write_fieldname("gNB-ID");
+  c.to_json(j);
   j.end_obj();
 }
 OCUDUASN_CODE en_gnb_id_c::pack(bit_ref& bref) const
@@ -1821,10 +1830,10 @@ void global_e2node_gnb_id_s::to_json(json_writer& j) const
     global_en_gnb_id.to_json(j);
   }
   if (gnb_cu_up_id_present) {
-    j.write_int("gNB-CU-UP-ID", gnb_cu_up_id);
+    j.write_uint("gNB-CU-UP-ID", gnb_cu_up_id);
   }
   if (gnb_du_id_present) {
-    j.write_int("gNB-DU-ID", gnb_du_id);
+    j.write_uint("gNB-DU-ID", gnb_du_id);
   }
   j.end_obj();
 }
@@ -1873,10 +1882,10 @@ void global_e2node_en_gnb_id_s::to_json(json_writer& j) const
   j.write_fieldname("global-en-gNB-ID");
   global_en_gnb_id.to_json(j);
   if (en_gnb_cu_up_id_present) {
-    j.write_int("en-gNB-CU-UP-ID", en_gnb_cu_up_id);
+    j.write_uint("en-gNB-CU-UP-ID", en_gnb_cu_up_id);
   }
   if (en_gnb_du_id_present) {
-    j.write_int("en-gNB-DU-ID", en_gnb_du_id);
+    j.write_uint("en-gNB-DU-ID", en_gnb_du_id);
   }
   j.end_obj();
 }
@@ -1929,7 +1938,7 @@ void global_e2node_ng_enb_id_s::to_json(json_writer& j) const
     global_enb_id.to_json(j);
   }
   if (ng_enb_du_id_present) {
-    j.write_int("ngENB-DU-ID", ng_enb_du_id);
+    j.write_uint("ngENB-DU-ID", ng_enb_du_id);
   }
   j.end_obj();
 }
@@ -2178,7 +2187,8 @@ void global_ric_id_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_str("pLMN-Identity", plmn_id.to_string());
-  j.write_str("ric-ID", ric_id.to_string());
+  j.write_fieldname("ric-ID");
+  ric_id.to_json(j);
   j.end_obj();
 }
 
@@ -2701,9 +2711,11 @@ OCUDUASN_CODE tnl_info_s::unpack(cbit_ref& bref)
 void tnl_info_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("tnlAddress", tnl_address.to_string());
+  j.write_fieldname("tnlAddress");
+  tnl_address.to_json(j);
   if (tnl_port_present) {
-    j.write_str("tnlPort", tnl_port.to_string());
+    j.write_fieldname("tnlPort");
+    tnl_port.to_json(j);
   }
   j.end_obj();
 }

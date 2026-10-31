@@ -909,7 +909,7 @@ TEST(asn1_json_writer, setup_release_names_the_setup_array)
   ASSERT_EQ(actual.to_string(), expected.to_string());
 }
 
-TEST(asn1_json_writer, setup_release_release_is_an_empty_object)
+TEST(asn1_json_writer, setup_release_names_the_release_alternative)
 {
   setup_release_c<json_payload_test> sr;
   sr.set_release();
@@ -918,6 +918,49 @@ TEST(asn1_json_writer, setup_release_release_is_an_empty_object)
 
   json_writer expected;
   expected.start_obj();
+  expected.write_null("release");
+  expected.end_obj();
+
+  ASSERT_EQ(actual.to_string(), expected.to_string());
+}
+
+TEST(asn1_json_writer, fixed_size_bit_string_is_a_padded_hex_string)
+{
+  fixed_bitstring<6> bs("000101");
+  json_writer        actual;
+  bs.to_json(actual);
+
+  json_writer expected;
+  expected.write_str("14");
+
+  ASSERT_EQ(actual.to_string(), expected.to_string());
+}
+
+TEST(asn1_json_writer, variable_size_bit_string_writes_value_and_length)
+{
+  bounded_bitstring<1, 160, true> bs("01000000110101");
+  json_writer                     actual;
+  bs.to_json(actual);
+
+  json_writer expected;
+  expected.start_obj();
+  expected.write_str("value", "40d4");
+  expected.write_uint("length", 14);
+  expected.end_obj();
+
+  ASSERT_EQ(actual.to_string(), expected.to_string());
+}
+
+TEST(asn1_json_writer, extensible_fixed_size_bit_string_writes_value_and_length)
+{
+  fixed_bitstring<4, true> bs("1010");
+  json_writer              actual;
+  bs.to_json(actual);
+
+  json_writer expected;
+  expected.start_obj();
+  expected.write_str("value", "a0");
+  expected.write_uint("length", 4);
   expected.end_obj();
 
   ASSERT_EQ(actual.to_string(), expected.to_string());

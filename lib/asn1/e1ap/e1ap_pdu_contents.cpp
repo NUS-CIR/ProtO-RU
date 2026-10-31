@@ -149,26 +149,22 @@ const crit_diagnostics_s& bc_bearer_context_mod_confirm_ies_o::value_c::crit_dia
 }
 void bc_bearer_context_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::bc_bearer_context_to_modify_confirm:
-      j.write_fieldname("BCBearerContextToModifyConfirm");
       c.get<bc_bearer_context_to_modify_confirm_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_mod_confirm_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_mod_confirm_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -312,22 +308,32 @@ OCUDUASN_CODE bc_bearer_context_mod_confirm_ies_container::unpack(cbit_ref& bref
 }
 void bc_bearer_context_mod_confirm_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 163);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   bc_bearer_context_to_modify_confirm.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextModificationFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -465,26 +471,22 @@ const crit_diagnostics_s& bc_bearer_context_mod_fail_ies_o::value_c::crit_diagno
 }
 void bc_bearer_context_mod_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_mod_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_mod_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -627,22 +629,32 @@ OCUDUASN_CODE bc_bearer_context_mod_fail_ies_container::unpack(cbit_ref& bref)
 }
 void bc_bearer_context_mod_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextModificationRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -760,22 +772,19 @@ const bc_bearer_context_to_modify_s& bc_bearer_context_mod_request_ies_o::value_
 }
 void bc_bearer_context_mod_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::bc_bearer_context_to_modify:
-      j.write_fieldname("BCBearerContextToModify");
       c.get<bc_bearer_context_to_modify_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_mod_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_mod_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -899,17 +908,24 @@ OCUDUASN_CODE bc_bearer_context_mod_request_ies_container::unpack(cbit_ref& bref
 }
 void bc_bearer_context_mod_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 160);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   bc_bearer_context_to_modify.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextModificationRequiredIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -1029,22 +1045,19 @@ bc_bearer_context_mod_required_ies_o::value_c::bc_bearer_context_to_modify_requi
 }
 void bc_bearer_context_mod_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::bc_bearer_context_to_modify_required:
-      j.write_fieldname("BCBearerContextToModifyRequired");
       c.get<bc_bearer_context_to_modify_required_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_mod_required_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_mod_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1168,17 +1181,24 @@ OCUDUASN_CODE bc_bearer_context_mod_required_ies_container::unpack(cbit_ref& bre
 }
 void bc_bearer_context_mod_required_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 162);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   bc_bearer_context_to_modify_required.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextModificationResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -1317,26 +1337,22 @@ const crit_diagnostics_s& bc_bearer_context_mod_resp_ies_o::value_c::crit_diagno
 }
 void bc_bearer_context_mod_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::bc_bearer_context_to_modify_resp:
-      j.write_fieldname("BCBearerContextToModifyResponse");
       c.get<bc_bearer_context_to_modify_resp_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_mod_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_mod_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1480,22 +1496,32 @@ OCUDUASN_CODE bc_bearer_context_mod_resp_ies_container::unpack(cbit_ref& bref)
 }
 void bc_bearer_context_mod_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 161);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   bc_bearer_context_to_modify_resp.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextReleaseCommandIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -1613,22 +1639,19 @@ const cause_c& bc_bearer_context_release_cmd_ies_o::value_c::cause() const
 }
 void bc_bearer_context_release_cmd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_release_cmd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_release_cmd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1752,17 +1775,24 @@ OCUDUASN_CODE bc_bearer_context_release_cmd_ies_container::unpack(cbit_ref& bref
 }
 void bc_bearer_context_release_cmd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextReleaseCompleteIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -1881,22 +1911,19 @@ const crit_diagnostics_s& bc_bearer_context_release_complete_ies_o::value_c::cri
 }
 void bc_bearer_context_release_complete_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_release_complete_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_release_complete_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2021,19 +2048,26 @@ OCUDUASN_CODE bc_bearer_context_release_complete_ies_container::unpack(cbit_ref&
 }
 void bc_bearer_context_release_complete_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextReleaseRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -2151,22 +2185,19 @@ const cause_c& bc_bearer_context_release_request_ies_o::value_c::cause() const
 }
 void bc_bearer_context_release_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_release_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_release_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2290,17 +2321,24 @@ OCUDUASN_CODE bc_bearer_context_release_request_ies_container::unpack(cbit_ref& 
 }
 void bc_bearer_context_release_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextSetupFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -2438,26 +2476,22 @@ const crit_diagnostics_s& bc_bearer_context_setup_fail_ies_o::value_c::crit_diag
 }
 void bc_bearer_context_setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2601,24 +2635,34 @@ OCUDUASN_CODE bc_bearer_context_setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void bc_bearer_context_setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
   if (gnb_cu_up_mbs_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 156);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+    j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextSetupRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -2776,30 +2820,25 @@ const mbs_service_area_s& bc_bearer_context_setup_request_ies_o::value_c::mbs_se
 }
 void bc_bearer_context_setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::global_mbs_session_id:
-      j.write_fieldname("GlobalMBSSessionID");
       c.get<global_mbs_session_id_s>().to_json(j);
       break;
     case types::bc_bearer_context_to_setup:
-      j.write_fieldname("BCBearerContextToSetup");
       c.get<bc_bearer_context_to_setup_s>().to_json(j);
       break;
     case types::associated_session_id:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::mbs_service_area:
-      j.write_fieldname("MBS-ServiceArea");
       c.get<mbs_service_area_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2967,27 +3006,40 @@ OCUDUASN_CODE bc_bearer_context_setup_request_ies_container::unpack(cbit_ref& br
 }
 void bc_bearer_context_setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 157);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   global_mbs_session_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 158);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   bc_bearer_context_to_setup.to_json(j);
+  j.end_obj();
   if (associated_session_id_present) {
+    j.start_obj();
     j.write_int("id", 199);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", associated_session_id.to_string());
+    j.write_str("value", associated_session_id.to_string());
+    j.end_obj();
   }
   if (mbs_service_area_present) {
+    j.start_obj();
     j.write_int("id", 200);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     mbs_service_area.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BCBearerContextSetupResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -3126,26 +3178,22 @@ const crit_diagnostics_s& bc_bearer_context_setup_resp_ies_o::value_c::crit_diag
 }
 void bc_bearer_context_setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::bc_bearer_context_to_setup_resp:
-      j.write_fieldname("BCBearerContextToSetupResponse");
       c.get<bc_bearer_context_to_setup_resp_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bc_bearer_context_setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bc_bearer_context_setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3289,22 +3337,32 @@ OCUDUASN_CODE bc_bearer_context_setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void bc_bearer_context_setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 159);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   bc_bearer_context_to_setup_resp.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BearerContextInactivityNotificationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -3422,22 +3480,19 @@ const activity_info_c& bearer_context_inactivity_notif_ies_o::value_c::activity_
 }
 void bearer_context_inactivity_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::activity_info:
-      j.write_fieldname("ActivityInformation");
       c.get<activity_info_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_inactivity_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_inactivity_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3561,17 +3616,24 @@ OCUDUASN_CODE bearer_context_inactivity_notif_ies_container::unpack(cbit_ref& br
 }
 void bearer_context_inactivity_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 24);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   activity_info.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-BearerContextModificationConfirm ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -3612,13 +3674,11 @@ presence_e eutran_bearer_context_mod_confirm_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void eutran_bearer_context_mod_confirm_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("DRB-Confirm-Modified-List-EUTRAN");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_bearer_context_mod_confirm_o::value_c::pack(bit_ref& bref) const
 {
@@ -3677,13 +3737,11 @@ presence_e ng_ran_bearer_context_mod_confirm_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ng_ran_bearer_context_mod_confirm_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("PDU-Session-Resource-Confirm-Modified-List");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_bearer_context_mod_confirm_o::value_c::pack(bit_ref& bref) const
 {
@@ -3809,9 +3867,11 @@ void sys_bearer_context_mod_confirm_c::to_json(json_writer& j) const
   switch (type_) {
     case types::e_utran_bearer_context_mod_confirm:
       j.write_fieldname("e-UTRAN-BearerContextModificationConfirm");
+      c.get<protocol_ie_container_l<eutran_bearer_context_mod_confirm_o>>().to_json(j);
       break;
     case types::ng_ran_bearer_context_mod_confirm:
       j.write_fieldname("nG-RAN-BearerContextModificationConfirm");
+      c.get<protocol_ie_container_l<ng_ran_bearer_context_mod_confirm_o>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -4010,26 +4070,22 @@ const crit_diagnostics_s& bearer_context_mod_confirm_ies_o::value_c::crit_diagno
 }
 void bearer_context_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sys_bearer_context_mod_confirm:
-      j.write_fieldname("System-BearerContextModificationConfirm");
       c.get<sys_bearer_context_mod_confirm_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_mod_confirm_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_mod_confirm_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4176,24 +4232,34 @@ OCUDUASN_CODE bearer_context_mod_confirm_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_mod_confirm_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
   if (sys_bearer_context_mod_confirm_present) {
+    j.start_obj();
     j.write_int("id", 20);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sys_bearer_context_mod_confirm.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BearerContextModificationFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -4331,26 +4397,22 @@ const crit_diagnostics_s& bearer_context_mod_fail_ies_o::value_c::crit_diagnosti
 }
 void bearer_context_mod_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_mod_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_mod_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4494,22 +4556,32 @@ OCUDUASN_CODE bearer_context_mod_fail_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_mod_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-BearerContextModificationRequest ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -4667,39 +4739,37 @@ const fixed_bitstring<32, false, true>& eutran_bearer_context_mod_request_o::val
 }
 void eutran_bearer_context_mod_request_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::drb_to_setup_mod_list_eutran:
-      j.start_array("DRB-To-Setup-Mod-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_to_setup_mod_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_to_modify_list_eutran:
-      j.start_array("DRB-To-Modify-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_to_modify_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_to_rem_list_eutran:
-      j.start_array("DRB-To-Remove-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_to_rem_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sub_profile_id_for_rfp:
-      j.write_int("INTEGER (1..256,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::add_rrm_prio_idx:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<32, false, true>>().to_string());
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "eutran_bearer_context_mod_request_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_bearer_context_mod_request_o::value_c::pack(bit_ref& bref) const
 {
@@ -4870,45 +4940,56 @@ OCUDUASN_CODE eutran_bearer_context_mod_request_container::unpack(cbit_ref& bref
 }
 void eutran_bearer_context_mod_request_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (drb_to_setup_mod_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 51);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_to_setup_mod_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drb_to_modify_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 33);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_to_modify_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drb_to_rem_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 34);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_to_rem_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sub_profile_id_for_rfp_present) {
+    j.start_obj();
     j.write_int("id", 83);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sub_profile_id_for_rfp);
+    j.write_int("value", sub_profile_id_for_rfp);
+    j.end_obj();
   }
   if (add_rrm_prio_idx_present) {
+    j.start_obj();
     j.write_int("id", 84);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", add_rrm_prio_idx.to_string());
+    j.write_fieldname("value");
+    add_rrm_prio_idx.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // NG-RAN-BearerContextModificationRequest ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -5028,24 +5109,23 @@ const pdu_session_res_to_rem_list_l& ng_ran_bearer_context_mod_request_o::value_
 }
 void ng_ran_bearer_context_mod_request_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::pdu_session_res_to_setup_mod_list:
-      j.start_array("PDU-Session-Resource-To-Setup-Mod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_to_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_to_modify_list:
-      j.start_array("PDU-Session-Resource-To-Modify-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_to_modify_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_to_rem_list:
-      j.start_array("PDU-Session-Resource-To-Remove-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_to_rem_list_l>()) {
         e1.to_json(j);
       }
@@ -5054,7 +5134,6 @@ void ng_ran_bearer_context_mod_request_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ng_ran_bearer_context_mod_request_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_bearer_context_mod_request_o::value_c::pack(bit_ref& bref) const
 {
@@ -5177,35 +5256,41 @@ OCUDUASN_CODE ng_ran_bearer_context_mod_request_container::unpack(cbit_ref& bref
 }
 void ng_ran_bearer_context_mod_request_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (pdu_session_res_to_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 56);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_to_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pdu_session_res_to_modify_list_present) {
+    j.start_obj();
     j.write_int("id", 43);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_to_modify_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pdu_session_res_to_rem_list_present) {
+    j.start_obj();
     j.write_int("id", 44);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_to_rem_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // System-BearerContextModificationRequest ::= CHOICE
@@ -5852,85 +5937,81 @@ const uint32_t& bearer_context_mod_request_ies_o::value_c::sdt_data_size_thres()
 }
 void bearer_context_mod_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::security_info:
-      j.write_fieldname("SecurityInformation");
       c.get<security_info_s>().to_json(j);
       break;
     case types::ue_dl_aggr_max_bit_rate:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::ue_dl_max_integrity_protected_data_rate:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::bearer_context_status_change:
-      j.write_str("BearerContextStatusChange", c.get<bearer_context_status_change_e>().to_string());
+      j.write_str(c.get<bearer_context_status_change_e>().to_string());
       break;
     case types::new_ul_tnl_info_required:
-      j.write_str("New-UL-TNL-Information-Required", "required");
+      j.write_str("required");
       break;
     case types::ue_inactivity_timer:
-      j.write_int("INTEGER (1..7200,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::data_discard_required:
-      j.write_str("DataDiscardRequired", "required");
+      j.write_str("required");
       break;
     case types::sys_bearer_context_mod_request:
-      j.write_fieldname("System-BearerContextModificationRequest");
       c.get<sys_bearer_context_mod_request_c>().to_json(j);
       break;
     case types::ran_ue_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     case types::gnb_du_id:
-      j.write_int("INTEGER (0..68719476735)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::activity_notif_level:
-      j.write_str("ActivityNotificationLevel", c.get<activity_notif_level_e>().to_string());
+      j.write_str(c.get<activity_notif_level_e>().to_string());
       break;
     case types::mdt_polluted_meas_ind:
-      j.write_str("MDTPollutedMeasurementIndicator", c.get<mdt_polluted_meas_ind_e>().to_string());
+      j.write_str(c.get<mdt_polluted_meas_ind_e>().to_string());
       break;
     case types::ue_slice_max_bit_rate_list:
-      j.start_array("UESliceMaximumBitRateList");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_slice_max_bit_rate_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::scg_activation_status:
-      j.write_str("SCGActivationStatus", c.get<scg_activation_status_e>().to_string());
+      j.write_str(c.get<scg_activation_status_e>().to_string());
       break;
     case types::sdt_continue_rohc:
-      j.write_str("SDTContinueROHC", "true");
+      j.write_str("true");
       break;
     case types::management_based_mdt_plmn_mod_list:
-      j.start_array("MDTPLMNModificationList");
+      j.start_array("");
       for (const auto& e1 : c.get<mdt_plmn_mod_list_l>()) {
         j.write_str(e1.to_string());
       }
       j.end_array();
       break;
     case types::inactivity_info_request:
-      j.write_str("InactivityInformationRequest", "true");
+      j.write_str("true");
       break;
     case types::mt_sdt_info_request:
-      j.write_str("MT-SDT-Information-Request", "true");
+      j.write_str("true");
       break;
     case types::sdt_data_size_thres:
-      j.write_int("INTEGER (1..192000,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_mod_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_mod_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6419,117 +6500,161 @@ OCUDUASN_CODE bearer_context_mod_request_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_mod_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
   if (security_info_present) {
+    j.start_obj();
     j.write_int("id", 13);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     security_info.to_json(j);
+    j.end_obj();
   }
   if (ue_dl_aggr_max_bit_rate_present) {
+    j.start_obj();
     j.write_int("id", 14);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ue_dl_aggr_max_bit_rate);
+    j.write_uint("value", ue_dl_aggr_max_bit_rate);
+    j.end_obj();
   }
   if (ue_dl_max_integrity_protected_data_rate_present) {
+    j.start_obj();
     j.write_int("id", 66);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ue_dl_max_integrity_protected_data_rate);
+    j.write_uint("value", ue_dl_max_integrity_protected_data_rate);
+    j.end_obj();
   }
   if (bearer_context_status_change_present) {
+    j.start_obj();
     j.write_int("id", 17);
     j.write_str("criticality", "reject");
-    j.write_str("Value", bearer_context_status_change.to_string());
+    j.write_str("value", bearer_context_status_change.to_string());
+    j.end_obj();
   }
   if (new_ul_tnl_info_required_present) {
+    j.start_obj();
     j.write_int("id", 26);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "required");
+    j.write_str("value", "required");
+    j.end_obj();
   }
   if (ue_inactivity_timer_present) {
+    j.start_obj();
     j.write_int("id", 59);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ue_inactivity_timer);
+    j.write_int("value", ue_inactivity_timer);
+    j.end_obj();
   }
   if (data_discard_required_present) {
+    j.start_obj();
     j.write_int("id", 70);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "required");
+    j.write_str("value", "required");
+    j.end_obj();
   }
   if (sys_bearer_context_mod_request_present) {
+    j.start_obj();
     j.write_int("id", 18);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     sys_bearer_context_mod_request.to_json(j);
+    j.end_obj();
   }
   if (ran_ue_id_present) {
+    j.start_obj();
     j.write_int("id", 76);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ran_ue_id.to_string());
+    j.write_str("value", ran_ue_id.to_string());
+    j.end_obj();
   }
   if (gnb_du_id_present) {
+    j.start_obj();
     j.write_int("id", 77);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_du_id);
+    j.write_uint("value", gnb_du_id);
+    j.end_obj();
   }
   if (activity_notif_level_present) {
+    j.start_obj();
     j.write_int("id", 23);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", activity_notif_level.to_string());
+    j.write_str("value", activity_notif_level.to_string());
+    j.end_obj();
   }
   if (mdt_polluted_meas_ind_present) {
+    j.start_obj();
     j.write_int("id", 146);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", mdt_polluted_meas_ind.to_string());
+    j.write_str("value", mdt_polluted_meas_ind.to_string());
+    j.end_obj();
   }
   if (ue_slice_max_bit_rate_list_present) {
+    j.start_obj();
     j.write_int("id", 150);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_slice_max_bit_rate_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (scg_activation_status_present) {
+    j.start_obj();
     j.write_int("id", 154);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", scg_activation_status.to_string());
+    j.write_str("value", scg_activation_status.to_string());
+    j.end_obj();
   }
   if (sdt_continue_rohc_present) {
+    j.start_obj();
     j.write_int("id", 174);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (management_based_mdt_plmn_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 178);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : management_based_mdt_plmn_mod_list) {
       j.write_str(e1.to_string());
     }
     j.end_array();
+    j.end_obj();
   }
   if (inactivity_info_request_present) {
+    j.start_obj();
     j.write_int("id", 187);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (mt_sdt_info_request_present) {
+    j.start_obj();
     j.write_int("id", 195);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (sdt_data_size_thres_present) {
+    j.start_obj();
     j.write_int("id", 196);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sdt_data_size_thres);
+    j.write_int("value", sdt_data_size_thres);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-BearerContextModificationRequired ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -6630,17 +6755,16 @@ eutran_bearer_context_mod_required_o::value_c::drb_required_to_rem_list_eutran()
 }
 void eutran_bearer_context_mod_required_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::drb_required_to_modify_list_eutran:
-      j.start_array("DRB-Required-To-Modify-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_required_to_modify_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_required_to_rem_list_eutran:
-      j.start_array("DRB-Required-To-Remove-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_required_to_rem_list_eutran_l>()) {
         e1.to_json(j);
       }
@@ -6649,7 +6773,6 @@ void eutran_bearer_context_mod_required_o::value_c::to_json(json_writer& j) cons
     default:
       log_invalid_choice_id(type_, "eutran_bearer_context_mod_required_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_bearer_context_mod_required_o::value_c::pack(bit_ref& bref) const
 {
@@ -6751,26 +6874,30 @@ OCUDUASN_CODE eutran_bearer_context_mod_required_container::unpack(cbit_ref& bre
 }
 void eutran_bearer_context_mod_required_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (drb_required_to_modify_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 35);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_required_to_modify_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drb_required_to_rem_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 36);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_required_to_rem_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // NG-RAN-BearerContextModificationRequired ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -6870,17 +6997,16 @@ const pdu_session_res_to_rem_list_l& ng_ran_bearer_context_mod_required_o::value
 }
 void ng_ran_bearer_context_mod_required_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::pdu_session_res_required_to_modify_list:
-      j.start_array("PDU-Session-Resource-Required-To-Modify-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_required_to_modify_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_to_rem_list:
-      j.start_array("PDU-Session-Resource-To-Remove-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_to_rem_list_l>()) {
         e1.to_json(j);
       }
@@ -6889,7 +7015,6 @@ void ng_ran_bearer_context_mod_required_o::value_c::to_json(json_writer& j) cons
     default:
       log_invalid_choice_id(type_, "ng_ran_bearer_context_mod_required_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_bearer_context_mod_required_o::value_c::pack(bit_ref& bref) const
 {
@@ -6991,26 +7116,30 @@ OCUDUASN_CODE ng_ran_bearer_context_mod_required_container::unpack(cbit_ref& bre
 }
 void ng_ran_bearer_context_mod_required_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (pdu_session_res_required_to_modify_list_present) {
+    j.start_obj();
     j.write_int("id", 45);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_required_to_modify_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pdu_session_res_to_rem_list_present) {
+    j.start_obj();
     j.write_int("id", 44);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_to_rem_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // System-BearerContextModificationRequired ::= CHOICE
@@ -7297,22 +7426,19 @@ bearer_context_mod_required_ies_o::value_c::sys_bearer_context_mod_required() co
 }
 void bearer_context_mod_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sys_bearer_context_mod_required:
-      j.write_fieldname("System-BearerContextModificationRequired");
       c.get<sys_bearer_context_mod_required_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_mod_required_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_mod_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7437,17 +7563,24 @@ OCUDUASN_CODE bearer_context_mod_required_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_mod_required_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 21);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   sys_bearer_context_mod_required.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-BearerContextModificationResponse ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -7606,38 +7739,37 @@ const retainability_meass_info_l& eutran_bearer_context_mod_resp_o::value_c::ret
 }
 void eutran_bearer_context_mod_resp_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::drb_setup_mod_list_eutran:
-      j.start_array("DRB-Setup-Mod-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_setup_mod_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_failed_mod_list_eutran:
-      j.start_array("DRB-Failed-Mod-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_failed_mod_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_modified_list_eutran:
-      j.start_array("DRB-Modified-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_modified_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_failed_to_modify_list_eutran:
-      j.start_array("DRB-Failed-To-Modify-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_failed_to_modify_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::retainability_meass_info:
-      j.start_array("RetainabilityMeasurementsInfo");
+      j.start_array("");
       for (const auto& e1 : c.get<retainability_meass_info_l>()) {
         e1.to_json(j);
       }
@@ -7646,7 +7778,6 @@ void eutran_bearer_context_mod_resp_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "eutran_bearer_context_mod_resp_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_bearer_context_mod_resp_o::value_c::pack(bit_ref& bref) const
 {
@@ -7809,53 +7940,63 @@ OCUDUASN_CODE eutran_bearer_context_mod_resp_container::unpack(cbit_ref& bref)
 }
 void eutran_bearer_context_mod_resp_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (drb_setup_mod_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 52);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_setup_mod_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drb_failed_mod_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 53);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_failed_mod_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drb_modified_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 39);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_modified_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drb_failed_to_modify_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 40);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_failed_to_modify_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (retainability_meass_info_present) {
+    j.start_obj();
     j.write_int("id", 85);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : retainability_meass_info) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // NG-RAN-BearerContextModificationResponse ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -8017,38 +8158,37 @@ const retainability_meass_info_l& ng_ran_bearer_context_mod_resp_o::value_c::ret
 }
 void ng_ran_bearer_context_mod_resp_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::pdu_session_res_setup_mod_list:
-      j.start_array("PDU-Session-Resource-Setup-Mod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_failed_mod_list:
-      j.start_array("PDU-Session-Resource-Failed-Mod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_failed_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_modified_list:
-      j.start_array("PDU-Session-Resource-Modified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_failed_to_modify_list:
-      j.start_array("PDU-Session-Resource-Failed-To-Modify-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_failed_to_modify_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::retainability_meass_info:
-      j.start_array("RetainabilityMeasurementsInfo");
+      j.start_array("");
       for (const auto& e1 : c.get<retainability_meass_info_l>()) {
         e1.to_json(j);
       }
@@ -8057,7 +8197,6 @@ void ng_ran_bearer_context_mod_resp_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ng_ran_bearer_context_mod_resp_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_bearer_context_mod_resp_o::value_c::pack(bit_ref& bref) const
 {
@@ -8220,53 +8359,63 @@ OCUDUASN_CODE ng_ran_bearer_context_mod_resp_container::unpack(cbit_ref& bref)
 }
 void ng_ran_bearer_context_mod_resp_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (pdu_session_res_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 54);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pdu_session_res_failed_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 55);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_failed_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pdu_session_res_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 48);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pdu_session_res_failed_to_modify_list_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_failed_to_modify_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (retainability_meass_info_present) {
+    j.start_obj();
     j.write_int("id", 85);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : retainability_meass_info) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // System-BearerContextModificationResponse ::= CHOICE
@@ -8588,29 +8737,25 @@ const uint16_t& bearer_context_mod_resp_ies_o::value_c::ue_inactivity_info() con
 }
 void bearer_context_mod_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sys_bearer_context_mod_resp:
-      j.write_fieldname("System-BearerContextModificationResponse");
       c.get<sys_bearer_context_mod_resp_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::ue_inactivity_info:
-      j.write_int("INTEGER (1..7200,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_mod_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_mod_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8777,29 +8922,41 @@ OCUDUASN_CODE bearer_context_mod_resp_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_mod_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
   if (sys_bearer_context_mod_resp_present) {
+    j.start_obj();
     j.write_int("id", 19);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sys_bearer_context_mod_resp.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (ue_inactivity_info_present) {
+    j.start_obj();
     j.write_int("id", 188);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", ue_inactivity_info);
+    j.write_int("value", ue_inactivity_info);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BearerContextReleaseCommandIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -8917,22 +9074,19 @@ const cause_c& bearer_context_release_cmd_ies_o::value_c::cause() const
 }
 void bearer_context_release_cmd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_release_cmd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_release_cmd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9056,17 +9210,24 @@ OCUDUASN_CODE bearer_context_release_cmd_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_release_cmd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // BearerContextReleaseCompleteIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -9204,20 +9365,18 @@ const retainability_meass_info_l& bearer_context_release_complete_ies_o::value_c
 }
 void bearer_context_release_complete_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::retainability_meass_info:
-      j.start_array("RetainabilityMeasurementsInfo");
+      j.start_array("");
       for (const auto& e1 : c.get<retainability_meass_info_l>()) {
         e1.to_json(j);
       }
@@ -9226,7 +9385,6 @@ void bearer_context_release_complete_ies_o::value_c::to_json(json_writer& j) con
     default:
       log_invalid_choice_id(type_, "bearer_context_release_complete_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_release_complete_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9371,28 +9529,37 @@ OCUDUASN_CODE bearer_context_release_complete_ies_container::unpack(cbit_ref& br
 }
 void bearer_context_release_complete_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (retainability_meass_info_present) {
+    j.start_obj();
     j.write_int("id", 85);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : retainability_meass_info) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // BearerContextReleaseRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -9530,29 +9697,26 @@ const cause_c& bearer_context_release_request_ies_o::value_c::cause() const
 }
 void bearer_context_release_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::drb_status_list:
-      j.start_array("DRB-Status-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_status_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_release_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_release_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9695,26 +9859,35 @@ OCUDUASN_CODE bearer_context_release_request_ies_container::unpack(cbit_ref& bre
 }
 void bearer_context_release_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
   if (drb_status_list_present) {
+    j.start_obj();
     j.write_int("id", 22);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_status_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // BearerContextSetupFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -9852,26 +10025,22 @@ const crit_diagnostics_s& bearer_context_setup_fail_ies_o::value_c::crit_diagnos
 }
 void bearer_context_setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10016,24 +10185,34 @@ OCUDUASN_CODE bearer_context_setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
   if (gnb_cu_up_ue_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 3);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+    j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-BearerContextSetupRequest ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -10151,25 +10330,23 @@ const fixed_bitstring<32, false, true>& eutran_bearer_context_setup_request_o::v
 }
 void eutran_bearer_context_setup_request_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::drb_to_setup_list_eutran:
-      j.start_array("DRB-To-Setup-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_to_setup_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sub_profile_id_for_rfp:
-      j.write_int("INTEGER (1..256,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::add_rrm_prio_idx:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<32, false, true>>().to_string());
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "eutran_bearer_context_setup_request_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_bearer_context_setup_request_o::value_c::pack(bit_ref& bref) const
 {
@@ -10303,25 +10480,32 @@ OCUDUASN_CODE eutran_bearer_context_setup_request_container::unpack(cbit_ref& br
 }
 void eutran_bearer_context_setup_request_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 32);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : drb_to_setup_list_eutran) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (sub_profile_id_for_rfp_present) {
+    j.start_obj();
     j.write_int("id", 83);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sub_profile_id_for_rfp);
+    j.write_int("value", sub_profile_id_for_rfp);
+    j.end_obj();
   }
   if (add_rrm_prio_idx_present) {
+    j.start_obj();
     j.write_int("id", 84);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", add_rrm_prio_idx.to_string());
+    j.write_fieldname("value");
+    add_rrm_prio_idx.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // NG-RAN-BearerContextSetupRequest ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -10362,13 +10546,11 @@ presence_e ng_ran_bearer_context_setup_request_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void ng_ran_bearer_context_setup_request_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("PDU-Session-Resource-To-Setup-List");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_bearer_context_setup_request_o::value_c::pack(bit_ref& bref) const
 {
@@ -10498,6 +10680,7 @@ void sys_bearer_context_setup_request_c::to_json(json_writer& j) const
       break;
     case types::ng_ran_bearer_context_setup_request:
       j.write_fieldname("nG-RAN-BearerContextSetupRequest");
+      c.get<protocol_ie_container_l<ng_ran_bearer_context_setup_request_o>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -11078,93 +11261,87 @@ const uint32_t& bearer_context_setup_request_ies_o::value_c::sdt_data_size_thres
 }
 void bearer_context_setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::security_info:
-      j.write_fieldname("SecurityInformation");
       c.get<security_info_s>().to_json(j);
       break;
     case types::ue_dl_aggr_max_bit_rate:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::ue_dl_max_integrity_protected_data_rate:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::serving_plmn:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<3, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<3, true>>().to_string());
       break;
     case types::activity_notif_level:
-      j.write_str("ActivityNotificationLevel", c.get<activity_notif_level_e>().to_string());
+      j.write_str(c.get<activity_notif_level_e>().to_string());
       break;
     case types::ue_inactivity_timer:
-      j.write_int("INTEGER (1..7200,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::bearer_context_status_change:
-      j.write_str("BearerContextStatusChange", c.get<bearer_context_status_change_e>().to_string());
+      j.write_str(c.get<bearer_context_status_change_e>().to_string());
       break;
     case types::sys_bearer_context_setup_request:
-      j.write_fieldname("System-BearerContextSetupRequest");
       c.get<sys_bearer_context_setup_request_c>().to_json(j);
       break;
     case types::ran_ue_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     case types::gnb_du_id:
-      j.write_int("INTEGER (0..68719476735)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::trace_activation:
-      j.write_fieldname("TraceActivation");
       c.get<trace_activation_s>().to_json(j);
       break;
     case types::npn_context_info:
-      j.write_fieldname("NPNContextInfo");
       c.get<npn_context_info_c>().to_json(j);
       break;
     case types::management_based_mdt_plmn_list:
-      j.start_array("MDTPLMNList");
+      j.start_array("");
       for (const auto& e1 : c.get<mdt_plmn_list_l>()) {
         j.write_str(e1.to_string());
       }
       j.end_array();
       break;
     case types::cho_initiation:
-      j.write_str("CHOInitiation", "true");
+      j.write_str("true");
       break;
     case types::add_ho_info:
-      j.write_str("AdditionalHandoverInfo", "discard-pdpc-SN");
+      j.write_str("discard-pdpc-SN");
       break;
     case types::direct_forwarding_path_availability:
-      j.write_str("DirectForwardingPathAvailability", c.get<direct_forwarding_path_availability_e>().to_string());
+      j.write_str(c.get<direct_forwarding_path_availability_e>().to_string());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::mdt_polluted_meas_ind:
-      j.write_str("MDTPollutedMeasurementIndicator", c.get<mdt_polluted_meas_ind_e>().to_string());
+      j.write_str(c.get<mdt_polluted_meas_ind_e>().to_string());
       break;
     case types::ue_slice_max_bit_rate_list:
-      j.start_array("UESliceMaximumBitRateList");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_slice_max_bit_rate_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::scg_activation_status:
-      j.write_str("SCGActivationStatus", c.get<scg_activation_status_e>().to_string());
+      j.write_str(c.get<scg_activation_status_e>().to_string());
       break;
     case types::mt_sdt_info_request:
-      j.write_str("MT-SDT-Information-Request", "true");
+      j.write_str("true");
       break;
     case types::sdt_data_size_thres:
-      j.write_int("INTEGER (1..192000,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11689,119 +11866,169 @@ OCUDUASN_CODE bearer_context_setup_request_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 13);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   security_info.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 14);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ue_dl_aggr_max_bit_rate);
+  j.write_uint("value", ue_dl_aggr_max_bit_rate);
+  j.end_obj();
   if (ue_dl_max_integrity_protected_data_rate_present) {
+    j.start_obj();
     j.write_int("id", 66);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ue_dl_max_integrity_protected_data_rate);
+    j.write_uint("value", ue_dl_max_integrity_protected_data_rate);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 58);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", serving_plmn.to_string());
+  j.write_str("value", serving_plmn.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 23);
   j.write_str("criticality", "reject");
-  j.write_str("Value", activity_notif_level.to_string());
+  j.write_str("value", activity_notif_level.to_string());
+  j.end_obj();
   if (ue_inactivity_timer_present) {
+    j.start_obj();
     j.write_int("id", 59);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ue_inactivity_timer);
+    j.write_int("value", ue_inactivity_timer);
+    j.end_obj();
   }
   if (bearer_context_status_change_present) {
+    j.start_obj();
     j.write_int("id", 17);
     j.write_str("criticality", "reject");
-    j.write_str("Value", bearer_context_status_change.to_string());
+    j.write_str("value", bearer_context_status_change.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 15);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   sys_bearer_context_setup_request.to_json(j);
+  j.end_obj();
   if (ran_ue_id_present) {
+    j.start_obj();
     j.write_int("id", 76);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ran_ue_id.to_string());
+    j.write_str("value", ran_ue_id.to_string());
+    j.end_obj();
   }
   if (gnb_du_id_present) {
+    j.start_obj();
     j.write_int("id", 77);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_du_id);
+    j.write_uint("value", gnb_du_id);
+    j.end_obj();
   }
   if (trace_activation_present) {
+    j.start_obj();
     j.write_int("id", 81);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     trace_activation.to_json(j);
+    j.end_obj();
   }
   if (npn_context_info_present) {
+    j.start_obj();
     j.write_int("id", 111);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     npn_context_info.to_json(j);
+    j.end_obj();
   }
   if (management_based_mdt_plmn_list_present) {
+    j.start_obj();
     j.write_int("id", 113);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : management_based_mdt_plmn_list) {
       j.write_str(e1.to_string());
     }
     j.end_array();
+    j.end_obj();
   }
   if (cho_initiation_present) {
+    j.start_obj();
     j.write_int("id", 121);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (add_ho_info_present) {
+    j.start_obj();
     j.write_int("id", 134);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "discard-pdpc-SN");
+    j.write_str("value", "discard-pdpc-SN");
+    j.end_obj();
   }
   if (direct_forwarding_path_availability_present) {
+    j.start_obj();
     j.write_int("id", 139);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", direct_forwarding_path_availability.to_string());
+    j.write_str("value", direct_forwarding_path_availability.to_string());
+    j.end_obj();
   }
   if (gnb_cu_up_ue_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 3);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+    j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+    j.end_obj();
   }
   if (mdt_polluted_meas_ind_present) {
+    j.start_obj();
     j.write_int("id", 146);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", mdt_polluted_meas_ind.to_string());
+    j.write_str("value", mdt_polluted_meas_ind.to_string());
+    j.end_obj();
   }
   if (ue_slice_max_bit_rate_list_present) {
+    j.start_obj();
     j.write_int("id", 150);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_slice_max_bit_rate_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (scg_activation_status_present) {
+    j.start_obj();
     j.write_int("id", 154);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", scg_activation_status.to_string());
+    j.write_str("value", scg_activation_status.to_string());
+    j.end_obj();
   }
   if (mt_sdt_info_request_present) {
+    j.start_obj();
     j.write_int("id", 195);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (sdt_data_size_thres_present) {
+    j.start_obj();
     j.write_int("id", 196);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sdt_data_size_thres);
+    j.write_int("value", sdt_data_size_thres);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-BearerContextSetupResponse ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -11899,17 +12126,16 @@ const drb_failed_list_eutran_l& eutran_bearer_context_setup_resp_o::value_c::drb
 }
 void eutran_bearer_context_setup_resp_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::drb_setup_list_eutran:
-      j.start_array("DRB-Setup-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_setup_list_eutran_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drb_failed_list_eutran:
-      j.start_array("DRB-Failed-List-EUTRAN");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_failed_list_eutran_l>()) {
         e1.to_json(j);
       }
@@ -11918,7 +12144,6 @@ void eutran_bearer_context_setup_resp_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "eutran_bearer_context_setup_resp_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_bearer_context_setup_resp_o::value_c::pack(bit_ref& bref) const
 {
@@ -12025,24 +12250,28 @@ OCUDUASN_CODE eutran_bearer_context_setup_resp_container::unpack(cbit_ref& bref)
 }
 void eutran_bearer_context_setup_resp_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 37);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : drb_setup_list_eutran) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (drb_failed_list_eutran_present) {
+    j.start_obj();
     j.write_int("id", 38);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drb_failed_list_eutran) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // NG-RAN-BearerContextSetupResponse ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -12140,17 +12369,16 @@ const pdu_session_res_failed_list_l& ng_ran_bearer_context_setup_resp_o::value_c
 }
 void ng_ran_bearer_context_setup_resp_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::pdu_session_res_setup_list:
-      j.start_array("PDU-Session-Resource-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pdu_session_res_failed_list:
-      j.start_array("PDU-Session-Resource-Failed-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_failed_list_l>()) {
         e1.to_json(j);
       }
@@ -12159,7 +12387,6 @@ void ng_ran_bearer_context_setup_resp_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ng_ran_bearer_context_setup_resp_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_bearer_context_setup_resp_o::value_c::pack(bit_ref& bref) const
 {
@@ -12266,24 +12493,28 @@ OCUDUASN_CODE ng_ran_bearer_context_setup_resp_container::unpack(cbit_ref& bref)
 }
 void ng_ran_bearer_context_setup_resp_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 46);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : pdu_session_res_setup_list) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (pdu_session_res_failed_list_present) {
+    j.start_obj();
     j.write_int("id", 47);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_res_failed_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // System-BearerContextSetupResponse ::= CHOICE
@@ -12587,26 +12818,22 @@ const crit_diagnostics_s& bearer_context_setup_resp_ies_o::value_c::crit_diagnos
 }
 void bearer_context_setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sys_bearer_context_setup_resp:
-      j.write_fieldname("System-BearerContextSetupResponse");
       c.get<sys_bearer_context_setup_resp_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "bearer_context_setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE bearer_context_setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -12752,22 +12979,32 @@ OCUDUASN_CODE bearer_context_setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void bearer_context_setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 16);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   sys_bearer_context_setup_resp.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // CellTrafficTraceIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -12946,30 +13183,28 @@ const visible_string<0, MAX_ASN_STRING_LENGTH, false, true>& cell_traffic_trace_
 }
 void cell_traffic_trace_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::trace_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     case types::trace_collection_entity_ip_address:
-      j.write_str("BIT STRING", c.get<bounded_bitstring<1, 160, true, true>>().to_string());
+      c.get<bounded_bitstring<1, 160, true, true>>().to_json(j);
       break;
     case types::privacy_ind:
-      j.write_str("PrivacyIndicator", c.get<privacy_ind_e>().to_string());
+      j.write_str(c.get<privacy_ind_e>().to_string());
       break;
     case types::ur_iaddress:
-      j.write_str("VisibleString", c.get<visible_string<0, MAX_ASN_STRING_LENGTH, false, true>>().to_string());
+      j.write_str(c.get<visible_string<0, MAX_ASN_STRING_LENGTH, false, true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "cell_traffic_trace_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE cell_traffic_trace_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13154,30 +13389,43 @@ OCUDUASN_CODE cell_traffic_trace_ies_container::unpack(cbit_ref& bref)
 }
 void cell_traffic_trace_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 82);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", trace_id.to_string());
+  j.write_str("value", trace_id.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 114);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", trace_collection_entity_ip_address.to_string());
+  j.write_fieldname("value");
+  trace_collection_entity_ip_address.to_json(j);
+  j.end_obj();
   if (privacy_ind_present) {
+    j.start_obj();
     j.write_int("id", 115);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", privacy_ind.to_string());
+    j.write_str("value", privacy_ind.to_string());
+    j.end_obj();
   }
   if (ur_iaddress_present) {
+    j.start_obj();
     j.write_int("id", 117);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ur_iaddress.to_string());
+    j.write_str("value", ur_iaddress.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // DLDataNotificationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -13355,35 +13603,32 @@ const sdt_data_size_thres_crossed_e& dl_data_notif_ies_o::value_c::sdt_data_size
 }
 void dl_data_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::ppi:
-      j.write_int("INTEGER (0..7,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::pdu_session_to_notify_list:
-      j.start_array("PDU-Session-To-Notify-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_to_notify_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::mt_sdt_info:
-      j.write_fieldname("MT-SDT-Information");
       c.get<mt_sdt_info_s>().to_json(j);
       break;
     case types::sdt_data_size_thres_crossed:
-      j.write_str("SDT-data-size-threshold-Crossed", "true");
+      j.write_str("true");
       break;
     default:
       log_invalid_choice_id(type_, "dl_data_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE dl_data_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13570,38 +13815,51 @@ OCUDUASN_CODE dl_data_notif_ies_container::unpack(cbit_ref& bref)
 }
 void dl_data_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
   if (ppi_present) {
+    j.start_obj();
     j.write_int("id", 63);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", ppi);
+    j.write_int("value", ppi);
+    j.end_obj();
   }
   if (pdu_session_to_notify_list_present) {
+    j.start_obj();
     j.write_int("id", 67);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pdu_session_to_notify_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (mt_sdt_info_present) {
+    j.start_obj();
     j.write_int("id", 194);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     mt_sdt_info.to_json(j);
+    j.end_obj();
   }
   if (sdt_data_size_thres_crossed_present) {
+    j.start_obj();
     j.write_int("id", 197);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // DataUsageReportIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -13719,16 +13977,15 @@ const data_usage_report_list_l& data_usage_report_ies_o::value_c::data_usage_rep
 }
 void data_usage_report_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::data_usage_report_list:
-      j.start_array("Data-Usage-Report-List");
+      j.start_array("");
       for (const auto& e1 : c.get<data_usage_report_list_l>()) {
         e1.to_json(j);
       }
@@ -13737,7 +13994,6 @@ void data_usage_report_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "data_usage_report_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE data_usage_report_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13861,21 +14117,27 @@ OCUDUASN_CODE data_usage_report_ies_container::unpack(cbit_ref& bref)
 }
 void data_usage_report_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 25);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : data_usage_report_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // DeactivateTraceIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -13993,21 +14255,19 @@ const fixed_octstring<8, true>& deactiv_trace_ies_o::value_c::trace_id() const
 }
 void deactiv_trace_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::trace_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "deactiv_trace_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE deactiv_trace_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14131,17 +14391,23 @@ OCUDUASN_CODE deactiv_trace_ies_container::unpack(cbit_ref& bref)
 }
 void deactiv_trace_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 82);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", trace_id.to_string());
+  j.write_str("value", trace_id.to_string());
   j.end_obj();
+  j.end_array();
 }
 
 // E1ReleaseRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -14239,19 +14505,16 @@ const cause_c& e1_release_request_ies_o::value_c::cause() const
 }
 void e1_release_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e1_release_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e1_release_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14362,14 +14625,19 @@ OCUDUASN_CODE e1_release_request_ies_container::unpack(cbit_ref& bref)
 }
 void e1_release_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // E1ReleaseResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -14467,19 +14735,16 @@ const crit_diagnostics_s& e1_release_resp_ies_o::value_c::crit_diagnostics() con
 }
 void e1_release_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e1_release_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e1_release_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14591,16 +14856,21 @@ OCUDUASN_CODE e1_release_resp_ies_container::unpack(cbit_ref& bref)
 }
 void e1_release_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // EUTRAN-GNB-CU-UP-CounterCheckRequest ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -14642,13 +14912,11 @@ presence_e eutran_gnb_cu_up_counter_check_request_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void eutran_gnb_cu_up_counter_check_request_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("DRBs-Subject-To-Counter-Check-List-EUTRAN");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE eutran_gnb_cu_up_counter_check_request_o::value_c::pack(bit_ref& bref) const
 {
@@ -14786,16 +15054,15 @@ early_forwarding_sn_transfer_ies_o::value_c::drbs_subject_to_early_forwarding_li
 }
 void early_forwarding_sn_transfer_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::drbs_subject_to_early_forwarding_list:
-      j.start_array("DRBs-Subject-To-Early-Forwarding-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_subject_to_early_forwarding_list_l>()) {
         e1.to_json(j);
       }
@@ -14804,7 +15071,6 @@ void early_forwarding_sn_transfer_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "early_forwarding_sn_transfer_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE early_forwarding_sn_transfer_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14929,21 +15195,27 @@ OCUDUASN_CODE early_forwarding_sn_transfer_ies_container::unpack(cbit_ref& bref)
 }
 void early_forwarding_sn_transfer_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 119);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : drbs_subject_to_early_forwarding_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // ErrorIndication-IEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -15141,35 +15413,31 @@ const uint32_t& error_ind_ies_o::value_c::gnb_cu_up_mbs_e1ap_id() const
 }
 void error_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE error_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -15377,41 +15645,57 @@ OCUDUASN_CODE error_ind_ies_container::unpack(cbit_ref& bref)
 }
 void error_ind_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (gnb_cu_cp_ue_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+    j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+    j.end_obj();
   }
   if (gnb_cu_up_ue_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 3);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+    j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+    j.end_obj();
   }
   if (cause_present) {
+    j.start_obj();
     j.write_int("id", 0);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     cause.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (gnb_cu_cp_mbs_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 155);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+    j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+    j.end_obj();
   }
   if (gnb_cu_up_mbs_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 156);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+    j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-CP-ConfigurationUpdateIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -15609,47 +15893,43 @@ const extended_gnb_cu_cp_name_s& gnb_cu_cp_cfg_upd_ies_o::value_c::extended_gnb_
 }
 void gnb_cu_cp_cfg_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_name:
-      j.write_str("PrintableString", c.get<printable_string<1, 150, true, true>>().to_string());
+      j.write_str(c.get<printable_string<1, 150, true, true>>().to_string());
       break;
     case types::gnb_cu_cp_tnl_a_to_add_list:
-      j.start_array("GNB-CU-CP-TNLA-To-Add-List");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_cu_cp_tnl_a_to_add_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::gnb_cu_cp_tnl_a_to_rem_list:
-      j.start_array("GNB-CU-CP-TNLA-To-Remove-List");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_cu_cp_tnl_a_to_rem_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::gnb_cu_cp_tnl_a_to_upd_list:
-      j.start_array("GNB-CU-CP-TNLA-To-Update-List");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_cu_cp_tnl_a_to_upd_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     case types::extended_gnb_cu_cp_name:
-      j.write_fieldname("Extended-GNB-CU-CP-Name");
       c.get<extended_gnb_cu_cp_name_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_cfg_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_cfg_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -15862,53 +16142,69 @@ OCUDUASN_CODE gnb_cu_cp_cfg_upd_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_cfg_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (gnb_cu_cp_name_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", gnb_cu_cp_name.to_string());
+    j.write_str("value", gnb_cu_cp_name.to_string());
+    j.end_obj();
   }
   if (gnb_cu_cp_tnl_a_to_add_list_present) {
+    j.start_obj();
     j.write_int("id", 27);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_cu_cp_tnl_a_to_add_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (gnb_cu_cp_tnl_a_to_rem_list_present) {
+    j.start_obj();
     j.write_int("id", 28);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_cu_cp_tnl_a_to_rem_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (gnb_cu_cp_tnl_a_to_upd_list_present) {
+    j.start_obj();
     j.write_int("id", 29);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_cu_cp_tnl_a_to_upd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
   if (extended_gnb_cu_cp_name_present) {
+    j.start_obj();
     j.write_int("id", 129);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     extended_gnb_cu_cp_name.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-CP-ConfigurationUpdateAcknowledgeIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -16067,37 +16363,33 @@ const transport_layer_address_info_s& gnb_cu_cp_cfg_upd_ack_ies_o::value_c::tran
 }
 void gnb_cu_cp_cfg_upd_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::gnb_cu_cp_tnl_a_setup_list:
-      j.start_array("GNB-CU-CP-TNLA-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_cu_cp_tnl_a_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::gnb_cu_cp_tnl_a_failed_to_setup_list:
-      j.start_array("GNB-CU-CP-TNLA-Failed-To-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_cu_cp_tnl_a_failed_to_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_cfg_upd_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_cfg_upd_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16270,39 +16562,51 @@ OCUDUASN_CODE gnb_cu_cp_cfg_upd_ack_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_cfg_upd_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (gnb_cu_cp_tnl_a_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 30);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_cu_cp_tnl_a_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (gnb_cu_cp_tnl_a_failed_to_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_cu_cp_tnl_a_failed_to_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-CP-ConfigurationUpdateFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -16440,26 +16744,22 @@ const crit_diagnostics_s& gnb_cu_cp_cfg_upd_fail_ies_o::value_c::crit_diagnostic
 }
 void gnb_cu_cp_cfg_upd_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_cfg_upd_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_cfg_upd_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16608,24 +16908,34 @@ OCUDUASN_CODE gnb_cu_cp_cfg_upd_fail_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_cfg_upd_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-CP-E1SetupFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -16763,26 +17073,22 @@ const crit_diagnostics_s& gnb_cu_cp_e1_setup_fail_ies_o::value_c::crit_diagnosti
 }
 void gnb_cu_cp_e1_setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_e1_setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_e1_setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16931,24 +17237,34 @@ OCUDUASN_CODE gnb_cu_cp_e1_setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_e1_setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-CP-E1SetupRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -17086,26 +17402,22 @@ const extended_gnb_cu_cp_name_s& gnb_cu_cp_e1_setup_request_ies_o::value_c::exte
 }
 void gnb_cu_cp_e1_setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_name:
-      j.write_str("PrintableString", c.get<printable_string<1, 150, true, true>>().to_string());
+      j.write_str(c.get<printable_string<1, 150, true, true>>().to_string());
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     case types::extended_gnb_cu_cp_name:
-      j.write_fieldname("Extended-GNB-CU-CP-Name");
       c.get<extended_gnb_cu_cp_name_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_e1_setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_e1_setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -17256,26 +17568,36 @@ OCUDUASN_CODE gnb_cu_cp_e1_setup_request_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_e1_setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (gnb_cu_cp_name_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", gnb_cu_cp_name.to_string());
+    j.write_str("value", gnb_cu_cp_name.to_string());
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
   if (extended_gnb_cu_cp_name_present) {
+    j.start_obj();
     j.write_int("id", 129);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     extended_gnb_cu_cp_name.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // SupportedPLMNs-ExtIEs ::= OBJECT SET OF E1AP-PROTOCOL-EXTENSION
@@ -17413,28 +17735,26 @@ const ecgi_support_list_l& supported_plmns_ext_ies_o::ext_c::ecgi_support_list()
 }
 void supported_plmns_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::npn_support_info:
-      j.write_fieldname("NPNSupportInfo");
       c.get<npn_support_info_c>().to_json(j);
       break;
     case types::extended_slice_support_list:
-      j.start_array("ExtendedSliceSupportList");
+      j.start_array("");
       for (const auto& e1 : c.get<extended_slice_support_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::extended_nr_cgi_support_list:
-      j.start_array("Extended-NR-CGI-Support-List");
+      j.start_array("");
       for (const auto& e1 : c.get<extended_nr_cgi_support_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ecgi_support_list:
-      j.start_array("ECGI-Support-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ecgi_support_list_l>()) {
         e1.to_json(j);
       }
@@ -17443,7 +17763,6 @@ void supported_plmns_ext_ies_o::ext_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "supported_plmns_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE supported_plmns_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -17584,40 +17903,49 @@ OCUDUASN_CODE supported_plmns_ext_ies_container::unpack(cbit_ref& bref)
 }
 void supported_plmns_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (npn_support_info_present) {
+    j.start_obj();
     j.write_int("id", 110);
     j.write_str("criticality", "reject");
+    j.write_fieldname("extensionValue");
     npn_support_info.to_json(j);
+    j.end_obj();
   }
   if (extended_slice_support_list_present) {
+    j.start_obj();
     j.write_int("id", 125);
     j.write_str("criticality", "reject");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : extended_slice_support_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (extended_nr_cgi_support_list_present) {
+    j.start_obj();
     j.write_int("id", 135);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : extended_nr_cgi_support_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ecgi_support_list_present) {
+    j.start_obj();
     j.write_int("id", 145);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : ecgi_support_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // SupportedPLMNs-Item ::= SEQUENCE
@@ -17940,46 +18268,41 @@ const crit_diagnostics_s& gnb_cu_cp_e1_setup_resp_ies_o::value_c::crit_diagnosti
 }
 void gnb_cu_cp_e1_setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_id:
-      j.write_int("INTEGER (0..68719476735)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_name:
-      j.write_str("PrintableString", c.get<printable_string<1, 150, true, true>>().to_string());
+      j.write_str(c.get<printable_string<1, 150, true, true>>().to_string());
       break;
     case types::cn_support:
-      j.write_str("CNSupport", c.get<cn_support_e>().to_string());
+      j.write_str(c.get<cn_support_e>().to_string());
       break;
     case types::supported_plmns:
-      j.start_array("SupportedPLMNs-List");
+      j.start_array("");
       for (const auto& e1 : c.get<supported_plmns_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::gnb_cu_up_capacity:
-      j.write_int("INTEGER (0..255)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     case types::extended_gnb_cu_up_name:
-      j.write_fieldname("Extended-GNB-CU-UP-Name");
       c.get<extended_gnb_cu_up_name_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_e1_setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_e1_setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18224,49 +18547,70 @@ OCUDUASN_CODE gnb_cu_cp_e1_setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_e1_setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 7);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_id);
+  j.write_uint("value", gnb_cu_up_id);
+  j.end_obj();
   if (gnb_cu_up_name_present) {
+    j.start_obj();
     j.write_int("id", 8);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", gnb_cu_up_name.to_string());
+    j.write_str("value", gnb_cu_up_name.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 10);
   j.write_str("criticality", "reject");
-  j.write_str("Value", cn_support.to_string());
+  j.write_str("value", cn_support.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 11);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : supported_plmns) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (gnb_cu_up_capacity_present) {
+    j.start_obj();
     j.write_int("id", 64);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_capacity);
+    j.write_int("value", gnb_cu_up_capacity);
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
   if (extended_gnb_cu_up_name_present) {
+    j.start_obj();
     j.write_int("id", 130);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     extended_gnb_cu_up_name.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-CPMeasurementResultsInformationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -18384,16 +18728,15 @@ const drb_meas_results_info_list_l& gnb_cu_cp_meas_results_info_ies_o::value_c::
 }
 void gnb_cu_cp_meas_results_info_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::drb_meas_results_info_list:
-      j.start_array("DRB-Measurement-Results-Information-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_meas_results_info_list_l>()) {
         e1.to_json(j);
       }
@@ -18402,7 +18745,6 @@ void gnb_cu_cp_meas_results_info_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "gnb_cu_cp_meas_results_info_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_cp_meas_results_info_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18527,21 +18869,27 @@ OCUDUASN_CODE gnb_cu_cp_meas_results_info_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_cp_meas_results_info_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 128);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : drb_meas_results_info_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-ConfigurationUpdateIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -18779,50 +19127,45 @@ const gnb_cu_up_mbs_support_info_s& gnb_cu_up_cfg_upd_ies_o::value_c::gnb_cu_up_
 }
 void gnb_cu_up_cfg_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_id:
-      j.write_int("INTEGER (0..68719476735)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_name:
-      j.write_str("PrintableString", c.get<printable_string<1, 150, true, true>>().to_string());
+      j.write_str(c.get<printable_string<1, 150, true, true>>().to_string());
       break;
     case types::supported_plmns:
-      j.start_array("SupportedPLMNs-List");
+      j.start_array("");
       for (const auto& e1 : c.get<supported_plmns_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::gnb_cu_up_capacity:
-      j.write_int("INTEGER (0..255)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_tnl_a_to_rem_list:
-      j.start_array("GNB-CU-UP-TNLA-To-Remove-List");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_cu_up_tnl_a_to_rem_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     case types::extended_gnb_cu_up_name:
-      j.write_fieldname("Extended-GNB-CU-UP-Name");
       c.get<extended_gnb_cu_up_name_s>().to_json(j);
       break;
     case types::gnb_cu_up_mbs_support_info:
-      j.write_fieldname("GNB-CU-UP-MBS-Support-Info");
       c.get<gnb_cu_up_mbs_support_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_cfg_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_cfg_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -19069,57 +19412,78 @@ OCUDUASN_CODE gnb_cu_up_cfg_upd_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_cfg_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 7);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_id);
+  j.write_uint("value", gnb_cu_up_id);
+  j.end_obj();
   if (gnb_cu_up_name_present) {
+    j.start_obj();
     j.write_int("id", 8);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", gnb_cu_up_name.to_string());
+    j.write_str("value", gnb_cu_up_name.to_string());
+    j.end_obj();
   }
   if (supported_plmns_present) {
+    j.start_obj();
     j.write_int("id", 11);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : supported_plmns) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (gnb_cu_up_capacity_present) {
+    j.start_obj();
     j.write_int("id", 64);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_capacity);
+    j.write_int("value", gnb_cu_up_capacity);
+    j.end_obj();
   }
   if (gnb_cu_up_tnl_a_to_rem_list_present) {
+    j.start_obj();
     j.write_int("id", 73);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_cu_up_tnl_a_to_rem_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
   if (extended_gnb_cu_up_name_present) {
+    j.start_obj();
     j.write_int("id", 130);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     extended_gnb_cu_up_name.to_json(j);
+    j.end_obj();
   }
   if (gnb_cu_up_mbs_support_info_present) {
+    j.start_obj();
     j.write_int("id", 171);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     gnb_cu_up_mbs_support_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-ConfigurationUpdateAcknowledgeIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -19237,23 +19601,19 @@ const transport_layer_address_info_s& gnb_cu_up_cfg_upd_ack_ies_o::value_c::tran
 }
 void gnb_cu_up_cfg_upd_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_cfg_upd_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_cfg_upd_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -19384,21 +19744,29 @@ OCUDUASN_CODE gnb_cu_up_cfg_upd_ack_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_cfg_upd_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-ConfigurationUpdateFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -19536,26 +19904,22 @@ const crit_diagnostics_s& gnb_cu_up_cfg_upd_fail_ies_o::value_c::crit_diagnostic
 }
 void gnb_cu_up_cfg_upd_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_cfg_upd_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_cfg_upd_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -19704,24 +20068,34 @@ OCUDUASN_CODE gnb_cu_up_cfg_upd_fail_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_cfg_upd_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // NG-RAN-GNB-CU-UP-CounterCheckRequest ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -19763,13 +20137,11 @@ presence_e ng_ran_gnb_cu_up_counter_check_request_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void ng_ran_gnb_cu_up_counter_check_request_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("DRBs-Subject-To-Counter-Check-List-NG-RAN");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE ng_ran_gnb_cu_up_counter_check_request_o::value_c::pack(bit_ref& bref) const
 {
@@ -19896,9 +20268,11 @@ void sys_gnb_cu_up_counter_check_request_c::to_json(json_writer& j) const
   switch (type_) {
     case types::e_utran_gnb_cu_up_counter_check_request:
       j.write_fieldname("e-UTRAN-GNB-CU-UP-CounterCheckRequest");
+      c.get<protocol_ie_container_l<eutran_gnb_cu_up_counter_check_request_o>>().to_json(j);
       break;
     case types::ng_ran_gnb_cu_up_counter_check_request:
       j.write_fieldname("nG-RAN-GNB-CU-UP-CounterCheckRequest");
+      c.get<protocol_ie_container_l<ng_ran_gnb_cu_up_counter_check_request_o>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -20078,22 +20452,19 @@ gnb_cu_up_counter_check_request_ies_o::value_c::sys_gnb_cu_up_counter_check_requ
 }
 void gnb_cu_up_counter_check_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sys_gnb_cu_up_counter_check_request:
-      j.write_fieldname("System-GNB-CU-UP-CounterCheckRequest");
       c.get<sys_gnb_cu_up_counter_check_request_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_counter_check_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_counter_check_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -20218,17 +20589,24 @@ OCUDUASN_CODE gnb_cu_up_counter_check_request_ies_container::unpack(cbit_ref& br
 }
 void gnb_cu_up_counter_check_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 60);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   sys_gnb_cu_up_counter_check_request.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-E1SetupFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -20366,26 +20744,22 @@ const crit_diagnostics_s& gnb_cu_up_e1_setup_fail_ies_o::value_c::crit_diagnosti
 }
 void gnb_cu_up_e1_setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_e1_setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_e1_setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -20534,24 +20908,34 @@ OCUDUASN_CODE gnb_cu_up_e1_setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_e1_setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-E1SetupRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -20789,46 +21173,41 @@ const gnb_cu_up_mbs_support_info_s& gnb_cu_up_e1_setup_request_ies_o::value_c::g
 }
 void gnb_cu_up_e1_setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_id:
-      j.write_int("INTEGER (0..68719476735)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_name:
-      j.write_str("PrintableString", c.get<printable_string<1, 150, true, true>>().to_string());
+      j.write_str(c.get<printable_string<1, 150, true, true>>().to_string());
       break;
     case types::cn_support:
-      j.write_str("CNSupport", c.get<cn_support_e>().to_string());
+      j.write_str(c.get<cn_support_e>().to_string());
       break;
     case types::supported_plmns:
-      j.start_array("SupportedPLMNs-List");
+      j.start_array("");
       for (const auto& e1 : c.get<supported_plmns_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::gnb_cu_up_capacity:
-      j.write_int("INTEGER (0..255)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     case types::extended_gnb_cu_up_name:
-      j.write_fieldname("Extended-GNB-CU-UP-Name");
       c.get<extended_gnb_cu_up_name_s>().to_json(j);
       break;
     case types::gnb_cu_up_mbs_support_info:
-      j.write_fieldname("GNB-CU-UP-MBS-Support-Info");
       c.get<gnb_cu_up_mbs_support_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_e1_setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_e1_setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -21073,49 +21452,70 @@ OCUDUASN_CODE gnb_cu_up_e1_setup_request_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_e1_setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 7);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_id);
+  j.write_uint("value", gnb_cu_up_id);
+  j.end_obj();
   if (gnb_cu_up_name_present) {
+    j.start_obj();
     j.write_int("id", 8);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", gnb_cu_up_name.to_string());
+    j.write_str("value", gnb_cu_up_name.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 10);
   j.write_str("criticality", "reject");
-  j.write_str("Value", cn_support.to_string());
+  j.write_str("value", cn_support.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 11);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : supported_plmns) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (gnb_cu_up_capacity_present) {
+    j.start_obj();
     j.write_int("id", 64);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_capacity);
+    j.write_int("value", gnb_cu_up_capacity);
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
   if (extended_gnb_cu_up_name_present) {
+    j.start_obj();
     j.write_int("id", 130);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     extended_gnb_cu_up_name.to_json(j);
+    j.end_obj();
   }
   if (gnb_cu_up_mbs_support_info_present) {
+    j.start_obj();
     j.write_int("id", 171);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     gnb_cu_up_mbs_support_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-E1SetupResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -21273,30 +21673,25 @@ const crit_diagnostics_s& gnb_cu_up_e1_setup_resp_ies_o::value_c::crit_diagnosti
 }
 void gnb_cu_up_e1_setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_name:
-      j.write_str("PrintableString", c.get<printable_string<1, 150, true, true>>().to_string());
+      j.write_str(c.get<printable_string<1, 150, true, true>>().to_string());
       break;
     case types::transport_layer_address_info:
-      j.write_fieldname("Transport-Layer-Address-Info");
       c.get<transport_layer_address_info_s>().to_json(j);
       break;
     case types::extended_gnb_cu_cp_name:
-      j.write_fieldname("Extended-GNB-CU-CP-Name");
       c.get<extended_gnb_cu_cp_name_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_e1_setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_e1_setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -21469,31 +21864,44 @@ OCUDUASN_CODE gnb_cu_up_e1_setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_e1_setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (gnb_cu_cp_name_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", gnb_cu_cp_name.to_string());
+    j.write_str("value", gnb_cu_cp_name.to_string());
+    j.end_obj();
   }
   if (transport_layer_address_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     transport_layer_address_info.to_json(j);
+    j.end_obj();
   }
   if (extended_gnb_cu_cp_name_present) {
+    j.start_obj();
     j.write_int("id", 129);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     extended_gnb_cu_cp_name.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-CU-UP-StatusIndicationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -21591,18 +21999,16 @@ const gnb_cu_up_overload_info_e& gnb_cu_up_status_ind_ies_o::value_c::gnb_cu_up_
 }
 void gnb_cu_up_status_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_overload_info:
-      j.write_str("GNB-CU-UP-OverloadInformation", c.get<gnb_cu_up_overload_info_e>().to_string());
+      j.write_str(c.get<gnb_cu_up_overload_info_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "gnb_cu_up_status_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_cu_up_status_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -21713,14 +22119,18 @@ OCUDUASN_CODE gnb_cu_up_status_ind_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_cu_up_status_ind_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 65);
   j.write_str("criticality", "reject");
-  j.write_str("Value", gnb_cu_up_overload_info.to_string());
+  j.write_str("value", gnb_cu_up_overload_info.to_string());
   j.end_obj();
+  j.end_array();
 }
 
 // IAB-UPTNLAddressUpdateIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -21818,13 +22228,12 @@ const dl_up_tnl_address_to_upd_list_l& iab_up_tnl_address_upd_ies_o::value_c::dl
 }
 void iab_up_tnl_address_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::dl_up_tnl_address_to_upd_list:
-      j.start_array("DLUPTNLAddressToUpdateList");
+      j.start_array("");
       for (const auto& e1 : c.get<dl_up_tnl_address_to_upd_list_l>()) {
         e1.to_json(j);
       }
@@ -21833,7 +22242,6 @@ void iab_up_tnl_address_upd_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "iab_up_tnl_address_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE iab_up_tnl_address_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -21945,20 +22353,24 @@ OCUDUASN_CODE iab_up_tnl_address_upd_ies_container::unpack(cbit_ref& bref)
 }
 void iab_up_tnl_address_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (dl_up_tnl_address_to_upd_list_present) {
+    j.start_obj();
     j.write_int("id", 108);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : dl_up_tnl_address_to_upd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // IAB-UPTNLAddressUpdateAcknowledgeIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -22076,17 +22488,15 @@ const ul_up_tnl_address_to_upd_list_l& iab_up_tnl_address_upd_ack_ies_o::value_c
 }
 void iab_up_tnl_address_upd_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::ul_up_tnl_address_to_upd_list:
-      j.start_array("ULUPTNLAddressToUpdateList");
+      j.start_array("");
       for (const auto& e1 : c.get<ul_up_tnl_address_to_upd_list_l>()) {
         e1.to_json(j);
       }
@@ -22095,7 +22505,6 @@ void iab_up_tnl_address_upd_ack_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "iab_up_tnl_address_upd_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE iab_up_tnl_address_upd_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22226,25 +22635,32 @@ OCUDUASN_CODE iab_up_tnl_address_upd_ack_ies_container::unpack(cbit_ref& bref)
 }
 void iab_up_tnl_address_upd_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (ul_up_tnl_address_to_upd_list_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ul_up_tnl_address_to_upd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // IAB-UPTNLAddressUpdateFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -22382,26 +22798,22 @@ const crit_diagnostics_s& iab_up_tnl_address_upd_fail_ies_o::value_c::crit_diagn
 }
 void iab_up_tnl_address_upd_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "iab_up_tnl_address_upd_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE iab_up_tnl_address_upd_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22550,24 +22962,34 @@ OCUDUASN_CODE iab_up_tnl_address_upd_fail_ies_container::unpack(cbit_ref& bref)
 }
 void iab_up_tnl_address_upd_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // IABPSKNotificationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -22665,13 +23087,12 @@ const iab_donor_cu_up_psk_info_l& iabpsk_notif_ies_o::value_c::iab_donor_cu_up_p
 }
 void iabpsk_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::iab_donor_cu_up_psk_info:
-      j.start_array("IAB-Donor-CU-UPPSKInfo");
+      j.start_array("");
       for (const auto& e1 : c.get<iab_donor_cu_up_psk_info_l>()) {
         e1.to_json(j);
       }
@@ -22680,7 +23101,6 @@ void iabpsk_notif_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "iabpsk_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE iabpsk_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22791,18 +23211,22 @@ OCUDUASN_CODE iabpsk_notif_ies_container::unpack(cbit_ref& bref)
 }
 void iabpsk_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 144);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : iab_donor_cu_up_psk_info) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextModificationConfirmIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -22942,26 +23366,22 @@ const crit_diagnostics_s& mc_bearer_context_mod_confirm_ies_o::value_c::crit_dia
 }
 void mc_bearer_context_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mc_bearer_context_to_modify_confirm:
-      j.write_fieldname("MCBearerContextToModifyConfirm");
       c.get<mc_bearer_context_to_modify_confirm_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_mod_confirm_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_mod_confirm_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23105,22 +23525,32 @@ OCUDUASN_CODE mc_bearer_context_mod_confirm_ies_container::unpack(cbit_ref& bref
 }
 void mc_bearer_context_mod_confirm_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 169);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   mc_bearer_context_to_modify_confirm.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextModificationFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -23280,30 +23710,25 @@ const crit_diagnostics_s& mc_bearer_context_mod_fail_ies_o::value_c::crit_diagno
 }
 void mc_bearer_context_mod_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mbs_multicast_f1_u_context_descriptor:
-      j.write_fieldname("MBSMulticastF1UContextDescriptor");
       c.get<mbs_multicast_f1_u_context_descriptor_s>().to_json(j);
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_mod_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_mod_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23469,27 +23894,40 @@ OCUDUASN_CODE mc_bearer_context_mod_fail_ies_container::unpack(cbit_ref& bref)
 }
 void mc_bearer_context_mod_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
   if (mbs_multicast_f1_u_context_descriptor_present) {
+    j.start_obj();
     j.write_int("id", 170);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     mbs_multicast_f1_u_context_descriptor.to_json(j);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextModificationRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -23607,22 +24045,19 @@ const mc_bearer_context_to_modify_s& mc_bearer_context_mod_request_ies_o::value_
 }
 void mc_bearer_context_mod_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mc_bearer_context_to_modify:
-      j.write_fieldname("MCBearerContextToModify");
       c.get<mc_bearer_context_to_modify_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_mod_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_mod_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23746,17 +24181,24 @@ OCUDUASN_CODE mc_bearer_context_mod_request_ies_container::unpack(cbit_ref& bref
 }
 void mc_bearer_context_mod_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 166);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   mc_bearer_context_to_modify.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextModificationRequiredIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -23876,22 +24318,19 @@ mc_bearer_context_mod_required_ies_o::value_c::mc_bearer_context_to_modify_requi
 }
 void mc_bearer_context_mod_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mc_bearer_context_to_modify_required:
-      j.write_fieldname("MCBearerContextToModifyRequired");
       c.get<mc_bearer_context_to_modify_required_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_mod_required_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_mod_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -24015,17 +24454,24 @@ OCUDUASN_CODE mc_bearer_context_mod_required_ies_container::unpack(cbit_ref& bre
 }
 void mc_bearer_context_mod_required_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 168);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   mc_bearer_context_to_modify_required.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextModificationResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -24164,26 +24610,22 @@ const crit_diagnostics_s& mc_bearer_context_mod_resp_ies_o::value_c::crit_diagno
 }
 void mc_bearer_context_mod_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mc_bearer_context_to_modify_resp:
-      j.write_fieldname("MCBearerContextToModifyResponse");
       c.get<mc_bearer_context_to_modify_resp_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_mod_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_mod_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -24327,22 +24769,32 @@ OCUDUASN_CODE mc_bearer_context_mod_resp_ies_container::unpack(cbit_ref& bref)
 }
 void mc_bearer_context_mod_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 167);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   mc_bearer_context_to_modify_resp.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextReleaseCommandIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -24460,22 +24912,19 @@ const cause_c& mc_bearer_context_release_cmd_ies_o::value_c::cause() const
 }
 void mc_bearer_context_release_cmd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_release_cmd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_release_cmd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -24599,17 +25048,24 @@ OCUDUASN_CODE mc_bearer_context_release_cmd_ies_container::unpack(cbit_ref& bref
 }
 void mc_bearer_context_release_cmd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextReleaseCompleteIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -24728,22 +25184,19 @@ const crit_diagnostics_s& mc_bearer_context_release_complete_ies_o::value_c::cri
 }
 void mc_bearer_context_release_complete_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_release_complete_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_release_complete_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -24868,19 +25321,26 @@ OCUDUASN_CODE mc_bearer_context_release_complete_ies_container::unpack(cbit_ref&
 }
 void mc_bearer_context_release_complete_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextReleaseRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -24998,22 +25458,19 @@ const cause_c& mc_bearer_context_release_request_ies_o::value_c::cause() const
 }
 void mc_bearer_context_release_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_release_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_release_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -25137,17 +25594,24 @@ OCUDUASN_CODE mc_bearer_context_release_request_ies_container::unpack(cbit_ref& 
 }
 void mc_bearer_context_release_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextSetupFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -25285,26 +25749,22 @@ const crit_diagnostics_s& mc_bearer_context_setup_fail_ies_o::value_c::crit_diag
 }
 void mc_bearer_context_setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -25448,24 +25908,34 @@ OCUDUASN_CODE mc_bearer_context_setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void mc_bearer_context_setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
   if (gnb_cu_up_mbs_e1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 156);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+    j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextSetupRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -25583,23 +26053,19 @@ const mc_bearer_context_to_setup_s& mc_bearer_context_setup_request_ies_o::value
 }
 void mc_bearer_context_setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::global_mbs_session_id:
-      j.write_fieldname("GlobalMBSSessionID");
       c.get<global_mbs_session_id_s>().to_json(j);
       break;
     case types::mc_bearer_context_to_setup:
-      j.write_fieldname("MCBearerContextToSetup");
       c.get<mc_bearer_context_to_setup_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -25728,17 +26194,25 @@ OCUDUASN_CODE mc_bearer_context_setup_request_ies_container::unpack(cbit_ref& br
 }
 void mc_bearer_context_setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 157);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   global_mbs_session_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 164);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   mc_bearer_context_to_setup.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MCBearerContextSetupResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -25877,26 +26351,22 @@ const crit_diagnostics_s& mc_bearer_context_setup_resp_ies_o::value_c::crit_diag
 }
 void mc_bearer_context_setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mc_bearer_context_to_setup_resp:
-      j.write_fieldname("MCBearerContextToSetupResponse");
       c.get<mc_bearer_context_to_setup_resp_s>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_context_setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_context_setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -26040,22 +26510,32 @@ OCUDUASN_CODE mc_bearer_context_setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void mc_bearer_context_setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 165);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   mc_bearer_context_to_setup_resp.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // MCBearerNotificationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -26173,22 +26653,19 @@ const mbs_session_res_notif_c& mc_bearer_notif_ies_o::value_c::mbs_session_res_n
 }
 void mc_bearer_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_mbs_e1ap_id:
-      j.write_int("INTEGER (0..16777215)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::gnb_cu_up_mbs_e1ap_id:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::mbs_session_res_notif:
-      j.write_fieldname("MBSSessionResourceNotification");
       c.get<mbs_session_res_notif_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "mc_bearer_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mc_bearer_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -26312,17 +26789,24 @@ OCUDUASN_CODE mc_bearer_notif_ies_container::unpack(cbit_ref& bref)
 }
 void mc_bearer_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 155);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_cp_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_mbs_e1ap_id);
+  j.write_int("value", gnb_cu_up_mbs_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 191);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   mbs_session_res_notif.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // MRDC-DataUsageReportIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -26440,16 +26924,15 @@ const pdu_session_res_data_usage_list_l& mrdc_data_usage_report_ies_o::value_c::
 }
 void mrdc_data_usage_report_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::pdu_session_res_data_usage_list:
-      j.start_array("PDU-Session-Resource-Data-Usage-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_res_data_usage_list_l>()) {
         e1.to_json(j);
       }
@@ -26458,7 +26941,6 @@ void mrdc_data_usage_report_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "mrdc_data_usage_report_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE mrdc_data_usage_report_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -26583,21 +27065,27 @@ OCUDUASN_CODE mrdc_data_usage_report_ies_container::unpack(cbit_ref& bref)
 }
 void mrdc_data_usage_report_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 68);
   j.write_str("criticality", "ignore");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : pdu_session_res_data_usage_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // Value ::= OPEN TYPE
@@ -26641,8 +27129,8 @@ OCUDUASN_CODE private_ie_container_empty_l::unpack(cbit_ref& bref)
 }
 void private_ie_container_empty_l::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.end_obj();
+  j.start_array();
+  j.end_array();
 }
 
 // PrivateMessage ::= SEQUENCE
@@ -26726,10 +27214,7 @@ presence_e ue_associated_lc_e1_conn_item_res_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ue_associated_lc_e1_conn_item_res_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-associatedLogicalE1-ConnectionItem");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_associated_lc_e1_conn_item_res_o::value_c::pack(bit_ref& bref) const
 {
@@ -27031,23 +27516,19 @@ const reset_type_c& reset_ies_o::value_c::reset_type() const
 }
 void reset_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::reset_type:
-      j.write_fieldname("ResetType");
       c.get<reset_type_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "reset_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE reset_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -27176,17 +27657,25 @@ OCUDUASN_CODE reset_ies_container::unpack(cbit_ref& bref)
 }
 void reset_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 4);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   reset_type.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // UE-associatedLogicalE1-ConnectionItemResAck ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -27227,10 +27716,7 @@ presence_e ue_associated_lc_e1_conn_item_res_ack_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void ue_associated_lc_e1_conn_item_res_ack_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("UE-associatedLogicalE1-ConnectionItem");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ue_associated_lc_e1_conn_item_res_ack_o::value_c::pack(bit_ref& bref) const
 {
@@ -27371,26 +27857,23 @@ const crit_diagnostics_s& reset_ack_ies_o::value_c::crit_diagnostics() const
 }
 void reset_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ue_associated_lc_e1_conn_list_res_ack:
-      j.start_array("UE-associatedLogicalE1-ConnectionListResAck");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_associated_lc_e1_conn_list_res_ack_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "reset_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE reset_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -27522,25 +28005,32 @@ OCUDUASN_CODE reset_ack_ies_container::unpack(cbit_ref& bref)
 }
 void reset_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (ue_associated_lc_e1_conn_list_res_ack_present) {
+    j.start_obj();
     j.write_int("id", 6);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_associated_lc_e1_conn_list_res_ack) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // ResourceStatusFailureIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -27698,29 +28188,25 @@ const crit_diagnostics_s& res_status_fail_ies_o::value_c::crit_diagnostics() con
 }
 void res_status_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "res_status_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE res_status_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -27883,27 +28369,39 @@ OCUDUASN_CODE res_status_fail_ies_container::unpack(cbit_ref& bref)
 }
 void res_status_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 89);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_meas_id);
+  j.write_int("value", gnb_cu_cp_meas_id);
+  j.end_obj();
   if (gnb_cu_up_meas_id_present) {
+    j.start_obj();
     j.write_int("id", 90);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_meas_id);
+    j.write_int("value", gnb_cu_up_meas_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // ResourceStatusRequestIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -28081,30 +28579,28 @@ const report_periodicity_e& res_status_request_ies_o::value_c::report_periodicit
 }
 void res_status_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::regist_request:
-      j.write_str("RegistrationRequest", c.get<regist_request_e>().to_string());
+      j.write_str(c.get<regist_request_e>().to_string());
       break;
     case types::report_characteristics:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<36, false, true>>().to_string());
+      c.get<fixed_bitstring<36, false, true>>().to_json(j);
       break;
     case types::report_periodicity:
-      j.write_str("ReportingPeriodicity", c.get<report_periodicity_e>().to_string());
+      j.write_str(c.get<report_periodicity_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "res_status_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE res_status_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -28290,32 +28786,45 @@ OCUDUASN_CODE res_status_request_ies_container::unpack(cbit_ref& bref)
 }
 void res_status_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 89);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_meas_id);
+  j.write_int("value", gnb_cu_cp_meas_id);
+  j.end_obj();
   if (gnb_cu_up_meas_id_present) {
+    j.start_obj();
     j.write_int("id", 90);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_cu_up_meas_id);
+    j.write_int("value", gnb_cu_up_meas_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 91);
   j.write_str("criticality", "reject");
-  j.write_str("Value", regist_request.to_string());
+  j.write_str("value", regist_request.to_string());
+  j.end_obj();
   if (report_characteristics_present) {
+    j.start_obj();
     j.write_int("id", 92);
     j.write_str("criticality", "reject");
-    j.write_str("Value", report_characteristics.to_string());
+    j.write_fieldname("value");
+    report_characteristics.to_json(j);
+    j.end_obj();
   }
   if (report_periodicity_present) {
+    j.start_obj();
     j.write_int("id", 93);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", report_periodicity.to_string());
+    j.write_str("value", report_periodicity.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // ResourceStatusResponseIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -28453,25 +28962,22 @@ const crit_diagnostics_s& res_status_resp_ies_o::value_c::crit_diagnostics() con
 }
 void res_status_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "res_status_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE res_status_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -28615,22 +29121,31 @@ OCUDUASN_CODE res_status_resp_ies_container::unpack(cbit_ref& bref)
 }
 void res_status_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 89);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_meas_id);
+  j.write_int("value", gnb_cu_cp_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 90);
   j.write_str("criticality", "ignore");
-  j.write_int("Value", gnb_cu_up_meas_id);
+  j.write_int("value", gnb_cu_up_meas_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // ResourceStatusUpdateIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -28788,29 +29303,25 @@ const hw_capacity_ind_s& res_status_upd_ies_o::value_c::hw_capacity_ind() const
 }
 void res_status_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_cp_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::gnb_cu_up_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::tnl_available_capacity_ind:
-      j.write_fieldname("TNL-AvailableCapacityIndicator");
       c.get<tnl_available_capacity_ind_s>().to_json(j);
       break;
     case types::hw_capacity_ind:
-      j.write_fieldname("HW-CapacityIndicator");
       c.get<hw_capacity_ind_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "res_status_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE res_status_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -28976,27 +29487,39 @@ OCUDUASN_CODE res_status_upd_ies_container::unpack(cbit_ref& bref)
 }
 void res_status_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 57);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 89);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_meas_id);
+  j.write_int("value", gnb_cu_cp_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 90);
   j.write_str("criticality", "ignore");
-  j.write_int("Value", gnb_cu_up_meas_id);
+  j.write_int("value", gnb_cu_up_meas_id);
+  j.end_obj();
   if (tnl_available_capacity_ind_present) {
+    j.start_obj();
     j.write_int("id", 94);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     tnl_available_capacity_ind.to_json(j);
+    j.end_obj();
   }
   if (hw_capacity_ind_present) {
+    j.start_obj();
     j.write_int("id", 95);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     hw_capacity_ind.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // TraceStartIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -29114,22 +29637,19 @@ const trace_activation_s& trace_start_ies_o::value_c::trace_activation() const
 }
 void trace_start_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::trace_activation:
-      j.write_fieldname("TraceActivation");
       c.get<trace_activation_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "trace_start_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trace_start_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -29253,17 +29773,24 @@ OCUDUASN_CODE trace_start_ies_container::unpack(cbit_ref& bref)
 }
 void trace_start_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 81);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   trace_activation.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // ULDataNotificationIEs ::= OBJECT SET OF E1AP-PROTOCOL-IES
@@ -29381,16 +29908,15 @@ const pdu_session_to_notify_list_l& ul_data_notif_ies_o::value_c::pdu_session_to
 }
 void ul_data_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_cp_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_cu_up_ue_e1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::pdu_session_to_notify_list:
-      j.start_array("PDU-Session-To-Notify-List");
+      j.start_array("");
       for (const auto& e1 : c.get<pdu_session_to_notify_list_l>()) {
         e1.to_json(j);
       }
@@ -29399,7 +29925,6 @@ void ul_data_notif_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ul_data_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ul_data_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -29523,19 +30048,25 @@ OCUDUASN_CODE ul_data_notif_ies_container::unpack(cbit_ref& bref)
 }
 void ul_data_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 2);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_cp_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_up_ue_e1ap_id);
+  j.write_uint("value", gnb_cu_up_ue_e1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 67);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : pdu_session_to_notify_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }

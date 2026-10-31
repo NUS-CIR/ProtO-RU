@@ -995,7 +995,8 @@ void bh_rlc_ch_cfg_r16_s::to_json(json_writer& j) const
     j.write_fieldname("bh-LogicalChannelIdentity-r16");
     bh_lc_ch_id_r16.to_json(j);
   }
-  j.write_str("bh-RLC-ChannelID-r16", bh_rlc_ch_id_r16.to_string());
+  j.write_fieldname("bh-RLC-ChannelID-r16");
+  bh_rlc_ch_id_r16.to_json(j);
   if (reestablish_rlc_r16_present) {
     j.write_str("reestablishRLC-r16", "true");
   }
@@ -1029,6 +1030,7 @@ void carrier_state_r17_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::de_activ_r17:
+      j.write_null("deActivated-r17");
       break;
     case types::active_bwp_r17:
       j.write_int("activeBWP-r17", c);
@@ -4959,7 +4961,8 @@ void mac_cell_group_cfg_s::to_json(json_writer& j) const
     drx_cfg_ext2_v1800->to_json(j);
   }
   if (add_bs_table_allowed_r18_present) {
-    j.write_str("additionalBS-TableAllowed-r18", add_bs_table_allowed_r18.to_string());
+    j.write_fieldname("additionalBS-TableAllowed-r18");
+    add_bs_table_allowed_r18.to_json(j);
   }
   if (dsr_cfg_to_add_mod_list_r18.is_present()) {
     j.start_array("dsr-ConfigToAddModList-r18");
@@ -5122,7 +5125,7 @@ void pdsch_harq_ack_enh_type3_r17_s::to_json(json_writer& j) const
   if (per_harq_ext_r17.is_present()) {
     j.start_array("perHARQ-Ext-r17");
     for (const auto& e1 : *per_harq_ext_r17) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -5224,7 +5227,7 @@ void pdsch_harq_ack_enh_type3_r17_s::applicable_r17_c_::to_json(json_writer& j) 
     case types::per_harq:
       j.start_array("perHARQ");
       for (const auto& e1 : c.get<per_harq_l_>()) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -7207,13 +7210,16 @@ void serving_cell_cfg_common_s::ssb_positions_in_burst_c_::to_json(json_writer& 
   j.start_obj();
   switch (type_) {
     case types::short_bitmap:
-      j.write_str("shortBitmap", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("shortBitmap");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::medium_bitmap:
-      j.write_str("mediumBitmap", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("mediumBitmap");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::long_bitmap:
-      j.write_str("longBitmap", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("longBitmap");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "serving_cell_cfg_common_s::ssb_positions_in_burst_c_");
@@ -7307,6 +7313,7 @@ void serving_cell_cfg_common_s::ch_access_mode_r16_c_::to_json(json_writer& j) c
   j.start_obj();
   switch (type_) {
     case types::dyn:
+      j.write_null("dynamic");
       break;
     case types::semi_static:
       j.write_fieldname("semiStatic");
@@ -7539,7 +7546,8 @@ OCUDUASN_CODE sl_path_switch_cfg_r17_s::unpack(cbit_ref& bref)
 void sl_path_switch_cfg_r17_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("targetRelayUE-Identity-r17", target_relay_ue_id_r17.to_string());
+  j.write_fieldname("targetRelayUE-Identity-r17");
+  target_relay_ue_id_r17.to_json(j);
   j.write_str("t420-r17", t420_r17.to_string());
   j.end_obj();
 }
@@ -8533,7 +8541,8 @@ void scell_cfg_s::to_json(json_writer& j) const
     j.write_str("secondaryDRX-GroupConfig-r16", "true");
   }
   if (pre_conf_gap_status_r17_present) {
-    j.write_str("preConfGapStatus-r17", pre_conf_gap_status_r17.to_string());
+    j.write_fieldname("preConfGapStatus-r17");
+    pre_conf_gap_status_r17.to_json(j);
   }
   if (good_serving_cell_eval_bfd_r17.is_present()) {
     j.write_fieldname("goodServingCellEvaluationBFD-r17");
@@ -9021,6 +9030,7 @@ void ncr_slot_periodicity_and_slot_offset_r18_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::sl1:
+      j.write_null("sl1");
       break;
     case types::sl2:
       j.write_int("sl2", c.get<uint8_t>());
@@ -11016,7 +11026,8 @@ void cell_group_cfg_s::to_json(json_writer& j) const
     j.write_str("reportUplinkTxDirectCurrent", "true");
   }
   if (bap_address_r16_present) {
-    j.write_str("bap-Address-r16", bap_address_r16.to_string());
+    j.write_fieldname("bap-Address-r16");
+    bap_address_r16.to_json(j);
   }
   if (bh_rlc_ch_to_add_mod_list_r16.is_present()) {
     j.start_array("bh-RLC-ChannelToAddModList-r16");
@@ -11028,7 +11039,7 @@ void cell_group_cfg_s::to_json(json_writer& j) const
   if (bh_rlc_ch_to_release_list_r16.is_present()) {
     j.start_array("bh-RLC-ChannelToReleaseList-r16");
     for (const auto& e1 : *bh_rlc_ch_to_release_list_r16) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }

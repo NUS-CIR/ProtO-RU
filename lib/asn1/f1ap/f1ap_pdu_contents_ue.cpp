@@ -389,62 +389,58 @@ dl_rrc_msg_transfer_ies_o::value_c::area_specific_semi_persistent_srs_pos_info()
 }
 void dl_rrc_msg_transfer_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::old_gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::srb_id:
-      j.write_int("INTEGER (0..3,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::execute_dupl:
-      j.write_str("ExecuteDuplication", "true");
+      j.write_str("true");
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::rat_freq_prio_info:
-      j.write_fieldname("RAT-FrequencyPriorityInformation");
       c.get<rat_freq_prio_info_c>().to_json(j);
       break;
     case types::rrc_delivery_status_request:
-      j.write_str("RRCDeliveryStatusRequest", "true");
+      j.write_str("true");
       break;
     case types::ue_context_not_retrievable:
-      j.write_str("UEContextNotRetrievable", "true");
+      j.write_str("true");
       break;
     case types::redirected_rrc_msg:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::plmn_assist_info_for_net_shar:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<3, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<3, true>>().to_string());
       break;
     case types::new_gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::add_rrm_prio_idx:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<32, false, true>>().to_string());
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     case types::srb_map_info:
-      j.write_int("INTEGER (1..32)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::plmn_idx_nr_assist_info_for_net_shar:
-      j.write_int("INTEGER (1..12)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::area_specific_semi_persistent_srs_pos_info:
-      j.write_fieldname("AreaSpecificSemiPersistentSRSPosInfo");
       c.get<area_specific_semi_persistent_srs_pos_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "dl_rrc_msg_transfer_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE dl_rrc_msg_transfer_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -829,80 +825,115 @@ OCUDUASN_CODE dl_rrc_msg_transfer_ies_container::unpack(cbit_ref& bref)
 }
 void dl_rrc_msg_transfer_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
   if (old_gnb_du_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 47);
     j.write_str("criticality", "reject");
-    j.write_int("Value", old_gnb_du_ue_f1ap_id);
+    j.write_uint("value", old_gnb_du_ue_f1ap_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 64);
   j.write_str("criticality", "reject");
-  j.write_int("Value", srb_id);
+  j.write_int("value", srb_id);
+  j.end_obj();
   if (execute_dupl_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 50);
   j.write_str("criticality", "reject");
-  j.write_str("Value", rrc_container.to_string());
+  j.write_str("value", rrc_container.to_string());
+  j.end_obj();
   if (rat_freq_prio_info_present) {
+    j.start_obj();
     j.write_int("id", 108);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     rat_freq_prio_info.to_json(j);
+    j.end_obj();
   }
   if (rrc_delivery_status_request_present) {
+    j.start_obj();
     j.write_int("id", 184);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (ue_context_not_retrievable_present) {
+    j.start_obj();
     j.write_int("id", 222);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (redirected_rrc_msg_present) {
+    j.start_obj();
     j.write_int("id", 218);
     j.write_str("criticality", "reject");
-    j.write_str("Value", redirected_rrc_msg.to_string());
+    j.write_str("value", redirected_rrc_msg.to_string());
+    j.end_obj();
   }
   if (plmn_assist_info_for_net_shar_present) {
+    j.start_obj();
     j.write_int("id", 221);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", plmn_assist_info_for_net_shar.to_string());
+    j.write_str("value", plmn_assist_info_for_net_shar.to_string());
+    j.end_obj();
   }
   if (new_gnb_cu_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 217);
     j.write_str("criticality", "reject");
-    j.write_int("Value", new_gnb_cu_ue_f1ap_id);
+    j.write_uint("value", new_gnb_cu_ue_f1ap_id);
+    j.end_obj();
   }
   if (add_rrm_prio_idx_present) {
+    j.start_obj();
     j.write_int("id", 248);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", add_rrm_prio_idx.to_string());
+    j.write_fieldname("value");
+    add_rrm_prio_idx.to_json(j);
+    j.end_obj();
   }
   if (srb_map_info_present) {
+    j.start_obj();
     j.write_int("id", 597);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", srb_map_info);
+    j.write_int("value", srb_map_info);
+    j.end_obj();
   }
   if (plmn_idx_nr_assist_info_for_net_shar_present) {
+    j.start_obj();
     j.write_int("id", 861);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", plmn_idx_nr_assist_info_for_net_shar);
+    j.write_int("value", plmn_idx_nr_assist_info_for_net_shar);
+    j.end_obj();
   }
   if (area_specific_semi_persistent_srs_pos_info_present) {
+    j.start_obj();
     j.write_int("id", 919);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     area_specific_semi_persistent_srs_pos_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // InitialULRRCMessageTransferIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -1220,54 +1251,49 @@ const nr_e_red_cap_ue_ind_e& init_ul_rrc_msg_transfer_ies_o::value_c::nr_e_red_c
 }
 void init_ul_rrc_msg_transfer_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::nr_cgi:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     case types::c_rnti:
-      j.write_int("INTEGER (0..65535,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::du_to_cu_rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::sul_access_ind:
-      j.write_str("SULAccessIndication", "true");
+      j.write_str("true");
       break;
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ran_ue_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     case types::rrc_container_rrc_setup_complete:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::nr_red_cap_ue_ind:
-      j.write_str("NRRedCapUEIndication", "true");
+      j.write_str("true");
       break;
     case types::sdt_info:
-      j.write_fieldname("SDTInformation");
       c.get<sdt_info_s>().to_json(j);
       break;
     case types::sidelink_relay_cfg:
-      j.write_fieldname("SidelinkRelayConfiguration");
       c.get<sidelink_relay_cfg_s>().to_json(j);
       break;
     case types::nr_e_red_cap_ue_ind:
-      j.write_str("NReRedCapUEIndication", "true");
+      j.write_str("true");
       break;
     default:
       log_invalid_choice_id(type_, "init_ul_rrc_msg_transfer_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE init_ul_rrc_msg_transfer_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1591,63 +1617,92 @@ OCUDUASN_CODE init_ul_rrc_msg_transfer_ies_container::unpack(cbit_ref& bref)
 }
 void init_ul_rrc_msg_transfer_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 111);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   nr_cgi.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 95);
   j.write_str("criticality", "reject");
-  j.write_int("Value", c_rnti);
+  j.write_int("value", c_rnti);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 50);
   j.write_str("criticality", "reject");
-  j.write_str("Value", rrc_container.to_string());
+  j.write_str("value", rrc_container.to_string());
+  j.end_obj();
   if (du_to_cu_rrc_container_present) {
+    j.start_obj();
     j.write_int("id", 128);
     j.write_str("criticality", "reject");
-    j.write_str("Value", du_to_cu_rrc_container.to_string());
+    j.write_str("value", du_to_cu_rrc_container.to_string());
+    j.end_obj();
   }
   if (sul_access_ind_present) {
+    j.start_obj();
     j.write_int("id", 178);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 78);
   j.write_str("criticality", "ignore");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (ran_ue_id_present) {
+    j.start_obj();
     j.write_int("id", 226);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ran_ue_id.to_string());
+    j.write_str("value", ran_ue_id.to_string());
+    j.end_obj();
   }
   if (rrc_container_rrc_setup_complete_present) {
+    j.start_obj();
     j.write_int("id", 241);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", rrc_container_rrc_setup_complete.to_string());
+    j.write_str("value", rrc_container_rrc_setup_complete.to_string());
+    j.end_obj();
   }
   if (nr_red_cap_ue_ind_present) {
+    j.start_obj();
     j.write_int("id", 578);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (sdt_info_present) {
+    j.start_obj();
     j.write_int("id", 592);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sdt_info.to_json(j);
+    j.end_obj();
   }
   if (sidelink_relay_cfg_present) {
+    j.start_obj();
     j.write_int("id", 617);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sidelink_relay_cfg.to_json(j);
+    j.end_obj();
   }
   if (nr_e_red_cap_ue_ind_present) {
+    j.start_obj();
     j.write_int("id", 783);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextModificationConfirmIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -1947,61 +2002,58 @@ ue_context_mod_confirm_ies_o::value_c::ue_multicast_m_rbs_confirmed_to_be_modifi
 }
 void ue_context_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::res_coordination_transfer_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::drbs_modified_conf_list:
-      j.start_array("DRBs-ModifiedConf-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_modified_conf_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::execute_dupl:
-      j.write_str("ExecuteDuplication", "true");
+      j.write_str("true");
       break;
     case types::res_coordination_transfer_info:
-      j.write_fieldname("ResourceCoordinationTransferInformation");
       c.get<res_coordination_transfer_info_s>().to_json(j);
       break;
     case types::sl_drbs_modified_conf_list:
-      j.start_array("SLDRBs-ModifiedConf-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_modified_conf_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_modified_list:
-      j.start_array("UuRLCChannelModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_modified_list:
-      j.start_array("PC5RLCChannelModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_confirmed_to_be_modified_list:
-      j.start_array("UE-MulticastMRBs-ConfirmedToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_confirmed_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
@@ -2010,7 +2062,6 @@ void ue_context_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ue_context_mod_confirm_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_mod_confirm_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2317,84 +2368,110 @@ OCUDUASN_CODE ue_context_mod_confirm_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_mod_confirm_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
   if (res_coordination_transfer_container_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", res_coordination_transfer_container.to_string());
+    j.write_str("value", res_coordination_transfer_container.to_string());
+    j.end_obj();
   }
   if (drbs_modified_conf_list_present) {
+    j.start_obj();
     j.write_int("id", 19);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_modified_conf_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (rrc_container_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", rrc_container.to_string());
+    j.write_str("value", rrc_container.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (execute_dupl_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (res_coordination_transfer_info_present) {
+    j.start_obj();
     j.write_int("id", 195);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     res_coordination_transfer_info.to_json(j);
+    j.end_obj();
   }
   if (sl_drbs_modified_conf_list_present) {
+    j.start_obj();
     j.write_int("id", 337);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_modified_conf_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 604);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 616);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_confirmed_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 653);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_confirmed_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextModificationFailureIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -2552,30 +2629,25 @@ const nr_cgi_s& ue_context_mod_fail_ies_o::value_c::requested_target_cell_global
 }
 void ue_context_mod_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::requested_target_cell_global_id:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_mod_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_mod_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2738,27 +2810,40 @@ OCUDUASN_CODE ue_context_mod_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_mod_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (requested_target_cell_global_id_present) {
+    j.start_obj();
     j.write_int("id", 376);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     requested_target_cell_global_id.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextModificationRefuseIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -2896,26 +2981,22 @@ const crit_diagnostics_s& ue_context_mod_refuse_ies_o::value_c::crit_diagnostics
 }
 void ue_context_mod_refuse_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_mod_refuse_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_mod_refuse_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3059,22 +3140,32 @@ OCUDUASN_CODE ue_context_mod_refuse_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_mod_refuse_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextModificationRequestIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -5057,444 +5148,415 @@ const ltmtci_states_cfgs_list_l& ue_context_mod_request_ies_o::value_c::ltmtci_s
 }
 void ue_context_mod_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sp_cell_id:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     case types::serv_cell_idx:
-      j.write_int("INTEGER (0..31,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::sp_cell_ul_cfg:
-      j.write_str("CellULConfigured", c.get<cell_ul_cfg_e>().to_string());
+      j.write_str(c.get<cell_ul_cfg_e>().to_string());
       break;
     case types::drx_cycle:
-      j.write_fieldname("DRXCycle");
       c.get<drx_cycle_s>().to_json(j);
       break;
     case types::cu_to_du_rrc_info:
-      j.write_fieldname("CUtoDURRCInformation");
       c.get<cu_to_du_rrc_info_s>().to_json(j);
       break;
     case types::tx_action_ind:
-      j.write_str("TransmissionActionIndicator", c.get<tx_action_ind_e>().to_string());
+      j.write_str(c.get<tx_action_ind_e>().to_string());
       break;
     case types::res_coordination_transfer_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::rrc_recfg_complete_ind:
-      j.write_str("RRCReconfigurationCompleteIndicator", c.get<rrc_recfg_complete_ind_e>().to_string());
+      j.write_str(c.get<rrc_recfg_complete_ind_e>().to_string());
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::scell_to_be_setup_mod_list:
-      j.start_array("SCell-ToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<scell_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::scell_to_be_remd_list:
-      j.start_array("SCell-ToBeRemoved-List");
+      j.start_array("");
       for (const auto& e1 : c.get<scell_to_be_remd_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_to_be_setup_mod_list:
-      j.start_array("SRBs-ToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_to_be_setup_mod_list:
-      j.start_array("DRBs-ToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_to_be_modified_list:
-      j.start_array("DRBs-ToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_to_be_released_list:
-      j.start_array("SRBs-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_to_be_released_list:
-      j.start_array("DRBs-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::inactivity_monitoring_request:
-      j.write_str("InactivityMonitoringRequest", "true");
+      j.write_str("true");
       break;
     case types::rat_freq_prio_info:
-      j.write_fieldname("RAT-FrequencyPriorityInformation");
       c.get<rat_freq_prio_info_c>().to_json(j);
       break;
     case types::drx_cfg_ind:
-      j.write_str("DRXConfigurationIndicator", "release");
+      j.write_str("release");
       break;
     case types::rlc_fail_ind:
-      j.write_fieldname("RLCFailureIndication");
       c.get<rlc_fail_ind_s>().to_json(j);
       break;
     case types::ul_tx_direct_current_list_info:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::gnb_du_cfg_query:
-      j.write_str("GNB-DUConfigurationQuery", "true");
+      j.write_str("true");
       break;
     case types::gnb_du_ue_ambr_ul:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::execute_dupl:
-      j.write_str("ExecuteDuplication", "true");
+      j.write_str("true");
       break;
     case types::rrc_delivery_status_request:
-      j.write_str("RRCDeliveryStatusRequest", "true");
+      j.write_str("true");
       break;
     case types::res_coordination_transfer_info:
-      j.write_fieldname("ResourceCoordinationTransferInformation");
       c.get<res_coordination_transfer_info_s>().to_json(j);
       break;
     case types::serving_cell_mo:
-      j.write_int("INTEGER (1..64,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::needfor_gap:
-      j.write_str("NeedforGap", "true");
+      j.write_str("true");
       break;
     case types::full_cfg:
-      j.write_str("FullConfiguration", "full");
+      j.write_str("full");
       break;
     case types::add_rrm_prio_idx:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<32, false, true>>().to_string());
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     case types::lower_layer_presence_status_change:
-      j.write_str("LowerLayerPresenceStatusChange", c.get<lower_layer_presence_status_change_e>().to_string());
+      j.write_str(c.get<lower_layer_presence_status_change_e>().to_string());
       break;
     case types::bh_chs_to_be_setup_mod_list:
-      j.start_array("BHChannels-ToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_to_be_modified_list:
-      j.start_array("BHChannels-ToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_to_be_released_list:
-      j.start_array("BHChannels-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::nr_v2x_services_authorized:
-      j.write_fieldname("NRV2XServicesAuthorized");
       c.get<nr_v2x_services_authorized_s>().to_json(j);
       break;
     case types::ltev2x_services_authorized:
-      j.write_fieldname("LTEV2XServicesAuthorized");
       c.get<ltev2x_services_authorized_s>().to_json(j);
       break;
     case types::nr_ue_sidelink_aggr_max_bitrate:
-      j.write_fieldname("NRUESidelinkAggregateMaximumBitrate");
       c.get<nr_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::lte_ue_sidelink_aggr_max_bitrate:
-      j.write_fieldname("LTEUESidelinkAggregateMaximumBitrate");
       c.get<lte_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::pc5_link_ambr:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sl_drbs_to_be_setup_mod_list:
-      j.start_array("SLDRBs-ToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_to_be_modified_list:
-      j.start_array("SLDRBs-ToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_to_be_released_list:
-      j.start_array("SLDRBs-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::conditional_intra_du_mob_info:
-      j.write_fieldname("ConditionalIntraDUMobilityInformation");
       c.get<conditional_intra_du_mob_info_s>().to_json(j);
       break;
     case types::f1_c_transfer_path:
-      j.write_fieldname("F1CTransferPath");
       c.get<f1_c_transfer_path_s>().to_json(j);
       break;
     case types::scg_ind:
-      j.write_str("SCGIndicator", "released");
+      j.write_str("released");
       break;
     case types::ul_tx_direct_current_two_carrier_list_info:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::iab_conditional_rrc_msg_delivery_ind:
-      j.write_str("IABConditionalRRCMessageDeliveryIndication", "true");
+      j.write_str("true");
       break;
     case types::f1_c_transfer_path_nr_dc:
-      j.write_fieldname("F1CTransferPathNRDC");
       c.get<f1_c_transfer_path_nr_dc_s>().to_json(j);
       break;
     case types::mdt_polluted_meas_ind:
-      j.write_str("MDTPollutedMeasurementIndicator", c.get<mdt_polluted_meas_ind_e>().to_string());
+      j.write_str(c.get<mdt_polluted_meas_ind_e>().to_string());
       break;
     case types::scg_activation_request:
-      j.write_str("SCGActivationRequest", c.get<scg_activation_request_e>().to_string());
+      j.write_str(c.get<scg_activation_request_e>().to_string());
       break;
     case types::cg_sdt_query_ind:
-      j.write_str("CG-SDTQueryIndication", "true");
+      j.write_str("true");
       break;
     case types::five_g_pro_se_authorized:
-      j.write_fieldname("FiveG-ProSeAuthorized");
       c.get<five_g_pro_se_authorized_s>().to_json(j);
       break;
     case types::five_g_pro_se_ue_pc5_aggr_max_bitrate:
-      j.write_fieldname("NRUESidelinkAggregateMaximumBitrate");
       c.get<nr_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::five_g_pro_se_pc5_link_ambr:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::upd_remote_ue_local_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::uu_rlc_ch_to_be_setup_list:
-      j.start_array("UuRLCChannelToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_to_be_modified_list:
-      j.start_array("UuRLCChannelToBeModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_to_be_released_list:
-      j.start_array("UuRLCChannelToBeReleasedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_to_be_setup_list:
-      j.start_array("PC5RLCChannelToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_to_be_modified_list:
-      j.start_array("PC5RLCChannelToBeModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_to_be_released_list:
-      j.start_array("PC5RLCChannelToBeReleasedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::path_switch_cfg:
-      j.write_fieldname("PathSwitchConfiguration");
       c.get<path_switch_cfg_s>().to_json(j);
       break;
     case types::gnb_du_ue_slice_max_bit_rate_list:
-      j.start_array("GNBDUUESliceMaximumBitRateList");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_du_ue_slice_max_bit_rate_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::multicast_mbs_session_setup_list:
-      j.start_array("MulticastMBSSessionList");
+      j.start_array("");
       for (const auto& e1 : c.get<multicast_mbs_session_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::multicast_mbs_session_rem_list:
-      j.start_array("MulticastMBSSessionList");
+      j.start_array("");
       for (const auto& e1 : c.get<multicast_mbs_session_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_to_be_setup_at_modify_list:
-      j.start_array("UE-MulticastMRBs-ToBeSetup-atModify-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_to_be_setup_at_modify_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_to_be_released_list:
-      j.start_array("UE-MulticastMRBs-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sldrx_cycle_list:
-      j.start_array("SLDRXCycleList");
+      j.start_array("");
       for (const auto& e1 : c.get<sldrx_cycle_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::management_based_mdt_plmn_mod_list:
-      j.start_array("MDTPLMNModificationList");
+      j.start_array("");
       for (const auto& e1 : c.get<mdt_plmn_mod_list_l>()) {
         j.write_str(e1.to_string());
       }
       j.end_array();
       break;
     case types::sdt_bearer_cfg_query_ind:
-      j.write_str("SDTBearerConfigurationQueryIndication", "true");
+      j.write_str("true");
       break;
     case types::daps_ho_status:
-      j.write_str("DAPS-HO-Status", "initiation");
+      j.write_str("initiation");
       break;
     case types::serving_cell_mo_list:
-      j.start_array("ServingCellMO-List");
+      j.start_array("");
       for (const auto& e1 : c.get<serving_cell_mo_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ul_tx_direct_current_more_carrier_info:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::cp_acmcg_info:
-      j.write_fieldname("CPACMCGInformation");
       c.get<cp_acmcg_info_s>().to_json(j);
       break;
     case types::network_ctrl_repeater_authorized:
-      j.write_str("NetworkControlledRepeaterAuthorized", c.get<network_ctrl_repeater_authorized_e>().to_string());
+      j.write_str(c.get<network_ctrl_repeater_authorized_e>().to_string());
       break;
     case types::sdt_volume_thres:
-      j.write_int("INTEGER (1..192000,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ltm_info_modify:
-      j.write_fieldname("LTMInformation-Modify");
       c.get<ltm_info_modify_s>().to_json(j);
       break;
     case types::ltmcfra_res_cfg_list:
-      j.start_array("LTMCFRAResourceConfig-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ltmcfra_res_cfg_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ltm_cfg_id_map_list:
-      j.start_array("LTMConfigurationIDMappingList");
+      j.start_array("");
       for (const auto& e1 : c.get<ltm_cfg_id_map_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::early_sync_info_request:
-      j.write_fieldname("EarlySyncInformation-Request");
       c.get<early_sync_info_request_s>().to_json(j);
       break;
     case types::early_sync_candidate_cell_info_list:
-      j.start_array("EarlySyncCandidateCellInformation-List");
+      j.start_array("");
       for (const auto& e1 : c.get<early_sync_candidate_cell_info_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::early_sync_serving_cell_info:
-      j.write_fieldname("EarlySyncServingCellInformation");
       c.get<early_sync_serving_cell_info_s>().to_json(j);
       break;
     case types::ltm_cells_to_be_released_list:
-      j.start_array("LTMCells-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ltm_cells_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::path_addition_info:
-      j.write_fieldname("PathAdditionInformation");
       c.get<path_addition_info_c>().to_json(j);
       break;
     case types::nr_a2_x_services_authorized:
-      j.write_fieldname("NRA2XServicesAuthorized");
       c.get<nr_a2_x_services_authorized_s>().to_json(j);
       break;
     case types::ltea2_x_services_authorized:
-      j.write_fieldname("LTEA2XServicesAuthorized");
       c.get<ltea2_x_services_authorized_s>().to_json(j);
       break;
     case types::nr_ue_sidelink_aggr_max_bitrate_for_a2_x:
-      j.write_fieldname("NRUESidelinkAggregateMaximumBitrate");
       c.get<nr_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::lte_ue_sidelink_aggr_max_bitrate_for_a2_x:
-      j.write_fieldname("LTEUESidelinkAggregateMaximumBitrate");
       c.get<lte_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::dl_lbt_fail_info_request:
-      j.write_str("DLLBTFailureInformationRequest", "inquiry");
+      j.write_str("inquiry");
       break;
     case types::sl_positioning_ranging_service_info:
-      j.write_fieldname("SLPositioning-Ranging-Service-Info");
       c.get<sl_positioning_ranging_service_info_s>().to_json(j);
       break;
     case types::non_integer_drx_cycle:
-      j.write_fieldname("NonIntegerDRXCycle");
       c.get<non_integer_drx_cycle_s>().to_json(j);
       break;
     case types::ltm_reset_info:
-      j.write_fieldname("LTMResetInformation");
       c.get<ltm_reset_info_s>().to_json(j);
       break;
     case types::ltmtci_states_cfgs_list:
-      j.start_array("LTMTCIStatesConfigurationsList");
+      j.start_array("");
       for (const auto& e1 : c.get<ltmtci_states_cfgs_list_l>()) {
         e1.to_json(j);
       }
@@ -5503,7 +5565,6 @@ void ue_context_mod_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ue_context_mod_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_mod_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7471,607 +7532,826 @@ OCUDUASN_CODE ue_context_mod_request_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_mod_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
   if (sp_cell_id_present) {
+    j.start_obj();
     j.write_int("id", 63);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sp_cell_id.to_json(j);
+    j.end_obj();
   }
   if (serv_cell_idx_present) {
+    j.start_obj();
     j.write_int("id", 107);
     j.write_str("criticality", "reject");
-    j.write_int("Value", serv_cell_idx);
+    j.write_int("value", serv_cell_idx);
+    j.end_obj();
   }
   if (sp_cell_ul_cfg_present) {
+    j.start_obj();
     j.write_int("id", 96);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", sp_cell_ul_cfg.to_string());
+    j.write_str("value", sp_cell_ul_cfg.to_string());
+    j.end_obj();
   }
   if (drx_cycle_present) {
+    j.start_obj();
     j.write_int("id", 38);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     drx_cycle.to_json(j);
+    j.end_obj();
   }
   if (cu_to_du_rrc_info_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     cu_to_du_rrc_info.to_json(j);
+    j.end_obj();
   }
   if (tx_action_ind_present) {
+    j.start_obj();
     j.write_int("id", 79);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", tx_action_ind.to_string());
+    j.write_str("value", tx_action_ind.to_string());
+    j.end_obj();
   }
   if (res_coordination_transfer_container_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", res_coordination_transfer_container.to_string());
+    j.write_str("value", res_coordination_transfer_container.to_string());
+    j.end_obj();
   }
   if (rrc_recfg_complete_ind_present) {
+    j.start_obj();
     j.write_int("id", 87);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", rrc_recfg_complete_ind.to_string());
+    j.write_str("value", rrc_recfg_complete_ind.to_string());
+    j.end_obj();
   }
   if (rrc_container_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "reject");
-    j.write_str("Value", rrc_container.to_string());
+    j.write_str("value", rrc_container.to_string());
+    j.end_obj();
   }
   if (scell_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 56);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : scell_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (scell_to_be_remd_list_present) {
+    j.start_obj();
     j.write_int("id", 52);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : scell_to_be_remd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 76);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 37);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 72);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 33);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (inactivity_monitoring_request_present) {
+    j.start_obj();
     j.write_int("id", 97);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (rat_freq_prio_info_present) {
+    j.start_obj();
     j.write_int("id", 108);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     rat_freq_prio_info.to_json(j);
+    j.end_obj();
   }
   if (drx_cfg_ind_present) {
+    j.start_obj();
     j.write_int("id", 159);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "release");
+    j.write_str("value", "release");
+    j.end_obj();
   }
   if (rlc_fail_ind_present) {
+    j.start_obj();
     j.write_int("id", 174);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     rlc_fail_ind.to_json(j);
+    j.end_obj();
   }
   if (ul_tx_direct_current_list_info_present) {
+    j.start_obj();
     j.write_int("id", 175);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ul_tx_direct_current_list_info.to_string());
+    j.write_str("value", ul_tx_direct_current_list_info.to_string());
+    j.end_obj();
   }
   if (gnb_du_cfg_query_present) {
+    j.start_obj();
     j.write_int("id", 162);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (gnb_du_ue_ambr_ul_present) {
+    j.start_obj();
     j.write_int("id", 158);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_du_ue_ambr_ul);
+    j.write_uint("value", gnb_du_ue_ambr_ul);
+    j.end_obj();
   }
   if (execute_dupl_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (rrc_delivery_status_request_present) {
+    j.start_obj();
     j.write_int("id", 184);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (res_coordination_transfer_info_present) {
+    j.start_obj();
     j.write_int("id", 195);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     res_coordination_transfer_info.to_json(j);
+    j.end_obj();
   }
   if (serving_cell_mo_present) {
+    j.start_obj();
     j.write_int("id", 182);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", serving_cell_mo);
+    j.write_int("value", serving_cell_mo);
+    j.end_obj();
   }
   if (needfor_gap_present) {
+    j.start_obj();
     j.write_int("id", 215);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (full_cfg_present) {
+    j.start_obj();
     j.write_int("id", 94);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "full");
+    j.write_str("value", "full");
+    j.end_obj();
   }
   if (add_rrm_prio_idx_present) {
+    j.start_obj();
     j.write_int("id", 248);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", add_rrm_prio_idx.to_string());
+    j.write_fieldname("value");
+    add_rrm_prio_idx.to_json(j);
+    j.end_obj();
   }
   if (lower_layer_presence_status_change_present) {
+    j.start_obj();
     j.write_int("id", 253);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", lower_layer_presence_status_change.to_string());
+    j.write_str("value", lower_layer_presence_status_change.to_string());
+    j.end_obj();
   }
   if (bh_chs_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 267);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 263);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 265);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (nr_v2x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 306);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_v2x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (ltev2x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 307);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltev2x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (nr_ue_sidelink_aggr_max_bitrate_present) {
+    j.start_obj();
     j.write_int("id", 308);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_ue_sidelink_aggr_max_bitrate.to_json(j);
+    j.end_obj();
   }
   if (lte_ue_sidelink_aggr_max_bitrate_present) {
+    j.start_obj();
     j.write_int("id", 309);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     lte_ue_sidelink_aggr_max_bitrate.to_json(j);
+    j.end_obj();
   }
   if (pc5_link_ambr_present) {
+    j.start_obj();
     j.write_int("id", 340);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", pc5_link_ambr);
+    j.write_uint("value", pc5_link_ambr);
+    j.end_obj();
   }
   if (sl_drbs_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 332);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 326);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 328);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (conditional_intra_du_mob_info_present) {
+    j.start_obj();
     j.write_int("id", 374);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     conditional_intra_du_mob_info.to_json(j);
+    j.end_obj();
   }
   if (f1_c_transfer_path_present) {
+    j.start_obj();
     j.write_int("id", 428);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     f1_c_transfer_path.to_json(j);
+    j.end_obj();
   }
   if (scg_ind_present) {
+    j.start_obj();
     j.write_int("id", 432);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "released");
+    j.write_str("value", "released");
+    j.end_obj();
   }
   if (ul_tx_direct_current_two_carrier_list_info_present) {
+    j.start_obj();
     j.write_int("id", 684);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ul_tx_direct_current_two_carrier_list_info.to_string());
+    j.write_str("value", ul_tx_direct_current_two_carrier_list_info.to_string());
+    j.end_obj();
   }
   if (iab_conditional_rrc_msg_delivery_ind_present) {
+    j.start_obj();
     j.write_int("id", 510);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (f1_c_transfer_path_nr_dc_present) {
+    j.start_obj();
     j.write_int("id", 511);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     f1_c_transfer_path_nr_dc.to_json(j);
+    j.end_obj();
   }
   if (mdt_polluted_meas_ind_present) {
+    j.start_obj();
     j.write_int("id", 536);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", mdt_polluted_meas_ind.to_string());
+    j.write_str("value", mdt_polluted_meas_ind.to_string());
+    j.end_obj();
   }
   if (scg_activation_request_present) {
+    j.start_obj();
     j.write_int("id", 547);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", scg_activation_request.to_string());
+    j.write_str("value", scg_activation_request.to_string());
+    j.end_obj();
   }
   if (cg_sdt_query_ind_present) {
+    j.start_obj();
     j.write_int("id", 586);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (five_g_pro_se_authorized_present) {
+    j.start_obj();
     j.write_int("id", 594);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     five_g_pro_se_authorized.to_json(j);
+    j.end_obj();
   }
   if (five_g_pro_se_ue_pc5_aggr_max_bitrate_present) {
+    j.start_obj();
     j.write_int("id", 595);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     five_g_pro_se_ue_pc5_aggr_max_bitrate.to_json(j);
+    j.end_obj();
   }
   if (five_g_pro_se_pc5_link_ambr_present) {
+    j.start_obj();
     j.write_int("id", 596);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", five_g_pro_se_pc5_link_ambr);
+    j.write_uint("value", five_g_pro_se_pc5_link_ambr);
+    j.end_obj();
   }
   if (upd_remote_ue_local_id_present) {
+    j.start_obj();
     j.write_int("id", 618);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", upd_remote_ue_local_id);
+    j.write_int("value", upd_remote_ue_local_id);
+    j.end_obj();
   }
   if (uu_rlc_ch_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 599);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 600);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 601);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 608);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 609);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 610);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (path_switch_cfg_present) {
+    j.start_obj();
     j.write_int("id", 619);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     path_switch_cfg.to_json(j);
+    j.end_obj();
   }
   if (gnb_du_ue_slice_max_bit_rate_list_present) {
+    j.start_obj();
     j.write_int("id", 626);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_du_ue_slice_max_bit_rate_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (multicast_mbs_session_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 632);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : multicast_mbs_session_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (multicast_mbs_session_rem_list_present) {
+    j.start_obj();
     j.write_int("id", 633);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : multicast_mbs_session_rem_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_to_be_setup_at_modify_list_present) {
+    j.start_obj();
     j.write_int("id", 685);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_to_be_setup_at_modify_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 628);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sldrx_cycle_list_present) {
+    j.start_obj();
     j.write_int("id", 643);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sldrx_cycle_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (management_based_mdt_plmn_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 647);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : management_based_mdt_plmn_mod_list) {
       j.write_str(e1.to_string());
     }
     j.end_array();
+    j.end_obj();
   }
   if (sdt_bearer_cfg_query_ind_present) {
+    j.start_obj();
     j.write_int("id", 675);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (daps_ho_status_present) {
+    j.start_obj();
     j.write_int("id", 683);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "initiation");
+    j.write_str("value", "initiation");
+    j.end_obj();
   }
   if (serving_cell_mo_list_present) {
+    j.start_obj();
     j.write_int("id", 695);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : serving_cell_mo_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ul_tx_direct_current_more_carrier_info_present) {
+    j.start_obj();
     j.write_int("id", 690);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ul_tx_direct_current_more_carrier_info.to_string());
+    j.write_str("value", ul_tx_direct_current_more_carrier_info.to_string());
+    j.end_obj();
   }
   if (cp_acmcg_info_present) {
+    j.start_obj();
     j.write_int("id", 691);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     cp_acmcg_info.to_json(j);
+    j.end_obj();
   }
   if (network_ctrl_repeater_authorized_present) {
+    j.start_obj();
     j.write_int("id", 712);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", network_ctrl_repeater_authorized.to_string());
+    j.write_str("value", network_ctrl_repeater_authorized.to_string());
+    j.end_obj();
   }
   if (sdt_volume_thres_present) {
+    j.start_obj();
     j.write_int("id", 716);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sdt_volume_thres);
+    j.write_int("value", sdt_volume_thres);
+    j.end_obj();
   }
   if (ltm_info_modify_present) {
+    j.start_obj();
     j.write_int("id", 722);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     ltm_info_modify.to_json(j);
+    j.end_obj();
   }
   if (ltmcfra_res_cfg_list_present) {
+    j.start_obj();
     j.write_int("id", 845);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltmcfra_res_cfg_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ltm_cfg_id_map_list_present) {
+    j.start_obj();
     j.write_int("id", 721);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltm_cfg_id_map_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (early_sync_info_request_present) {
+    j.start_obj();
     j.write_int("id", 726);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     early_sync_info_request.to_json(j);
+    j.end_obj();
   }
   if (early_sync_candidate_cell_info_list_present) {
+    j.start_obj();
     j.write_int("id", 728);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : early_sync_candidate_cell_info_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (early_sync_serving_cell_info_present) {
+    j.start_obj();
     j.write_int("id", 843);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     early_sync_serving_cell_info.to_json(j);
+    j.end_obj();
   }
   if (ltm_cells_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 723);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltm_cells_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (path_addition_info_present) {
+    j.start_obj();
     j.write_int("id", 741);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     path_addition_info.to_json(j);
+    j.end_obj();
   }
   if (nr_a2_x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 779);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_a2_x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (ltea2_x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 780);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltea2_x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (nr_ue_sidelink_aggr_max_bitrate_for_a2_x_present) {
+    j.start_obj();
     j.write_int("id", 781);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_ue_sidelink_aggr_max_bitrate_for_a2_x.to_json(j);
+    j.end_obj();
   }
   if (lte_ue_sidelink_aggr_max_bitrate_for_a2_x_present) {
+    j.start_obj();
     j.write_int("id", 782);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     lte_ue_sidelink_aggr_max_bitrate_for_a2_x.to_json(j);
+    j.end_obj();
   }
   if (dl_lbt_fail_info_request_present) {
+    j.start_obj();
     j.write_int("id", 794);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "inquiry");
+    j.write_str("value", "inquiry");
+    j.end_obj();
   }
   if (sl_positioning_ranging_service_info_present) {
+    j.start_obj();
     j.write_int("id", 801);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sl_positioning_ranging_service_info.to_json(j);
+    j.end_obj();
   }
   if (non_integer_drx_cycle_present) {
+    j.start_obj();
     j.write_int("id", 838);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     non_integer_drx_cycle.to_json(j);
+    j.end_obj();
   }
   if (ltm_reset_info_present) {
+    j.start_obj();
     j.write_int("id", 855);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltm_reset_info.to_json(j);
+    j.end_obj();
   }
   if (ltmtci_states_cfgs_list_present) {
+    j.start_obj();
     j.write_int("id", 863);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltmtci_states_cfgs_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextModificationRequiredIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -8529,118 +8809,115 @@ const ltm_cells_to_be_released_list_l& ue_context_mod_required_ies_o::value_c::l
 }
 void ue_context_mod_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::res_coordination_transfer_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::du_to_cu_rrc_info:
-      j.write_fieldname("DUtoCURRCInformation");
       c.get<du_to_cu_rrc_info_s>().to_json(j);
       break;
     case types::drbs_required_to_be_modified_list:
-      j.start_array("DRBs-Required-ToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_required_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_required_to_be_released_list:
-      j.start_array("SRBs-Required-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_required_to_be_released_list:
-      j.start_array("DRBs-Required-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::bh_chs_required_to_be_released_list:
-      j.start_array("BHChannels-Required-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_required_to_be_modified_list:
-      j.start_array("SLDRBs-Required-ToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_required_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_required_to_be_released_list:
-      j.start_array("SLDRBs-Required-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::target_cells_to_cancel:
-      j.start_array("TargetCellList");
+      j.start_array("");
       for (const auto& e1 : c.get<target_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_required_to_be_modified_list:
-      j.start_array("UuRLCChannelRequiredToBeModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_required_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_required_to_be_released_list:
-      j.start_array("UuRLCChannelRequiredToBeReleasedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_required_to_be_modified_list:
-      j.start_array("PC5RLCChannelRequiredToBeModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_required_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_required_to_be_released_list:
-      j.start_array("PC5RLCChannelRequiredToBeReleasedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_required_to_be_modified_list:
-      j.start_array("UE-MulticastMRBs-RequiredToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_required_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_required_to_be_released_list:
-      j.start_array("UE-MulticastMRBs-RequiredToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_required_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ltm_cells_to_be_released_list:
-      j.start_array("LTMCells-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ltm_cells_to_be_released_list_l>()) {
         e1.to_json(j);
       }
@@ -8649,7 +8926,6 @@ void ue_context_mod_required_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ue_context_mod_required_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_mod_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9095,153 +9371,193 @@ OCUDUASN_CODE ue_context_mod_required_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_mod_required_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
   if (res_coordination_transfer_container_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", res_coordination_transfer_container.to_string());
+    j.write_str("value", res_coordination_transfer_container.to_string());
+    j.end_obj();
   }
   if (du_to_cu_rrc_info_present) {
+    j.start_obj();
     j.write_int("id", 39);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     du_to_cu_rrc_info.to_json(j);
+    j.end_obj();
   }
   if (drbs_required_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 23);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_required_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 70);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 25);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (bh_chs_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 277);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_required_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 320);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_required_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 322);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (target_cells_to_cancel_present) {
+    j.start_obj();
     j.write_int("id", 375);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : target_cells_to_cancel) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_required_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 606);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_required_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 607);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_required_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 614);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_required_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 615);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_required_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 655);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_required_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_required_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 657);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_required_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ltm_cells_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 723);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltm_cells_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextModificationResponseIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -10170,260 +10486,251 @@ const s_cp_ac_cfg_s& ue_context_mod_resp_ies_o::value_c::s_cp_ac_cfg() const
 }
 void ue_context_mod_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::res_coordination_transfer_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::du_to_cu_rrc_info:
-      j.write_fieldname("DUtoCURRCInformation");
       c.get<du_to_cu_rrc_info_s>().to_json(j);
       break;
     case types::drbs_setup_mod_list:
-      j.start_array("DRBs-SetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_modified_list:
-      j.start_array("DRBs-Modified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_failed_to_be_setup_mod_list:
-      j.start_array("SRBs-FailedToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_failed_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_failed_to_be_setup_mod_list:
-      j.start_array("DRBs-FailedToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_failed_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::scell_failedto_setup_mod_list:
-      j.start_array("SCell-FailedtoSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<scell_failedto_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_failed_to_be_modified_list:
-      j.start_array("DRBs-FailedToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_failed_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::inactivity_monitoring_resp:
-      j.write_str("InactivityMonitoringResponse", "not-supported");
+      j.write_str("not-supported");
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::c_rnti:
-      j.write_int("INTEGER (0..65535,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::associated_scell_list:
-      j.start_array("Associated-SCell-List");
+      j.start_array("");
       for (const auto& e1 : c.get<associated_scell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_setup_mod_list:
-      j.start_array("SRBs-SetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_modified_list:
-      j.start_array("SRBs-Modified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::full_cfg:
-      j.write_str("FullConfiguration", "full");
+      j.write_str("full");
       break;
     case types::bh_chs_setup_mod_list:
-      j.start_array("BHChannels-SetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_modified_list:
-      j.start_array("BHChannels-Modified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_failed_to_be_setup_mod_list:
-      j.start_array("BHChannels-FailedToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_failed_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_failed_to_be_modified_list:
-      j.start_array("BHChannels-FailedToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_failed_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_setup_mod_list:
-      j.start_array("SLDRBs-SetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_modified_list:
-      j.start_array("SLDRBs-Modified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_failed_to_be_setup_mod_list:
-      j.start_array("SLDRBs-FailedToBeSetupMod-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_failed_to_be_setup_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_failed_to_be_modified_list:
-      j.start_array("SLDRBs-FailedToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_failed_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::requested_target_cell_global_id:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     case types::scg_activation_status:
-      j.write_str("SCGActivationStatus", c.get<scg_activation_status_e>().to_string());
+      j.write_str(c.get<scg_activation_status_e>().to_string());
       break;
     case types::uu_rlc_ch_setup_list:
-      j.start_array("UuRLCChannelSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_failed_to_be_setup_list:
-      j.start_array("UuRLCChannelFailedToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_modified_list:
-      j.start_array("UuRLCChannelModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_failed_to_be_modified_list:
-      j.start_array("UuRLCChannelFailedToBeModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_failed_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_setup_list:
-      j.start_array("PC5RLCChannelSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_failed_to_be_setup_list:
-      j.start_array("PC5RLCChannelFailedToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_modified_list:
-      j.start_array("PC5RLCChannelModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_failed_to_be_modified_list:
-      j.start_array("PC5RLCChannelFailedToBeModifiedList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_failed_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sdt_bearer_cfg_info:
-      j.write_fieldname("SDTBearerConfigurationInfo");
       c.get<sdt_bearer_cfg_info_s>().to_json(j);
       break;
     case types::ue_multicast_m_rbs_setup_list:
-      j.start_array("UE-MulticastMRBs-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::serving_cell_mo_encoded_in_cgc_list:
-      j.start_array("ServingCellMO-encoded-in-CGC-List");
+      j.start_array("");
       for (const auto& e1 : c.get<serving_cell_mo_encoded_in_cgc_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ded_si_delivery_ind:
-      j.write_str("DedicatedSIDeliveryIndication", "true");
+      j.write_str("true");
       break;
     case types::cfg_bwp_list:
-      j.start_array("Configured-BWP-List");
+      j.start_array("");
       for (const auto& e1 : c.get<cfg_bwp_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::early_sync_info:
-      j.write_fieldname("EarlySyncInformation");
       c.get<early_sync_info_s>().to_json(j);
       break;
     case types::ltm_cfg:
-      j.write_fieldname("LTMConfiguration");
       c.get<ltm_cfg_s>().to_json(j);
       break;
     case types::s_cp_ac_cfg:
-      j.write_fieldname("S-CPAC-Configuration");
       c.get<s_cp_ac_cfg_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_mod_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_mod_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11350,331 +11657,424 @@ OCUDUASN_CODE ue_context_mod_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_mod_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
   if (res_coordination_transfer_container_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", res_coordination_transfer_container.to_string());
+    j.write_str("value", res_coordination_transfer_container.to_string());
+    j.end_obj();
   }
   if (du_to_cu_rrc_info_present) {
+    j.start_obj();
     j.write_int("id", 39);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     du_to_cu_rrc_info.to_json(j);
+    j.end_obj();
   }
   if (drbs_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 29);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 21);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_failed_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 68);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_failed_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_failed_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 17);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_failed_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (scell_failedto_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 85);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : scell_failedto_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_failed_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 13);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_failed_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (inactivity_monitoring_resp_present) {
+    j.start_obj();
     j.write_int("id", 98);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "not-supported");
+    j.write_str("value", "not-supported");
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (c_rnti_present) {
+    j.start_obj();
     j.write_int("id", 95);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", c_rnti);
+    j.write_int("value", c_rnti);
+    j.end_obj();
   }
   if (associated_scell_list_present) {
+    j.start_obj();
     j.write_int("id", 198);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : associated_scell_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 204);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 206);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (full_cfg_present) {
+    j.start_obj();
     j.write_int("id", 94);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "full");
+    j.write_str("value", "full");
+    j.end_obj();
   }
   if (bh_chs_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 275);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 273);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_failed_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 271);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_failed_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_failed_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 269);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_failed_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 333);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 318);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_failed_to_be_setup_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 334);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_failed_to_be_setup_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_failed_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 314);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_failed_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (requested_target_cell_global_id_present) {
+    j.start_obj();
     j.write_int("id", 376);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     requested_target_cell_global_id.to_json(j);
+    j.end_obj();
   }
   if (scg_activation_status_present) {
+    j.start_obj();
     j.write_int("id", 548);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", scg_activation_status.to_string());
+    j.write_str("value", scg_activation_status.to_string());
+    j.end_obj();
   }
   if (uu_rlc_ch_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 602);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 603);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 604);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_failed_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 605);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_failed_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 611);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 612);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 616);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_failed_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 613);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_failed_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sdt_bearer_cfg_info_present) {
+    j.start_obj();
     j.write_int("id", 676);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sdt_bearer_cfg_info.to_json(j);
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 679);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (serving_cell_mo_encoded_in_cgc_list_present) {
+    j.start_obj();
     j.write_int("id", 697);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : serving_cell_mo_encoded_in_cgc_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ded_si_delivery_ind_present) {
+    j.start_obj();
     j.write_int("id", 708);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (cfg_bwp_list_present) {
+    j.start_obj();
     j.write_int("id", 709);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : cfg_bwp_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (early_sync_info_present) {
+    j.start_obj();
     j.write_int("id", 727);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     early_sync_info.to_json(j);
+    j.end_obj();
   }
   if (ltm_cfg_present) {
+    j.start_obj();
     j.write_int("id", 725);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltm_cfg.to_json(j);
+    j.end_obj();
   }
   if (s_cp_ac_cfg_present) {
+    j.start_obj();
     j.write_int("id", 792);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     s_cp_ac_cfg.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextReleaseCommandIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -11992,60 +12392,57 @@ const dl_lbt_fail_info_request_e& ue_context_release_cmd_ies_o::value_c::dl_lbt_
 }
 void ue_context_release_cmd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::srb_id:
-      j.write_int("INTEGER (0..3,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::old_gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::execute_dupl:
-      j.write_str("ExecuteDuplication", "true");
+      j.write_str("true");
       break;
     case types::rrc_delivery_status_request:
-      j.write_str("RRCDeliveryStatusRequest", "true");
+      j.write_str("true");
       break;
     case types::target_cells_to_cancel:
-      j.start_array("TargetCellList");
+      j.start_array("");
       for (const auto& e1 : c.get<target_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pos_context_rev_ind:
-      j.write_str("PosContextRevIndication", "true");
+      j.write_str("true");
       break;
     case types::cg_sdt_kept_ind:
-      j.write_str("CG-SDTKeptIndicator", "true");
+      j.write_str("true");
       break;
     case types::ltm_cells_to_be_released_list:
-      j.start_array("LTMCells-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ltm_cells_to_be_released_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::dl_lbt_fail_info_request:
-      j.write_str("DLLBTFailureInformationRequest", "inquiry");
+      j.write_str("inquiry");
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_release_cmd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_release_cmd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -12371,75 +12768,102 @@ OCUDUASN_CODE ue_context_release_cmd_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_release_cmd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (rrc_container_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", rrc_container.to_string());
+    j.write_str("value", rrc_container.to_string());
+    j.end_obj();
   }
   if (srb_id_present) {
+    j.start_obj();
     j.write_int("id", 64);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", srb_id);
+    j.write_int("value", srb_id);
+    j.end_obj();
   }
   if (old_gnb_du_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 47);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", old_gnb_du_ue_f1ap_id);
+    j.write_uint("value", old_gnb_du_ue_f1ap_id);
+    j.end_obj();
   }
   if (execute_dupl_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (rrc_delivery_status_request_present) {
+    j.start_obj();
     j.write_int("id", 184);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (target_cells_to_cancel_present) {
+    j.start_obj();
     j.write_int("id", 375);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : target_cells_to_cancel) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pos_context_rev_ind_present) {
+    j.start_obj();
     j.write_int("id", 576);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (cg_sdt_kept_ind_present) {
+    j.start_obj();
     j.write_int("id", 588);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (ltm_cells_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 723);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltm_cells_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (dl_lbt_fail_info_request_present) {
+    j.start_obj();
     j.write_int("id", 794);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "inquiry");
+    j.write_str("value", "inquiry");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextReleaseCompleteIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -12578,20 +13002,18 @@ ue_context_release_complete_ies_o::value_c::recommended_ss_bs_for_paging_list() 
 }
 void ue_context_release_complete_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::recommended_ss_bs_for_paging_list:
-      j.start_array("Recommended-SSBs-for-Paging-List");
+      j.start_array("");
       for (const auto& e1 : c.get<recommended_ss_bs_for_paging_list_l>()) {
         e1.to_json(j);
       }
@@ -12600,7 +13022,6 @@ void ue_context_release_complete_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ue_context_release_complete_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_release_complete_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -12747,28 +13168,37 @@ OCUDUASN_CODE ue_context_release_complete_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_release_complete_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (recommended_ss_bs_for_paging_list_present) {
+    j.start_obj();
     j.write_int("id", 743);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : recommended_ss_bs_for_paging_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextReleaseRequestIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -12926,27 +13356,25 @@ const ltm_cells_to_be_released_list_l& ue_context_release_request_ies_o::value_c
 }
 void ue_context_release_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::target_cells_to_cancel:
-      j.start_array("TargetCellList");
+      j.start_array("");
       for (const auto& e1 : c.get<target_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ltm_cells_to_be_released_list:
-      j.start_array("LTMCells-ToBeReleased-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ltm_cells_to_be_released_list_l>()) {
         e1.to_json(j);
       }
@@ -12955,7 +13383,6 @@ void ue_context_release_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ue_context_release_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_release_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13118,35 +13545,46 @@ OCUDUASN_CODE ue_context_release_request_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_release_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (target_cells_to_cancel_present) {
+    j.start_obj();
     j.write_int("id", 375);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : target_cells_to_cancel) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ltm_cells_to_be_released_list_present) {
+    j.start_obj();
     j.write_int("id", 723);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltm_cells_to_be_released_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextSetupFailureIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -13324,37 +13762,32 @@ const nr_cgi_s& ue_context_setup_fail_ies_o::value_c::requested_target_cell_glob
 }
 void ue_context_setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::potential_sp_cell_list:
-      j.start_array("Potential-SpCell-List");
+      j.start_array("");
       for (const auto& e1 : c.get<potential_sp_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::requested_target_cell_global_id:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13541,38 +13974,53 @@ OCUDUASN_CODE ue_context_setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
   if (gnb_du_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 41);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_du_ue_f1ap_id);
+    j.write_uint("value", gnb_du_ue_f1ap_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 0);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (potential_sp_cell_list_present) {
+    j.start_obj();
     j.write_int("id", 92);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : potential_sp_cell_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (requested_target_cell_global_id_present) {
+    j.start_obj();
     j.write_int("id", 376);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     requested_target_cell_global_id.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextSetupRequestIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -14925,286 +15373,258 @@ const non_integer_drx_cycle_s& ue_context_setup_request_ies_o::value_c::non_inte
 }
 void ue_context_setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sp_cell_id:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     case types::serv_cell_idx:
-      j.write_int("INTEGER (0..31,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::sp_cell_ul_cfg:
-      j.write_str("CellULConfigured", c.get<cell_ul_cfg_e>().to_string());
+      j.write_str(c.get<cell_ul_cfg_e>().to_string());
       break;
     case types::cu_to_du_rrc_info:
-      j.write_fieldname("CUtoDURRCInformation");
       c.get<cu_to_du_rrc_info_s>().to_json(j);
       break;
     case types::candidate_sp_cell_list:
-      j.start_array("Candidate-SpCell-List");
+      j.start_array("");
       for (const auto& e1 : c.get<candidate_sp_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drx_cycle:
-      j.write_fieldname("DRXCycle");
       c.get<drx_cycle_s>().to_json(j);
       break;
     case types::res_coordination_transfer_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::scell_to_be_setup_list:
-      j.start_array("SCell-ToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<scell_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_to_be_setup_list:
-      j.start_array("SRBs-ToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_to_be_setup_list:
-      j.start_array("DRBs-ToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::inactivity_monitoring_request:
-      j.write_str("InactivityMonitoringRequest", "true");
+      j.write_str("true");
       break;
     case types::rat_freq_prio_info:
-      j.write_fieldname("RAT-FrequencyPriorityInformation");
       c.get<rat_freq_prio_info_c>().to_json(j);
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::masked_imeisv:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<64, false, true>>().to_string());
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::serving_plmn:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<3, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<3, true>>().to_string());
       break;
     case types::gnb_du_ue_ambr_ul:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::rrc_delivery_status_request:
-      j.write_str("RRCDeliveryStatusRequest", "true");
+      j.write_str("true");
       break;
     case types::res_coordination_transfer_info:
-      j.write_fieldname("ResourceCoordinationTransferInformation");
       c.get<res_coordination_transfer_info_s>().to_json(j);
       break;
     case types::serving_cell_mo:
-      j.write_int("INTEGER (1..64,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::new_gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::ran_ue_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     case types::trace_activation:
-      j.write_fieldname("TraceActivation");
       c.get<trace_activation_s>().to_json(j);
       break;
     case types::add_rrm_prio_idx:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<32, false, true>>().to_string());
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     case types::bh_chs_to_be_setup_list:
-      j.start_array("BHChannels-ToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::cfg_bap_address:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<10, false, true>>().to_string());
+      c.get<fixed_bitstring<10, false, true>>().to_json(j);
       break;
     case types::nr_v2x_services_authorized:
-      j.write_fieldname("NRV2XServicesAuthorized");
       c.get<nr_v2x_services_authorized_s>().to_json(j);
       break;
     case types::ltev2x_services_authorized:
-      j.write_fieldname("LTEV2XServicesAuthorized");
       c.get<ltev2x_services_authorized_s>().to_json(j);
       break;
     case types::nr_ue_sidelink_aggr_max_bitrate:
-      j.write_fieldname("NRUESidelinkAggregateMaximumBitrate");
       c.get<nr_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::lte_ue_sidelink_aggr_max_bitrate:
-      j.write_fieldname("LTEUESidelinkAggregateMaximumBitrate");
       c.get<lte_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::pc5_link_ambr:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::sl_drbs_to_be_setup_list:
-      j.start_array("SLDRBs-ToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::conditional_inter_du_mob_info:
-      j.write_fieldname("ConditionalInterDUMobilityInformation");
       c.get<conditional_inter_du_mob_info_s>().to_json(j);
       break;
     case types::management_based_mdt_plmn_list:
-      j.start_array("MDTPLMNList");
+      j.start_array("");
       for (const auto& e1 : c.get<mdt_plmn_list_l>()) {
         j.write_str(e1.to_string());
       }
       j.end_array();
       break;
     case types::serving_n_id:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<44, false, true>>().to_string());
+      c.get<fixed_bitstring<44, false, true>>().to_json(j);
       break;
     case types::f1_c_transfer_path:
-      j.write_fieldname("F1CTransferPath");
       c.get<f1_c_transfer_path_s>().to_json(j);
       break;
     case types::f1_c_transfer_path_nr_dc:
-      j.write_fieldname("F1CTransferPathNRDC");
       c.get<f1_c_transfer_path_nr_dc_s>().to_json(j);
       break;
     case types::mdt_polluted_meas_ind:
-      j.write_str("MDTPollutedMeasurementIndicator", c.get<mdt_polluted_meas_ind_e>().to_string());
+      j.write_str(c.get<mdt_polluted_meas_ind_e>().to_string());
       break;
     case types::scg_activation_request:
-      j.write_str("SCGActivationRequest", c.get<scg_activation_request_e>().to_string());
+      j.write_str(c.get<scg_activation_request_e>().to_string());
       break;
     case types::cg_sdt_session_info_old:
-      j.write_fieldname("CG-SDTSessionInfo");
       c.get<cg_sdt_session_info_s>().to_json(j);
       break;
     case types::five_g_pro_se_authorized:
-      j.write_fieldname("FiveG-ProSeAuthorized");
       c.get<five_g_pro_se_authorized_s>().to_json(j);
       break;
     case types::five_g_pro_se_ue_pc5_aggr_max_bitrate:
-      j.write_fieldname("NRUESidelinkAggregateMaximumBitrate");
       c.get<nr_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::five_g_pro_se_pc5_link_ambr:
-      j.write_int("INTEGER (0..4000000000000,...)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::uu_rlc_ch_to_be_setup_list:
-      j.start_array("UuRLCChannelToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_to_be_setup_list:
-      j.start_array("PC5RLCChannelToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::path_switch_cfg:
-      j.write_fieldname("PathSwitchConfiguration");
       c.get<path_switch_cfg_s>().to_json(j);
       break;
     case types::gnb_du_ue_slice_max_bit_rate_list:
-      j.start_array("GNBDUUESliceMaximumBitRateList");
+      j.start_array("");
       for (const auto& e1 : c.get<gnb_du_ue_slice_max_bit_rate_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::multicast_mbs_session_setup_list:
-      j.start_array("MulticastMBSSessionList");
+      j.start_array("");
       for (const auto& e1 : c.get<multicast_mbs_session_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_to_be_setup_list:
-      j.start_array("UE-MulticastMRBs-ToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::serving_cell_mo_list:
-      j.start_array("ServingCellMO-List");
+      j.start_array("");
       for (const auto& e1 : c.get<serving_cell_mo_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::network_ctrl_repeater_authorized:
-      j.write_str("NetworkControlledRepeaterAuthorized", c.get<network_ctrl_repeater_authorized_e>().to_string());
+      j.write_str(c.get<network_ctrl_repeater_authorized_e>().to_string());
       break;
     case types::sdt_volume_thres:
-      j.write_int("INTEGER (1..192000,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ltm_info_setup:
-      j.write_fieldname("LTMInformation-Setup");
       c.get<ltm_info_setup_s>().to_json(j);
       break;
     case types::ltm_cfg_id_map_list:
-      j.start_array("LTMConfigurationIDMappingList");
+      j.start_array("");
       for (const auto& e1 : c.get<ltm_cfg_id_map_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::early_sync_info_request:
-      j.write_fieldname("EarlySyncInformation-Request");
       c.get<early_sync_info_request_s>().to_json(j);
       break;
     case types::path_addition_info:
-      j.write_fieldname("PathAdditionInformation");
       c.get<path_addition_info_c>().to_json(j);
       break;
     case types::nr_a2_x_services_authorized:
-      j.write_fieldname("NRA2XServicesAuthorized");
       c.get<nr_a2_x_services_authorized_s>().to_json(j);
       break;
     case types::ltea2_x_services_authorized:
-      j.write_fieldname("LTEA2XServicesAuthorized");
       c.get<ltea2_x_services_authorized_s>().to_json(j);
       break;
     case types::nr_ue_sidelink_aggr_max_bitrate_for_a2_x:
-      j.write_fieldname("NRUESidelinkAggregateMaximumBitrate");
       c.get<nr_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::lte_ue_sidelink_aggr_max_bitrate_for_a2_x:
-      j.write_fieldname("LTEUESidelinkAggregateMaximumBitrate");
       c.get<lte_ue_sidelink_aggr_max_bitrate_s>().to_json(j);
       break;
     case types::dl_lbt_fail_info_request:
-      j.write_str("DLLBTFailureInformationRequest", "inquiry");
+      j.write_str("inquiry");
       break;
     case types::sl_positioning_ranging_service_info:
-      j.write_fieldname("SLPositioning-Ranging-Service-Info");
       c.get<sl_positioning_ranging_service_info_s>().to_json(j);
       break;
     case types::non_integer_drx_cycle:
-      j.write_fieldname("NonIntegerDRXCycle");
       c.get<non_integer_drx_cycle_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16550,376 +16970,534 @@ OCUDUASN_CODE ue_context_setup_request_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
   if (gnb_du_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 41);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_du_ue_f1ap_id);
+    j.write_uint("value", gnb_du_ue_f1ap_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 63);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   sp_cell_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 107);
   j.write_str("criticality", "reject");
-  j.write_int("Value", serv_cell_idx);
+  j.write_int("value", serv_cell_idx);
+  j.end_obj();
   if (sp_cell_ul_cfg_present) {
+    j.start_obj();
     j.write_int("id", 96);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", sp_cell_ul_cfg.to_string());
+    j.write_str("value", sp_cell_ul_cfg.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 9);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cu_to_du_rrc_info.to_json(j);
+  j.end_obj();
   if (candidate_sp_cell_list_present) {
+    j.start_obj();
     j.write_int("id", 90);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : candidate_sp_cell_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drx_cycle_present) {
+    j.start_obj();
     j.write_int("id", 38);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     drx_cycle.to_json(j);
+    j.end_obj();
   }
   if (res_coordination_transfer_container_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", res_coordination_transfer_container.to_string());
+    j.write_str("value", res_coordination_transfer_container.to_string());
+    j.end_obj();
   }
   if (scell_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 54);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : scell_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 74);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 35);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (inactivity_monitoring_request_present) {
+    j.start_obj();
     j.write_int("id", 97);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (rat_freq_prio_info_present) {
+    j.start_obj();
     j.write_int("id", 108);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     rat_freq_prio_info.to_json(j);
+    j.end_obj();
   }
   if (rrc_container_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", rrc_container.to_string());
+    j.write_str("value", rrc_container.to_string());
+    j.end_obj();
   }
   if (masked_imeisv_present) {
+    j.start_obj();
     j.write_int("id", 126);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", masked_imeisv.to_string());
+    j.write_fieldname("value");
+    masked_imeisv.to_json(j);
+    j.end_obj();
   }
   if (serving_plmn_present) {
+    j.start_obj();
     j.write_int("id", 165);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", serving_plmn.to_string());
+    j.write_str("value", serving_plmn.to_string());
+    j.end_obj();
   }
   if (gnb_du_ue_ambr_ul_present) {
+    j.start_obj();
     j.write_int("id", 158);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", gnb_du_ue_ambr_ul);
+    j.write_uint("value", gnb_du_ue_ambr_ul);
+    j.end_obj();
   }
   if (rrc_delivery_status_request_present) {
+    j.start_obj();
     j.write_int("id", 184);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (res_coordination_transfer_info_present) {
+    j.start_obj();
     j.write_int("id", 195);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     res_coordination_transfer_info.to_json(j);
+    j.end_obj();
   }
   if (serving_cell_mo_present) {
+    j.start_obj();
     j.write_int("id", 182);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", serving_cell_mo);
+    j.write_int("value", serving_cell_mo);
+    j.end_obj();
   }
   if (new_gnb_cu_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 217);
     j.write_str("criticality", "reject");
-    j.write_int("Value", new_gnb_cu_ue_f1ap_id);
+    j.write_uint("value", new_gnb_cu_ue_f1ap_id);
+    j.end_obj();
   }
   if (ran_ue_id_present) {
+    j.start_obj();
     j.write_int("id", 226);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ran_ue_id.to_string());
+    j.write_str("value", ran_ue_id.to_string());
+    j.end_obj();
   }
   if (trace_activation_present) {
+    j.start_obj();
     j.write_int("id", 242);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     trace_activation.to_json(j);
+    j.end_obj();
   }
   if (add_rrm_prio_idx_present) {
+    j.start_obj();
     j.write_int("id", 248);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", add_rrm_prio_idx.to_string());
+    j.write_fieldname("value");
+    add_rrm_prio_idx.to_json(j);
+    j.end_obj();
   }
   if (bh_chs_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 258);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (cfg_bap_address_present) {
+    j.start_obj();
     j.write_int("id", 282);
     j.write_str("criticality", "reject");
-    j.write_str("Value", cfg_bap_address.to_string());
+    j.write_fieldname("value");
+    cfg_bap_address.to_json(j);
+    j.end_obj();
   }
   if (nr_v2x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 306);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_v2x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (ltev2x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 307);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltev2x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (nr_ue_sidelink_aggr_max_bitrate_present) {
+    j.start_obj();
     j.write_int("id", 308);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_ue_sidelink_aggr_max_bitrate.to_json(j);
+    j.end_obj();
   }
   if (lte_ue_sidelink_aggr_max_bitrate_present) {
+    j.start_obj();
     j.write_int("id", 309);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     lte_ue_sidelink_aggr_max_bitrate.to_json(j);
+    j.end_obj();
   }
   if (pc5_link_ambr_present) {
+    j.start_obj();
     j.write_int("id", 340);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", pc5_link_ambr);
+    j.write_uint("value", pc5_link_ambr);
+    j.end_obj();
   }
   if (sl_drbs_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 330);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (conditional_inter_du_mob_info_present) {
+    j.start_obj();
     j.write_int("id", 373);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     conditional_inter_du_mob_info.to_json(j);
+    j.end_obj();
   }
   if (management_based_mdt_plmn_list_present) {
+    j.start_obj();
     j.write_int("id", 377);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : management_based_mdt_plmn_list) {
       j.write_str(e1.to_string());
     }
     j.end_array();
+    j.end_obj();
   }
   if (serving_n_id_present) {
+    j.start_obj();
     j.write_int("id", 382);
     j.write_str("criticality", "reject");
-    j.write_str("Value", serving_n_id.to_string());
+    j.write_fieldname("value");
+    serving_n_id.to_json(j);
+    j.end_obj();
   }
   if (f1_c_transfer_path_present) {
+    j.start_obj();
     j.write_int("id", 428);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     f1_c_transfer_path.to_json(j);
+    j.end_obj();
   }
   if (f1_c_transfer_path_nr_dc_present) {
+    j.start_obj();
     j.write_int("id", 511);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     f1_c_transfer_path_nr_dc.to_json(j);
+    j.end_obj();
   }
   if (mdt_polluted_meas_ind_present) {
+    j.start_obj();
     j.write_int("id", 536);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", mdt_polluted_meas_ind.to_string());
+    j.write_str("value", mdt_polluted_meas_ind.to_string());
+    j.end_obj();
   }
   if (scg_activation_request_present) {
+    j.start_obj();
     j.write_int("id", 547);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", scg_activation_request.to_string());
+    j.write_str("value", scg_activation_request.to_string());
+    j.end_obj();
   }
   if (cg_sdt_session_info_old_present) {
+    j.start_obj();
     j.write_int("id", 591);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     cg_sdt_session_info_old.to_json(j);
+    j.end_obj();
   }
   if (five_g_pro_se_authorized_present) {
+    j.start_obj();
     j.write_int("id", 594);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     five_g_pro_se_authorized.to_json(j);
+    j.end_obj();
   }
   if (five_g_pro_se_ue_pc5_aggr_max_bitrate_present) {
+    j.start_obj();
     j.write_int("id", 595);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     five_g_pro_se_ue_pc5_aggr_max_bitrate.to_json(j);
+    j.end_obj();
   }
   if (five_g_pro_se_pc5_link_ambr_present) {
+    j.start_obj();
     j.write_int("id", 596);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", five_g_pro_se_pc5_link_ambr);
+    j.write_uint("value", five_g_pro_se_pc5_link_ambr);
+    j.end_obj();
   }
   if (uu_rlc_ch_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 599);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 608);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (path_switch_cfg_present) {
+    j.start_obj();
     j.write_int("id", 619);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     path_switch_cfg.to_json(j);
+    j.end_obj();
   }
   if (gnb_du_ue_slice_max_bit_rate_list_present) {
+    j.start_obj();
     j.write_int("id", 626);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : gnb_du_ue_slice_max_bit_rate_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (multicast_mbs_session_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 632);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : multicast_mbs_session_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 630);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (serving_cell_mo_list_present) {
+    j.start_obj();
     j.write_int("id", 695);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : serving_cell_mo_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (network_ctrl_repeater_authorized_present) {
+    j.start_obj();
     j.write_int("id", 712);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", network_ctrl_repeater_authorized.to_string());
+    j.write_str("value", network_ctrl_repeater_authorized.to_string());
+    j.end_obj();
   }
   if (sdt_volume_thres_present) {
+    j.start_obj();
     j.write_int("id", 716);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", sdt_volume_thres);
+    j.write_int("value", sdt_volume_thres);
+    j.end_obj();
   }
   if (ltm_info_setup_present) {
+    j.start_obj();
     j.write_int("id", 720);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     ltm_info_setup.to_json(j);
+    j.end_obj();
   }
   if (ltm_cfg_id_map_list_present) {
+    j.start_obj();
     j.write_int("id", 721);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ltm_cfg_id_map_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (early_sync_info_request_present) {
+    j.start_obj();
     j.write_int("id", 726);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     early_sync_info_request.to_json(j);
+    j.end_obj();
   }
   if (path_addition_info_present) {
+    j.start_obj();
     j.write_int("id", 741);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     path_addition_info.to_json(j);
+    j.end_obj();
   }
   if (nr_a2_x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 779);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_a2_x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (ltea2_x_services_authorized_present) {
+    j.start_obj();
     j.write_int("id", 780);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltea2_x_services_authorized.to_json(j);
+    j.end_obj();
   }
   if (nr_ue_sidelink_aggr_max_bitrate_for_a2_x_present) {
+    j.start_obj();
     j.write_int("id", 781);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     nr_ue_sidelink_aggr_max_bitrate_for_a2_x.to_json(j);
+    j.end_obj();
   }
   if (lte_ue_sidelink_aggr_max_bitrate_for_a2_x_present) {
+    j.start_obj();
     j.write_int("id", 782);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     lte_ue_sidelink_aggr_max_bitrate_for_a2_x.to_json(j);
+    j.end_obj();
   }
   if (dl_lbt_fail_info_request_present) {
+    j.start_obj();
     j.write_int("id", 794);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "inquiry");
+    j.write_str("value", "inquiry");
+    j.end_obj();
   }
   if (sl_positioning_ranging_service_info_present) {
+    j.start_obj();
     j.write_int("id", 801);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     sl_positioning_ranging_service_info.to_json(j);
+    j.end_obj();
   }
   if (non_integer_drx_cycle_present) {
+    j.start_obj();
     j.write_int("id", 838);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     non_integer_drx_cycle.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEContextSetupResponseIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -17582,172 +18160,164 @@ const s_cp_ac_cfg_s& ue_context_setup_resp_ies_o::value_c::s_cp_ac_cfg() const
 }
 void ue_context_setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::du_to_cu_rrc_info:
-      j.write_fieldname("DUtoCURRCInformation");
       c.get<du_to_cu_rrc_info_s>().to_json(j);
       break;
     case types::c_rnti:
-      j.write_int("INTEGER (0..65535,...)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::res_coordination_transfer_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::full_cfg:
-      j.write_str("FullConfiguration", "full");
+      j.write_str("full");
       break;
     case types::drbs_setup_list:
-      j.start_array("DRBs-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::srbs_failed_to_be_setup_list:
-      j.start_array("SRBs-FailedToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::drbs_failed_to_be_setup_list:
-      j.start_array("DRBs-FailedToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drbs_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::scell_failedto_setup_list:
-      j.start_array("SCell-FailedtoSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<scell_failedto_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::inactivity_monitoring_resp:
-      j.write_str("InactivityMonitoringResponse", "not-supported");
+      j.write_str("not-supported");
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::srbs_setup_list:
-      j.start_array("SRBs-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<srbs_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_setup_list:
-      j.start_array("BHChannels-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::bh_chs_failed_to_be_setup_list:
-      j.start_array("BHChannels-FailedToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<bh_chs_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_setup_list:
-      j.start_array("SLDRBs-Setup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sl_drbs_failed_to_be_setup_list:
-      j.start_array("SLDRBs-FailedToBeSetup-List");
+      j.start_array("");
       for (const auto& e1 : c.get<sl_drbs_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::requested_target_cell_global_id:
-      j.write_fieldname("NRCGI");
       c.get<nr_cgi_s>().to_json(j);
       break;
     case types::scg_activation_status:
-      j.write_str("SCGActivationStatus", c.get<scg_activation_status_e>().to_string());
+      j.write_str(c.get<scg_activation_status_e>().to_string());
       break;
     case types::uu_rlc_ch_setup_list:
-      j.start_array("UuRLCChannelSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::uu_rlc_ch_failed_to_be_setup_list:
-      j.start_array("UuRLCChannelFailedToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<uu_rlc_ch_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_setup_list:
-      j.start_array("PC5RLCChannelSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::pc5_rlc_ch_failed_to_be_setup_list:
-      j.start_array("PC5RLCChannelFailedToBeSetupList");
+      j.start_array("");
       for (const auto& e1 : c.get<pc5_rlc_ch_failed_to_be_setup_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::serving_cell_mo_encoded_in_cgc_list:
-      j.start_array("ServingCellMO-encoded-in-CGC-List");
+      j.start_array("");
       for (const auto& e1 : c.get<serving_cell_mo_encoded_in_cgc_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ue_multicast_m_rbs_setupnew_list:
-      j.start_array("UE-MulticastMRBs-Setupnew-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ue_multicast_m_rbs_setupnew_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ded_si_delivery_ind:
-      j.write_str("DedicatedSIDeliveryIndication", "true");
+      j.write_str("true");
       break;
     case types::cfg_bwp_list:
-      j.start_array("Configured-BWP-List");
+      j.start_array("");
       for (const auto& e1 : c.get<cfg_bwp_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::early_sync_info:
-      j.write_fieldname("EarlySyncInformation");
       c.get<early_sync_info_s>().to_json(j);
       break;
     case types::ltm_cfg:
-      j.write_fieldname("LTMConfiguration");
       c.get<ltm_cfg_s>().to_json(j);
       break;
     case types::s_cp_ac_cfg:
-      j.write_fieldname("S-CPAC-Configuration");
       c.get<s_cp_ac_cfg_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ue_context_setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_context_setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18413,216 +18983,282 @@ OCUDUASN_CODE ue_context_setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ue_context_setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 39);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   du_to_cu_rrc_info.to_json(j);
+  j.end_obj();
   if (c_rnti_present) {
+    j.start_obj();
     j.write_int("id", 95);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", c_rnti);
+    j.write_int("value", c_rnti);
+    j.end_obj();
   }
   if (res_coordination_transfer_container_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", res_coordination_transfer_container.to_string());
+    j.write_str("value", res_coordination_transfer_container.to_string());
+    j.end_obj();
   }
   if (full_cfg_present) {
+    j.start_obj();
     j.write_int("id", 94);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "full");
+    j.write_str("value", "full");
+    j.end_obj();
   }
   if (drbs_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 27);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (srbs_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 66);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (drbs_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 15);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : drbs_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (scell_failedto_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 83);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : scell_failedto_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (inactivity_monitoring_resp_present) {
+    j.start_obj();
     j.write_int("id", 98);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "not-supported");
+    j.write_str("value", "not-supported");
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 7);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (srbs_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 202);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : srbs_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 260);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (bh_chs_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 279);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : bh_chs_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 324);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (sl_drbs_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 316);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : sl_drbs_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (requested_target_cell_global_id_present) {
+    j.start_obj();
     j.write_int("id", 376);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     requested_target_cell_global_id.to_json(j);
+    j.end_obj();
   }
   if (scg_activation_status_present) {
+    j.start_obj();
     j.write_int("id", 548);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", scg_activation_status.to_string());
+    j.write_str("value", scg_activation_status.to_string());
+    j.end_obj();
   }
   if (uu_rlc_ch_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 602);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (uu_rlc_ch_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 603);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : uu_rlc_ch_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 611);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (pc5_rlc_ch_failed_to_be_setup_list_present) {
+    j.start_obj();
     j.write_int("id", 612);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : pc5_rlc_ch_failed_to_be_setup_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (serving_cell_mo_encoded_in_cgc_list_present) {
+    j.start_obj();
     j.write_int("id", 697);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : serving_cell_mo_encoded_in_cgc_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ue_multicast_m_rbs_setupnew_list_present) {
+    j.start_obj();
     j.write_int("id", 699);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ue_multicast_m_rbs_setupnew_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ded_si_delivery_ind_present) {
+    j.start_obj();
     j.write_int("id", 708);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (cfg_bwp_list_present) {
+    j.start_obj();
     j.write_int("id", 709);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : cfg_bwp_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (early_sync_info_present) {
+    j.start_obj();
     j.write_int("id", 727);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     early_sync_info.to_json(j);
+    j.end_obj();
   }
   if (ltm_cfg_present) {
+    j.start_obj();
     j.write_int("id", 725);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     ltm_cfg.to_json(j);
+    j.end_obj();
   }
   if (s_cp_ac_cfg_present) {
+    j.start_obj();
     j.write_int("id", 792);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     s_cp_ac_cfg.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UEInactivityNotificationIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -18760,28 +19396,26 @@ const sdt_termination_request_e& ue_inactivity_notif_ies_o::value_c::sdt_termina
 }
 void ue_inactivity_notif_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::drb_activity_list:
-      j.start_array("DRB-Activity-List");
+      j.start_array("");
       for (const auto& e1 : c.get<drb_activity_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::sdt_termination_request:
-      j.write_str("SDT-Termination-Request", c.get<sdt_termination_request_e>().to_string());
+      j.write_str(c.get<sdt_termination_request_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ue_inactivity_notif_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ue_inactivity_notif_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18925,26 +19559,34 @@ OCUDUASN_CODE ue_inactivity_notif_ies_container::unpack(cbit_ref& bref)
 }
 void ue_inactivity_notif_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 100);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : drb_activity_list) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (sdt_termination_request_present) {
+    j.start_obj();
     j.write_int("id", 635);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", sdt_termination_request.to_string());
+    j.write_str("value", sdt_termination_request.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // ULRRCMessageTransferIEs ::= OBJECT SET OF F1AP-PROTOCOL-IES
@@ -19122,30 +19764,28 @@ const uint64_t& ul_rrc_msg_transfer_ies_o::value_c::new_gnb_du_ue_f1ap_id() cons
 }
 void ul_rrc_msg_transfer_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::gnb_cu_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     case types::srb_id:
-      j.write_int("INTEGER (0..3,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::rrc_container:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::sel_plmn_id:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<3, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<3, true>>().to_string());
       break;
     case types::new_gnb_du_ue_f1ap_id:
-      j.write_int("INTEGER (0..4294967295)", c.get<uint64_t>());
+      j.write_uint(c.get<uint64_t>());
       break;
     default:
       log_invalid_choice_id(type_, "ul_rrc_msg_transfer_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ul_rrc_msg_transfer_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -19330,28 +19970,40 @@ OCUDUASN_CODE ul_rrc_msg_transfer_ies_container::unpack(cbit_ref& bref)
 }
 void ul_rrc_msg_transfer_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 40);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_cu_ue_f1ap_id);
+  j.write_uint("value", gnb_cu_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 41);
   j.write_str("criticality", "reject");
-  j.write_int("Value", gnb_du_ue_f1ap_id);
+  j.write_uint("value", gnb_du_ue_f1ap_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 64);
   j.write_str("criticality", "reject");
-  j.write_int("Value", srb_id);
+  j.write_int("value", srb_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 50);
   j.write_str("criticality", "reject");
-  j.write_str("Value", rrc_container.to_string());
+  j.write_str("value", rrc_container.to_string());
+  j.end_obj();
   if (sel_plmn_id_present) {
+    j.start_obj();
     j.write_int("id", 224);
     j.write_str("criticality", "reject");
-    j.write_str("Value", sel_plmn_id.to_string());
+    j.write_str("value", sel_plmn_id.to_string());
+    j.end_obj();
   }
   if (new_gnb_du_ue_f1ap_id_present) {
+    j.start_obj();
     j.write_int("id", 219);
     j.write_str("criticality", "reject");
-    j.write_int("Value", new_gnb_du_ue_f1ap_id);
+    j.write_uint("value", new_gnb_du_ue_f1ap_id);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }

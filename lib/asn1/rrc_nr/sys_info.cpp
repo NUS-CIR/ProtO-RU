@@ -114,12 +114,14 @@ void plmn_id_info_s::to_json(json_writer& j) const
   }
   j.end_array();
   if (tac_present) {
-    j.write_str("trackingAreaCode", tac.to_string());
+    j.write_fieldname("trackingAreaCode");
+    tac.to_json(j);
   }
   if (ranac_present) {
     j.write_int("ranac", ranac);
   }
-  j.write_str("cellIdentity", cell_id.to_string());
+  j.write_fieldname("cellIdentity");
+  cell_id.to_json(j);
   j.write_str("cellReservedForOperatorUse", cell_reserved_for_oper.to_string());
   if (iab_support_r16_present) {
     j.write_str("iab-Support-r16", "true");
@@ -127,7 +129,7 @@ void plmn_id_info_s::to_json(json_writer& j) const
   if (tracking_area_list_r17.is_present()) {
     j.start_array("trackingAreaList-r17");
     for (const auto& e1 : *tracking_area_list_r17) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -166,7 +168,8 @@ OCUDUASN_CODE cag_id_info_r16_s::unpack(cbit_ref& bref)
 void cag_id_info_r16_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("cag-Identity-r16", cag_id_r16.to_string());
+  j.write_fieldname("cag-Identity-r16");
+  cag_id_r16.to_json(j);
   if (manual_ca_gsel_allowed_r16_present) {
     j.write_str("manualCAGselectionAllowed-r16", "true");
   }
@@ -274,7 +277,7 @@ void npn_id_r16_c::to_json(json_writer& j) const
       c.get<snpn_r16_s_>().plmn_id_r16.to_json(j);
       j.start_array("nid-List-r16");
       for (const auto& e1 : c.get<snpn_r16_s_>().nid_list_r16) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       j.end_obj();
@@ -407,11 +410,13 @@ void npn_id_info_r16_s::to_json(json_writer& j) const
     e1.to_json(j);
   }
   j.end_array();
-  j.write_str("trackingAreaCode-r16", tac_r16.to_string());
+  j.write_fieldname("trackingAreaCode-r16");
+  tac_r16.to_json(j);
   if (ranac_r16_present) {
     j.write_int("ranac-r16", ranac_r16);
   }
-  j.write_str("cellIdentity-r16", cell_id_r16.to_string());
+  j.write_fieldname("cellIdentity-r16");
+  cell_id_r16.to_json(j);
   j.write_str("cellReservedForOperatorUse-r16", cell_reserved_for_oper_r16.to_string());
   if (iab_support_r16_present) {
     j.write_str("iab-Support-r16", "true");
@@ -695,7 +700,8 @@ OCUDUASN_CODE ss_rssi_meas_s::unpack(cbit_ref& bref)
 void ss_rssi_meas_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("measurementSlots", meas_slots.to_string());
+  j.write_fieldname("measurementSlots");
+  meas_slots.to_json(j);
   j.write_int("endSymbol", end_symbol);
   j.end_obj();
 }
@@ -800,13 +806,16 @@ void ssb_to_measure_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::short_bitmap:
-      j.write_str("shortBitmap", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("shortBitmap");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::medium_bitmap:
-      j.write_str("mediumBitmap", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("mediumBitmap");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::long_bitmap:
-      j.write_str("longBitmap", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("longBitmap");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ssb_to_measure_c");
@@ -1009,10 +1018,13 @@ void applicable_disaster_info_r17_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_disaster_roaming_r17:
+      j.write_null("noDisasterRoaming-r17");
       break;
     case types::disaster_related_ind_r17:
+      j.write_null("disasterRelatedIndication-r17");
       break;
     case types::common_plmns_r17:
+      j.write_null("commonPLMNs-r17");
       break;
     case types::ded_plmns_r17:
       j.start_array("dedicatedPLMNs-r17");
@@ -4188,8 +4200,10 @@ OCUDUASN_CODE sib6_s::unpack(cbit_ref& bref)
 void sib6_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("messageIdentifier", msg_id.to_string());
-  j.write_str("serialNumber", serial_num.to_string());
+  j.write_fieldname("messageIdentifier");
+  msg_id.to_json(j);
+  j.write_fieldname("serialNumber");
+  serial_num.to_json(j);
   j.write_str("warningType", warning_type.to_string());
   if (late_non_crit_ext.size() > 0) {
     j.write_str("lateNonCriticalExtension", late_non_crit_ext.to_string());
@@ -4247,8 +4261,10 @@ OCUDUASN_CODE sib7_s::unpack(cbit_ref& bref)
 void sib7_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("messageIdentifier", msg_id.to_string());
-  j.write_str("serialNumber", serial_num.to_string());
+  j.write_fieldname("messageIdentifier");
+  msg_id.to_json(j);
+  j.write_fieldname("serialNumber");
+  serial_num.to_json(j);
   j.write_str("warningMessageSegmentType", warning_msg_segment_type.to_string());
   j.write_int("warningMessageSegmentNumber", warning_msg_segment_num);
   j.write_str("warningMessageSegment", warning_msg_segment.to_string());
@@ -4326,8 +4342,10 @@ OCUDUASN_CODE sib8_s::unpack(cbit_ref& bref)
 void sib8_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("messageIdentifier", msg_id.to_string());
-  j.write_str("serialNumber", serial_num.to_string());
+  j.write_fieldname("messageIdentifier");
+  msg_id.to_json(j);
+  j.write_fieldname("serialNumber");
+  serial_num.to_json(j);
   j.write_str("warningMessageSegmentType", warning_msg_segment_type.to_string());
   j.write_int("warningMessageSegmentNumber", warning_msg_segment_num);
   j.write_str("warningMessageSegment", warning_msg_segment.to_string());
@@ -4533,9 +4551,10 @@ void sib9_s::to_json(json_writer& j) const
   if (time_info_present) {
     j.write_fieldname("timeInfo");
     j.start_obj();
-    j.write_int("timeInfoUTC", time_info.time_info_utc);
+    j.write_uint("timeInfoUTC", time_info.time_info_utc);
     if (time_info.day_light_saving_time_present) {
-      j.write_str("dayLightSavingTime", time_info.day_light_saving_time.to_string());
+      j.write_fieldname("dayLightSavingTime");
+      time_info.day_light_saving_time.to_json(j);
     }
     if (time_info.leap_seconds_present) {
       j.write_int("leapSeconds", time_info.leap_seconds);
@@ -5404,9 +5423,11 @@ OCUDUASN_CODE nsag_id_info_r17_s::unpack(cbit_ref& bref)
 void nsag_id_info_r17_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("nsag-ID-r17", nsag_id_r17.to_string());
+  j.write_fieldname("nsag-ID-r17");
+  nsag_id_r17.to_json(j);
   if (tac_r17_present) {
-    j.write_str("trackingAreaCode-r17", tac_r17.to_string());
+    j.write_fieldname("trackingAreaCode-r17");
+    tac_r17.to_json(j);
   }
   j.end_obj();
 }
@@ -5757,7 +5778,7 @@ void gin_elem_r17_s::to_json(json_writer& j) const
   plmn_id_r17.to_json(j);
   j.start_array("nid-List-r17");
   for (const auto& e1 : nid_list_r17) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -5788,7 +5809,8 @@ void gi_ns_per_sn_pn_r17_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (supported_gi_ns_r17_present) {
-    j.write_str("supportedGINs-r17", supported_gi_ns_r17.to_string());
+    j.write_fieldname("supportedGINs-r17");
+    supported_gi_ns_r17.to_json(j);
   }
   j.end_obj();
 }
@@ -5991,7 +6013,7 @@ OCUDUASN_CODE orbital_r17_s::unpack(cbit_ref& bref)
 void orbital_r17_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("semiMajorAxis-r17", semi_major_axis_r17);
+  j.write_uint("semiMajorAxis-r17", semi_major_axis_r17);
   j.write_int("eccentricity-r17", eccentricity_r17);
   j.write_int("periapsis-r17", periapsis_r17);
   j.write_int("longitude-r17", longitude_r17);
@@ -6375,7 +6397,8 @@ OCUDUASN_CODE ntn_cov_enh_r18_s::unpack(cbit_ref& bref)
 void ntn_cov_enh_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("numberOfMsg4HARQ-ACK-Repetitions-r18", nof_msg4_harq_ack_repeats_r18.to_string());
+  j.write_fieldname("numberOfMsg4HARQ-ACK-Repetitions-r18");
+  nof_msg4_harq_ack_repeats_r18.to_json(j);
   if (rsrp_thres_msg4_harq_ack_r18_present) {
     j.write_int("rsrp-ThresholdMsg4HARQ-ACK-r18", rsrp_thres_msg4_harq_ack_r18);
   }
@@ -6419,7 +6442,7 @@ void sat_switch_with_re_sync_r18_s::to_json(json_writer& j) const
   j.write_fieldname("ntn-Config-r18");
   ntn_cfg_r18.to_json(j);
   if (t_service_start_r18_present) {
-    j.write_int("t-ServiceStart-r18", t_service_start_r18);
+    j.write_uint("t-ServiceStart-r18", t_service_start_r18);
   }
   if (ssb_time_offset_r18_present) {
     j.write_int("ssb-TimeOffset-r18", ssb_time_offset_r18);
@@ -6563,7 +6586,7 @@ void sib19_r17_s::to_json(json_writer& j) const
     ntn_cfg_r17.to_json(j);
   }
   if (t_service_r17_present) {
-    j.write_int("t-Service-r17", t_service_r17);
+    j.write_uint("t-Service-r17", t_service_r17);
   }
   if (ref_location_r17.size() > 0) {
     j.write_str("referenceLocation-r17", ref_location_r17.to_string());
@@ -6956,6 +6979,7 @@ void location_and_bw_broadcast_r17_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::same_as_sib1_cfg_location_and_bw:
+      j.write_null("sameAsSib1ConfiguredLocationAndBW");
       break;
     case types::location_and_bw:
       j.write_int("locationAndBandwidth", c);
@@ -10453,6 +10477,9 @@ void sys_info_s::crit_exts_c_::crit_exts_future_r16_c_::to_json(json_writer& j) 
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "sys_info_s::crit_exts_c_::crit_exts_future_r16_c_");
@@ -10993,7 +11020,8 @@ void si_sched_info_s::to_json(json_writer& j) const
     si_request_cfg_sul.to_json(j);
   }
   if (sys_info_area_id_present) {
-    j.write_str("systemInformationAreaID", sys_info_area_id.to_string());
+    j.write_fieldname("systemInformationAreaID");
+    sys_info_area_id.to_json(j);
   }
   j.end_obj();
 }
@@ -11361,7 +11389,8 @@ void uac_barr_info_set_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_str("uac-BarringFactor", uac_barr_factor.to_string());
   j.write_str("uac-BarringTime", uac_barr_time.to_string());
-  j.write_str("uac-BarringForAccessIdentity", uac_barr_for_access_id.to_string());
+  j.write_fieldname("uac-BarringForAccessIdentity");
+  uac_barr_for_access_id.to_json(j);
   j.end_obj();
 }
 
@@ -13113,7 +13142,8 @@ void sib1_v1700_ies_s::to_json(json_writer& j) const
     si_sched_info_v1700.to_json(j);
   }
   if (hyper_sfn_r17_present) {
-    j.write_str("hyperSFN-r17", hyper_sfn_r17.to_string());
+    j.write_fieldname("hyperSFN-r17");
+    hyper_sfn_r17.to_json(j);
   }
   if (edrx_allowed_idle_r17_present) {
     j.write_str("eDRX-AllowedIdle-r17", "true");

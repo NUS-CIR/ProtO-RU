@@ -308,7 +308,7 @@ void plmn_ran_area_cell_s::to_json(json_writer& j) const
   }
   j.start_array("ran-AreaCells");
   for (const auto& e1 : ran_area_cells) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -341,7 +341,8 @@ OCUDUASN_CODE ran_area_cfg_s::unpack(cbit_ref& bref)
 void ran_area_cfg_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("trackingAreaCode", tac.to_string());
+  j.write_fieldname("trackingAreaCode");
+  tac.to_json(j);
   if (ran_area_code_list.size() > 0) {
     j.start_array("ran-AreaCodeList");
     for (const auto& e1 : ran_area_code_list) {
@@ -1181,7 +1182,7 @@ void cond_trigger_cfg_r16_s::cond_event_id_c_::to_json(json_writer& j) const
     case types::cond_event_t1_r17:
       j.write_fieldname("condEventT1-r17");
       j.start_obj();
-      j.write_int("t1-Threshold-r17", c.get<cond_event_t1_r17_s_>().t1_thres_r17);
+      j.write_uint("t1-Threshold-r17", c.get<cond_event_t1_r17_s_>().t1_thres_r17);
       j.write_int("duration-r17", c.get<cond_event_t1_r17_s_>().dur_r17);
       j.end_obj();
       break;
@@ -5004,10 +5005,12 @@ void csi_rs_res_mob_s::freq_domain_alloc_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::row1:
-      j.write_str("row1", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("row1");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::row2:
-      j.write_str("row2", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("row2");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "csi_rs_res_mob_s::freq_domain_alloc_c_");
@@ -5397,9 +5400,11 @@ void cgi_info_logging_r16_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("plmn-Identity-r16");
   plmn_id_r16.to_json(j);
-  j.write_str("cellIdentity-r16", cell_id_r16.to_string());
+  j.write_fieldname("cellIdentity-r16");
+  cell_id_r16.to_json(j);
   if (tac_r16_present) {
-    j.write_str("trackingAreaCode-r16", tac_r16.to_string());
+    j.write_fieldname("trackingAreaCode-r16");
+    tac_r16.to_json(j);
   }
   j.end_obj();
 }
@@ -5424,7 +5429,8 @@ void tracking_area_id_r16_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("plmn-Identity-r16");
   plmn_id_r16.to_json(j);
-  j.write_str("trackingAreaCode-r16", tac_r16.to_string());
+  j.write_fieldname("trackingAreaCode-r16");
+  tac_r16.to_json(j);
   j.end_obj();
 }
 
@@ -5554,7 +5560,7 @@ void qoe_area_scope_r18_c::to_json(json_writer& j) const
     case types::tac_list:
       j.start_array("trackingAreaCodeList");
       for (const auto& e1 : c.get<tac_list_r16_l>()) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -6241,7 +6247,7 @@ void area_cfg_r16_c::to_json(json_writer& j) const
     case types::tac_list_r16:
       j.start_array("trackingAreaCodeList-r16");
       for (const auto& e1 : c.get<tac_list_r16_l>()) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -6450,7 +6456,7 @@ void cag_cfg_r18_s::to_json(json_writer& j) const
   plmn_id_r18.to_json(j);
   j.start_array("cag-IdentityList-r18");
   for (const auto& e1 : cag_id_list_r18) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -6478,7 +6484,7 @@ void sn_pn_cfg_cell_id_r18_s::to_json(json_writer& j) const
   cgi_id_r18.to_json(j);
   j.start_array("nid-IdentityList-r18");
   for (const auto& e1 : nid_id_list_r18) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -6506,7 +6512,7 @@ void sn_pn_cfg_tai_r18_s::to_json(json_writer& j) const
   tai_id_r18.to_json(j);
   j.start_array("nid-IdentityList-r18");
   for (const auto& e1 : nid_id_list_r18) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -6534,7 +6540,7 @@ void sn_pn_cfg_id_r18_s::to_json(json_writer& j) const
   plmn_id_r18.to_json(j);
   j.start_array("nid-IdentityList-r18");
   for (const auto& e1 : nid_id_list_r18) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -6869,8 +6875,10 @@ OCUDUASN_CODE bap_routing_id_r16_s::unpack(cbit_ref& bref)
 void bap_routing_id_r16_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("bap-Address-r16", bap_address_r16.to_string());
-  j.write_str("bap-PathId-r16", bap_path_id_r16.to_string());
+  j.write_fieldname("bap-Address-r16");
+  bap_address_r16.to_json(j);
+  j.write_fieldname("bap-PathId-r16");
+  bap_path_id_r16.to_json(j);
   j.end_obj();
 }
 
@@ -6930,14 +6938,16 @@ void bap_cfg_r16_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (bap_address_r16_present) {
-    j.write_str("bap-Address-r16", bap_address_r16.to_string());
+    j.write_fieldname("bap-Address-r16");
+    bap_address_r16.to_json(j);
   }
   if (default_ul_bap_routing_id_r16_present) {
     j.write_fieldname("defaultUL-BAP-RoutingID-r16");
     default_ul_bap_routing_id_r16.to_json(j);
   }
   if (default_ul_bh_rlc_ch_r16_present) {
-    j.write_str("defaultUL-BH-RLC-Channel-r16", default_ul_bh_rlc_ch_r16.to_string());
+    j.write_fieldname("defaultUL-BH-RLC-Channel-r16");
+    default_ul_bh_rlc_ch_r16.to_json(j);
   }
   if (flow_ctrl_feedback_type_r16_present) {
     j.write_str("flowControlFeedbackType-r16", flow_ctrl_feedback_type_r16.to_string());
@@ -8448,7 +8458,8 @@ void clock_quality_metrics_r18_s::to_json(json_writer& j) const
     j.write_bool("tracebilityToGNSS-r18", tracebility_to_gnss_r18);
   }
   if (clock_freq_stability_r18_present) {
-    j.write_str("clockFrequencyStability-r18", clock_freq_stability_r18.to_string());
+    j.write_fieldname("clockFrequencyStability-r18");
+    clock_freq_stability_r18.to_json(j);
   }
   if (clock_accuracy_r18_present) {
     j.write_fieldname("clockAccuracy-r18");
@@ -9159,6 +9170,9 @@ void counter_check_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "counter_check_s::crit_exts_c_");
@@ -11098,6 +11112,16 @@ void meas_obj_rx_tx_diff_r17_s::dl_ref_r17_c_::set_csi_rs_ref_r17()
 void meas_obj_rx_tx_diff_r17_s::dl_ref_r17_c_::to_json(json_writer& j) const
 {
   j.start_obj();
+  switch (type_) {
+    case types::prs_ref_r17:
+      j.write_null("prs-Ref-r17");
+      break;
+    case types::csi_rs_ref_r17:
+      j.write_null("csi-RS-Ref-r17");
+      break;
+    default:
+      log_invalid_choice_id(type_, "meas_obj_rx_tx_diff_r17_s::dl_ref_r17_c_");
+  }
   j.end_obj();
 }
 OCUDUASN_CODE meas_obj_rx_tx_diff_r17_s::dl_ref_r17_c_::pack(bit_ref& bref) const
@@ -14905,6 +14929,7 @@ void other_cfg_s::delay_budget_report_cfg_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::release:
+      j.write_null("release");
       break;
     case types::setup:
       j.write_fieldname("setup");
@@ -15764,13 +15789,16 @@ void iab_ip_address_r16_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::ip_v4_address_r16:
-      j.write_str("iPv4-Address-r16", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("iPv4-Address-r16");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::ip_v6_address_r16:
-      j.write_str("iPv6-Address-r16", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("iPv6-Address-r16");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     case types::ip_v6_prefix_r16:
-      j.write_str("iPv6-Prefix-r16", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("iPv6-Prefix-r16");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "iab_ip_address_r16_c");
@@ -15889,7 +15917,8 @@ void iab_ip_address_cfg_r16_s::to_json(json_writer& j) const
     j.write_str("iab-IP-Usage-r16", iab_ip_usage_r16.to_string());
   }
   if (iab_donor_du_bap_address_r16_present) {
-    j.write_str("iab-donor-DU-BAP-Address-r16", iab_donor_du_bap_address_r16.to_string());
+    j.write_fieldname("iab-donor-DU-BAP-Address-r16");
+    iab_donor_du_bap_address_r16.to_json(j);
   }
   j.end_obj();
 }
@@ -16732,7 +16761,8 @@ OCUDUASN_CODE sl_remote_ue_to_add_mod_r17_s::unpack(cbit_ref& bref)
 void sl_remote_ue_to_add_mod_r17_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-L2IdentityRemote-r17", sl_l2_id_remote_r17.to_string());
+  j.write_fieldname("sl-L2IdentityRemote-r17");
+  sl_l2_id_remote_r17.to_json(j);
   if (sl_srap_cfg_relay_r17_present) {
     j.write_fieldname("sl-SRAP-ConfigRelay-r17");
     sl_srap_cfg_relay_r17.to_json(j);
@@ -16765,7 +16795,8 @@ OCUDUASN_CODE sl_source_remote_ue_cfg_r18_s::unpack(cbit_ref& bref)
 void sl_source_remote_ue_cfg_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-SourceUE-Identity-r18", sl_source_ue_id_r18.to_string());
+  j.write_fieldname("sl-SourceUE-Identity-r18");
+  sl_source_ue_id_r18.to_json(j);
   j.write_fieldname("sl-SRAP-ConfigU2U-r18");
   sl_srap_cfg_u2_u_r18.to_json(j);
   j.end_obj();
@@ -16814,7 +16845,8 @@ OCUDUASN_CODE sl_u2_u_remote_ue_cfg_r18_s::unpack(cbit_ref& bref)
 void sl_u2_u_remote_ue_cfg_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-L2IdentityRemoteUE-r18", sl_l2_id_remote_ue_r18.to_string());
+  j.write_fieldname("sl-L2IdentityRemoteUE-r18");
+  sl_l2_id_remote_ue_r18.to_json(j);
   if (sl_source_remote_ue_to_add_mod_list_r18.size() > 0) {
     j.start_array("sl-SourceRemoteUE-ToAddModList-r18");
     for (const auto& e1 : sl_source_remote_ue_to_add_mod_list_r18) {
@@ -16825,7 +16857,7 @@ void sl_u2_u_remote_ue_cfg_r18_s::to_json(json_writer& j) const
   if (sl_source_remote_ue_to_release_list_r18.size() > 0) {
     j.start_array("sl-SourceRemoteUE-ToReleaseList-r18");
     for (const auto& e1 : sl_source_remote_ue_to_release_list_r18) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -16914,7 +16946,7 @@ void sl_l2_relay_ue_cfg_r17_s::to_json(json_writer& j) const
   if (sl_remote_ue_to_release_list_r17.size() > 0) {
     j.start_array("sl-RemoteUE-ToReleaseList-r17");
     for (const auto& e1 : sl_remote_ue_to_release_list_r17) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -16928,7 +16960,7 @@ void sl_l2_relay_ue_cfg_r17_s::to_json(json_writer& j) const
   if (sl_u2_u_remote_ue_to_release_list_r18.is_present()) {
     j.start_array("sl-U2U-RemoteUE-ToReleaseList-r18");
     for (const auto& e1 : *sl_u2_u_remote_ue_to_release_list_r18) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -17095,6 +17127,7 @@ void ue_tx_teg_request_ul_tdoa_cfg_r17_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::one_shot_r17:
+      j.write_null("oneShot-r17");
       break;
     case types::periodic_report_r17:
       j.write_str("periodicReporting-r17", c.to_string());
@@ -17194,8 +17227,10 @@ OCUDUASN_CODE sl_indirect_path_add_change_r18_s::unpack(cbit_ref& bref)
 void sl_indirect_path_add_change_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-IndirectPathRelayUE-Identity-r18", sl_indirect_path_relay_ue_id_r18.to_string());
-  j.write_str("sl-IndirectPathCellIdentity-r18", sl_indirect_path_cell_id_r18.to_string());
+  j.write_fieldname("sl-IndirectPathRelayUE-Identity-r18");
+  sl_indirect_path_relay_ue_id_r18.to_json(j);
+  j.write_fieldname("sl-IndirectPathCellIdentity-r18");
+  sl_indirect_path_cell_id_r18.to_json(j);
   if (t421_r18_present) {
     j.write_str("t421-r18", t421_r18.to_string());
   }
@@ -17237,7 +17272,8 @@ void n3_c_relay_ue_info_r18_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("n3c-PLMN-Id-r18");
   n3c_cell_global_id_r18.n3c_plmn_id_r18.to_json(j);
-  j.write_str("n3c-CellIdentity-r18", n3c_cell_global_id_r18.n3c_cell_id_r18.to_string());
+  j.write_fieldname("n3c-CellIdentity-r18");
+  n3c_cell_global_id_r18.n3c_cell_id_r18.to_json(j);
   j.end_obj();
   j.write_int("n3c-C-RNTI-r18", n3c_c_rnti_r18);
   j.end_obj();
@@ -17927,13 +17963,16 @@ void ltm_ssb_cfg_r18_s::ssb_positions_in_burst_r18_c_::to_json(json_writer& j) c
   j.start_obj();
   switch (type_) {
     case types::short_bitmap:
-      j.write_str("shortBitmap", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("shortBitmap");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::medium_bitmap:
-      j.write_str("mediumBitmap", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("mediumBitmap");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::long_bitmap:
-      j.write_str("longBitmap", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("longBitmap");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ltm_ssb_cfg_r18_s::ssb_positions_in_burst_r18_c_");
@@ -19382,6 +19421,9 @@ void rrc_recfg_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_recfg_s::crit_exts_c_");
@@ -19966,6 +20008,9 @@ void rrc_resume_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_resume_s::crit_exts_c_");
@@ -20475,8 +20520,10 @@ OCUDUASN_CODE suspend_cfg_s::unpack(cbit_ref& bref)
 void suspend_cfg_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("fullI-RNTI", full_i_rnti.to_string());
-  j.write_str("shortI-RNTI", short_i_rnti.to_string());
+  j.write_fieldname("fullI-RNTI");
+  full_i_rnti.to_json(j);
+  j.write_fieldname("shortI-RNTI");
+  short_i_rnti.to_json(j);
   j.write_str("ran-PagingCycle", ran_paging_cycle.to_string());
   if (ran_notif_area_info_present) {
     j.write_fieldname("ran-NotificationAreaInfo");
@@ -21015,6 +21062,9 @@ void rrc_release_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_release_s::crit_exts_c_");
@@ -21190,6 +21240,9 @@ void rrc_reest_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_reest_s::crit_exts_c_");
@@ -21351,6 +21404,9 @@ void security_mode_cmd_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "security_mode_cmd_s::crit_exts_c_");
@@ -21850,6 +21906,9 @@ void dl_info_transfer_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "dl_info_transfer_s::crit_exts_c_");
@@ -22032,6 +22091,9 @@ void ue_cap_enquiry_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_cap_enquiry_s::crit_exts_c_");
@@ -22219,6 +22281,9 @@ void mob_from_nr_cmd_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "mob_from_nr_cmd_s::crit_exts_c_");
@@ -22360,6 +22425,9 @@ void dl_ded_msg_segment_r16_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "dl_ded_msg_segment_r16_s::crit_exts_c_");
@@ -22645,6 +22713,9 @@ void ue_info_request_r16_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_info_request_r16_s::crit_exts_c_");
@@ -22795,6 +22866,9 @@ void dl_info_transfer_mrdc_r16_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "dl_info_transfer_mrdc_r16_s::crit_exts_c_");
@@ -22864,10 +22938,13 @@ void dl_info_transfer_mrdc_r16_s::crit_exts_c_::c1_c_::to_json(json_writer& j) c
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "dl_info_transfer_mrdc_r16_s::crit_exts_c_::c1_c_");
@@ -23036,6 +23113,7 @@ void event_type_r16_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::out_of_coverage:
+      j.write_null("outOfCoverage");
       break;
     case types::event_l1:
       j.write_fieldname("eventL1");
@@ -23314,7 +23392,8 @@ void logged_meas_cfg_r16_ies_s::to_json(json_writer& j) const
   trace_ref_r16.to_json(j);
   j.write_str("traceRecordingSessionRef-r16", trace_recording_session_ref_r16.to_string());
   j.write_str("tce-Id-r16", tce_id_r16.to_string());
-  j.write_str("absoluteTimeInfo-r16", absolute_time_info_r16.to_string());
+  j.write_fieldname("absoluteTimeInfo-r16");
+  absolute_time_info_r16.to_json(j);
   if (area_cfg_r16_present) {
     j.write_fieldname("areaConfiguration-r16");
     area_cfg_r16.to_json(j);
@@ -23530,6 +23609,9 @@ void logged_meas_cfg_r16_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "logged_meas_cfg_r16_s::crit_exts_c_");

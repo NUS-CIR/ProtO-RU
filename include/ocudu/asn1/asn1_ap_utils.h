@@ -26,7 +26,7 @@ template <typename ExtensionSetParam>
 struct ie_field_ext_item {
   using obj_set_type = ExtensionSetParam;
   using value_type   = typename ExtensionSetParam::ext_c;
-  const char* item_name() const { return "extension"; }
+  const char* item_name() const { return "extensionValue"; }
   void        set_item(uint32_t id) { item = ExtensionSetParam::get_ext(id); }
 
 protected:
@@ -147,7 +147,7 @@ struct ie_ext_item {
   const value_type* operator->() const { return &ext; }
   value_type&       operator*() { return ext; }
   const value_type& operator*() const { return ext; }
-  const char*       item_name() const { return "extension"; }
+  const char*       item_name() const { return "extensionValue"; }
 
 protected:
   value_type&       item() { return ext; }
@@ -288,8 +288,8 @@ struct protocol_container_empty_l {
   }
   void to_json(json_writer& j) const
   {
-    j.start_obj();
-    j.end_obj();
+    j.start_array();
+    j.end_array();
   }
 };
 

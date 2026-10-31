@@ -117,10 +117,12 @@ void init_ue_id_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::ng_5_g_s_tmsi_part1:
-      j.write_str("ng-5G-S-TMSI-Part1", c.get<fixed_bitstring<39>>().to_string());
+      j.write_fieldname("ng-5G-S-TMSI-Part1");
+      c.get<fixed_bitstring<39>>().to_json(j);
       break;
     case types::random_value:
-      j.write_str("randomValue", c.get<fixed_bitstring<39>>().to_string());
+      j.write_fieldname("randomValue");
+      c.get<fixed_bitstring<39>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "init_ue_id_c");
@@ -191,8 +193,10 @@ OCUDUASN_CODE rrc_pos_sys_info_request_r16_ies_s::unpack(cbit_ref& bref)
 void rrc_pos_sys_info_request_r16_ies_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("requestedPosSI-List", requested_pos_si_list.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("requestedPosSI-List");
+  requested_pos_si_list.to_json(j);
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -218,7 +222,8 @@ void reestab_ue_id_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("c-RNTI", c_rnti);
   j.write_int("physCellId", pci);
-  j.write_str("shortMAC-I", short_mac_i.to_string());
+  j.write_fieldname("shortMAC-I");
+  short_mac_i.to_json(j);
   j.end_obj();
 }
 
@@ -252,7 +257,8 @@ void rrc_reest_request_ies_s::to_json(json_writer& j) const
   j.write_fieldname("ue-Identity");
   ue_id.to_json(j);
   j.write_str("reestablishmentCause", reest_cause.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -321,10 +327,13 @@ OCUDUASN_CODE rrc_resume_request_ies_s::unpack(cbit_ref& bref)
 void rrc_resume_request_ies_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("resumeIdentity", resume_id.to_string());
-  j.write_str("resumeMAC-I", resume_mac_i.to_string());
+  j.write_fieldname("resumeIdentity");
+  resume_id.to_json(j);
+  j.write_fieldname("resumeMAC-I");
+  resume_mac_i.to_json(j);
   j.write_str("resumeCause", resume_cause.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -372,7 +381,8 @@ void rrc_setup_request_ies_s::to_json(json_writer& j) const
   j.write_fieldname("ue-Identity");
   ue_id.to_json(j);
   j.write_str("establishmentCause", establishment_cause.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -415,8 +425,10 @@ OCUDUASN_CODE rrc_sys_info_request_ies_s::unpack(cbit_ref& bref)
 void rrc_sys_info_request_ies_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("requested-SI-List", requested_si_list.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("requested-SI-List");
+  requested_si_list.to_json(j);
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -595,6 +607,9 @@ void rrc_sys_info_request_s::crit_exts_c_::crit_exts_future_r16_c_::to_json(json
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_sys_info_request_s::crit_exts_c_::crit_exts_future_r16_c_");

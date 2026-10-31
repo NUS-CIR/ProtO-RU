@@ -993,7 +993,8 @@ void test_cond_value_c::to_json(json_writer& j) const
       j.write_bool("valueBool", c.get<bool>());
       break;
     case types::value_bit_s:
-      j.write_str("valueBitS", c.get<unbounded_bitstring<false, true>>().to_string());
+      j.write_fieldname("valueBitS");
+      c.get<unbounded_bitstring<false, true>>().to_json(j);
       break;
     case types::value_oct_s:
       j.write_str("valueOctS", c.get<unbounded_octstring<true>>().to_string());
@@ -1278,7 +1279,7 @@ void e2sm_kpm_action_definition_format1_s::to_json(json_writer& j) const
     e1.to_json(j);
   }
   j.end_array();
-  j.write_int("granulPeriod", granul_period);
+  j.write_uint("granulPeriod", granul_period);
   if (cell_global_id_present) {
     j.write_fieldname("cellGlobalID");
     cell_global_id.to_json(j);
@@ -2033,7 +2034,7 @@ void e2sm_kpm_action_definition_format3_s::to_json(json_writer& j) const
     e1.to_json(j);
   }
   j.end_array();
-  j.write_int("granulPeriod", granul_period);
+  j.write_uint("granulPeriod", granul_period);
   if (cell_global_id_present) {
     j.write_fieldname("cellGlobalID");
     cell_global_id.to_json(j);
@@ -2918,7 +2919,7 @@ OCUDUASN_CODE e2sm_kpm_event_trigger_definition_format1_s::unpack(cbit_ref& bref
 void e2sm_kpm_event_trigger_definition_format1_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("reportingPeriod", report_period);
+  j.write_uint("reportingPeriod", report_period);
   j.end_obj();
 }
 
@@ -3395,7 +3396,7 @@ void event_trigger_item_s::to_json(json_writer& j) const
   j.write_fieldname("eventCond");
   event_cond.to_json(j);
   if (event_eval_period_present) {
-    j.write_int("eventEvalPeriod", event_eval_period);
+    j.write_uint("eventEvalPeriod", event_eval_period);
   }
   if (lc_or_present) {
     j.write_str("logicalOR", "true");
@@ -3865,14 +3866,16 @@ void meas_record_item_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::integer:
-      j.write_int("integer", c.get<uint64_t>());
+      j.write_uint("integer", c.get<uint64_t>());
       break;
     case types::real:
       j.write_float("real", c.get<real_s>().value);
       break;
     case types::no_value:
+      j.write_null("noValue");
       break;
     case types::not_satisfied:
+      j.write_null("notSatisfied");
       break;
     default:
       log_invalid_choice_id(type_, "meas_record_item_c");
@@ -4035,7 +4038,7 @@ void e2sm_kpm_ind_msg_format1_s::to_json(json_writer& j) const
     j.end_array();
   }
   if (granul_period_present) {
-    j.write_int("granulPeriod", granul_period);
+    j.write_uint("granulPeriod", granul_period);
   }
   j.end_obj();
 }
@@ -4397,7 +4400,7 @@ void e2sm_kpm_ind_msg_format2_s::to_json(json_writer& j) const
   }
   j.end_array();
   if (granul_period_present) {
-    j.write_int("granulPeriod", granul_period);
+    j.write_uint("granulPeriod", granul_period);
   }
   j.end_obj();
 }

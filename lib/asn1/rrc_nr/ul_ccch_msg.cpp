@@ -36,6 +36,9 @@ void ul_ccch_msg_type_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ul_ccch_msg_type_c");

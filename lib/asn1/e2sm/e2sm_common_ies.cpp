@@ -69,7 +69,8 @@ void nr_cgi_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_str("pLMNIdentity", plmn_id.to_string());
-  j.write_str("nRCellIdentity", nr_cell_id.to_string());
+  j.write_fieldname("nRCellIdentity");
+  nr_cell_id.to_json(j);
   j.end_obj();
 }
 
@@ -99,7 +100,8 @@ void eutra_cgi_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_str("pLMNIdentity", plmn_id.to_string());
-  j.write_str("eUTRACellIdentity", eutra_cell_id.to_string());
+  j.write_fieldname("eUTRACellIdentity");
+  eutra_cell_id.to_json(j);
   j.end_obj();
 }
 
@@ -300,9 +302,12 @@ void guami_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_str("pLMNIdentity", plmn_id.to_string());
-  j.write_str("aMFRegionID", amf_region_id.to_string());
-  j.write_str("aMFSetID", amf_set_id.to_string());
-  j.write_str("aMFPointer", amf_pointer.to_string());
+  j.write_fieldname("aMFRegionID");
+  amf_region_id.to_json(j);
+  j.write_fieldname("aMFSetID");
+  amf_set_id.to_json(j);
+  j.write_fieldname("aMFPointer");
+  amf_pointer.to_json(j);
   j.end_obj();
 }
 
@@ -484,7 +489,8 @@ uint8_t core_cp_id_c::types_opts::to_number() const
 void en_gnb_id_c::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("en-gNB-ID", c.to_string());
+  j.write_fieldname("en-gNB-ID");
+  c.to_json(j);
   j.end_obj();
 }
 OCUDUASN_CODE en_gnb_id_c::pack(bit_ref& bref) const
@@ -628,16 +634,20 @@ void enb_id_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::macro_enb_id:
-      j.write_str("macro-eNB-ID", c.get<fixed_bitstring<20, false, true>>().to_string());
+      j.write_fieldname("macro-eNB-ID");
+      c.get<fixed_bitstring<20, false, true>>().to_json(j);
       break;
     case types::home_enb_id:
-      j.write_str("home-eNB-ID", c.get<fixed_bitstring<28, false, true>>().to_string());
+      j.write_fieldname("home-eNB-ID");
+      c.get<fixed_bitstring<28, false, true>>().to_json(j);
       break;
     case types::short_macro_enb_id:
-      j.write_str("short-Macro-eNB-ID", c.get<fixed_bitstring<18, false, true>>().to_string());
+      j.write_fieldname("short-Macro-eNB-ID");
+      c.get<fixed_bitstring<18, false, true>>().to_json(j);
       break;
     case types::long_macro_enb_id:
-      j.write_str("long-Macro-eNB-ID", c.get<fixed_bitstring<21, false, true>>().to_string());
+      j.write_fieldname("long-Macro-eNB-ID");
+      c.get<fixed_bitstring<21, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "enb_id_c");
@@ -732,7 +742,8 @@ void freq_band_nr_item_s::to_json(json_writer& j) const
 void gnb_id_c::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("gNB-ID", c.to_string());
+  j.write_fieldname("gNB-ID");
+  c.to_json(j);
   j.end_obj();
 }
 OCUDUASN_CODE gnb_id_c::pack(bit_ref& bref) const
@@ -921,13 +932,16 @@ void ng_enb_id_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::macro_ng_enb_id:
-      j.write_str("macroNgENB-ID", c.get<fixed_bitstring<20, false, true>>().to_string());
+      j.write_fieldname("macroNgENB-ID");
+      c.get<fixed_bitstring<20, false, true>>().to_json(j);
       break;
     case types::short_macro_ng_enb_id:
-      j.write_str("shortMacroNgENB-ID", c.get<fixed_bitstring<18, false, true>>().to_string());
+      j.write_fieldname("shortMacroNgENB-ID");
+      c.get<fixed_bitstring<18, false, true>>().to_json(j);
       break;
     case types::long_macro_ng_enb_id:
-      j.write_str("longMacroNgENB-ID", c.get<fixed_bitstring<21, false, true>>().to_string());
+      j.write_fieldname("longMacroNgENB-ID");
+      c.get<fixed_bitstring<21, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ng_enb_id_c");
@@ -1357,7 +1371,7 @@ void interface_id_e1_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("globalGNB-ID");
   global_gnb_id.to_json(j);
-  j.write_int("gNB-CU-UP-ID", gnb_cu_up_id);
+  j.write_uint("gNB-CU-UP-ID", gnb_cu_up_id);
   j.end_obj();
 }
 
@@ -1388,7 +1402,7 @@ void interface_id_f1_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("globalGNB-ID");
   global_gnb_id.to_json(j);
-  j.write_int("gNB-DU-ID", gnb_du_id);
+  j.write_uint("gNB-DU-ID", gnb_du_id);
   j.end_obj();
 }
 
@@ -1475,7 +1489,7 @@ void interface_id_w1_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("global-ng-eNB-ID");
   global_ng_enb_id.to_json(j);
-  j.write_int("ng-eNB-DU-ID", ng_enb_du_id);
+  j.write_uint("ng-eNB-DU-ID", ng_enb_du_id);
   j.end_obj();
 }
 
@@ -2228,23 +2242,23 @@ void partial_ue_id_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (amf_ue_ngap_id_present) {
-    j.write_int("amf-UE-NGAP-ID", amf_ue_ngap_id);
+    j.write_uint("amf-UE-NGAP-ID", amf_ue_ngap_id);
   }
   if (guami_present) {
     j.write_fieldname("guami");
     guami.to_json(j);
   }
   if (gnb_cu_ue_f1ap_id_present) {
-    j.write_int("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
+    j.write_uint("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
   }
   if (gnb_cu_cp_ue_e1ap_id_present) {
-    j.write_int("gNB-CU-CP-UE-E1AP-ID", gnb_cu_cp_ue_e1ap_id);
+    j.write_uint("gNB-CU-CP-UE-E1AP-ID", gnb_cu_cp_ue_e1ap_id);
   }
   if (ran_ue_id_present) {
     j.write_str("ran-UEID", ran_ue_id.to_string());
   }
   if (m_ng_ran_ue_xnap_id_present) {
-    j.write_int("m-NG-RAN-UE-XnAP-ID", m_ng_ran_ue_xnap_id);
+    j.write_uint("m-NG-RAN-UE-XnAP-ID", m_ng_ran_ue_xnap_id);
   }
   if (global_ng_ran_node_id_present) {
     j.write_fieldname("globalNG-RANNode-ID");
@@ -2255,7 +2269,7 @@ void partial_ue_id_s::to_json(json_writer& j) const
     cell_rnti.to_json(j);
   }
   if (ng_enb_cu_ue_w1_ap_id_present) {
-    j.write_int("ng-eNB-CU-UE-W1AP-ID", ng_enb_cu_ue_w1_ap_id);
+    j.write_uint("ng-eNB-CU-UE-W1AP-ID", ng_enb_cu_ue_w1_ap_id);
   }
   if (m_enb_ue_x2ap_id_present) {
     j.write_int("m-eNB-UE-X2AP-ID", m_enb_ue_x2ap_id);
@@ -2268,7 +2282,7 @@ void partial_ue_id_s::to_json(json_writer& j) const
     global_enb_id.to_json(j);
   }
   if (mme_ue_s1ap_id_present) {
-    j.write_int("mME-UE-S1AP-ID", mme_ue_s1ap_id);
+    j.write_uint("mME-UE-S1AP-ID", mme_ue_s1ap_id);
   }
   if (gummei_present) {
     j.write_fieldname("gUMMEI");
@@ -2916,7 +2930,7 @@ OCUDUASN_CODE ue_id_gnb_cu_cp_f1ap_id_item_s::unpack(cbit_ref& bref)
 void ue_id_gnb_cu_cp_f1ap_id_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
+  j.write_uint("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
   j.end_obj();
 }
 
@@ -2943,7 +2957,7 @@ OCUDUASN_CODE ue_id_gnb_cu_cp_e1ap_id_item_s::unpack(cbit_ref& bref)
 void ue_id_gnb_cu_cp_e1ap_id_item_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("gNB-CU-CP-UE-E1AP-ID", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("gNB-CU-CP-UE-E1AP-ID", gnb_cu_cp_ue_e1ap_id);
   j.end_obj();
 }
 
@@ -3044,7 +3058,7 @@ OCUDUASN_CODE ue_id_gnb_s::unpack(cbit_ref& bref)
 void ue_id_gnb_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("amf-UE-NGAP-ID", amf_ue_ngap_id);
+  j.write_uint("amf-UE-NGAP-ID", amf_ue_ngap_id);
   j.write_fieldname("guami");
   guami.to_json(j);
   if (gnb_cu_ue_f1ap_id_list.size() > 0) {
@@ -3065,7 +3079,7 @@ void ue_id_gnb_s::to_json(json_writer& j) const
     j.write_str("ran-UEID", ran_ue_id.to_string());
   }
   if (m_ng_ran_ue_xnap_id_present) {
-    j.write_int("m-NG-RAN-UE-XnAP-ID", m_ng_ran_ue_xnap_id);
+    j.write_uint("m-NG-RAN-UE-XnAP-ID", m_ng_ran_ue_xnap_id);
   }
   if (global_gnb_id_present) {
     j.write_fieldname("globalGNB-ID");
@@ -3132,7 +3146,7 @@ OCUDUASN_CODE ue_id_gnb_du_s::unpack(cbit_ref& bref)
 void ue_id_gnb_du_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
+  j.write_uint("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
   if (ran_ue_id_present) {
     j.write_str("ran-UEID", ran_ue_id.to_string());
   }
@@ -3176,7 +3190,7 @@ OCUDUASN_CODE ue_id_gnb_cu_up_s::unpack(cbit_ref& bref)
 void ue_id_gnb_cu_up_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("gNB-CU-CP-UE-E1AP-ID", gnb_cu_cp_ue_e1ap_id);
+  j.write_uint("gNB-CU-CP-UE-E1AP-ID", gnb_cu_cp_ue_e1ap_id);
   if (ran_ue_id_present) {
     j.write_str("ran-UEID", ran_ue_id.to_string());
   }
@@ -3262,14 +3276,14 @@ OCUDUASN_CODE ue_id_ng_enb_s::unpack(cbit_ref& bref)
 void ue_id_ng_enb_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("amf-UE-NGAP-ID", amf_ue_ngap_id);
+  j.write_uint("amf-UE-NGAP-ID", amf_ue_ngap_id);
   j.write_fieldname("guami");
   guami.to_json(j);
   if (ng_enb_cu_ue_w1_ap_id_present) {
-    j.write_int("ng-eNB-CU-UE-W1AP-ID", ng_enb_cu_ue_w1_ap_id);
+    j.write_uint("ng-eNB-CU-UE-W1AP-ID", ng_enb_cu_ue_w1_ap_id);
   }
   if (m_ng_ran_ue_xnap_id_present) {
-    j.write_int("m-NG-RAN-UE-XnAP-ID", m_ng_ran_ue_xnap_id);
+    j.write_uint("m-NG-RAN-UE-XnAP-ID", m_ng_ran_ue_xnap_id);
   }
   if (global_ng_enb_id_present) {
     j.write_fieldname("globalNgENB-ID");
@@ -3326,7 +3340,7 @@ OCUDUASN_CODE ue_id_ng_enb_du_s::unpack(cbit_ref& bref)
 void ue_id_ng_enb_du_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("ng-eNB-CU-UE-W1AP-ID", ng_enb_cu_ue_w1_ap_id);
+  j.write_uint("ng-eNB-CU-UE-W1AP-ID", ng_enb_cu_ue_w1_ap_id);
   if (cell_rnti.is_present()) {
     j.write_fieldname("cell-RNTI");
     cell_rnti->to_json(j);
@@ -3418,7 +3432,7 @@ void ue_id_en_gnb_s::to_json(json_writer& j) const
   j.write_fieldname("globalENB-ID");
   global_enb_id.to_json(j);
   if (gnb_cu_ue_f1ap_id_present) {
-    j.write_int("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
+    j.write_uint("gNB-CU-UE-F1AP-ID", gnb_cu_ue_f1ap_id);
   }
   if (gnb_cu_cp_ue_e1ap_id_list.size() > 0) {
     j.start_array("gNB-CU-CP-UE-E1AP-ID-List");
@@ -3505,7 +3519,7 @@ OCUDUASN_CODE ue_id_enb_s::unpack(cbit_ref& bref)
 void ue_id_enb_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_int("mME-UE-S1AP-ID", mme_ue_s1ap_id);
+  j.write_uint("mME-UE-S1AP-ID", mme_ue_s1ap_id);
   j.write_fieldname("gUMMEI");
   gummei.to_json(j);
   if (m_enb_ue_x2ap_id_present) {

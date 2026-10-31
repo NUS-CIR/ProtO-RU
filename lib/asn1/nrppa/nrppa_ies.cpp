@@ -606,13 +606,11 @@ presence_e abort_tx_ext_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void abort_tx_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("PosSRSResourceSet-Aggregation-List");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE abort_tx_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -725,6 +723,7 @@ void abort_tx_c::to_json(json_writer& j) const
       j.write_int("deactivateSRSResourceSetID", c.get<uint8_t>());
       break;
     case types::release_all:
+      j.write_null("releaseALL");
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -855,10 +854,7 @@ presence_e tx_comb_ext_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void tx_comb_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("TransmissionCombn8");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE tx_comb_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1765,25 +1761,22 @@ const start_rb_idx_c& srs_res_ext_ies_o::ext_c::start_rb_idx() const
 }
 void srs_res_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::nrof_symbols_extended:
-      j.write_str("NrofSymbolsExtended", c.get<nrof_symbols_extended_e>().to_string());
+      j.write_str(c.get<nrof_symbols_extended_e>().to_string());
       break;
     case types::repeat_factor_extended:
-      j.write_str("RepetitionFactorExtended", c.get<repeat_factor_extended_e>().to_string());
+      j.write_str(c.get<repeat_factor_extended_e>().to_string());
       break;
     case types::start_rb_hop:
-      j.write_str("StartRBHopping", "enable");
+      j.write_str("enable");
       break;
     case types::start_rb_idx:
-      j.write_fieldname("StartRBIndex");
       c.get<start_rb_idx_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "srs_res_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE srs_res_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -1923,28 +1916,37 @@ OCUDUASN_CODE srs_res_ext_ies_container::unpack(cbit_ref& bref)
 }
 void srs_res_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (nrof_symbols_extended_present) {
+    j.start_obj();
     j.write_int("id", 107);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", nrof_symbols_extended.to_string());
+    j.write_str("extensionValue", nrof_symbols_extended.to_string());
+    j.end_obj();
   }
   if (repeat_factor_extended_present) {
+    j.start_obj();
     j.write_int("id", 108);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", repeat_factor_extended.to_string());
+    j.write_str("extensionValue", repeat_factor_extended.to_string());
+    j.end_obj();
   }
   if (start_rb_hop_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", "enable");
+    j.write_str("extensionValue", "enable");
+    j.end_obj();
   }
   if (start_rb_idx_present) {
+    j.start_obj();
     j.write_int("id", 110);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     start_rb_idx.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // SRSResource ::= SEQUENCE
@@ -2344,9 +2346,7 @@ presence_e res_type_periodic_pos_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void res_type_periodic_pos_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("SRSPosPeriodicConfigHyperSFNIndex", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE res_type_periodic_pos_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -2407,6 +2407,7 @@ void res_type_periodic_pos_s::to_json(json_writer& j) const
   j.write_int("offset", offset);
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -2449,9 +2450,7 @@ presence_e res_type_semi_persistent_pos_ext_ies_o::get_presence(const uint32_t& 
 // Extension ::= OPEN TYPE
 void res_type_semi_persistent_pos_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("SRSPosPeriodicConfigHyperSFNIndex", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE res_type_semi_persistent_pos_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -2512,6 +2511,7 @@ void res_type_semi_persistent_pos_s::to_json(json_writer& j) const
   j.write_int("offset", offset);
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -3519,10 +3519,7 @@ presence_e pos_srs_res_item_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void pos_srs_res_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("TxHoppingConfiguration");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE pos_srs_res_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -3618,6 +3615,7 @@ void pos_srs_res_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -4763,30 +4761,28 @@ const uint32_t& relative_path_delay_ext_ies_o::value_c::report_granularitykminus
 }
 void relative_path_delay_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::report_granularitykminus1_add_path:
-      j.write_int("INTEGER (0..32701)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::report_granularitykminus2_add_path:
-      j.write_int("INTEGER (0..65401)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::report_granularitykminus3_add_path:
-      j.write_int("INTEGER (0..130801)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus4_add_path:
-      j.write_int("INTEGER (0..261601)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus5_add_path:
-      j.write_int("INTEGER (0..523201)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus6_add_path:
-      j.write_int("INTEGER (0..1046401)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "relative_path_delay_ext_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE relative_path_delay_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5331,10 +5327,7 @@ presence_e trp_meas_quality_ext_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void trp_meas_quality_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("TRPPhaseQuality");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE trp_meas_quality_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6026,20 +6019,16 @@ const ul_srs_rsrp_p_s& add_path_list_item_ext_ies_o::ext_c::path_pwr() const
 }
 void add_path_list_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::multiple_ul_ao_a:
-      j.write_fieldname("MultipleULAoA");
       c.get<multiple_ul_ao_a_s>().to_json(j);
       break;
     case types::path_pwr:
-      j.write_fieldname("UL-SRS-RSRPP");
       c.get<ul_srs_rsrp_p_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "add_path_list_item_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE add_path_list_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -6141,18 +6130,24 @@ OCUDUASN_CODE add_path_list_item_ext_ies_container::unpack(cbit_ref& bref)
 }
 void add_path_list_item_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (multiple_ul_ao_a_present) {
+    j.start_obj();
     j.write_int("id", 74);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     multiple_ul_ao_a.to_json(j);
+    j.end_obj();
   }
   if (path_pwr_present) {
+    j.start_obj();
     j.write_int("id", 96);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     path_pwr.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // AdditionalPathListItem ::= SEQUENCE
@@ -6410,22 +6405,19 @@ const uint16_t& aggr_pos_srs_res_id_item_ext_ies_o::ext_c::nr_pci() const
 }
 void aggr_pos_srs_res_id_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::point_a:
-      j.write_int("INTEGER (0..3279165)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::scs_specific_carrier:
-      j.write_fieldname("SCS-SpecificCarrier");
       c.get<scs_specific_carrier_s>().to_json(j);
       break;
     case types::nr_pci:
-      j.write_int("INTEGER (0..1007)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "aggr_pos_srs_res_id_item_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE aggr_pos_srs_res_id_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -6550,19 +6542,26 @@ OCUDUASN_CODE aggr_pos_srs_res_id_item_ext_ies_container::unpack(cbit_ref& bref)
 }
 void aggr_pos_srs_res_id_item_ext_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 154);
   j.write_str("criticality", "ignore");
-  j.write_int("Extension", point_a);
+  j.write_int("extensionValue", point_a);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 156);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("extensionValue");
   scs_specific_carrier.to_json(j);
+  j.end_obj();
   if (nr_pci_present) {
+    j.start_obj();
     j.write_int("id", 155);
     j.write_str("criticality", "ignore");
-    j.write_int("Extension", nr_pci);
+    j.write_int("extensionValue", nr_pci);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // AggregatedPosSRSResourceID-Item ::= SEQUENCE
@@ -7623,7 +7622,8 @@ void cgi_eutra_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_str("pLMN-Identity", plmn_id.to_string());
-  j.write_str("eUTRAcellIdentifier", eutr_acell_id.to_string());
+  j.write_fieldname("eUTRAcellIdentifier");
+  eutr_acell_id.to_json(j);
   if (ie_exts_present) {
     j.write_fieldname("iE-Extensions");
     ie_exts.to_json(j);
@@ -7667,7 +7667,8 @@ void cgi_nr_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_str("pLMN-Identity", plmn_id.to_string());
-  j.write_str("nRcellIdentifier", nr_cell_id.to_string());
+  j.write_fieldname("nRcellIdentifier");
+  nr_cell_id.to_json(j);
   if (ie_exts_present) {
     j.write_fieldname("iE-Extensions");
     ie_exts.to_json(j);
@@ -8292,6 +8293,7 @@ void choice_trp_beam_ant_info_item_c::to_json(json_writer& j) const
       c.get<trp_beam_ant_explicit_info_s>().to_json(j);
       break;
     case types::no_change:
+      j.write_null("noChange");
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -8824,22 +8826,28 @@ void dl_prs_muting_pattern_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::two:
-      j.write_str("two", c.get<fixed_bitstring<2, false, true>>().to_string());
+      j.write_fieldname("two");
+      c.get<fixed_bitstring<2, false, true>>().to_json(j);
       break;
     case types::four:
-      j.write_str("four", c.get<fixed_bitstring<4, false, true>>().to_string());
+      j.write_fieldname("four");
+      c.get<fixed_bitstring<4, false, true>>().to_json(j);
       break;
     case types::six:
-      j.write_str("six", c.get<fixed_bitstring<6, false, true>>().to_string());
+      j.write_fieldname("six");
+      c.get<fixed_bitstring<6, false, true>>().to_json(j);
       break;
     case types::eight:
-      j.write_str("eight", c.get<fixed_bitstring<8, false, true>>().to_string());
+      j.write_fieldname("eight");
+      c.get<fixed_bitstring<8, false, true>>().to_json(j);
       break;
     case types::sixteen:
-      j.write_str("sixteen", c.get<fixed_bitstring<16, false, true>>().to_string());
+      j.write_fieldname("sixteen");
+      c.get<fixed_bitstring<16, false, true>>().to_json(j);
       break;
     case types::thirty_two:
-      j.write_str("thirty-two", c.get<fixed_bitstring<32, false, true>>().to_string());
+      j.write_fieldname("thirty-two");
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -9537,10 +9545,12 @@ void ng_ran_cell_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::eutra_cell_id:
-      j.write_str("eUTRA-CellID", c.get<fixed_bitstring<28, false, true>>().to_string());
+      j.write_fieldname("eUTRA-CellID");
+      c.get<fixed_bitstring<28, false, true>>().to_json(j);
       break;
     case types::nr_cell_id:
-      j.write_str("nR-CellID", c.get<fixed_bitstring<36, false, true>>().to_string());
+      j.write_fieldname("nR-CellID");
+      c.get<fixed_bitstring<36, false, true>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-Extension");
@@ -10549,50 +10559,47 @@ const uint16_t& measured_results_value_ext_ie_o::value_c::ue_rx_tx_time_diff() c
 }
 void measured_results_value_ext_ie_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::result_ss_rsrp:
-      j.start_array("ResultSS-RSRP");
+      j.start_array("");
       for (const auto& e1 : c.get<result_ss_rsrp_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::result_ss_rsrq:
-      j.start_array("ResultSS-RSRQ");
+      j.start_array("");
       for (const auto& e1 : c.get<result_ss_rsrq_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::result_csi_rsrp:
-      j.start_array("ResultCSI-RSRP");
+      j.start_array("");
       for (const auto& e1 : c.get<result_csi_rsrp_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::result_csi_rsrq:
-      j.start_array("ResultCSI-RSRQ");
+      j.start_array("");
       for (const auto& e1 : c.get<result_csi_rsrq_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::angle_of_arrival_nr:
-      j.write_fieldname("UL-AoA");
       c.get<ul_ao_a_s>().to_json(j);
       break;
     case types::nr_tadv:
-      j.write_int("INTEGER (0..7690)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ue_rx_tx_time_diff:
-      j.write_int("INTEGER (0..61565)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "measured_results_value_ext_ie_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE measured_results_value_ext_ie_o::value_c::pack(bit_ref& bref) const
 {
@@ -11285,10 +11292,7 @@ presence_e ref_point_ext_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ref_point_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("LocalOrigin");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ref_point_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11905,13 +11909,11 @@ presence_e geographical_coordinates_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void geographical_coordinates_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("ARPLocationInformation");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE geographical_coordinates_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -11982,6 +11984,7 @@ void geographical_coordinates_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -12081,18 +12084,16 @@ const uint16_t& time_stamp_slot_idx_ext_ies_o::value_c::scs_960() const
 }
 void time_stamp_slot_idx_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::scs_480:
-      j.write_int("INTEGER (0..319)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::scs_960:
-      j.write_int("INTEGER (0..639)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "time_stamp_slot_idx_ext_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE time_stamp_slot_idx_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -12373,9 +12374,7 @@ presence_e time_stamp_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void time_stamp_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_int("INTEGER (0..13)", c);
-  j.end_obj();
+  j.write_int(c);
 }
 OCUDUASN_CODE time_stamp_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -12449,10 +12448,12 @@ void time_stamp_s::to_json(json_writer& j) const
   j.write_fieldname("slotIndex");
   slot_idx.to_json(j);
   if (meas_time_present) {
-    j.write_str("measurementTime", meas_time.to_string());
+    j.write_fieldname("measurementTime");
+    meas_time.to_json(j);
   }
   if (ie_ext.size() > 0) {
     j.write_fieldname("iE-Extension");
+    ie_ext.to_json(j);
   }
   j.end_obj();
 }
@@ -12561,9 +12562,7 @@ presence_e measured_results_associated_info_item_ext_ies_o::get_presence(const u
 // Extension ::= OPEN TYPE
 void measured_results_associated_info_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("DL-reference-signal-UERxTx-TD", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE measured_results_associated_info_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -12642,6 +12641,7 @@ void measured_results_associated_info_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -12762,18 +12762,15 @@ e_c_id_meas_result_ext_ies_o::ext_c::measured_results_associated_info_list() con
 }
 void e_c_id_meas_result_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::geographical_coordinates:
-      j.write_fieldname("GeographicalCoordinates");
       c.get<geographical_coordinates_s>().to_json(j);
       break;
     case types::mobile_access_point_location:
-      j.write_fieldname("Mobile-TRP-LocationInformation");
       c.get<mobile_trp_location_info_s>().to_json(j);
       break;
     case types::measured_results_associated_info_list:
-      j.start_array("MeasuredResultsAssociatedInfoList");
+      j.start_array("");
       for (const auto& e1 : c.get<measured_results_associated_info_list_l>()) {
         e1.to_json(j);
       }
@@ -12782,7 +12779,6 @@ void e_c_id_meas_result_ext_ies_o::ext_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e_c_id_meas_result_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e_c_id_meas_result_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -12904,27 +12900,35 @@ OCUDUASN_CODE e_c_id_meas_result_ext_ies_container::unpack(cbit_ref& bref)
 }
 void e_c_id_meas_result_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (geographical_coordinates_present) {
+    j.start_obj();
     j.write_int("id", 37);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     geographical_coordinates.to_json(j);
+    j.end_obj();
   }
   if (mobile_access_point_location_present) {
+    j.start_obj();
     j.write_int("id", 116);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     mobile_access_point_location.to_json(j);
+    j.end_obj();
   }
   if (measured_results_associated_info_list_present) {
+    j.start_obj();
     j.write_int("id", 153);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : measured_results_associated_info_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E-CID-MeasurementResult ::= SEQUENCE
@@ -13253,30 +13257,28 @@ const uint32_t& gnb_rx_tx_time_diff_meas_ext_ies_o::value_c::report_granularityk
 }
 void gnb_rx_tx_time_diff_meas_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::report_granularitykminus1:
-      j.write_int("INTEGER (0..3940097)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus2:
-      j.write_int("INTEGER (0..7880193)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus3:
-      j.write_int("INTEGER (0..15760385)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus4:
-      j.write_int("INTEGER (0..31520769)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus5:
-      j.write_int("INTEGER (0..63041537)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus6:
-      j.write_int("INTEGER (0..126083073)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "gnb_rx_tx_time_diff_meas_ext_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_rx_tx_time_diff_meas_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14143,23 +14145,20 @@ const trpteg_info_c& gnb_rx_tx_time_diff_ext_ies_o::ext_c::trpteg_info() const
 }
 void gnb_rx_tx_time_diff_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::extended_add_path_list:
-      j.start_array("ExtendedAdditionalPathList");
+      j.start_array("");
       for (const auto& e1 : c.get<extended_add_path_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::trpteg_info:
-      j.write_fieldname("TRPTEGInformation");
       c.get<trpteg_info_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "gnb_rx_tx_time_diff_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE gnb_rx_tx_time_diff_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -14261,22 +14260,27 @@ OCUDUASN_CODE gnb_rx_tx_time_diff_ext_ies_container::unpack(cbit_ref& bref)
 }
 void gnb_rx_tx_time_diff_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (extended_add_path_list_present) {
+    j.start_obj();
     j.write_int("id", 77);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : extended_add_path_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (trpteg_info_present) {
+    j.start_obj();
     j.write_int("id", 85);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     trpteg_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // GNB-RxTxTimeDiff ::= SEQUENCE
@@ -14857,10 +14861,7 @@ presence_e meas_quantities_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void meas_quantities_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("MeasurementQuantities-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE meas_quantities_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14931,9 +14932,7 @@ presence_e prs_angle_item_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void prs_angle_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_int("INTEGER (0..63)", c);
-  j.end_obj();
+  j.write_int(c);
 }
 OCUDUASN_CODE prs_angle_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -15029,6 +15028,7 @@ void prs_angle_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -15477,34 +15477,44 @@ void prs_muting_cfg_eutra_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::two:
-      j.write_str("two", c.get<fixed_bitstring<2, false, true>>().to_string());
+      j.write_fieldname("two");
+      c.get<fixed_bitstring<2, false, true>>().to_json(j);
       break;
     case types::four:
-      j.write_str("four", c.get<fixed_bitstring<4, false, true>>().to_string());
+      j.write_fieldname("four");
+      c.get<fixed_bitstring<4, false, true>>().to_json(j);
       break;
     case types::eight:
-      j.write_str("eight", c.get<fixed_bitstring<8, false, true>>().to_string());
+      j.write_fieldname("eight");
+      c.get<fixed_bitstring<8, false, true>>().to_json(j);
       break;
     case types::sixteen:
-      j.write_str("sixteen", c.get<fixed_bitstring<16, false, true>>().to_string());
+      j.write_fieldname("sixteen");
+      c.get<fixed_bitstring<16, false, true>>().to_json(j);
       break;
     case types::thirty_two:
-      j.write_str("thirty-two", c.get<fixed_bitstring<32, false, true>>().to_string());
+      j.write_fieldname("thirty-two");
+      c.get<fixed_bitstring<32, false, true>>().to_json(j);
       break;
     case types::sixty_four:
-      j.write_str("sixty-four", c.get<fixed_bitstring<64, false, true>>().to_string());
+      j.write_fieldname("sixty-four");
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::one_hundred_and_twenty_eight:
-      j.write_str("one-hundred-and-twenty-eight", c.get<fixed_bitstring<128, false, true>>().to_string());
+      j.write_fieldname("one-hundred-and-twenty-eight");
+      c.get<fixed_bitstring<128, false, true>>().to_json(j);
       break;
     case types::two_hundred_and_fifty_six:
-      j.write_str("two-hundred-and-fifty-six", c.get<fixed_bitstring<256, false, true>>().to_string());
+      j.write_fieldname("two-hundred-and-fifty-six");
+      c.get<fixed_bitstring<256, false, true>>().to_json(j);
       break;
     case types::five_hundred_and_twelve:
-      j.write_str("five-hundred-and-twelve", c.get<fixed_bitstring<512, false, true>>().to_string());
+      j.write_fieldname("five-hundred-and-twelve");
+      c.get<fixed_bitstring<512, false, true>>().to_json(j);
       break;
     case types::one_thousand_and_twenty_four:
-      j.write_str("one-thousand-and-twenty-four", c.get<fixed_bitstring<1024, false, true>>().to_string());
+      j.write_fieldname("one-thousand-and-twenty-four");
+      c.get<fixed_bitstring<1024, false, true>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-Extension");
@@ -15854,23 +15864,19 @@ const fixed_bitstring<64, false, true>& otdoa_cell_info_item_ext_ie_o::value_c::
 }
 void otdoa_cell_info_item_ext_ie_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::tdd_cfg_eutra_item:
-      j.write_fieldname("TDD-Config-EUTRA-Item");
       c.get<tdd_cfg_eutra_item_s>().to_json(j);
       break;
     case types::cgi_nr:
-      j.write_fieldname("CGI-NR");
       c.get<cgi_nr_s>().to_json(j);
       break;
     case types::sfn_initisation_time_nr:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<64, false, true>>().to_string());
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "otdoa_cell_info_item_ext_ie_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE otdoa_cell_info_item_ext_ie_o::value_c::pack(bit_ref& bref) const
 {
@@ -16295,7 +16301,8 @@ void otdoa_cell_info_item_c::to_json(json_writer& j) const
       j.write_str("numberOfAntennaPorts-EUTRA", c.get<nof_ant_ports_eutra_e>().to_string());
       break;
     case types::sfn_initisation_time_eutra:
-      j.write_str("sFNInitialisationTime-EUTRA", c.get<fixed_bitstring<64, false, true>>().to_string());
+      j.write_fieldname("sFNInitialisationTime-EUTRA");
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::ng_ran_access_point_position:
       j.write_fieldname("nG-RANAccessPointPosition");
@@ -16631,21 +16638,27 @@ OCUDUASN_CODE on_demand_prs_info_s::unpack(cbit_ref& bref)
 void on_demand_prs_info_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("onDemandPRSRequestAllowed", on_demand_prs_request_allowed.to_string());
+  j.write_fieldname("onDemandPRSRequestAllowed");
+  on_demand_prs_request_allowed.to_json(j);
   if (allowed_res_set_periodicity_values_present) {
-    j.write_str("allowedResourceSetPeriodicityValues", allowed_res_set_periodicity_values.to_string());
+    j.write_fieldname("allowedResourceSetPeriodicityValues");
+    allowed_res_set_periodicity_values.to_json(j);
   }
   if (allowed_prs_bw_values_present) {
-    j.write_str("allowedPRSBandwidthValues", allowed_prs_bw_values.to_string());
+    j.write_fieldname("allowedPRSBandwidthValues");
+    allowed_prs_bw_values.to_json(j);
   }
   if (allowed_res_repeat_factor_values_present) {
-    j.write_str("allowedResourceRepetitionFactorValues", allowed_res_repeat_factor_values.to_string());
+    j.write_fieldname("allowedResourceRepetitionFactorValues");
+    allowed_res_repeat_factor_values.to_json(j);
   }
   if (allowed_res_nof_symbols_values_present) {
-    j.write_str("allowedResourceNumberOfSymbolsValues", allowed_res_nof_symbols_values.to_string());
+    j.write_fieldname("allowedResourceNumberOfSymbolsValues");
+    allowed_res_nof_symbols_values.to_json(j);
   }
   if (allowed_comb_size_values_present) {
-    j.write_str("allowedCombSizeValues", allowed_comb_size_values.to_string());
+    j.write_fieldname("allowedCombSizeValues");
+    allowed_comb_size_values.to_json(j);
   }
   if (ie_exts_present) {
     j.write_fieldname("iE-Extensions");
@@ -17162,17 +17175,16 @@ const result_eutra_l& other_rat_measured_results_value_ext_ie_o::value_c::result
 }
 void other_rat_measured_results_value_ext_ie_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::result_nr:
-      j.start_array("ResultNR");
+      j.start_array("");
       for (const auto& e1 : c.get<result_nr_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::result_eutra:
-      j.start_array("ResultEUTRA");
+      j.start_array("");
       for (const auto& e1 : c.get<result_eutra_l>()) {
         e1.to_json(j);
       }
@@ -17181,7 +17193,6 @@ void other_rat_measured_results_value_ext_ie_o::value_c::to_json(json_writer& j)
     default:
       log_invalid_choice_id(type_, "other_rat_measured_results_value_ext_ie_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE other_rat_measured_results_value_ext_ie_o::value_c::pack(bit_ref& bref) const
 {
@@ -17479,10 +17490,7 @@ presence_e other_rat_meas_quantities_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void other_rat_meas_quantities_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("OtherRATMeasurementQuantities-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE other_rat_meas_quantities_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18097,9 +18105,7 @@ presence_e prs_res_item_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void prs_res_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_int("INTEGER (0..13,...)", c);
-  j.end_obj();
+  j.write_int(c);
 }
 OCUDUASN_CODE prs_res_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -18186,6 +18192,7 @@ void prs_res_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -18399,13 +18406,11 @@ presence_e prs_cfg_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void prs_cfg_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("AggregatedPRSResourceSetList");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE prs_cfg_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -18467,6 +18472,7 @@ void prs_cfg_s::to_json(json_writer& j) const
   j.end_array();
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -18569,7 +18575,8 @@ void start_time_and_dur_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (start_time_present) {
-    j.write_str("startTime", start_time.to_string());
+    j.write_fieldname("startTime");
+    start_time.to_json(j);
   }
   if (dur_present) {
     j.write_int("duration", dur);
@@ -18788,13 +18795,11 @@ presence_e requested_dl_prs_tx_characteristics_ext_ies_o::get_presence(const uin
 // Extension ::= OPEN TYPE
 void requested_dl_prs_tx_characteristics_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("PRSBWAggregationRequestInfoList");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE requested_dl_prs_tx_characteristics_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -18879,6 +18884,7 @@ void requested_dl_prs_tx_characteristics_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -19123,6 +19129,7 @@ void prs_tx_off_ind_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::prs_tx_off_per_trp:
+      j.write_null("pRSTransmissionOffPerTRP");
       break;
     case types::prs_tx_off_per_res_set:
       j.start_array("pRSTransmissionOffPerResourceSet");
@@ -20148,10 +20155,7 @@ presence_e srs_res_set_item_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void srs_res_set_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("SpatialRelationPerSRSResource");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE srs_res_set_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -20257,6 +20261,7 @@ void srs_res_set_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -20378,13 +20383,16 @@ void ssb_burst_position_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::short_bitmap:
-      j.write_str("shortBitmap", c.get<fixed_bitstring<4, false, true>>().to_string());
+      j.write_fieldname("shortBitmap");
+      c.get<fixed_bitstring<4, false, true>>().to_json(j);
       break;
     case types::medium_bitmap:
-      j.write_str("mediumBitmap", c.get<fixed_bitstring<8, false, true>>().to_string());
+      j.write_fieldname("mediumBitmap");
+      c.get<fixed_bitstring<8, false, true>>().to_json(j);
       break;
     case types::long_bitmap:
-      j.write_str("longBitmap", c.get<fixed_bitstring<64, false, true>>().to_string());
+      j.write_fieldname("longBitmap");
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::choice_ext:
       j.write_fieldname("choice-extension");
@@ -20518,7 +20526,8 @@ void tf_cfg_s::to_json(json_writer& j) const
     ssb_burst_position.to_json(j);
   }
   if (sfn_initisation_time_present) {
-    j.write_str("sFN-initialisation-time", sfn_initisation_time.to_string());
+    j.write_fieldname("sFN-initialisation-time");
+    sfn_initisation_time.to_json(j);
   }
   if (ie_exts_present) {
     j.write_fieldname("iE-Extensions");
@@ -21032,33 +21041,29 @@ requested_srs_tx_characteristics_ext_ies_o::ext_c::validity_area_specific_srs_in
 }
 void requested_srs_tx_characteristics_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_freq:
-      j.write_int("INTEGER (0..3279165)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::bw_aggregation_request_ind:
-      j.write_str("Bandwidth-Aggregation-Request-Indication", "true");
+      j.write_str("true");
       break;
     case types::pos_validity_area_cell_list:
-      j.start_array("PosValidityAreaCellList");
+      j.start_array("");
       for (const auto& e1 : c.get<pos_validity_area_cell_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::validity_area_specific_srs_info:
-      j.write_fieldname("ValidityAreaSpecificSRSInformation");
       c.get<validity_area_specific_srs_info_s>().to_json(j);
       break;
     case types::validity_area_specific_srs_info_extended:
-      j.write_fieldname("ValidityAreaSpecificSRSInformationExtended");
       c.get<validity_area_specific_srs_info_extended_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "requested_srs_tx_characteristics_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE requested_srs_tx_characteristics_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -21226,37 +21231,49 @@ OCUDUASN_CODE requested_srs_tx_characteristics_ext_ies_container::unpack(cbit_re
 }
 void requested_srs_tx_characteristics_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (srs_freq_present) {
+    j.start_obj();
     j.write_int("id", 61);
     j.write_str("criticality", "ignore");
-    j.write_int("Extension", srs_freq);
+    j.write_int("extensionValue", srs_freq);
+    j.end_obj();
   }
   if (bw_aggregation_request_ind_present) {
+    j.start_obj();
     j.write_int("id", 121);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", "true");
+    j.write_str("extensionValue", "true");
+    j.end_obj();
   }
   if (pos_validity_area_cell_list_present) {
+    j.start_obj();
     j.write_int("id", 128);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : pos_validity_area_cell_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (validity_area_specific_srs_info_present) {
+    j.start_obj();
     j.write_int("id", 135);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     validity_area_specific_srs_info.to_json(j);
+    j.end_obj();
   }
   if (validity_area_specific_srs_info_extended_present) {
+    j.start_obj();
     j.write_int("id", 166);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     validity_area_specific_srs_info_extended.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RequestedSRSTransmissionCharacteristics ::= SEQUENCE
@@ -21542,13 +21559,11 @@ presence_e srs_configuration_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void srs_configuration_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("PosSRSResourceSet-Aggregation-List");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE srs_configuration_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -21610,6 +21625,7 @@ void srs_configuration_s::to_json(json_writer& j) const
   j.end_array();
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -21971,9 +21987,7 @@ presence_e srs_restype_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void srs_restype_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("SRSPortIndex", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE srs_restype_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -22032,6 +22046,7 @@ void srs_restype_s::to_json(json_writer& j) const
   srs_res_type_choice.to_json(j);
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -22264,26 +22279,22 @@ const nof_trp_rx_tx_teg_e& trp_meas_request_item_ext_ies_o::ext_c::nof_trp_rx_tx
 }
 void trp_meas_request_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::cell_id:
-      j.write_fieldname("CGI-NR");
       c.get<cgi_nr_s>().to_json(j);
       break;
     case types::ao_a_search_win:
-      j.write_fieldname("AoA-AssistanceInfo");
       c.get<ao_a_assist_info_s>().to_json(j);
       break;
     case types::nof_trp_rx_teg:
-      j.write_str("NumberOfTRPRxTEG", c.get<nof_trp_rx_teg_e>().to_string());
+      j.write_str(c.get<nof_trp_rx_teg_e>().to_string());
       break;
     case types::nof_trp_rx_tx_teg:
-      j.write_str("NumberOfTRPRxTxTEG", c.get<nof_trp_rx_tx_teg_e>().to_string());
+      j.write_str(c.get<nof_trp_rx_tx_teg_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "trp_meas_request_item_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_meas_request_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -22423,28 +22434,38 @@ OCUDUASN_CODE trp_meas_request_item_ext_ies_container::unpack(cbit_ref& bref)
 }
 void trp_meas_request_item_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (cell_id_present) {
+    j.start_obj();
     j.write_int("id", 60);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     cell_id.to_json(j);
+    j.end_obj();
   }
   if (ao_a_search_win_present) {
+    j.start_obj();
     j.write_int("id", 69);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     ao_a_search_win.to_json(j);
+    j.end_obj();
   }
   if (nof_trp_rx_teg_present) {
+    j.start_obj();
     j.write_int("id", 82);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", nof_trp_rx_teg.to_string());
+    j.write_str("extensionValue", nof_trp_rx_teg.to_string());
+    j.end_obj();
   }
   if (nof_trp_rx_tx_teg_present) {
+    j.start_obj();
     j.write_int("id", 83);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", nof_trp_rx_tx_teg.to_string());
+    j.write_str("extensionValue", nof_trp_rx_tx_teg.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // TRP-MeasurementRequestItem ::= SEQUENCE
@@ -22675,30 +22696,28 @@ const uint32_t& ul_rtoa_meas_ext_ies_o::value_c::report_granularitykminus6() con
 }
 void ul_rtoa_meas_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::report_granularitykminus1:
-      j.write_int("INTEGER (0..3940097)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus2:
-      j.write_int("INTEGER (0..7880193)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus3:
-      j.write_int("INTEGER (0..15760385)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus4:
-      j.write_int("INTEGER (0..31520769)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus5:
-      j.write_int("INTEGER (0..63041537)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::report_granularitykminus6:
-      j.write_int("INTEGER (0..126083073)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "ul_rtoa_meas_ext_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ul_rtoa_meas_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23109,23 +23128,20 @@ const trp_rx_teg_info_s& ul_rtoa_measurement_ext_ies_o::ext_c::trp_rx_teg_info()
 }
 void ul_rtoa_measurement_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::extended_add_path_list:
-      j.start_array("ExtendedAdditionalPathList");
+      j.start_array("");
       for (const auto& e1 : c.get<extended_add_path_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::trp_rx_teg_info:
-      j.write_fieldname("TRP-Rx-TEGInformation");
       c.get<trp_rx_teg_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ul_rtoa_measurement_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ul_rtoa_measurement_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -23227,22 +23243,27 @@ OCUDUASN_CODE ul_rtoa_measurement_ext_ies_container::unpack(cbit_ref& bref)
 }
 void ul_rtoa_measurement_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (extended_add_path_list_present) {
+    j.start_obj();
     j.write_int("id", 77);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : extended_add_path_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (trp_rx_teg_info_present) {
+    j.start_obj();
     j.write_int("id", 86);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     trp_rx_teg_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // UL-RTOAMeasurement ::= SEQUENCE
@@ -23479,28 +23500,22 @@ const ul_rs_cp_meas_s& trp_measured_results_value_ext_ies_o::value_c::ul_rs_cp_m
 }
 void trp_measured_results_value_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::zo_a:
-      j.write_fieldname("ZoA");
       c.get<zo_a_s>().to_json(j);
       break;
     case types::multiple_ul_ao_a:
-      j.write_fieldname("MultipleULAoA");
       c.get<multiple_ul_ao_a_s>().to_json(j);
       break;
     case types::ul_srs_rsrp_p:
-      j.write_fieldname("UL-SRS-RSRPP");
       c.get<ul_srs_rsrp_p_s>().to_json(j);
       break;
     case types::ul_rs_cp_meas:
-      j.write_fieldname("UL-RSCPMeas");
       c.get<ul_rs_cp_meas_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "trp_measured_results_value_ext_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_measured_results_value_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23960,40 +23975,35 @@ const meas_based_on_aggr_res_e& trp_meas_result_item_ext_ies_o::ext_c::meas_base
 }
 void trp_meas_result_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::srs_restype:
-      j.write_fieldname("SRSResourcetype");
       c.get<srs_restype_s>().to_json(j);
       break;
     case types::arp_id:
-      j.write_int("INTEGER (1..16,...)", c.get<uint8_t>());
+      j.write_int(c.get<uint8_t>());
       break;
     case types::lo_s_n_lo_si_nformation:
-      j.write_fieldname("LoS-NLoSInformation");
       c.get<lo_s_n_lo_si_nformation_c>().to_json(j);
       break;
     case types::mobile_trp_location_info:
-      j.write_fieldname("Mobile-TRP-LocationInformation");
       c.get<mobile_trp_location_info_s>().to_json(j);
       break;
     case types::measured_freq_hops:
-      j.write_str("MeasuredFrequencyHops", c.get<measured_freq_hops_e>().to_string());
+      j.write_str(c.get<measured_freq_hops_e>().to_string());
       break;
     case types::aggr_pos_srs_res_id_list:
-      j.start_array("AggregatedPosSRSResourceID-List");
+      j.start_array("");
       for (const auto& e1 : c.get<aggr_pos_srs_res_id_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::meas_based_on_aggr_res:
-      j.write_str("MeasBasedOnAggregatedResources", "true");
+      j.write_str("true");
       break;
     default:
       log_invalid_choice_id(type_, "trp_meas_result_item_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_meas_result_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -24204,47 +24214,64 @@ OCUDUASN_CODE trp_meas_result_item_ext_ies_container::unpack(cbit_ref& bref)
 }
 void trp_meas_result_item_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (srs_restype_present) {
+    j.start_obj();
     j.write_int("id", 76);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     srs_restype.to_json(j);
+    j.end_obj();
   }
   if (arp_id_present) {
+    j.start_obj();
     j.write_int("id", 79);
     j.write_str("criticality", "ignore");
-    j.write_int("Extension", arp_id);
+    j.write_int("extensionValue", arp_id);
+    j.end_obj();
   }
   if (lo_s_n_lo_si_nformation_present) {
+    j.start_obj();
     j.write_int("id", 80);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     lo_s_n_lo_si_nformation.to_json(j);
+    j.end_obj();
   }
   if (mobile_trp_location_info_present) {
+    j.start_obj();
     j.write_int("id", 114);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("extensionValue");
     mobile_trp_location_info.to_json(j);
+    j.end_obj();
   }
   if (measured_freq_hops_present) {
+    j.start_obj();
     j.write_int("id", 140);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", measured_freq_hops.to_string());
+    j.write_str("extensionValue", measured_freq_hops.to_string());
+    j.end_obj();
   }
   if (aggr_pos_srs_res_id_list_present) {
+    j.start_obj();
     j.write_int("id", 131);
     j.write_str("criticality", "ignore");
-    j.start_array("Extension");
+    j.start_array("extensionValue");
     for (const auto& e1 : aggr_pos_srs_res_id_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (meas_based_on_aggr_res_present) {
+    j.start_obj();
     j.write_int("id", 157);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", "true");
+    j.write_str("extensionValue", "true");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // TrpMeasurementResultItem ::= SEQUENCE
@@ -24355,10 +24382,7 @@ presence_e trp_meas_resp_item_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void trp_meas_resp_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("CGI-NR");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE trp_meas_resp_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -24423,6 +24447,7 @@ void trp_meas_resp_item_s::to_json(json_writer& j) const
   j.end_array();
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -24522,18 +24547,16 @@ const nof_trp_rx_tx_teg_e& trp_meas_upd_item_ext_ies_o::ext_c::nof_trp_rx_tx_teg
 }
 void trp_meas_upd_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::nof_trp_rx_teg:
-      j.write_str("NumberOfTRPRxTEG", c.get<nof_trp_rx_teg_e>().to_string());
+      j.write_str(c.get<nof_trp_rx_teg_e>().to_string());
       break;
     case types::nof_trp_rx_tx_teg:
-      j.write_str("NumberOfTRPRxTxTEG", c.get<nof_trp_rx_tx_teg_e>().to_string());
+      j.write_str(c.get<nof_trp_rx_tx_teg_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "trp_meas_upd_item_ext_ies_o::ext_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_meas_upd_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -24635,18 +24658,22 @@ OCUDUASN_CODE trp_meas_upd_item_ext_ies_container::unpack(cbit_ref& bref)
 }
 void trp_meas_upd_item_ext_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (nof_trp_rx_teg_present) {
+    j.start_obj();
     j.write_int("id", 82);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", nof_trp_rx_teg.to_string());
+    j.write_str("extensionValue", nof_trp_rx_teg.to_string());
+    j.end_obj();
   }
   if (nof_trp_rx_tx_teg_present) {
+    j.start_obj();
     j.write_int("id", 83);
     j.write_str("criticality", "ignore");
-    j.write_str("Extension", nof_trp_rx_tx_teg.to_string());
+    j.write_str("extensionValue", nof_trp_rx_tx_teg.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // TRP-MeasurementUpdateItem ::= SEQUENCE
@@ -25047,38 +25074,32 @@ const common_ta_params_s& trp_info_type_resp_item_ext_ies_o::value_c::common_ta_
 }
 void trp_info_type_resp_item_ext_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::trp_type:
-      j.write_str("TRPType", c.get<trp_type_e>().to_string());
+      j.write_str(c.get<trp_type_e>().to_string());
       break;
     case types::on_demand_prs:
-      j.write_fieldname("OnDemandPRS-Info");
       c.get<on_demand_prs_info_s>().to_json(j);
       break;
     case types::trp_tx_teg_assoc:
-      j.start_array("TRPTxTEGAssociation");
+      j.start_array("");
       for (const auto& e1 : c.get<trp_tx_teg_assoc_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::trp_beam_ant_info:
-      j.write_fieldname("TRPBeamAntennaInformation");
       c.get<trp_beam_ant_info_s>().to_json(j);
       break;
     case types::mobile_trp_location_info:
-      j.write_fieldname("Mobile-TRP-LocationInformation");
       c.get<mobile_trp_location_info_s>().to_json(j);
       break;
     case types::common_ta_params:
-      j.write_fieldname("CommonTAParameters");
       c.get<common_ta_params_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "trp_info_type_resp_item_ext_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE trp_info_type_resp_item_ext_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -25360,7 +25381,8 @@ void trp_info_type_resp_item_c::to_json(json_writer& j) const
       c.get<ssb_info_s>().to_json(j);
       break;
     case types::sfn_initisation_time:
-      j.write_str("sFNInitialisationTime", c.get<fixed_bitstring<64, false, true>>().to_string());
+      j.write_fieldname("sFNInitialisationTime");
+      c.get<fixed_bitstring<64, false, true>>().to_json(j);
       break;
     case types::spatial_direction_info:
       j.write_fieldname("spatialDirectionInformation");
@@ -25508,9 +25530,7 @@ presence_e trp_info_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void trp_info_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("OCTET STRING", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE trp_info_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -25575,6 +25595,7 @@ void trp_info_s::to_json(json_writer& j) const
   j.end_array();
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -25678,9 +25699,7 @@ presence_e trp_info_type_item_trp_req_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void trp_info_type_item_trp_req_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("TRPInformationTypeItem", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE trp_info_type_item_trp_req_o::value_c::pack(bit_ref& bref) const
 {
@@ -25788,9 +25807,7 @@ presence_e trp_meas_quantities_list_item_ext_ies_o::get_presence(const uint32_t&
 // Extension ::= OPEN TYPE
 void trp_meas_quantities_list_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_int("INTEGER (-6..-1,...)", c);
-  j.end_obj();
+  j.write_int(c);
 }
 OCUDUASN_CODE trp_meas_quantities_list_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -25864,6 +25881,7 @@ void trp_meas_quantities_list_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -26518,9 +26536,7 @@ presence_e ue_report_info_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void ue_report_info_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_int("INTEGER (1..999)", c);
-  j.end_obj();
+  j.write_int(c);
 }
 OCUDUASN_CODE ue_report_info_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -26586,6 +26602,7 @@ void ue_report_info_s::to_json(json_writer& j) const
   j.write_str("reportingInterval", report_interv.to_string());
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -26646,9 +26663,7 @@ presence_e ue_tx_teg_assoc_item_ext_ies_o::get_presence(const uint32_t& id)
 // Extension ::= OPEN TYPE
 void ue_tx_teg_assoc_item_ext_ies_o::ext_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_str("TimingErrorMargin", c.to_string());
-  j.end_obj();
+  j.write_str(c.to_string());
 }
 OCUDUASN_CODE ue_tx_teg_assoc_item_ext_ies_o::ext_c::pack(bit_ref& bref) const
 {
@@ -26729,6 +26744,7 @@ void ue_tx_teg_assoc_item_s::to_json(json_writer& j) const
   }
   if (ie_exts.size() > 0) {
     j.write_fieldname("iE-Extensions");
+    ie_exts.to_json(j);
   }
   j.end_obj();
 }
@@ -26843,10 +26859,7 @@ presence_e wlan_meas_quantities_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void wlan_meas_quantities_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("WLANMeasurementQuantities-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE wlan_meas_quantities_item_ies_o::value_c::pack(bit_ref& bref) const
 {

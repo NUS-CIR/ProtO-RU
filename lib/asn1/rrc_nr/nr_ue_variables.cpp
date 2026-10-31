@@ -305,7 +305,8 @@ void sn_pn_id_r18_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("plmn-Identity-r18");
   plmn_id_r18.to_json(j);
-  j.write_str("nid-r18", nid_r18.to_string());
+  j.write_fieldname("nid-r18");
+  nid_r18.to_json(j);
   j.end_obj();
 }
 
@@ -1042,7 +1043,8 @@ OCUDUASN_CODE var_log_meas_report_r16_s::unpack(cbit_ref& bref)
 void var_log_meas_report_r16_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("absoluteTimeInfo-r16", absolute_time_info_r16.to_string());
+  j.write_fieldname("absoluteTimeInfo-r16");
+  absolute_time_info_r16.to_json(j);
   j.write_fieldname("traceReference-r16");
   trace_ref_r16.to_json(j);
   j.write_str("traceRecordingSessionRef-r16", trace_recording_session_ref_r16.to_string());
@@ -1700,7 +1702,7 @@ void var_meas_report_s::to_json(json_writer& j) const
   if (relays_triggered_list_r17.size() > 0) {
     j.start_array("relaysTriggeredList-r17");
     for (const auto& e1 : relays_triggered_list_r17) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -2238,7 +2240,8 @@ void var_resume_mac_input_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("sourcePhysCellId", source_pci);
-  j.write_str("targetCellIdentity", target_cell_id.to_string());
+  j.write_fieldname("targetCellIdentity");
+  target_cell_id.to_json(j);
   j.write_int("source-c-RNTI", source_c_rnti);
   j.end_obj();
 }
@@ -2284,7 +2287,8 @@ void var_short_mac_input_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("sourcePhysCellId", source_pci);
-  j.write_str("targetCellIdentity", target_cell_id.to_string());
+  j.write_fieldname("targetCellIdentity");
+  target_cell_id.to_json(j);
   j.write_int("source-c-RNTI", source_c_rnti);
   j.end_obj();
 }
@@ -2651,7 +2655,8 @@ void var_tss_info_r18_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("plmn-Identity-r18");
   stored_global_gnb_id_r18.plmn_id_r18.to_json(j);
-  j.write_str("gnb-ID-r18", stored_global_gnb_id_r18.gnb_id_r18.to_string());
+  j.write_fieldname("gnb-ID-r18");
+  stored_global_gnb_id_r18.gnb_id_r18.to_json(j);
   j.end_obj();
   j.end_obj();
 }

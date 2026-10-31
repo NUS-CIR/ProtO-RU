@@ -538,7 +538,8 @@ void availability_combinations_per_cell_r16_s::to_json(json_writer& j) const
 {
   j.start_obj();
   j.write_int("availabilityCombinationsPerCellIndex-r16", availability_combinations_per_cell_idx_r16);
-  j.write_str("iab-DU-CellIdentity-r16", iab_du_cell_id_r16.to_string());
+  j.write_fieldname("iab-DU-CellIdentity-r16");
+  iab_du_cell_id_r16.to_json(j);
   if (position_in_dci_ai_r16_present) {
     j.write_int("positionInDCI-AI-r16", position_in_dci_ai_r16);
   }
@@ -1050,10 +1051,12 @@ void eutra_mbsfn_sf_cfg_s::sf_alloc1_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::one_frame:
-      j.write_str("oneFrame", c.get<fixed_bitstring<6>>().to_string());
+      j.write_fieldname("oneFrame");
+      c.get<fixed_bitstring<6>>().to_json(j);
       break;
     case types::four_frames:
-      j.write_str("fourFrames", c.get<fixed_bitstring<24>>().to_string());
+      j.write_fieldname("fourFrames");
+      c.get<fixed_bitstring<24>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "eutra_mbsfn_sf_cfg_s::sf_alloc1_c_");
@@ -1189,10 +1192,12 @@ void eutra_mbsfn_sf_cfg_s::sf_alloc2_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::one_frame:
-      j.write_str("oneFrame", c.get<fixed_bitstring<2>>().to_string());
+      j.write_fieldname("oneFrame");
+      c.get<fixed_bitstring<2>>().to_json(j);
       break;
     case types::four_frames:
-      j.write_str("fourFrames", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("fourFrames");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "eutra_mbsfn_sf_cfg_s::sf_alloc2_c_");
@@ -1560,6 +1565,7 @@ void pcch_cfg_s::nand_paging_frame_offset_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::one_t:
+      j.write_null("oneT");
       break;
     case types::half_t:
       j.write_int("halfT", c.get<uint8_t>());
@@ -3035,9 +3041,11 @@ void serving_cell_cfg_common_sib_s::to_json(json_writer& j) const
   }
   j.write_fieldname("ssb-PositionsInBurst");
   j.start_obj();
-  j.write_str("inOneGroup", ssb_positions_in_burst.in_one_group.to_string());
+  j.write_fieldname("inOneGroup");
+  ssb_positions_in_burst.in_one_group.to_json(j);
   if (ssb_positions_in_burst.group_presence_present) {
-    j.write_str("groupPresence", ssb_positions_in_burst.group_presence.to_string());
+    j.write_fieldname("groupPresence");
+    ssb_positions_in_burst.group_presence.to_json(j);
   }
   j.end_obj();
   j.write_str("ssb-PeriodicityServingCell", ssb_periodicity_serving_cell.to_string());
@@ -3128,6 +3136,7 @@ void serving_cell_cfg_common_sib_s::ch_access_mode_r16_c_::to_json(json_writer& 
   j.start_obj();
   switch (type_) {
     case types::dyn:
+      j.write_null("dynamic");
       break;
     case types::semi_static:
       j.write_fieldname("semiStatic");
@@ -5623,8 +5632,8 @@ void codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::to_json(json_write
       j.start_obj();
       j.write_fieldname("nrOfAntennaPorts");
       c.get<type_i_single_panel_s_>().nr_of_ant_ports.to_json(j);
-      j.write_str("typeI-SinglePanel-ri-Restriction",
-                  c.get<type_i_single_panel_s_>().type_i_single_panel_ri_restrict.to_string());
+      j.write_fieldname("typeI-SinglePanel-ri-Restriction");
+      c.get<type_i_single_panel_s_>().type_i_single_panel_ri_restrict.to_json(j);
       j.end_obj();
       break;
     case types::type_i_multi_panel:
@@ -5632,7 +5641,8 @@ void codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::to_json(json_write
       j.start_obj();
       j.write_fieldname("ng-n1-n2");
       c.get<type_i_multi_panel_s_>().ng_n1_n2.to_json(j);
-      j.write_str("ri-Restriction", c.get<type_i_multi_panel_s_>().ri_restrict.to_string());
+      j.write_fieldname("ri-Restriction");
+      c.get<type_i_multi_panel_s_>().ri_restrict.to_json(j);
       j.end_obj();
       break;
     default:
@@ -5773,7 +5783,8 @@ void codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_pane
     case types::two:
       j.write_fieldname("two");
       j.start_obj();
-      j.write_str("twoTX-CodebookSubsetRestriction", c.get<two_s_>().two_tx_codebook_subset_restrict.to_string());
+      j.write_fieldname("twoTX-CodebookSubsetRestriction");
+      c.get<two_s_>().two_tx_codebook_subset_restrict.to_json(j);
       j.end_obj();
       break;
     case types::more_than_two:
@@ -5782,8 +5793,8 @@ void codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_pane
       j.write_fieldname("n1-n2");
       c.get<more_than_two_s_>().n1_n2.to_json(j);
       if (c.get<more_than_two_s_>().type_i_single_panel_codebook_subset_restrict_i2_present) {
-        j.write_str("typeI-SinglePanel-codebookSubsetRestriction-i2",
-                    c.get<more_than_two_s_>().type_i_single_panel_codebook_subset_restrict_i2.to_string());
+        j.write_fieldname("typeI-SinglePanel-codebookSubsetRestriction-i2");
+        c.get<more_than_two_s_>().type_i_single_panel_codebook_subset_restrict_i2.to_json(j);
       }
       j.end_obj();
       break;
@@ -6139,43 +6150,56 @@ void codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_pane
   j.start_obj();
   switch (type_) {
     case types::two_one_type_i_single_panel_restrict:
-      j.write_str("two-one-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("two-one-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::two_two_type_i_single_panel_restrict:
-      j.write_str("two-two-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("two-two-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     case types::four_one_type_i_single_panel_restrict:
-      j.write_str("four-one-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("four-one-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::three_two_type_i_single_panel_restrict:
-      j.write_str("three-two-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<96>>().to_string());
+      j.write_fieldname("three-two-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<96>>().to_json(j);
       break;
     case types::six_one_type_i_single_panel_restrict:
-      j.write_str("six-one-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<24>>().to_string());
+      j.write_fieldname("six-one-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<24>>().to_json(j);
       break;
     case types::four_two_type_i_single_panel_restrict:
-      j.write_str("four-two-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("four-two-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     case types::eight_one_type_i_single_panel_restrict:
-      j.write_str("eight-one-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("eight-one-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::four_three_type_i_single_panel_restrict:
-      j.write_str("four-three-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<192>>().to_string());
+      j.write_fieldname("four-three-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<192>>().to_json(j);
       break;
     case types::six_two_type_i_single_panel_restrict:
-      j.write_str("six-two-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<192>>().to_string());
+      j.write_fieldname("six-two-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<192>>().to_json(j);
       break;
     case types::twelve_one_type_i_single_panel_restrict:
-      j.write_str("twelve-one-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<48>>().to_string());
+      j.write_fieldname("twelve-one-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<48>>().to_json(j);
       break;
     case types::four_four_type_i_single_panel_restrict:
-      j.write_str("four-four-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<256>>().to_string());
+      j.write_fieldname("four-four-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<256>>().to_json(j);
       break;
     case types::eight_two_type_i_single_panel_restrict:
-      j.write_str("eight-two-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<256>>().to_string());
+      j.write_fieldname("eight-two-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<256>>().to_json(j);
       break;
     case types::sixteen_one_type_i_single_panel_restrict:
-      j.write_str("sixteen-one-TypeI-SinglePanel-Restriction", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("sixteen-one-TypeI-SinglePanel-Restriction");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_,
@@ -6534,28 +6558,36 @@ void codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_multi_panel
   j.start_obj();
   switch (type_) {
     case types::two_two_one_type_i_multi_panel_restrict:
-      j.write_str("two-two-one-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("two-two-one-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::two_four_one_type_i_multi_panel_restrict:
-      j.write_str("two-four-one-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("two-four-one-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::four_two_one_type_i_multi_panel_restrict:
-      j.write_str("four-two-one-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("four-two-one-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::two_two_two_type_i_multi_panel_restrict:
-      j.write_str("two-two-two-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("two-two-two-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     case types::two_eight_one_type_i_multi_panel_restrict:
-      j.write_str("two-eight-one-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("two-eight-one-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::four_four_one_type_i_multi_panel_restrict:
-      j.write_str("four-four-one-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("four-four-one-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::two_four_two_type_i_multi_panel_restrict:
-      j.write_str("two-four-two-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("two-four-two-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     case types::four_two_two_type_i_multi_panel_restrict:
-      j.write_str("four-two-two-TypeI-MultiPanel-Restriction", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("four-two-two-TypeI-MultiPanel-Restriction");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(
@@ -6754,7 +6786,8 @@ void codebook_cfg_s::codebook_type_c_::type2_s_::sub_type_c_::to_json(json_write
       j.start_obj();
       j.write_fieldname("n1-n2-codebookSubsetRestriction");
       c.get<type_ii_s_>().n1_n2_codebook_subset_restrict.to_json(j);
-      j.write_str("typeII-RI-Restriction", c.get<type_ii_s_>().type_ii_ri_restrict.to_string());
+      j.write_fieldname("typeII-RI-Restriction");
+      c.get<type_ii_s_>().type_ii_ri_restrict.to_json(j);
       j.end_obj();
       break;
     case types::type_ii_port_sel:
@@ -6763,8 +6796,8 @@ void codebook_cfg_s::codebook_type_c_::type2_s_::sub_type_c_::to_json(json_write
       if (c.get<type_ii_port_sel_s_>().port_sel_sampling_size_present) {
         j.write_str("portSelectionSamplingSize", c.get<type_ii_port_sel_s_>().port_sel_sampling_size.to_string());
       }
-      j.write_str("typeII-PortSelectionRI-Restriction",
-                  c.get<type_ii_port_sel_s_>().type_ii_port_sel_ri_restrict.to_string());
+      j.write_fieldname("typeII-PortSelectionRI-Restriction");
+      c.get<type_ii_port_sel_s_>().type_ii_port_sel_ri_restrict.to_json(j);
       j.end_obj();
       break;
     default:
@@ -7112,43 +7145,56 @@ void codebook_cfg_s::codebook_type_c_::type2_s_::sub_type_c_::type_ii_s_::n1_n2_
   j.start_obj();
   switch (type_) {
     case types::two_one:
-      j.write_str("two-one", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("two-one");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::two_two:
-      j.write_str("two-two", c.get<fixed_bitstring<43>>().to_string());
+      j.write_fieldname("two-two");
+      c.get<fixed_bitstring<43>>().to_json(j);
       break;
     case types::four_one:
-      j.write_str("four-one", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("four-one");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::three_two:
-      j.write_str("three-two", c.get<fixed_bitstring<59>>().to_string());
+      j.write_fieldname("three-two");
+      c.get<fixed_bitstring<59>>().to_json(j);
       break;
     case types::six_one:
-      j.write_str("six-one", c.get<fixed_bitstring<48>>().to_string());
+      j.write_fieldname("six-one");
+      c.get<fixed_bitstring<48>>().to_json(j);
       break;
     case types::four_two:
-      j.write_str("four-two", c.get<fixed_bitstring<75>>().to_string());
+      j.write_fieldname("four-two");
+      c.get<fixed_bitstring<75>>().to_json(j);
       break;
     case types::eight_one:
-      j.write_str("eight-one", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("eight-one");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     case types::four_three:
-      j.write_str("four-three", c.get<fixed_bitstring<107>>().to_string());
+      j.write_fieldname("four-three");
+      c.get<fixed_bitstring<107>>().to_json(j);
       break;
     case types::six_two:
-      j.write_str("six-two", c.get<fixed_bitstring<107>>().to_string());
+      j.write_fieldname("six-two");
+      c.get<fixed_bitstring<107>>().to_json(j);
       break;
     case types::twelve_one:
-      j.write_str("twelve-one", c.get<fixed_bitstring<96>>().to_string());
+      j.write_fieldname("twelve-one");
+      c.get<fixed_bitstring<96>>().to_json(j);
       break;
     case types::four_four:
-      j.write_str("four-four", c.get<fixed_bitstring<139>>().to_string());
+      j.write_fieldname("four-four");
+      c.get<fixed_bitstring<139>>().to_json(j);
       break;
     case types::eight_two:
-      j.write_str("eight-two", c.get<fixed_bitstring<139>>().to_string());
+      j.write_fieldname("eight-two");
+      c.get<fixed_bitstring<139>>().to_json(j);
       break;
     case types::sixteen_one:
-      j.write_str("sixteen-one", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("sixteen-one");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(
@@ -7562,6 +7608,7 @@ void port_idx_for8_ranks_c::to_json(json_writer& j) const
       j.end_obj();
       break;
     case types::port_idx1:
+      j.write_null("portIndex1");
       break;
     default:
       log_invalid_choice_id(type_, "port_idx_for8_ranks_c");
@@ -7891,7 +7938,8 @@ void codebook_cfg_r16_s::codebook_type_c_::type2_s_::sub_type_c_::to_json(json_w
       j.start_obj();
       j.write_fieldname("n1-n2-codebookSubsetRestriction-r16");
       c.get<type_ii_r16_s_>().n1_n2_codebook_subset_restrict_r16.to_json(j);
-      j.write_str("typeII-RI-Restriction-r16", c.get<type_ii_r16_s_>().type_ii_ri_restrict_r16.to_string());
+      j.write_fieldname("typeII-RI-Restriction-r16");
+      c.get<type_ii_r16_s_>().type_ii_ri_restrict_r16.to_json(j);
       j.end_obj();
       break;
     case types::type_ii_port_sel_r16:
@@ -7899,8 +7947,8 @@ void codebook_cfg_r16_s::codebook_type_c_::type2_s_::sub_type_c_::to_json(json_w
       j.start_obj();
       j.write_str("portSelectionSamplingSize-r16",
                   c.get<type_ii_port_sel_r16_s_>().port_sel_sampling_size_r16.to_string());
-      j.write_str("typeII-PortSelectionRI-Restriction-r16",
-                  c.get<type_ii_port_sel_r16_s_>().type_ii_port_sel_ri_restrict_r16.to_string());
+      j.write_fieldname("typeII-PortSelectionRI-Restriction-r16");
+      c.get<type_ii_port_sel_r16_s_>().type_ii_port_sel_ri_restrict_r16.to_json(j);
       j.end_obj();
       break;
     default:
@@ -8243,43 +8291,56 @@ void codebook_cfg_r16_s::codebook_type_c_::type2_s_::sub_type_c_::type_ii_r16_s_
   j.start_obj();
   switch (type_) {
     case types::two_one:
-      j.write_str("two-one", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("two-one");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::two_two:
-      j.write_str("two-two", c.get<fixed_bitstring<43>>().to_string());
+      j.write_fieldname("two-two");
+      c.get<fixed_bitstring<43>>().to_json(j);
       break;
     case types::four_one:
-      j.write_str("four-one", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("four-one");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::three_two:
-      j.write_str("three-two", c.get<fixed_bitstring<59>>().to_string());
+      j.write_fieldname("three-two");
+      c.get<fixed_bitstring<59>>().to_json(j);
       break;
     case types::six_one:
-      j.write_str("six-one", c.get<fixed_bitstring<48>>().to_string());
+      j.write_fieldname("six-one");
+      c.get<fixed_bitstring<48>>().to_json(j);
       break;
     case types::four_two:
-      j.write_str("four-two", c.get<fixed_bitstring<75>>().to_string());
+      j.write_fieldname("four-two");
+      c.get<fixed_bitstring<75>>().to_json(j);
       break;
     case types::eight_one:
-      j.write_str("eight-one", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("eight-one");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     case types::four_three:
-      j.write_str("four-three", c.get<fixed_bitstring<107>>().to_string());
+      j.write_fieldname("four-three");
+      c.get<fixed_bitstring<107>>().to_json(j);
       break;
     case types::six_two:
-      j.write_str("six-two", c.get<fixed_bitstring<107>>().to_string());
+      j.write_fieldname("six-two");
+      c.get<fixed_bitstring<107>>().to_json(j);
       break;
     case types::twelve_one:
-      j.write_str("twelve-one", c.get<fixed_bitstring<96>>().to_string());
+      j.write_fieldname("twelve-one");
+      c.get<fixed_bitstring<96>>().to_json(j);
       break;
     case types::four_four:
-      j.write_str("four-four", c.get<fixed_bitstring<139>>().to_string());
+      j.write_fieldname("four-four");
+      c.get<fixed_bitstring<139>>().to_json(j);
       break;
     case types::eight_two:
-      j.write_str("eight-two", c.get<fixed_bitstring<139>>().to_string());
+      j.write_fieldname("eight-two");
+      c.get<fixed_bitstring<139>>().to_json(j);
       break;
     case types::sixteen_one:
-      j.write_str("sixteen-one", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("sixteen-one");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_,
@@ -8577,12 +8638,12 @@ void codebook_cfg_r17_s::codebook_type_c_::to_json(json_writer& j) const
         j.end_obj();
       }
       if (c.get<type1_s_>().type_i_single_panel_ri_restrict_strp_r17_present) {
-        j.write_str("typeI-SinglePanel-ri-RestrictionSTRP-r17",
-                    c.get<type1_s_>().type_i_single_panel_ri_restrict_strp_r17.to_string());
+        j.write_fieldname("typeI-SinglePanel-ri-RestrictionSTRP-r17");
+        c.get<type1_s_>().type_i_single_panel_ri_restrict_strp_r17.to_json(j);
       }
       if (c.get<type1_s_>().type_i_single_panel_ri_restrict_sdm_r17_present) {
-        j.write_str("typeI-SinglePanel-ri-RestrictionSDM-r17",
-                    c.get<type1_s_>().type_i_single_panel_ri_restrict_sdm_r17.to_string());
+        j.write_fieldname("typeI-SinglePanel-ri-RestrictionSDM-r17");
+        c.get<type1_s_>().type_i_single_panel_ri_restrict_sdm_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -8599,8 +8660,8 @@ void codebook_cfg_r17_s::codebook_type_c_::to_json(json_writer& j) const
         j.write_int("numberOfPMI-SubbandsPerCQI-Subband-r17",
                     c.get<type2_s_>().type_ii_port_sel_r17.nof_pmi_subbands_per_cqi_subband_r17);
       }
-      j.write_str("typeII-PortSelectionRI-Restriction-r17",
-                  c.get<type2_s_>().type_ii_port_sel_r17.type_ii_port_sel_ri_restrict_r17.to_string());
+      j.write_fieldname("typeII-PortSelectionRI-Restriction-r17");
+      c.get<type2_s_>().type_ii_port_sel_r17.type_ii_port_sel_ri_restrict_r17.to_json(j);
       j.end_obj();
       j.end_obj();
       break;
@@ -8800,8 +8861,8 @@ void codebook_cfg_r17_s::codebook_type_c_::type1_s_::type_i_single_panel_group1_
     case types::two:
       j.write_fieldname("two");
       j.start_obj();
-      j.write_str("twoTX-CodebookSubsetRestriction1-r17",
-                  c.get<two_s_>().two_tx_codebook_subset_restrict1_r17.to_string());
+      j.write_fieldname("twoTX-CodebookSubsetRestriction1-r17");
+      c.get<two_s_>().two_tx_codebook_subset_restrict1_r17.to_json(j);
       j.end_obj();
       break;
     case types::more_than_two:
@@ -9160,43 +9221,56 @@ void codebook_cfg_r17_s::codebook_type_c_::type1_s_::type_i_single_panel_group1_
   j.start_obj();
   switch (type_) {
     case types::two_one_type_i_single_panel_restrict1_r17:
-      j.write_str("two-one-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("two-one-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::two_two_type_i_single_panel_restrict1_r17:
-      j.write_str("two-two-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("two-two-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     case types::four_one_type_i_single_panel_restrict1_r17:
-      j.write_str("four-one-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("four-one-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::three_two_type_i_single_panel_restrict1_r17:
-      j.write_str("three-two-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<96>>().to_string());
+      j.write_fieldname("three-two-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<96>>().to_json(j);
       break;
     case types::six_one_type_i_single_panel_restrict1_r17:
-      j.write_str("six-one-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<24>>().to_string());
+      j.write_fieldname("six-one-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<24>>().to_json(j);
       break;
     case types::four_two_type_i_single_panel_restrict1_r17:
-      j.write_str("four-two-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("four-two-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     case types::eight_one_type_i_single_panel_restrict1_r17:
-      j.write_str("eight-one-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("eight-one-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::four_three_type_i_single_panel_restrict1_r17:
-      j.write_str("four-three-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<192>>().to_string());
+      j.write_fieldname("four-three-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<192>>().to_json(j);
       break;
     case types::six_two_type_i_single_panel_restrict1_r17:
-      j.write_str("six-two-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<192>>().to_string());
+      j.write_fieldname("six-two-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<192>>().to_json(j);
       break;
     case types::twelve_one_type_i_single_panel_restrict1_r17:
-      j.write_str("twelve-one-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<48>>().to_string());
+      j.write_fieldname("twelve-one-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<48>>().to_json(j);
       break;
     case types::four_four_type_i_single_panel_restrict1_r17:
-      j.write_str("four-four-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<256>>().to_string());
+      j.write_fieldname("four-four-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<256>>().to_json(j);
       break;
     case types::eight_two_type_i_single_panel_restrict1_r17:
-      j.write_str("eight-two-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<256>>().to_string());
+      j.write_fieldname("eight-two-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<256>>().to_json(j);
       break;
     case types::sixteen_one_type_i_single_panel_restrict1_r17:
-      j.write_str("sixteen-one-TypeI-SinglePanel-Restriction1-r17", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("sixteen-one-TypeI-SinglePanel-Restriction1-r17");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_,
@@ -9456,8 +9530,8 @@ void codebook_cfg_r17_s::codebook_type_c_::type1_s_::type_i_single_panel_group2_
     case types::two:
       j.write_fieldname("two");
       j.start_obj();
-      j.write_str("twoTX-CodebookSubsetRestriction2-r17",
-                  c.get<two_s_>().two_tx_codebook_subset_restrict2_r17.to_string());
+      j.write_fieldname("twoTX-CodebookSubsetRestriction2-r17");
+      c.get<two_s_>().two_tx_codebook_subset_restrict2_r17.to_json(j);
       j.end_obj();
       break;
     case types::more_than_two:
@@ -9816,43 +9890,56 @@ void codebook_cfg_r17_s::codebook_type_c_::type1_s_::type_i_single_panel_group2_
   j.start_obj();
   switch (type_) {
     case types::two_one_type_i_single_panel_restrict2_r17:
-      j.write_str("two-one-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("two-one-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::two_two_type_i_single_panel_restrict2_r17:
-      j.write_str("two-two-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("two-two-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     case types::four_one_type_i_single_panel_restrict2_r17:
-      j.write_str("four-one-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("four-one-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::three_two_type_i_single_panel_restrict2_r17:
-      j.write_str("three-two-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<96>>().to_string());
+      j.write_fieldname("three-two-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<96>>().to_json(j);
       break;
     case types::six_one_type_i_single_panel_restrict2_r17:
-      j.write_str("six-one-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<24>>().to_string());
+      j.write_fieldname("six-one-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<24>>().to_json(j);
       break;
     case types::four_two_type_i_single_panel_restrict2_r17:
-      j.write_str("four-two-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<128>>().to_string());
+      j.write_fieldname("four-two-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<128>>().to_json(j);
       break;
     case types::eight_one_type_i_single_panel_restrict2_r17:
-      j.write_str("eight-one-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("eight-one-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     case types::four_three_type_i_single_panel_restrict2_r17:
-      j.write_str("four-three-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<192>>().to_string());
+      j.write_fieldname("four-three-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<192>>().to_json(j);
       break;
     case types::six_two_type_i_single_panel_restrict2_r17:
-      j.write_str("six-two-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<192>>().to_string());
+      j.write_fieldname("six-two-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<192>>().to_json(j);
       break;
     case types::twelve_one_type_i_single_panel_restrict2_r17:
-      j.write_str("twelve-one-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<48>>().to_string());
+      j.write_fieldname("twelve-one-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<48>>().to_json(j);
       break;
     case types::four_four_type_i_single_panel_restrict2_r17:
-      j.write_str("four-four-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<256>>().to_string());
+      j.write_fieldname("four-four-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<256>>().to_json(j);
       break;
     case types::eight_two_type_i_single_panel_restrict2_r17:
-      j.write_str("eight-two-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<256>>().to_string());
+      j.write_fieldname("eight-two-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<256>>().to_json(j);
       break;
     case types::sixteen_one_type_i_single_panel_restrict2_r17:
-      j.write_str("sixteen-one-TypeI-SinglePanel-Restriction2-r17", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("sixteen-one-TypeI-SinglePanel-Restriction2-r17");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_,
@@ -10553,11 +10640,12 @@ void n1_n2_cbsr_list_r18_c::two_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -10623,11 +10711,12 @@ void n1_n2_cbsr_list_r18_c::two_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -10693,11 +10782,12 @@ void n1_n2_cbsr_list_r18_c::four_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -10763,11 +10853,12 @@ void n1_n2_cbsr_list_r18_c::three_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -10833,11 +10924,12 @@ void n1_n2_cbsr_list_r18_c::six_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -10903,11 +10995,12 @@ void n1_n2_cbsr_list_r18_c::four_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -10973,11 +11066,12 @@ void n1_n2_cbsr_list_r18_c::eight_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -11044,11 +11138,12 @@ void n1_n2_cbsr_list_r18_c::four_three_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -11115,11 +11210,12 @@ void n1_n2_cbsr_list_r18_c::twelve_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -11185,11 +11281,12 @@ void n1_n2_cbsr_list_r18_c::four_four_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -11255,11 +11352,12 @@ void n1_n2_cbsr_list_r18_c::eight_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -11326,11 +11424,12 @@ void n1_n2_cbsr_list_r18_c::sixteen_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_list_r18:
       j.start_array("cbsr-list-r18");
       for (const auto& e1 : c) {
-        j.write_str(e1.to_string());
+        e1.to_json(j);
       }
       j.end_array();
       break;
@@ -11813,9 +11912,11 @@ void n1_n2_cbsr_r18_c::two_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::two_one_r18_c_");
@@ -11879,9 +11980,11 @@ void n1_n2_cbsr_r18_c::two_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::two_two_r18_c_");
@@ -11945,9 +12048,11 @@ void n1_n2_cbsr_r18_c::four_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::four_one_r18_c_");
@@ -12011,9 +12116,11 @@ void n1_n2_cbsr_r18_c::three_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::three_two_r18_c_");
@@ -12077,9 +12184,11 @@ void n1_n2_cbsr_r18_c::six_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::six_one_r18_c_");
@@ -12143,9 +12252,11 @@ void n1_n2_cbsr_r18_c::four_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::four_two_r18_c_");
@@ -12209,9 +12320,11 @@ void n1_n2_cbsr_r18_c::eight_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::eight_one_r18_c_");
@@ -12275,9 +12388,11 @@ void n1_n2_cbsr_r18_c::four_three_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::four_three_r18_c_");
@@ -12341,9 +12456,11 @@ void n1_n2_cbsr_r18_c::twelve_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::twelve_one_r18_c_");
@@ -12407,9 +12524,11 @@ void n1_n2_cbsr_r18_c::four_four_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::four_four_r18_c_");
@@ -12473,9 +12592,11 @@ void n1_n2_cbsr_r18_c::eight_two_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::eight_two_r18_c_");
@@ -12539,9 +12660,11 @@ void n1_n2_cbsr_r18_c::sixteen_one_r18_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::no_cbsr_r18:
+      j.write_null("no-cbsr-r18");
       break;
     case types::cbsr_r18:
-      j.write_str("cbsr-r18", c.to_string());
+      j.write_fieldname("cbsr-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "n1_n2_cbsr_r18_c::sixteen_one_r18_c_");
@@ -12868,7 +12991,8 @@ void codebook_cfg_r18_s::codebook_type_c_::type2_c_::to_json(json_writer& j) con
       }
       j.write_int("numberOfPMI-SubbandsPerCQI-Subband-r18",
                   c.get<type_ii_cjt_r18_s_>().nof_pmi_subbands_per_cqi_subband_r18);
-      j.write_str("typeII-RI-Restriction-r18", c.get<type_ii_cjt_r18_s_>().type_ii_ri_restrict_r18.to_string());
+      j.write_fieldname("typeII-RI-Restriction-r18");
+      c.get<type_ii_cjt_r18_s_>().type_ii_ri_restrict_r18.to_json(j);
       j.write_int("codebookMode-r18", c.get<type_ii_cjt_r18_s_>().codebook_mode_r18);
       j.end_obj();
       break;
@@ -12890,8 +13014,8 @@ void codebook_cfg_r18_s::codebook_type_c_::type2_c_::to_json(json_writer& j) con
       }
       j.write_int("numberOfPMI-SubbandsPerCQI-Subband-r18",
                   c.get<type_ii_cjt_port_sel_r18_s_>().nof_pmi_subbands_per_cqi_subband_r18);
-      j.write_str("typeII-PortSelectionRI-Restriction-r18",
-                  c.get<type_ii_cjt_port_sel_r18_s_>().type_ii_port_sel_ri_restrict_r18.to_string());
+      j.write_fieldname("typeII-PortSelectionRI-Restriction-r18");
+      c.get<type_ii_cjt_port_sel_r18_s_>().type_ii_port_sel_ri_restrict_r18.to_json(j);
       j.write_int("codebookMode-r18", c.get<type_ii_cjt_port_sel_r18_s_>().codebook_mode_r18);
       j.end_obj();
       break;
@@ -12906,7 +13030,8 @@ void codebook_cfg_r18_s::codebook_type_c_::type2_c_::to_json(json_writer& j) con
       j.write_int("numberOfPMI-SubbandsPerCQI-Subband-r18",
                   c.get<type_ii_doppler_r18_s_>().nof_pmi_subbands_per_cqi_subband_r18);
       j.write_str("predictionDelay-r18", c.get<type_ii_doppler_r18_s_>().prediction_delay_r18.to_string());
-      j.write_str("typeII-RI-Restriction-r18", c.get<type_ii_doppler_r18_s_>().type_ii_ri_restrict_r18.to_string());
+      j.write_fieldname("typeII-RI-Restriction-r18");
+      c.get<type_ii_doppler_r18_s_>().type_ii_ri_restrict_r18.to_json(j);
       j.end_obj();
       break;
     case types::type_ii_doppler_port_sel_r18:
@@ -12923,8 +13048,8 @@ void codebook_cfg_r18_s::codebook_type_c_::type2_c_::to_json(json_writer& j) con
       j.write_int("numberOfPMI-SubbandsPerCQI-Subband-r18",
                   c.get<type_ii_doppler_port_sel_r18_s_>().nof_pmi_subbands_per_cqi_subband_r18);
       j.write_str("predictionDelay-r18", c.get<type_ii_doppler_port_sel_r18_s_>().prediction_delay_r18.to_string());
-      j.write_str("typeII-PortSelectionRI-Restriction-r18",
-                  c.get<type_ii_doppler_port_sel_r18_s_>().type_ii_port_sel_ri_restrict_r18.to_string());
+      j.write_fieldname("typeII-PortSelectionRI-Restriction-r18");
+      c.get<type_ii_doppler_port_sel_r18_s_>().type_ii_port_sel_ri_restrict_r18.to_json(j);
       j.end_obj();
       break;
     default:
@@ -13601,25 +13726,32 @@ void csi_report_sub_cfg_r18_s::report_sub_cfg_params_r18_c_::a1_params_s_::port_
   j.start_obj();
   switch (type_) {
     case types::p2:
-      j.write_str("p2", c.get<fixed_bitstring<2>>().to_string());
+      j.write_fieldname("p2");
+      c.get<fixed_bitstring<2>>().to_json(j);
       break;
     case types::p4:
-      j.write_str("p4", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("p4");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::p8:
-      j.write_str("p8", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("p8");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::p12:
-      j.write_str("p12", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("p12");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     case types::p16:
-      j.write_str("p16", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("p16");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::p24:
-      j.write_str("p24", c.get<fixed_bitstring<24>>().to_string());
+      j.write_fieldname("p24");
+      c.get<fixed_bitstring<24>>().to_json(j);
       break;
     case types::p32:
-      j.write_str("p32", c.get<fixed_bitstring<32>>().to_string());
+      j.write_fieldname("p32");
+      c.get<fixed_bitstring<32>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(
@@ -14712,10 +14844,13 @@ void csi_report_cfg_s::report_quant_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::none:
+      j.write_null("none");
       break;
     case types::cri_ri_pmi_cqi:
+      j.write_null("cri-RI-PMI-CQI");
       break;
     case types::cri_ri_i1:
+      j.write_null("cri-RI-i1");
       break;
     case types::cri_ri_i1_cqi:
       j.write_fieldname("cri-RI-i1-CQI");
@@ -14726,12 +14861,16 @@ void csi_report_cfg_s::report_quant_c_::to_json(json_writer& j) const
       j.end_obj();
       break;
     case types::cri_ri_cqi:
+      j.write_null("cri-RI-CQI");
       break;
     case types::cri_rsrp:
+      j.write_null("cri-RSRP");
       break;
     case types::ssb_idx_rsrp:
+      j.write_null("ssb-Index-RSRP");
       break;
     case types::cri_ri_li_pmi_cqi:
+      j.write_null("cri-RI-LI-PMI-CQI");
       break;
     default:
       log_invalid_choice_id(type_, "csi_report_cfg_s::report_quant_c_");
@@ -15179,55 +15318,72 @@ void csi_report_cfg_s::report_freq_cfg_s_::csi_report_band_c_::to_json(json_writ
   j.start_obj();
   switch (type_) {
     case types::subbands3:
-      j.write_str("subbands3", c.get<fixed_bitstring<3>>().to_string());
+      j.write_fieldname("subbands3");
+      c.get<fixed_bitstring<3>>().to_json(j);
       break;
     case types::subbands4:
-      j.write_str("subbands4", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("subbands4");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::subbands5:
-      j.write_str("subbands5", c.get<fixed_bitstring<5>>().to_string());
+      j.write_fieldname("subbands5");
+      c.get<fixed_bitstring<5>>().to_json(j);
       break;
     case types::subbands6:
-      j.write_str("subbands6", c.get<fixed_bitstring<6>>().to_string());
+      j.write_fieldname("subbands6");
+      c.get<fixed_bitstring<6>>().to_json(j);
       break;
     case types::subbands7:
-      j.write_str("subbands7", c.get<fixed_bitstring<7>>().to_string());
+      j.write_fieldname("subbands7");
+      c.get<fixed_bitstring<7>>().to_json(j);
       break;
     case types::subbands8:
-      j.write_str("subbands8", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("subbands8");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::subbands9:
-      j.write_str("subbands9", c.get<fixed_bitstring<9>>().to_string());
+      j.write_fieldname("subbands9");
+      c.get<fixed_bitstring<9>>().to_json(j);
       break;
     case types::subbands10:
-      j.write_str("subbands10", c.get<fixed_bitstring<10>>().to_string());
+      j.write_fieldname("subbands10");
+      c.get<fixed_bitstring<10>>().to_json(j);
       break;
     case types::subbands11:
-      j.write_str("subbands11", c.get<fixed_bitstring<11>>().to_string());
+      j.write_fieldname("subbands11");
+      c.get<fixed_bitstring<11>>().to_json(j);
       break;
     case types::subbands12:
-      j.write_str("subbands12", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("subbands12");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     case types::subbands13:
-      j.write_str("subbands13", c.get<fixed_bitstring<13>>().to_string());
+      j.write_fieldname("subbands13");
+      c.get<fixed_bitstring<13>>().to_json(j);
       break;
     case types::subbands14:
-      j.write_str("subbands14", c.get<fixed_bitstring<14>>().to_string());
+      j.write_fieldname("subbands14");
+      c.get<fixed_bitstring<14>>().to_json(j);
       break;
     case types::subbands15:
-      j.write_str("subbands15", c.get<fixed_bitstring<15>>().to_string());
+      j.write_fieldname("subbands15");
+      c.get<fixed_bitstring<15>>().to_json(j);
       break;
     case types::subbands16:
-      j.write_str("subbands16", c.get<fixed_bitstring<16>>().to_string());
+      j.write_fieldname("subbands16");
+      c.get<fixed_bitstring<16>>().to_json(j);
       break;
     case types::subbands17:
-      j.write_str("subbands17", c.get<fixed_bitstring<17>>().to_string());
+      j.write_fieldname("subbands17");
+      c.get<fixed_bitstring<17>>().to_json(j);
       break;
     case types::subbands18:
-      j.write_str("subbands18", c.get<fixed_bitstring<18>>().to_string());
+      j.write_fieldname("subbands18");
+      c.get<fixed_bitstring<18>>().to_json(j);
       break;
     case types::subbands19_v1530:
-      j.write_str("subbands19-v1530", c.get<fixed_bitstring<19>>().to_string());
+      j.write_fieldname("subbands19-v1530");
+      c.get<fixed_bitstring<19>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "csi_report_cfg_s::report_freq_cfg_s_::csi_report_band_c_");
@@ -15429,6 +15585,7 @@ void csi_report_cfg_s::group_based_beam_report_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::enabled:
+      j.write_null("enabled");
       break;
     case types::disabled:
       j.write_fieldname("disabled");
@@ -15551,6 +15708,16 @@ void csi_report_cfg_s::report_quant_r16_c_::set_ssb_idx_sinr_r16()
 void csi_report_cfg_s::report_quant_r16_c_::to_json(json_writer& j) const
 {
   j.start_obj();
+  switch (type_) {
+    case types::cri_sinr_r16:
+      j.write_null("cri-SINR-r16");
+      break;
+    case types::ssb_idx_sinr_r16:
+      j.write_null("ssb-Index-SINR-r16");
+      break;
+    default:
+      log_invalid_choice_id(type_, "csi_report_cfg_s::report_quant_r16_c_");
+  }
   j.end_obj();
 }
 OCUDUASN_CODE csi_report_cfg_s::report_quant_r16_c_::pack(bit_ref& bref) const
@@ -15630,6 +15797,22 @@ void csi_report_cfg_s::report_quant_r17_c_::set_ssb_idx_sinr_idx_r17()
 void csi_report_cfg_s::report_quant_r17_c_::to_json(json_writer& j) const
 {
   j.start_obj();
+  switch (type_) {
+    case types::cri_rsrp_idx_r17:
+      j.write_null("cri-RSRP-Index-r17");
+      break;
+    case types::ssb_idx_rsrp_idx_r17:
+      j.write_null("ssb-Index-RSRP-Index-r17");
+      break;
+    case types::cri_sinr_idx_r17:
+      j.write_null("cri-SINR-Index-r17");
+      break;
+    case types::ssb_idx_sinr_idx_r17:
+      j.write_null("ssb-Index-SINR-Index-r17");
+      break;
+    default:
+      log_invalid_choice_id(type_, "csi_report_cfg_s::report_quant_r17_c_");
+  }
   j.end_obj();
 }
 OCUDUASN_CODE csi_report_cfg_s::report_quant_r17_c_::pack(bit_ref& bref) const
@@ -17273,8 +17456,10 @@ void tdd_ul_dl_slot_cfg_s::symbols_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::all_dl:
+      j.write_null("allDownlink");
       break;
     case types::all_ul:
+      j.write_null("allUplink");
       break;
     case types::explicit_value:
       j.write_fieldname("explicit");
@@ -19568,8 +19753,10 @@ void tdd_ul_dl_slot_cfg_iab_mt_r16_s::symbols_iab_mt_r16_c_::to_json(json_writer
   j.start_obj();
   switch (type_) {
     case types::all_dl_r16:
+      j.write_null("allDownlink-r16");
       break;
     case types::all_ul_r16:
+      j.write_null("allUplink-r16");
       break;
     case types::explicit_r16:
       j.write_fieldname("explicit-r16");
@@ -22797,13 +22984,16 @@ void ssb_mtc_add_pci_r17_s::ssb_positions_in_burst_r17_c_::to_json(json_writer& 
   j.start_obj();
   switch (type_) {
     case types::short_bitmap:
-      j.write_str("shortBitmap", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("shortBitmap");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::medium_bitmap:
-      j.write_str("mediumBitmap", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("mediumBitmap");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::long_bitmap:
-      j.write_str("longBitmap", c.get<fixed_bitstring<64>>().to_string());
+      j.write_fieldname("longBitmap");
+      c.get<fixed_bitstring<64>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ssb_mtc_add_pci_r17_s::ssb_positions_in_burst_r17_c_");
@@ -23127,7 +23317,8 @@ void tci_activ_cfg_r17_s::to_json(json_writer& j) const
     j.write_int(e1);
   }
   j.end_array();
-  j.write_str("pdsch-TCI-r17", pdsch_tci_r17.to_string());
+  j.write_fieldname("pdsch-TCI-r17");
+  pdsch_tci_r17.to_json(j);
   j.end_obj();
 }
 
@@ -23665,7 +23856,7 @@ void mc_dci_set_of_cells_r18_s::to_json(json_writer& j) const
     for (const auto& e1 : rate_match_list_dci_1_3_r18) {
       j.start_array();
       for (const auto& e2 : e1) {
-        j.write_str(e2.to_string());
+        e2.to_json(j);
       }
       j.end_array();
     }
@@ -23676,7 +23867,7 @@ void mc_dci_set_of_cells_r18_s::to_json(json_writer& j) const
     for (const auto& e1 : zp_csi_rs_list_dci_1_3_r18) {
       j.start_array();
       for (const auto& e2 : e1) {
-        j.write_str(e2.to_string());
+        e2.to_json(j);
       }
       j.end_array();
     }
@@ -23687,7 +23878,7 @@ void mc_dci_set_of_cells_r18_s::to_json(json_writer& j) const
     for (const auto& e1 : tci_list_dci_1_3_r18) {
       j.start_array();
       for (const auto& e2 : e1) {
-        j.write_str(e2.to_string());
+        e2.to_json(j);
       }
       j.end_array();
     }
@@ -23698,7 +23889,7 @@ void mc_dci_set_of_cells_r18_s::to_json(json_writer& j) const
     for (const auto& e1 : srs_request_list_dci_1_3_r18) {
       j.start_array();
       for (const auto& e2 : e1) {
-        j.write_str(e2.to_string());
+        e2.to_json(j);
       }
       j.end_array();
     }
@@ -23720,7 +23911,7 @@ void mc_dci_set_of_cells_r18_s::to_json(json_writer& j) const
     for (const auto& e1 : srs_request_list_dci_0_3_r18) {
       j.start_array();
       for (const auto& e2 : e1) {
-        j.write_str(e2.to_string());
+        e2.to_json(j);
       }
       j.end_array();
     }

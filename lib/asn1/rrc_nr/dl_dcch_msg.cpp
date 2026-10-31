@@ -36,6 +36,9 @@ void dl_dcch_msg_type_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "dl_dcch_msg_type_c");
@@ -264,10 +267,13 @@ void dl_dcch_msg_type_c::c1_c_::to_json(json_writer& j) const
       c.get<logged_meas_cfg_r16_s>().to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "dl_dcch_msg_type_c::c1_c_");

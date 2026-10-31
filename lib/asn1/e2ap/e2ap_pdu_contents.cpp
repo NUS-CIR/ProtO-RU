@@ -127,23 +127,19 @@ const crit_diagnostics_s& e2_removal_fail_ies_o::value_c::crit_diagnostics() con
 }
 void e2_removal_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2_removal_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2_removal_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -273,19 +269,27 @@ OCUDUASN_CODE e2_removal_fail_ies_container::unpack(cbit_ref& bref)
 }
 void e2_removal_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2RemovalRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -326,9 +330,7 @@ presence_e e2_removal_request_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void e2_removal_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_int("INTEGER (0..255,...)", c);
-  j.end_obj();
+  j.write_int(c);
 }
 OCUDUASN_CODE e2_removal_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -449,19 +451,16 @@ const crit_diagnostics_s& e2_removal_resp_ies_o::value_c::crit_diagnostics() con
 }
 void e2_removal_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2_removal_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2_removal_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -573,16 +572,21 @@ OCUDUASN_CODE e2_removal_resp_ies_container::unpack(cbit_ref& bref)
 }
 void e2_removal_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2ResourceStatusFailureIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -740,29 +744,25 @@ const crit_diagnostics_s& e2_res_status_fail_ies_o::value_c::crit_diagnostics() 
 }
 void e2_res_status_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2_res_status_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2_res_status_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -924,25 +924,37 @@ OCUDUASN_CODE e2_res_status_fail_ies_container::unpack(cbit_ref& bref)
 }
 void e2_res_status_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 105);
   j.write_str("criticality", "reject");
-  j.write_int("Value", e2node_load_meas_id);
+  j.write_int("value", e2node_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2ResourceStatusRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -1120,30 +1132,28 @@ const report_periodicity_e2_e& e2_res_status_request_ies_o::value_c::report_peri
 }
 void e2_res_status_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::regist_request_e2:
-      j.write_str("RegistrationRequest-E2", c.get<regist_request_e2_e>().to_string());
+      j.write_str(c.get<regist_request_e2_e>().to_string());
       break;
     case types::report_characteristics:
-      j.write_str("BIT STRING", c.get<fixed_bitstring<8, false, true>>().to_string());
+      c.get<fixed_bitstring<8, false, true>>().to_json(j);
       break;
     case types::report_periodicity_e2:
-      j.write_str("ReportingPeriodicity-E2", c.get<report_periodicity_e2_e>().to_string());
+      j.write_str(c.get<report_periodicity_e2_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "e2_res_status_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2_res_status_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1329,32 +1339,45 @@ OCUDUASN_CODE e2_res_status_request_ies_container::unpack(cbit_ref& bref)
 }
 void e2_res_status_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
   if (e2node_load_meas_id_present) {
+    j.start_obj();
     j.write_int("id", 105);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", e2node_load_meas_id);
+    j.write_int("value", e2node_load_meas_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 133);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", regist_request_e2.to_string());
+  j.write_str("value", regist_request_e2.to_string());
+  j.end_obj();
   if (report_characteristics_present) {
+    j.start_obj();
     j.write_int("id", 135);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", report_characteristics.to_string());
+    j.write_fieldname("value");
+    report_characteristics.to_json(j);
+    j.end_obj();
   }
   if (report_periodicity_e2_present) {
+    j.start_obj();
     j.write_int("id", 134);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", report_periodicity_e2.to_string());
+    j.write_str("value", report_periodicity_e2.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2ResourceStatusResponseIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -1492,25 +1515,22 @@ const crit_diagnostics_s& e2_res_status_resp_ies_o::value_c::crit_diagnostics() 
 }
 void e2_res_status_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2_res_status_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2_res_status_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1654,22 +1674,31 @@ OCUDUASN_CODE e2_res_status_resp_ies_container::unpack(cbit_ref& bref)
 }
 void e2_res_status_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 105);
   j.write_str("criticality", "reject");
-  j.write_int("Value", e2node_load_meas_id);
+  j.write_int("value", e2node_load_meas_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2ResourceStatusUpdateIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -1799,25 +1828,25 @@ const uint16_t& e2_res_status_upd_ies_o::value_c::e2node_load_meas_id() const
 }
 void e2_res_status_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::tnl_capacity_ind:
+      j.write_null();
       break;
     case types::hardware_load_ind:
+      j.write_null();
       break;
     default:
       log_invalid_choice_id(type_, "e2_res_status_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2_res_status_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -1972,27 +2001,37 @@ OCUDUASN_CODE e2_res_status_upd_ies_container::unpack(cbit_ref& bref)
 }
 void e2_res_status_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 105);
   j.write_str("criticality", "reject");
-  j.write_int("Value", e2node_load_meas_id);
+  j.write_int("value", e2node_load_meas_id);
+  j.end_obj();
   if (tnl_capacity_ind_present) {
+    j.start_obj();
     j.write_int("id", 136);
     j.write_str("criticality", "ignore");
-    j.write_null("Value");
+    j.write_null("value");
+    j.end_obj();
   }
   if (hardware_load_ind_present) {
+    j.start_obj();
     j.write_int("id", 137);
     j.write_str("criticality", "ignore");
-    j.write_null("Value");
+    j.write_null("value");
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2connectionSetupFailed-Item ::= SEQUENCE
@@ -2065,10 +2104,7 @@ presence_e e2conn_setup_failed_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void e2conn_setup_failed_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2connectionSetupFailed-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2conn_setup_failed_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2163,10 +2199,7 @@ presence_e e2conn_upd_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void e2conn_upd_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2connectionUpdate-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2conn_upd_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2258,10 +2291,7 @@ presence_e e2conn_upd_rem_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void e2conn_upd_rem_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2connectionUpdateRemove-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2conn_upd_rem_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2422,27 +2452,26 @@ const e2conn_upd_list_l& e2conn_upd_ies_o::value_c::e2conn_upd_modify() const
 }
 void e2conn_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2conn_upd_add:
-      j.start_array("E2connectionUpdate-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2conn_upd_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2conn_upd_rem:
-      j.start_array("E2connectionUpdateRemove-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2conn_upd_rem_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2conn_upd_modify:
-      j.start_array("E2connectionUpdate-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2conn_upd_list_l>()) {
         e1.to_json(j);
       }
@@ -2451,7 +2480,6 @@ void e2conn_upd_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e2conn_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2conn_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2597,38 +2625,46 @@ OCUDUASN_CODE e2conn_upd_ies_container::unpack(cbit_ref& bref)
 }
 void e2conn_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (e2conn_upd_add_present) {
+    j.start_obj();
     j.write_int("id", 44);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2conn_upd_add) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2conn_upd_rem_present) {
+    j.start_obj();
     j.write_int("id", 46);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2conn_upd_rem) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2conn_upd_modify_present) {
+    j.start_obj();
     j.write_int("id", 45);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2conn_upd_modify) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2connectionUpdateAck-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -2746,20 +2782,19 @@ const e2conn_setup_failed_list_l& e2conn_upd_ack_ies_o::value_c::e2conn_setup_fa
 }
 void e2conn_upd_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2conn_setup:
-      j.start_array("E2connectionUpdate-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2conn_upd_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2conn_setup_failed:
-      j.start_array("E2connectionSetupFailed-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2conn_setup_failed_list_l>()) {
         e1.to_json(j);
       }
@@ -2768,7 +2803,6 @@ void e2conn_upd_ack_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e2conn_upd_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2conn_upd_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -2894,29 +2928,35 @@ OCUDUASN_CODE e2conn_upd_ack_ies_container::unpack(cbit_ref& bref)
 }
 void e2conn_upd_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (e2conn_setup_present) {
+    j.start_obj();
     j.write_int("id", 39);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2conn_setup) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2conn_setup_failed_present) {
+    j.start_obj();
     j.write_int("id", 40);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2conn_setup_failed) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2connectionUpdateFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -3054,26 +3094,22 @@ const crit_diagnostics_s& e2conn_upd_fail_ies_o::value_c::crit_diagnostics() con
 }
 void e2conn_upd_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2conn_upd_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2conn_upd_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3223,26 +3259,36 @@ OCUDUASN_CODE e2conn_upd_fail_ies_container::unpack(cbit_ref& bref)
 }
 void e2conn_upd_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (cause_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     cause.to_json(j);
+    j.end_obj();
   }
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2nodeComponentConfigAddition-Item ::= SEQUENCE
@@ -3319,10 +3365,7 @@ presence_e e2node_component_cfg_addition_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void e2node_component_cfg_addition_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeComponentConfigAddition-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_component_cfg_addition_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3422,10 +3465,7 @@ presence_e e2node_component_cfg_addition_ack_item_ies_o::get_presence(const uint
 // Value ::= OPEN TYPE
 void e2node_component_cfg_addition_ack_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeComponentConfigAdditionAck-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_component_cfg_addition_ack_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3520,10 +3560,7 @@ presence_e e2node_component_cfg_removal_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void e2node_component_cfg_removal_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeComponentConfigRemoval-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_component_cfg_removal_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3623,10 +3660,7 @@ presence_e e2node_component_cfg_removal_ack_item_ies_o::get_presence(const uint3
 // Value ::= OPEN TYPE
 void e2node_component_cfg_removal_ack_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeComponentConfigRemovalAck-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_component_cfg_removal_ack_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3725,10 +3759,7 @@ presence_e e2node_component_cfg_upd_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void e2node_component_cfg_upd_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeComponentConfigUpdate-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_component_cfg_upd_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3827,10 +3858,7 @@ presence_e e2node_component_cfg_upd_ack_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void e2node_component_cfg_upd_ack_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeComponentConfigUpdateAck-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_component_cfg_upd_ack_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -3926,10 +3954,7 @@ presence_e e2node_tnl_assoc_removal_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void e2node_tnl_assoc_removal_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("E2nodeTNLassociationRemoval-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_tnl_assoc_removal_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4130,38 +4155,36 @@ const e2node_tnl_assoc_removal_list_l& e2node_cfg_upd_ies_o::value_c::e2node_tnl
 }
 void e2node_cfg_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::global_e2node_id:
-      j.write_fieldname("GlobalE2node-ID");
       c.get<global_e2node_id_c>().to_json(j);
       break;
     case types::e2node_component_cfg_addition:
-      j.start_array("E2nodeComponentConfigAddition-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_addition_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_component_cfg_upd:
-      j.start_array("E2nodeComponentConfigUpdate-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_upd_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_component_cfg_removal:
-      j.start_array("E2nodeComponentConfigRemoval-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_removal_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_tnl_assoc_removal:
-      j.start_array("E2nodeTNLassociationRemoval-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_tnl_assoc_removal_list_l>()) {
         e1.to_json(j);
       }
@@ -4170,7 +4193,6 @@ void e2node_cfg_upd_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e2node_cfg_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_cfg_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4358,52 +4380,65 @@ OCUDUASN_CODE e2node_cfg_upd_ies_container::unpack(cbit_ref& bref)
 }
 void e2node_cfg_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (global_e2node_id_present) {
+    j.start_obj();
     j.write_int("id", 3);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     global_e2node_id.to_json(j);
+    j.end_obj();
   }
   if (e2node_component_cfg_addition_present) {
+    j.start_obj();
     j.write_int("id", 50);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_component_cfg_addition) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2node_component_cfg_upd_present) {
+    j.start_obj();
     j.write_int("id", 33);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_component_cfg_upd) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2node_component_cfg_removal_present) {
+    j.start_obj();
     j.write_int("id", 54);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_component_cfg_removal) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2node_tnl_assoc_removal_present) {
+    j.start_obj();
     j.write_int("id", 58);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_tnl_assoc_removal) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2nodeConfigurationUpdateAcknowledge-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -4543,27 +4578,26 @@ e2node_cfg_upd_ack_ies_o::value_c::e2node_component_cfg_removal_ack() const
 }
 void e2node_cfg_upd_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_component_cfg_addition_ack:
-      j.start_array("E2nodeComponentConfigAdditionAck-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_addition_ack_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_component_cfg_upd_ack:
-      j.start_array("E2nodeComponentConfigUpdateAck-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_upd_ack_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_component_cfg_removal_ack:
-      j.start_array("E2nodeComponentConfigRemovalAck-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_removal_ack_list_l>()) {
         e1.to_json(j);
       }
@@ -4572,7 +4606,6 @@ void e2node_cfg_upd_ack_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e2node_cfg_upd_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_cfg_upd_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -4720,38 +4753,46 @@ OCUDUASN_CODE e2node_cfg_upd_ack_ies_container::unpack(cbit_ref& bref)
 }
 void e2node_cfg_upd_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (e2node_component_cfg_addition_ack_present) {
+    j.start_obj();
     j.write_int("id", 52);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_component_cfg_addition_ack) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2node_component_cfg_upd_ack_present) {
+    j.start_obj();
     j.write_int("id", 35);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_component_cfg_upd_ack) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (e2node_component_cfg_removal_ack_present) {
+    j.start_obj();
     j.write_int("id", 56);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : e2node_component_cfg_removal_ack) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2nodeConfigurationUpdateFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -4889,26 +4930,22 @@ const crit_diagnostics_s& e2node_cfg_upd_fail_ies_o::value_c::crit_diagnostics()
 }
 void e2node_cfg_upd_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2node_cfg_upd_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2node_cfg_upd_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5057,24 +5094,34 @@ OCUDUASN_CODE e2node_cfg_upd_fail_ies_container::unpack(cbit_ref& bref)
 }
 void e2node_cfg_upd_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // E2setupFailureIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -5232,30 +5279,25 @@ const tnl_info_s& e2setup_fail_ies_o::value_c::tnl_info() const
 }
 void e2setup_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     case types::tnl_info:
-      j.write_fieldname("TNLinformation");
       c.get<tnl_info_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "e2setup_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2setup_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5424,29 +5466,42 @@ OCUDUASN_CODE e2setup_fail_ies_container::unpack(cbit_ref& bref)
 }
 void e2setup_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
   if (tnl_info_present) {
+    j.start_obj();
     j.write_int("id", 48);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     tnl_info.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RANfunction-Item ::= SEQUENCE
@@ -5523,10 +5578,7 @@ presence_e ran_function_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ran_function_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunction-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5682,24 +5734,22 @@ const e2node_component_cfg_addition_list_l& e2setup_request_ies_o::value_c::e2no
 }
 void e2setup_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::global_e2node_id:
-      j.write_fieldname("GlobalE2node-ID");
       c.get<global_e2node_id_c>().to_json(j);
       break;
     case types::ran_functions_added:
-      j.start_array("RANfunctions-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_component_cfg_addition:
-      j.start_array("E2nodeComponentConfigAddition-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_addition_list_l>()) {
         e1.to_json(j);
       }
@@ -5708,7 +5758,6 @@ void e2setup_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e2setup_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2setup_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -5851,28 +5900,37 @@ OCUDUASN_CODE e2setup_request_ies_container::unpack(cbit_ref& bref)
 }
 void e2setup_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 3);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   global_e2node_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 10);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : ran_functions_added) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 50);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : e2node_component_cfg_addition) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // RANfunctionID-Item ::= SEQUENCE
@@ -5943,10 +6001,7 @@ presence_e ran_function_id_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ran_function_id_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionID-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_id_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6036,10 +6091,7 @@ presence_e ran_function_id_cause_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ran_function_id_cause_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionIDcause-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_id_cause_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6131,10 +6183,7 @@ presence_e ran_function_accept_modified_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void ran_function_accept_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunction-AcceptModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_accept_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6330,38 +6379,36 @@ const ran_functions_accept_modified_list_l& e2setup_resp_ies_o::value_c::ran_fun
 }
 void e2setup_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::global_ric_id:
-      j.write_fieldname("GlobalRIC-ID");
       c.get<global_ric_id_s>().to_json(j);
       break;
     case types::ran_functions_accepted:
-      j.start_array("RANfunctionsID-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_id_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ran_functions_rejected:
-      j.start_array("RANfunctionsIDcause-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_id_cause_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::e2node_component_cfg_addition_ack:
-      j.start_array("E2nodeComponentConfigAdditionAck-List");
+      j.start_array("");
       for (const auto& e1 : c.get<e2node_component_cfg_addition_ack_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ran_functions_accept_modified_list:
-      j.start_array("RANfunctions-AcceptModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_accept_modified_list_l>()) {
         e1.to_json(j);
       }
@@ -6370,7 +6417,6 @@ void e2setup_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "e2setup_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE e2setup_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6568,48 +6614,61 @@ OCUDUASN_CODE e2setup_resp_ies_container::unpack(cbit_ref& bref)
 }
 void e2setup_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 4);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   global_ric_id.to_json(j);
+  j.end_obj();
   if (ran_functions_accepted_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_accepted) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ran_functions_rejected_present) {
+    j.start_obj();
     j.write_int("id", 13);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_rejected) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 52);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : e2node_component_cfg_addition_ack) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (ran_functions_accept_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 138);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_accept_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // ErrorIndication-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -6767,30 +6826,25 @@ const crit_diagnostics_s& error_ind_ies_o::value_c::crit_diagnostics() const
 }
 void error_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "error_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE error_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -6950,33 +7004,46 @@ OCUDUASN_CODE error_ind_ies_container::unpack(cbit_ref& bref)
 }
 void error_ind_ies_container::to_json(json_writer& j) const
 {
-  j.start_obj();
+  j.start_array();
   if (transaction_id_present) {
+    j.start_obj();
     j.write_int("id", 49);
     j.write_str("criticality", "reject");
-    j.write_int("Value", transaction_id);
+    j.write_int("value", transaction_id);
+    j.end_obj();
   }
   if (ric_request_id_present) {
+    j.start_obj();
     j.write_int("id", 29);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     ric_request_id.to_json(j);
+    j.end_obj();
   }
   if (ran_function_id_present) {
+    j.start_obj();
     j.write_int("id", 5);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ran_function_id);
+    j.write_int("value", ran_function_id);
+    j.end_obj();
   }
   if (cause_present) {
+    j.start_obj();
     j.write_int("id", 1);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     cause.to_json(j);
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICactionLoad-Item ::= SEQUENCE
@@ -7048,10 +7115,7 @@ presence_e ric_action_load_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_load_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICactionLoad-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_load_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7168,10 +7232,7 @@ presence_e ric_sub_load_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_load_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscriptionLoad-ItemIE");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_load_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7299,10 +7360,7 @@ presence_e ran_function_load_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ran_function_load_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionLoad-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_load_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7391,10 +7449,7 @@ presence_e ric_action_load_confirm_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_load_confirm_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICactionLoadConfirm-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_load_confirm_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7510,10 +7565,7 @@ presence_e ric_sub_load_confirm_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_load_confirm_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscriptionLoadConfirm-ItemIE");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_load_confirm_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7640,10 +7692,7 @@ presence_e ran_function_load_confirm_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void ran_function_load_confirm_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionLoadConfirm-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_load_confirm_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7732,10 +7781,7 @@ presence_e ric_action_load_request_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_load_request_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICactionLoadRequest-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_load_request_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7851,10 +7897,7 @@ presence_e ric_sub_load_request_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_load_request_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscriptionLoadRequest-ItemIE");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_load_request_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -7981,10 +8024,7 @@ presence_e ran_function_load_request_item_ies_o::get_presence(const uint32_t& id
 // Value ::= OPEN TYPE
 void ran_function_load_request_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionLoadRequest-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_load_request_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8070,10 +8110,7 @@ presence_e ric_action_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICactionList-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8178,10 +8215,7 @@ presence_e ric_sub_list_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_list_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscriptionList-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_list_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8301,10 +8335,7 @@ presence_e ran_function_state_confirm_item_ies_o::get_presence(const uint32_t& i
 // Value ::= OPEN TYPE
 void ran_function_state_confirm_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionStateConfirm-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_state_confirm_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8424,10 +8455,7 @@ presence_e ran_function_state_ctrl_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ran_function_state_ctrl_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RANfunctionStateControl-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ran_function_state_ctrl_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8513,10 +8541,7 @@ presence_e ric_action_added_for_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_added_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-AddedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_added_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8602,10 +8627,7 @@ presence_e ric_action_admitted_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_admitted_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-Admitted-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_admitted_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8691,10 +8713,7 @@ presence_e ric_action_confirmed_for_mod_item_ies_o::get_presence(const uint32_t&
 // Value ::= OPEN TYPE
 void ric_action_confirmed_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ConfirmedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_confirmed_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8781,10 +8800,7 @@ presence_e ric_action_confirmed_for_removal_item_ies_o::get_presence(const uint3
 // Value ::= OPEN TYPE
 void ric_action_confirmed_for_removal_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ConfirmedForRemoval-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_confirmed_for_removal_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8875,10 +8891,7 @@ presence_e ric_action_failed_to_be_added_for_mod_item_ies_o::get_presence(const 
 // Value ::= OPEN TYPE
 void ric_action_failed_to_be_added_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-FailedToBeAddedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_failed_to_be_added_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -8969,10 +8982,7 @@ presence_e ric_action_failed_to_be_modified_for_mod_item_ies_o::get_presence(con
 // Value ::= OPEN TYPE
 void ric_action_failed_to_be_modified_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-FailedToBeModifiedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_failed_to_be_modified_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9063,10 +9073,7 @@ presence_e ric_action_failed_to_be_remd_for_mod_item_ies_o::get_presence(const u
 // Value ::= OPEN TYPE
 void ric_action_failed_to_be_remd_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-FailedToBeRemovedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_failed_to_be_remd_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9152,10 +9159,7 @@ presence_e ric_action_modified_for_mod_item_ies_o::get_presence(const uint32_t& 
 // Value ::= OPEN TYPE
 void ric_action_modified_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ModifiedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_modified_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9245,10 +9249,7 @@ presence_e ric_action_not_admitted_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_not_admitted_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-NotAdmitted-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_not_admitted_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9339,10 +9340,7 @@ presence_e ric_action_refused_to_be_modified_item_ies_o::get_presence(const uint
 // Value ::= OPEN TYPE
 void ric_action_refused_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-RefusedToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_refused_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9433,10 +9431,7 @@ presence_e ric_action_refused_to_be_remd_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void ric_action_refused_to_be_remd_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-RefusedToBeRemoved-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_refused_to_be_remd_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9522,10 +9517,7 @@ presence_e ric_action_remd_for_mod_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_remd_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-RemovedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_remd_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9615,10 +9607,7 @@ presence_e ric_action_required_to_be_modified_item_ies_o::get_presence(const uin
 // Value ::= OPEN TYPE
 void ric_action_required_to_be_modified_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-RequiredToBeModified-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_required_to_be_modified_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9709,10 +9698,7 @@ presence_e ric_action_required_to_be_remd_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void ric_action_required_to_be_remd_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-RequiredToBeRemoved-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_required_to_be_remd_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9822,10 +9808,7 @@ presence_e ric_action_to_be_added_for_mod_item_ies_o::get_presence(const uint32_
 // Value ::= OPEN TYPE
 void ric_action_to_be_added_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ToBeAddedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_to_be_added_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -9949,10 +9932,7 @@ presence_e ric_action_to_be_modified_for_mod_item_ies_o::get_presence(const uint
 // Value ::= OPEN TYPE
 void ric_action_to_be_modified_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ToBeModifiedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_to_be_modified_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10039,10 +10019,7 @@ presence_e ric_action_to_be_remd_for_mod_item_ies_o::get_presence(const uint32_t
 // Value ::= OPEN TYPE
 void ric_action_to_be_remd_for_mod_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ToBeRemovedForModification-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_to_be_remd_for_mod_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10177,10 +10154,7 @@ presence_e ric_action_to_be_setup_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_action_to_be_setup_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICaction-ToBeSetup-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_action_to_be_setup_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10316,24 +10290,19 @@ const crit_diagnostics_s& ric_assist_fail_ies_o::value_c::crit_diagnostics() con
 }
 void ric_assist_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_assist_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_assist_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10458,19 +10427,28 @@ OCUDUASN_CODE ric_assist_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_assist_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICassistanceHalt-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -10511,10 +10489,7 @@ presence_e ric_assist_halt_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_assist_halt_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICrequestID");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_assist_halt_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10670,25 +10645,22 @@ const unbounded_octstring<true>& ric_assist_ind_ies_o::value_c::ric_assist_outco
 }
 void ric_assist_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ric_assist_sn:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ric_assist_hdr:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_assist_outcome:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_assist_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_assist_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -10838,20 +10810,29 @@ OCUDUASN_CODE ric_assist_ind_ies_container::unpack(cbit_ref& bref)
 }
 void ric_assist_ind_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 130);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_assist_sn);
+  j.write_int("value", ric_assist_sn);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 127);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_assist_hdr.to_string());
+  j.write_str("value", ric_assist_hdr.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 129);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_assist_outcome.to_string());
+  j.write_str("value", ric_assist_outcome.to_string());
   j.end_obj();
+  j.end_array();
 }
 
 // RICassistanceRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -11009,28 +10990,25 @@ const uint32_t& ric_assist_request_ies_o::value_c::ric_assist_upd_num() const
 }
 void ric_assist_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ric_assist_hdr:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_assist_msg:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_assist_upd:
-      j.write_str("RICassistanceUpdate", "true");
+      j.write_str("true");
       break;
     case types::ric_assist_upd_num:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     default:
       log_invalid_choice_id(type_, "ric_assist_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_assist_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11201,27 +11179,38 @@ OCUDUASN_CODE ric_assist_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_assist_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 127);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_assist_hdr.to_string());
+  j.write_str("value", ric_assist_hdr.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 128);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_assist_msg.to_string());
+  j.write_str("value", ric_assist_msg.to_string());
+  j.end_obj();
   if (ric_assist_upd_present) {
+    j.start_obj();
     j.write_int("id", 131);
     j.write_str("criticality", "reject");
-    j.write_str("Value", "true");
+    j.write_str("value", "true");
+    j.end_obj();
   }
   if (ric_assist_upd_num_present) {
+    j.start_obj();
     j.write_int("id", 132);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ric_assist_upd_num);
+    j.write_int("value", ric_assist_upd_num);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICassistanceResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -11339,22 +11328,19 @@ const unbounded_octstring<true>& ric_assist_resp_ies_o::value_c::ric_assist_outc
 }
 void ric_assist_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ric_assist_hdr:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_assist_outcome:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_assist_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_assist_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11478,17 +11464,24 @@ OCUDUASN_CODE ric_assist_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_assist_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 127);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_assist_hdr.to_string());
+  j.write_str("value", ric_assist_hdr.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 129);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_assist_outcome.to_string());
+  j.write_str("value", ric_assist_outcome.to_string());
   j.end_obj();
+  j.end_array();
 }
 
 // RICcontrolAcknowledge-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -11626,25 +11619,22 @@ const unbounded_octstring<true>& ric_ctrl_ack_ies_o::value_c::ric_ctrl_outcome()
 }
 void ric_ctrl_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_call_process_id:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_ctrl_outcome:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_ctrl_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_ctrl_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -11796,24 +11786,33 @@ OCUDUASN_CODE ric_ctrl_ack_ies_container::unpack(cbit_ref& bref)
 }
 void ric_ctrl_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_call_process_id_present) {
+    j.start_obj();
     j.write_int("id", 20);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_call_process_id.to_string());
+    j.write_str("value", ric_call_process_id.to_string());
+    j.end_obj();
   }
   if (ric_ctrl_outcome_present) {
+    j.start_obj();
     j.write_int("id", 32);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_ctrl_outcome.to_string());
+    j.write_str("value", ric_ctrl_outcome.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICcontrolFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -11991,33 +11990,28 @@ const crit_diagnostics_s& ric_ctrl_fail_ies_o::value_c::crit_diagnostics() const
 }
 void ric_ctrl_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_call_process_id:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::ric_ctrl_outcome:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_ctrl_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_ctrl_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -12207,32 +12201,47 @@ OCUDUASN_CODE ric_ctrl_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_ctrl_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_call_process_id_present) {
+    j.start_obj();
     j.write_int("id", 20);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_call_process_id.to_string());
+    j.write_str("value", ric_call_process_id.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (ric_ctrl_outcome_present) {
+    j.start_obj();
     j.write_int("id", 32);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_ctrl_outcome.to_string());
+    j.write_str("value", ric_ctrl_outcome.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICcontrolRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -12410,31 +12419,28 @@ const ric_ctrl_ack_request_e& ric_ctrl_request_ies_o::value_c::ric_ctrl_ack_requ
 }
 void ric_ctrl_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_call_process_id:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_ctrl_hdr:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_ctrl_msg:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_ctrl_ack_request:
-      j.write_str("RICcontrolAckRequest", c.get<ric_ctrl_ack_request_e>().to_string());
+      j.write_str(c.get<ric_ctrl_ack_request_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_ctrl_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_ctrl_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -12623,30 +12629,43 @@ OCUDUASN_CODE ric_ctrl_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_ctrl_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_call_process_id_present) {
+    j.start_obj();
     j.write_int("id", 20);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_call_process_id.to_string());
+    j.write_str("value", ric_call_process_id.to_string());
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 22);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_ctrl_hdr.to_string());
+  j.write_str("value", ric_ctrl_hdr.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 23);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_ctrl_msg.to_string());
+  j.write_str("value", ric_ctrl_msg.to_string());
+  j.end_obj();
   if (ric_ctrl_ack_request_present) {
+    j.start_obj();
     j.write_int("id", 21);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_ctrl_ack_request.to_string());
+    j.write_str("value", ric_ctrl_ack_request.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICindication-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -12864,37 +12883,34 @@ const unbounded_octstring<true>& ric_ind_ies_o::value_c::ric_call_process_id() c
 }
 void ric_ind_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_action_id:
-      j.write_int("INTEGER (0..255)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_ind_sn:
-      j.write_int("INTEGER (0..65535)", c.get<uint32_t>());
+      j.write_int(c.get<uint32_t>());
       break;
     case types::ric_ind_type:
-      j.write_str("RICindicationType", c.get<ric_ind_type_e>().to_string());
+      j.write_str(c.get<ric_ind_type_e>().to_string());
       break;
     case types::ric_ind_hdr:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_ind_msg:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_call_process_id:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_ind_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_ind_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13117,36 +13133,53 @@ OCUDUASN_CODE ric_ind_ies_container::unpack(cbit_ref& bref)
 }
 void ric_ind_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 15);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_action_id);
+  j.write_int("value", ric_action_id);
+  j.end_obj();
   if (ric_ind_sn_present) {
+    j.start_obj();
     j.write_int("id", 27);
     j.write_str("criticality", "reject");
-    j.write_int("Value", ric_ind_sn);
+    j.write_int("value", ric_ind_sn);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 28);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_ind_type.to_string());
+  j.write_str("value", ric_ind_type.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 25);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_ind_hdr.to_string());
+  j.write_str("value", ric_ind_hdr.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 26);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_ind_msg.to_string());
+  j.write_str("value", ric_ind_msg.to_string());
+  j.end_obj();
   if (ric_call_process_id_present) {
+    j.start_obj();
     j.write_int("id", 20);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_call_process_id.to_string());
+    j.write_str("value", ric_call_process_id.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICqueryFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -13284,27 +13317,22 @@ const crit_diagnostics_s& ric_query_fail_ies_o::value_c::crit_diagnostics() cons
 }
 void ric_query_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_query_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_query_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13455,22 +13483,33 @@ OCUDUASN_CODE ric_query_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_query_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICqueryRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -13608,25 +13647,22 @@ const unbounded_octstring<true>& ric_query_request_ies_o::value_c::ric_query_def
 }
 void ric_query_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_query_hdr:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_query_definition:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_query_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_query_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -13776,20 +13812,29 @@ OCUDUASN_CODE ric_query_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_query_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 95);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_query_hdr.to_string());
+  j.write_str("value", ric_query_hdr.to_string());
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 96);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_query_definition.to_string());
+  j.write_str("value", ric_query_definition.to_string());
   j.end_obj();
+  j.end_array();
 }
 
 // RICqueryResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -13907,22 +13952,19 @@ const unbounded_octstring<true>& ric_query_resp_ies_o::value_c::ric_query_outcom
 }
 void ric_query_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_query_outcome:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_query_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_query_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14054,17 +14096,24 @@ OCUDUASN_CODE ric_query_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_query_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 97);
   j.write_str("criticality", "reject");
-  j.write_str("Value", ric_query_outcome.to_string());
+  j.write_str("value", ric_query_outcome.to_string());
   j.end_obj();
+  j.end_array();
 }
 
 // RICserviceLoadStatusFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -14202,26 +14251,22 @@ const crit_diagnostics_s& ric_service_load_status_fail_ies_o::value_c::crit_diag
 }
 void ric_service_load_status_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_service_load_status_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_load_status_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14364,22 +14409,32 @@ OCUDUASN_CODE ric_service_load_status_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_load_status_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 105);
   j.write_str("criticality", "ignore");
-  j.write_int("Value", e2node_load_meas_id);
+  j.write_int("value", e2node_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICserviceLoadStatusRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -14538,31 +14593,29 @@ const report_periodicity_e& ric_service_load_status_request_ies_o::value_c::repo
 }
 void ric_service_load_status_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::regist_request:
-      j.write_str("RegistrationRequest", c.get<regist_request_e>().to_string());
+      j.write_str(c.get<regist_request_e>().to_string());
       break;
     case types::ran_function_load_request_list:
-      j.start_array("RANfunctionLoadRequest-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_function_load_request_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::report_periodicity:
-      j.write_str("ReportingPeriodicity", c.get<report_periodicity_e>().to_string());
+      j.write_str(c.get<report_periodicity_e>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_service_load_status_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_load_status_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -14729,33 +14782,43 @@ OCUDUASN_CODE ric_service_load_status_request_ies_container::unpack(cbit_ref& br
 }
 void ric_service_load_status_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
   if (e2node_load_meas_id_present) {
+    j.start_obj();
     j.write_int("id", 105);
     j.write_str("criticality", "ignore");
-    j.write_int("Value", e2node_load_meas_id);
+    j.write_int("value", e2node_load_meas_id);
+    j.end_obj();
   }
+  j.start_obj();
   j.write_int("id", 112);
   j.write_str("criticality", "ignore");
-  j.write_str("Value", regist_request.to_string());
+  j.write_str("value", regist_request.to_string());
+  j.end_obj();
   if (ran_function_load_request_list_present) {
+    j.start_obj();
     j.write_int("id", 111);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_function_load_request_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (report_periodicity_present) {
+    j.start_obj();
     j.write_int("id", 113);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", report_periodicity.to_string());
+    j.write_str("value", report_periodicity.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICserviceLoadStatusResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -14874,16 +14937,15 @@ ric_service_load_status_resp_ies_o::value_c::ran_function_load_confirm_list() co
 }
 void ric_service_load_status_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ran_function_load_confirm_list:
-      j.start_array("RANfunctionLoadConfirm-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_function_load_confirm_list_l>()) {
         e1.to_json(j);
       }
@@ -14892,7 +14954,6 @@ void ric_service_load_status_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_service_load_status_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_load_status_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -15017,23 +15078,29 @@ OCUDUASN_CODE ric_service_load_status_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_load_status_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 105);
   j.write_str("criticality", "ignore");
-  j.write_int("Value", e2node_load_meas_id);
+  j.write_int("value", e2node_load_meas_id);
+  j.end_obj();
   if (ran_function_load_confirm_list_present) {
+    j.start_obj();
     j.write_int("id", 109);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_function_load_confirm_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICserviceLoadUpdate-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -15151,16 +15218,15 @@ const ran_function_load_list_l& ric_service_load_upd_ies_o::value_c::ran_functio
 }
 void ric_service_load_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::e2node_load_meas_id:
-      j.write_int("INTEGER (1..4095,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ran_function_load_list:
-      j.start_array("RANfunctionLoad-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_function_load_list_l>()) {
         e1.to_json(j);
       }
@@ -15169,7 +15235,6 @@ void ric_service_load_upd_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_service_load_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_load_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -15293,21 +15358,27 @@ OCUDUASN_CODE ric_service_load_upd_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_load_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 117);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ric_load_meas_id);
+  j.write_int("value", ric_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 105);
   j.write_str("criticality", "ignore");
-  j.write_int("Value", e2node_load_meas_id);
+  j.write_int("value", e2node_load_meas_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 107);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : ran_function_load_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // RICserviceQuery-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -15405,13 +15476,12 @@ const ran_functions_id_list_l& ric_service_query_ies_o::value_c::ran_functions_a
 }
 void ric_service_query_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ran_functions_accepted:
-      j.start_array("RANfunctionsID-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_id_list_l>()) {
         e1.to_json(j);
       }
@@ -15420,7 +15490,6 @@ void ric_service_query_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_service_query_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_query_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -15532,20 +15601,24 @@ OCUDUASN_CODE ric_service_query_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_query_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (ran_functions_accepted_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_accepted) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICserviceUpdate-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -15683,27 +15756,26 @@ const ran_functions_id_list_l& ric_service_upd_ies_o::value_c::ran_functions_del
 }
 void ric_service_upd_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ran_functions_added:
-      j.start_array("RANfunctions-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ran_functions_modified:
-      j.start_array("RANfunctions-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ran_functions_deleted:
-      j.start_array("RANfunctionsID-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_id_list_l>()) {
         e1.to_json(j);
       }
@@ -15712,7 +15784,6 @@ void ric_service_upd_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_service_upd_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_upd_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -15863,38 +15934,46 @@ OCUDUASN_CODE ric_service_upd_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_upd_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (ran_functions_added_present) {
+    j.start_obj();
     j.write_int("id", 10);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_added) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ran_functions_modified_present) {
+    j.start_obj();
     j.write_int("id", 12);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_modified) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ran_functions_deleted_present) {
+    j.start_obj();
     j.write_int("id", 11);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_deleted) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICserviceUpdateAcknowledge-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -16033,27 +16112,26 @@ ric_service_upd_ack_ies_o::value_c::ran_functions_accept_modified_list() const
 }
 void ric_service_upd_ack_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ran_functions_accepted:
-      j.start_array("RANfunctionsID-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_id_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ran_functions_rejected:
-      j.start_array("RANfunctionsIDcause-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_id_cause_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ran_functions_accept_modified_list:
-      j.start_array("RANfunctions-AcceptModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_functions_accept_modified_list_l>()) {
         e1.to_json(j);
       }
@@ -16062,7 +16140,6 @@ void ric_service_upd_ack_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_service_upd_ack_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_upd_ack_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16213,38 +16290,46 @@ OCUDUASN_CODE ric_service_upd_ack_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_upd_ack_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (ran_functions_accepted_present) {
+    j.start_obj();
     j.write_int("id", 9);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_accepted) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ran_functions_rejected_present) {
+    j.start_obj();
     j.write_int("id", 13);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_rejected) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ran_functions_accept_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 138);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ran_functions_accept_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICserviceUpdateFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -16382,26 +16467,22 @@ const crit_diagnostics_s& ric_service_upd_fail_ies_o::value_c::crit_diagnostics(
 }
 void ric_service_upd_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::time_to_wait:
-      j.write_str("TimeToWait", c.get<time_to_wait_e>().to_string());
+      j.write_str(c.get<time_to_wait_e>().to_string());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_service_upd_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_service_upd_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16550,24 +16631,34 @@ OCUDUASN_CODE ric_service_upd_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_service_upd_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (time_to_wait_present) {
+    j.start_obj();
     j.write_int("id", 31);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", time_to_wait.to_string());
+    j.write_str("value", time_to_wait.to_string());
+    j.end_obj();
   }
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscription-withCause-Item ::= SEQUENCE
@@ -16643,10 +16734,7 @@ presence_e ric_sub_with_cause_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_with_cause_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscription-withCause-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_with_cause_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16736,10 +16824,7 @@ presence_e ric_sub_audit_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_audit_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscriptionAudit-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_audit_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16836,10 +16921,7 @@ presence_e ric_sub_audit_action_item_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_audit_action_item_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.write_fieldname("RICsubscriptionAuditAction-Item");
   c.to_json(j);
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_audit_action_item_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -16975,24 +17057,19 @@ const crit_diagnostics_s& ric_sub_audit_fail_ies_o::value_c::crit_diagnostics() 
 }
 void ric_sub_audit_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_audit_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_audit_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -17117,19 +17194,28 @@ OCUDUASN_CODE ric_sub_audit_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_audit_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionAuditRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -17247,18 +17333,15 @@ const ric_sub_audit_list_l& ric_sub_audit_request_ies_o::value_c::ric_sub_audit_
 }
 void ric_sub_audit_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ric_sub_audit_flag:
-      j.write_fieldname("RICsubscriptionAuditFlag");
       c.get<ric_sub_audit_flag_s>().to_json(j);
       break;
     case types::ric_sub_audit_list:
-      j.start_array("RICsubscriptionAuditList");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_sub_audit_list_l>()) {
         e1.to_json(j);
       }
@@ -17267,7 +17350,6 @@ void ric_sub_audit_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_audit_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_audit_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -17393,25 +17475,33 @@ OCUDUASN_CODE ric_sub_audit_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_audit_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
   if (ric_sub_audit_flag_present) {
+    j.start_obj();
     j.write_int("id", 98);
     j.write_str("criticality", "reject");
+    j.write_fieldname("value");
     ric_sub_audit_flag.to_json(j);
+    j.end_obj();
   }
   if (ric_sub_audit_list_present) {
+    j.start_obj();
     j.write_int("id", 99);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_sub_audit_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionAuditResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -17549,28 +17639,26 @@ const ric_sub_audit_action_list_l& ric_sub_audit_resp_ies_o::value_c::ric_sub_au
 }
 void ric_sub_audit_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ric_sub_audit_confirmed_list:
-      j.start_array("RICsubscriptionAuditActionList");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_sub_audit_action_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_sub_audit_unkown_list:
-      j.start_array("RICsubscriptionAuditList");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_sub_audit_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_sub_audit_missing_list:
-      j.start_array("RICsubscriptionAuditActionList");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_sub_audit_action_list_l>()) {
         e1.to_json(j);
       }
@@ -17579,7 +17667,6 @@ void ric_sub_audit_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_audit_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_audit_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -17724,36 +17811,45 @@ OCUDUASN_CODE ric_sub_audit_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_audit_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 102);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : ric_sub_audit_confirmed_list) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (ric_sub_audit_unkown_list_present) {
+    j.start_obj();
     j.write_int("id", 104);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_sub_audit_unkown_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_sub_audit_missing_list_present) {
+    j.start_obj();
     j.write_int("id", 103);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_sub_audit_missing_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionDeleteFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -17891,27 +17987,22 @@ const crit_diagnostics_s& ric_sub_delete_fail_ies_o::value_c::crit_diagnostics()
 }
 void ric_sub_delete_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_delete_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_delete_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18062,22 +18153,33 @@ OCUDUASN_CODE ric_sub_delete_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_delete_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionDeleteRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -18175,19 +18277,16 @@ const uint16_t& ric_sub_delete_request_ies_o::value_c::ran_function_id() const
 }
 void ric_sub_delete_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_delete_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_delete_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18301,14 +18400,19 @@ OCUDUASN_CODE ric_sub_delete_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_delete_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
   j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionDeleteRequired-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -18349,13 +18453,11 @@ presence_e ric_sub_delete_required_ies_o::get_presence(const uint32_t& id)
 // Value ::= OPEN TYPE
 void ric_sub_delete_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
-  j.start_array("RICsubscription-List-withCause");
+  j.start_array("");
   for (const auto& e1 : c) {
     e1.to_json(j);
   }
   j.end_array();
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_delete_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18471,19 +18573,16 @@ const uint16_t& ric_sub_delete_resp_ies_o::value_c::ran_function_id() const
 }
 void ric_sub_delete_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_delete_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_delete_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18597,14 +18696,19 @@ OCUDUASN_CODE ric_sub_delete_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_delete_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
   j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionDetails ::= SEQUENCE
@@ -18776,27 +18880,22 @@ const crit_diagnostics_s& ric_sub_fail_ies_o::value_c::crit_diagnostics() const
 }
 void ric_sub_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -18947,22 +19046,33 @@ OCUDUASN_CODE ric_sub_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionModificationConfirm-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -19144,38 +19254,36 @@ ric_sub_mod_confirm_ies_o::value_c::ric_actions_refused_to_be_remd_list() const
 }
 void ric_sub_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_actions_confirmed_for_mod_list:
-      j.start_array("RICactions-ConfirmedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_confirmed_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_refused_to_be_modified_list:
-      j.start_array("RICactions-RefusedToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_refused_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_confirmed_for_removal_list:
-      j.start_array("RICactions-ConfirmedForRemoval-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_confirmed_for_removal_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_refused_to_be_remd_list:
-      j.start_array("RICactions-RefusedToBeRemoved-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_refused_to_be_remd_list_l>()) {
         e1.to_json(j);
       }
@@ -19184,7 +19292,6 @@ void ric_sub_mod_confirm_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_mod_confirm_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_mod_confirm_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -19379,50 +19486,63 @@ OCUDUASN_CODE ric_sub_mod_confirm_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_mod_confirm_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_actions_confirmed_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 87);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_confirmed_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_refused_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 89);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_refused_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_confirmed_for_removal_list_present) {
+    j.start_obj();
     j.write_int("id", 91);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_confirmed_for_removal_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_refused_to_be_remd_list_present) {
+    j.start_obj();
     j.write_int("id", 93);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_refused_to_be_remd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionModificationFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -19560,27 +19680,22 @@ const crit_diagnostics_s& ric_sub_mod_fail_ies_o::value_c::crit_diagnostics() co
 }
 void ric_sub_mod_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_mod_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_mod_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -19731,22 +19846,33 @@ OCUDUASN_CODE ric_sub_mod_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_mod_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionModificationRefuse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -19884,27 +20010,22 @@ const crit_diagnostics_s& ric_sub_mod_refuse_ies_o::value_c::crit_diagnostics() 
 }
 void ric_sub_mod_refuse_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_mod_refuse_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_mod_refuse_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -20055,22 +20176,33 @@ OCUDUASN_CODE ric_sub_mod_refuse_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_mod_refuse_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionModificationRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -20251,34 +20383,32 @@ ric_sub_mod_request_ies_o::value_c::ric_actions_to_be_added_for_mod_list() const
 }
 void ric_sub_mod_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_event_trigger_definition_to_be_modified:
-      j.write_str("OCTET STRING", c.get<unbounded_octstring<true>>().to_string());
+      j.write_str(c.get<unbounded_octstring<true>>().to_string());
       break;
     case types::ric_actions_to_be_remd_for_mod_list:
-      j.start_array("RICactions-ToBeRemovedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_to_be_remd_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_to_be_modified_for_mod_list:
-      j.start_array("RICactions-ToBeModifiedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_to_be_modified_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_to_be_added_for_mod_list:
-      j.start_array("RICactions-ToBeAddedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_to_be_added_for_mod_list_l>()) {
         e1.to_json(j);
       }
@@ -20287,7 +20417,6 @@ void ric_sub_mod_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_mod_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_mod_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -20482,46 +20611,59 @@ OCUDUASN_CODE ric_sub_mod_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_mod_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_event_trigger_definition_to_be_modified_present) {
+    j.start_obj();
     j.write_int("id", 64);
     j.write_str("criticality", "ignore");
-    j.write_str("Value", ric_event_trigger_definition_to_be_modified.to_string());
+    j.write_str("value", ric_event_trigger_definition_to_be_modified.to_string());
+    j.end_obj();
   }
   if (ric_actions_to_be_remd_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 65);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_to_be_remd_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_to_be_modified_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 67);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_to_be_modified_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_to_be_added_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 69);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_to_be_added_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionModificationRequired-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -20662,24 +20804,22 @@ ric_sub_mod_required_ies_o::value_c::ric_actions_required_to_be_remd_list() cons
 }
 void ric_sub_mod_required_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_actions_required_to_be_modified_list:
-      j.start_array("RICactions-RequiredToBeModified-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_required_to_be_modified_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_required_to_be_remd_list:
-      j.start_array("RICactions-RequiredToBeRemoved-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_required_to_be_remd_list_l>()) {
         e1.to_json(j);
       }
@@ -20688,7 +20828,6 @@ void ric_sub_mod_required_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_mod_required_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_mod_required_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -20843,32 +20982,41 @@ OCUDUASN_CODE ric_sub_mod_required_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_mod_required_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_actions_required_to_be_modified_list_present) {
+    j.start_obj();
     j.write_int("id", 83);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_required_to_be_modified_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_required_to_be_remd_list_present) {
+    j.start_obj();
     j.write_int("id", 85);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_required_to_be_remd_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionModificationResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -21092,52 +21240,50 @@ ric_sub_mod_resp_ies_o::value_c::ric_actions_failed_to_be_added_for_mod_list() c
 }
 void ric_sub_mod_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_actions_remd_for_mod_list:
-      j.start_array("RICactions-RemovedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_remd_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_failed_to_be_remd_for_mod_list:
-      j.start_array("RICactions-FailedToBeRemovedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_failed_to_be_remd_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_modified_for_mod_list:
-      j.start_array("RICactions-ModifiedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_modified_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_failed_to_be_modified_for_mod_list:
-      j.start_array("RICactions-FailedToBeModifiedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_failed_to_be_modified_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_added_for_mod_list:
-      j.start_array("RICactions-AddedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_added_for_mod_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_failed_to_be_added_for_mod_list:
-      j.start_array("RICactions-FailedToBeAddedForModification-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_actions_failed_to_be_added_for_mod_list_l>()) {
         e1.to_json(j);
       }
@@ -21146,7 +21292,6 @@ void ric_sub_mod_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_mod_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_mod_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -21381,68 +21526,85 @@ OCUDUASN_CODE ric_sub_mod_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_mod_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
   if (ric_actions_remd_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 71);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_remd_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_failed_to_be_remd_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 73);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_failed_to_be_remd_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_modified_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 75);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_modified_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_failed_to_be_modified_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 77);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_failed_to_be_modified_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_added_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 79);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_added_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
   if (ric_actions_failed_to_be_added_for_mod_list_present) {
+    j.start_obj();
     j.write_int("id", 81);
     j.write_str("criticality", "ignore");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_failed_to_be_added_for_mod_list) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -21600,29 +21762,25 @@ const fixed_octstring<8, true>& ric_sub_request_ies_o::value_c::ric_sub_end_time
 }
 void ric_sub_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_sub_details:
-      j.write_fieldname("RICsubscriptionDetails");
       c.get<ric_sub_details_s>().to_json(j);
       break;
     case types::ric_sub_start_time:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     case types::ric_sub_end_time:
-      j.write_str("OCTET STRING", c.get<fixed_octstring<8, true>>().to_string());
+      j.write_str(c.get<fixed_octstring<8, true>>().to_string());
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -21793,27 +21951,39 @@ OCUDUASN_CODE ric_sub_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 30);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_sub_details.to_json(j);
+  j.end_obj();
   if (ric_sub_start_time_present) {
+    j.start_obj();
     j.write_int("id", 62);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_sub_start_time.to_string());
+    j.write_str("value", ric_sub_start_time.to_string());
+    j.end_obj();
   }
   if (ric_sub_end_time_present) {
+    j.start_obj();
     j.write_int("id", 63);
     j.write_str("criticality", "reject");
-    j.write_str("Value", ric_sub_end_time.to_string());
+    j.write_str("value", ric_sub_end_time.to_string());
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -21951,24 +22121,22 @@ const ric_action_not_admitted_list_l& ric_sub_resp_ies_o::value_c::ric_actions_n
 }
 void ric_sub_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_id:
-      j.write_int("INTEGER (0..4095)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::ric_actions_admitted:
-      j.start_array("RICaction-Admitted-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_action_admitted_list_l>()) {
         e1.to_json(j);
       }
       j.end_array();
       break;
     case types::ric_actions_not_admitted:
-      j.start_array("RICaction-NotAdmitted-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ric_action_not_admitted_list_l>()) {
         e1.to_json(j);
       }
@@ -21977,7 +22145,6 @@ void ric_sub_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22129,30 +22296,39 @@ OCUDUASN_CODE ric_sub_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 5);
   j.write_str("criticality", "reject");
-  j.write_int("Value", ran_function_id);
+  j.write_int("value", ran_function_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 17);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : ric_actions_admitted) {
     e1.to_json(j);
   }
   j.end_array();
+  j.end_obj();
   if (ric_actions_not_admitted_present) {
+    j.start_obj();
     j.write_int("id", 18);
     j.write_str("criticality", "reject");
-    j.start_array("Value");
+    j.start_array("value");
     for (const auto& e1 : ric_actions_not_admitted) {
       e1.to_json(j);
     }
     j.end_array();
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionStateControlFailure-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -22270,24 +22446,19 @@ const crit_diagnostics_s& ric_sub_state_ctrl_fail_ies_o::value_c::crit_diagnosti
 }
 void ric_sub_state_ctrl_fail_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "ric_sub_state_ctrl_fail_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_state_ctrl_fail_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22412,19 +22583,28 @@ OCUDUASN_CODE ric_sub_state_ctrl_fail_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_state_ctrl_fail_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   cause.to_json(j);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionStateControlRequest-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -22522,14 +22702,12 @@ const ran_function_state_ctrl_list_l& ric_sub_state_ctrl_request_ies_o::value_c:
 }
 void ric_sub_state_ctrl_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_state_ctrl_list:
-      j.start_array("RANfunctionStateControl-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_function_state_ctrl_list_l>()) {
         e1.to_json(j);
       }
@@ -22538,7 +22716,6 @@ void ric_sub_state_ctrl_request_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_state_ctrl_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_state_ctrl_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22644,18 +22821,23 @@ OCUDUASN_CODE ric_sub_state_ctrl_request_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_state_ctrl_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 124);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : ran_function_state_ctrl_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // RICsubscriptionStateControlResponse-IEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -22753,14 +22935,12 @@ const ran_function_state_confirm_list_l& ric_sub_state_ctrl_resp_ies_o::value_c:
 }
 void ric_sub_state_ctrl_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::ric_request_id:
-      j.write_fieldname("RICrequestID");
       c.get<ric_request_id_s>().to_json(j);
       break;
     case types::ran_function_state_confirm_list:
-      j.start_array("RANfunctionStateConfirm-List");
+      j.start_array("");
       for (const auto& e1 : c.get<ran_function_state_confirm_list_l>()) {
         e1.to_json(j);
       }
@@ -22769,7 +22949,6 @@ void ric_sub_state_ctrl_resp_ies_o::value_c::to_json(json_writer& j) const
     default:
       log_invalid_choice_id(type_, "ric_sub_state_ctrl_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE ric_sub_state_ctrl_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -22875,18 +23054,23 @@ OCUDUASN_CODE ric_sub_state_ctrl_resp_ies_container::unpack(cbit_ref& bref)
 }
 void ric_sub_state_ctrl_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 29);
   j.write_str("criticality", "reject");
+  j.write_fieldname("value");
   ric_request_id.to_json(j);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 122);
   j.write_str("criticality", "reject");
-  j.start_array("Value");
+  j.start_array("value");
   for (const auto& e1 : ran_function_state_confirm_list) {
     e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
+  j.end_array();
 }
 
 // ResetRequestIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -22984,19 +23168,16 @@ const cause_c& reset_request_ies_o::value_c::cause() const
 }
 void reset_request_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::cause:
-      j.write_fieldname("Cause");
       c.get<cause_c>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "reset_request_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE reset_request_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23107,14 +23288,19 @@ OCUDUASN_CODE reset_request_ies_container::unpack(cbit_ref& bref)
 }
 void reset_request_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
+  j.start_obj();
   j.write_int("id", 1);
   j.write_str("criticality", "ignore");
+  j.write_fieldname("value");
   cause.to_json(j);
   j.end_obj();
+  j.end_array();
 }
 
 // ResetResponseIEs ::= OBJECT SET OF E2AP-PROTOCOL-IES
@@ -23212,19 +23398,16 @@ const crit_diagnostics_s& reset_resp_ies_o::value_c::crit_diagnostics() const
 }
 void reset_resp_ies_o::value_c::to_json(json_writer& j) const
 {
-  j.start_obj();
   switch (type_) {
     case types::transaction_id:
-      j.write_int("INTEGER (0..255,...)", c.get<uint16_t>());
+      j.write_int(c.get<uint16_t>());
       break;
     case types::crit_diagnostics:
-      j.write_fieldname("CriticalityDiagnostics");
       c.get<crit_diagnostics_s>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "reset_resp_ies_o::value_c");
   }
-  j.end_obj();
 }
 OCUDUASN_CODE reset_resp_ies_o::value_c::pack(bit_ref& bref) const
 {
@@ -23336,14 +23519,19 @@ OCUDUASN_CODE reset_resp_ies_container::unpack(cbit_ref& bref)
 }
 void reset_resp_ies_container::to_json(json_writer& j) const
 {
+  j.start_array();
   j.start_obj();
   j.write_int("id", 49);
   j.write_str("criticality", "reject");
-  j.write_int("Value", transaction_id);
+  j.write_int("value", transaction_id);
+  j.end_obj();
   if (crit_diagnostics_present) {
+    j.start_obj();
     j.write_int("id", 2);
     j.write_str("criticality", "ignore");
+    j.write_fieldname("value");
     crit_diagnostics.to_json(j);
+    j.end_obj();
   }
-  j.end_obj();
+  j.end_array();
 }

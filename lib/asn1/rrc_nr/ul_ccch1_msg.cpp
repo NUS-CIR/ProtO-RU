@@ -34,10 +34,13 @@ OCUDUASN_CODE rrc_resume_request1_ies_s::unpack(cbit_ref& bref)
 void rrc_resume_request1_ies_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("resumeIdentity", resume_id.to_string());
-  j.write_str("resumeMAC-I", resume_mac_i.to_string());
+  j.write_fieldname("resumeIdentity");
+  resume_id.to_json(j);
+  j.write_fieldname("resumeMAC-I");
+  resume_mac_i.to_json(j);
   j.write_str("resumeCause", resume_cause.to_string());
-  j.write_str("spare", spare.to_string());
+  j.write_fieldname("spare");
+  spare.to_json(j);
   j.end_obj();
 }
 
@@ -85,6 +88,9 @@ void ul_ccch1_msg_type_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ul_ccch1_msg_type_c");
@@ -154,10 +160,13 @@ void ul_ccch1_msg_type_c::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "ul_ccch1_msg_type_c::c1_c_");

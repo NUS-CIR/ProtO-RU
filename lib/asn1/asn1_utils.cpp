@@ -1361,6 +1361,17 @@ std::string to_string(const uint8_t* ptr, uint32_t nbits)
   return str;
 }
 
+std::string to_hex_string(const uint8_t* ptr, uint32_t nbits)
+{
+  std::vector<uint8_t> octets(ceil_frac(nbits, 8u), 0);
+  for (uint32_t i = 0; i < nbits; ++i) {
+    if (bitstring_utils::get(ptr, nbits - 1 - i)) {
+      octets[i / 8] |= 0x80u >> (i % 8);
+    }
+  }
+  return octet_string_helper::to_hex_string(octets);
+}
+
 uint64_t to_number(const uint8_t* ptr, uint32_t nbits)
 {
   if (nbits > 64u) {
@@ -1744,6 +1755,16 @@ void json_writer::write_int(const char* fieldname, int64_t value)
 void json_writer::write_int(int64_t value)
 {
   write_int("", value);
+}
+void json_writer::write_uint(const char* fieldname, uint64_t value)
+{
+  write_fieldname(fieldname);
+  fmt::format_to(std::back_inserter(buffer), "{}", value);
+  sep = COMMA;
+}
+void json_writer::write_uint(uint64_t value)
+{
+  write_uint("", value);
 }
 
 void json_writer::write_bool(const char* fieldname, bool value)

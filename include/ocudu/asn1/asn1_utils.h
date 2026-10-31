@@ -932,6 +932,8 @@ using dyn_octstring = unbounded_octstring<false>;
       bitstring
 *********************/
 
+class json_writer;
+
 namespace bitstring_utils {
 inline bool get(const uint8_t* ptr, uint32_t idx)
 {
@@ -958,6 +960,8 @@ OCUDUASN_CODE unpack_bitfield(uint8_t* buf, cbit_ref& bref, uint32_t n, uint32_t
 uint64_t    to_number(const uint8_t* ptr, uint32_t nbits);
 void        from_number(uint8_t* ptr, uint64_t number, uint32_t nbits);
 std::string to_string(const uint8_t* ptr, uint32_t nbits);
+/// Hex string of the bits, first bit first, padded with zeros to whole octets.
+std::string to_hex_string(const uint8_t* ptr, uint32_t nbits);
 
 } // namespace bitstring_utils
 
@@ -1061,6 +1065,9 @@ public:
     }
     return bitstring_utils::unpack_bitfield(data(), bref, nbits, lb, ub, is_aligned);
   }
+
+  /// Writes the JER form: a hex string for fixed sizes, {"value", "length"} otherwise.
+  void to_json(json_writer& j) const;
 
 private:
   static const uint32_t          stack_size = (UB == std::numeric_limits<uint32_t>::max()) ? 4 : ceil_frac(ub, 8u);
@@ -1222,6 +1229,7 @@ struct dyn_seq_of : public dyn_array<ItemType> {
   dyn_seq_of(const bounded_array<ItemType, ub>& other) : dyn_array<ItemType>(&other[0], other.size()) {}
   OCUDUASN_CODE pack(bit_ref& bref) const { return pack_dyn_seq_of(bref, *this, lb, ub, aligned); }
   OCUDUASN_CODE unpack(cbit_ref& bref) { return unpack_dyn_seq_of(*this, bref, lb, ub, aligned); }
+  void          to_json(json_writer& j) const;
 };
 
 /*********************
@@ -1583,6 +1591,8 @@ public:
   void        write_str(const std::string& value);
   void        write_int(const char* fieldname, int64_t value);
   void        write_int(int64_t value);
+  void        write_uint(const char* fieldname, uint64_t value);
+  void        write_uint(uint64_t value);
   void        write_bool(const char* fieldname, bool value);
   void        write_bool(bool value);
   void        write_float(const char* fieldname, float value);
@@ -1620,6 +1630,41 @@ inline void to_json(json_writer& j, const asn1::dyn_array<T>& lst)
   j.start_array();
   for (const auto& o : lst) {
     to_json(j, o);
+  }
+  j.end_array();
+}
+
+template <class IntType, IntType LB, IntType UB, bool Ext, bool Al>
+inline void to_json(json_writer& j, const integer<IntType, LB, UB, Ext, Al>& obj)
+{
+  j.write_int(obj.value);
+}
+
+template <uint32_t LB, uint32_t UB, bool ext, bool aligned>
+void bitstring<LB, UB, ext, aligned>::to_json(json_writer& j) const
+{
+  if (LB == UB and not ext) {
+    j.write_str(bitstring_utils::to_hex_string(data(), length()));
+    return;
+  }
+  j.start_obj();
+  j.write_str("value", bitstring_utils::to_hex_string(data(), length()));
+  j.write_uint("length", length());
+  j.end_obj();
+}
+
+template <uint32_t LB, uint32_t UB, bool ext, bool aligned>
+inline void to_json(json_writer& j, const bitstring<LB, UB, ext, aligned>& obj)
+{
+  obj.to_json(j);
+}
+
+template <class ItemType, uint32_t lb, uint32_t ub, bool aligned>
+void dyn_seq_of<ItemType, lb, ub, aligned>::to_json(json_writer& j) const
+{
+  j.start_array();
+  for (const ItemType& item : *this) {
+    asn1::to_json(j, item);
   }
   j.end_array();
 }
@@ -1720,6 +1765,7 @@ struct setup_release_c {
     j.start_obj();
     switch (type_) {
       case types::release:
+        j.write_null("release");
         break;
       case types::setup:
         j.write_fieldname("setup");
@@ -1805,6 +1851,7 @@ struct setup_release_c<std::array<T, N>> {
     j.start_obj();
     switch (type_) {
       case types::release:
+        j.write_null("release");
         break;
       case types::setup:
         j.write_fieldname("setup");

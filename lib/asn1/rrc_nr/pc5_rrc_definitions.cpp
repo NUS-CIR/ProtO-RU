@@ -424,13 +424,16 @@ void band_sidelink_pc5_r16_s::sl_reception_r16_s_::scs_cp_pattern_rx_sidelink_r1
       j.write_fieldname("fr1-r16");
       j.start_obj();
       if (c.get<fr1_r16_s_>().scs_15k_hz_r16_present) {
-        j.write_str("scs-15kHz-r16", c.get<fr1_r16_s_>().scs_15k_hz_r16.to_string());
+        j.write_fieldname("scs-15kHz-r16");
+        c.get<fr1_r16_s_>().scs_15k_hz_r16.to_json(j);
       }
       if (c.get<fr1_r16_s_>().scs_30k_hz_r16_present) {
-        j.write_str("scs-30kHz-r16", c.get<fr1_r16_s_>().scs_30k_hz_r16.to_string());
+        j.write_fieldname("scs-30kHz-r16");
+        c.get<fr1_r16_s_>().scs_30k_hz_r16.to_json(j);
       }
       if (c.get<fr1_r16_s_>().scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", c.get<fr1_r16_s_>().scs_60k_hz_r16.to_string());
+        j.write_fieldname("scs-60kHz-r16");
+        c.get<fr1_r16_s_>().scs_60k_hz_r16.to_json(j);
       }
       j.end_obj();
       break;
@@ -438,10 +441,12 @@ void band_sidelink_pc5_r16_s::sl_reception_r16_s_::scs_cp_pattern_rx_sidelink_r1
       j.write_fieldname("fr2-r16");
       j.start_obj();
       if (c.get<fr2_r16_s_>().scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", c.get<fr2_r16_s_>().scs_60k_hz_r16.to_string());
+        j.write_fieldname("scs-60kHz-r16");
+        c.get<fr2_r16_s_>().scs_60k_hz_r16.to_json(j);
       }
       if (c.get<fr2_r16_s_>().scs_120k_hz_r16_present) {
-        j.write_str("scs-120kHz-r16", c.get<fr2_r16_s_>().scs_120k_hz_r16.to_string());
+        j.write_fieldname("scs-120kHz-r16");
+        c.get<fr2_r16_s_>().scs_120k_hz_r16.to_json(j);
       }
       j.end_obj();
       break;
@@ -634,11 +639,15 @@ OCUDUASN_CODE mib_sidelink_s::unpack(cbit_ref& bref)
 void mib_sidelink_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-TDD-Config-r16", sl_tdd_cfg_r16.to_string());
+  j.write_fieldname("sl-TDD-Config-r16");
+  sl_tdd_cfg_r16.to_json(j);
   j.write_bool("inCoverage-r16", in_coverage_r16);
-  j.write_str("directFrameNumber-r16", direct_frame_num_r16.to_string());
-  j.write_str("slotIndex-r16", slot_idx_r16.to_string());
-  j.write_str("reservedBits-r16", reserved_bits_r16.to_string());
+  j.write_fieldname("directFrameNumber-r16");
+  direct_frame_num_r16.to_json(j);
+  j.write_fieldname("slotIndex-r16");
+  slot_idx_r16.to_json(j);
+  j.write_fieldname("reservedBits-r16");
+  reserved_bits_r16.to_json(j);
   j.end_obj();
 }
 
@@ -884,6 +893,9 @@ void meas_report_sidelink_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "meas_report_sidelink_s::crit_exts_c_");
@@ -967,7 +979,8 @@ void notif_msg_sidelink_v1800_ies_s::to_json(json_writer& j) const
     j.write_str("sl-IndicationType-r18", sl_ind_type_r18.to_string());
   }
   if (sl_dest_id_remote_ue_r18_present) {
-    j.write_str("sl-DestinationIdentityRemoteUE-r18", sl_dest_id_remote_ue_r18.to_string());
+    j.write_fieldname("sl-DestinationIdentityRemoteUE-r18");
+    sl_dest_id_remote_ue_r18.to_json(j);
   }
   if (non_crit_ext_present) {
     j.write_fieldname("nonCriticalExtension");
@@ -1091,6 +1104,9 @@ void notif_msg_sidelink_r17_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "notif_msg_sidelink_r17_s::crit_exts_c_");
@@ -1341,6 +1357,9 @@ void rrc_recfg_complete_sidelink_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_recfg_complete_sidelink_s::crit_exts_c_");
@@ -1470,6 +1489,9 @@ void rrc_recfg_fail_sidelink_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_recfg_fail_sidelink_s::crit_exts_c_");
@@ -2112,10 +2134,12 @@ void sl_csi_rs_cfg_r16_s::sl_csi_rs_freq_alloc_r16_c_::to_json(json_writer& j) c
   j.start_obj();
   switch (type_) {
     case types::sl_one_ant_port_r16:
-      j.write_str("sl-OneAntennaPort-r16", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("sl-OneAntennaPort-r16");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     case types::sl_two_ant_port_r16:
-      j.write_str("sl-TwoAntennaPort-r16", c.get<fixed_bitstring<6>>().to_string());
+      j.write_fieldname("sl-TwoAntennaPort-r16");
+      c.get<fixed_bitstring<6>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "sl_csi_rs_cfg_r16_s::sl_csi_rs_freq_alloc_r16_c_");
@@ -2514,13 +2538,15 @@ void sl_srap_cfg_pc5_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (sl_peer_remote_ue_l2_id_r18_present) {
-    j.write_str("sl-PeerRemoteUE-L2Identity-r18", sl_peer_remote_ue_l2_id_r18.to_string());
+    j.write_fieldname("sl-PeerRemoteUE-L2Identity-r18");
+    sl_peer_remote_ue_l2_id_r18.to_json(j);
   }
   if (sl_peer_remote_ue_local_id_r18_present) {
     j.write_int("sl-PeerRemoteUE-LocalIdentity-r18", sl_peer_remote_ue_local_id_r18);
   }
   if (sl_remote_ue_l2_id_r18_present) {
-    j.write_str("sl-RemoteUE-L2Identity-r18", sl_remote_ue_l2_id_r18.to_string());
+    j.write_fieldname("sl-RemoteUE-L2Identity-r18");
+    sl_remote_ue_l2_id_r18.to_json(j);
   }
   if (sl_remote_ue_local_id_r18_present) {
     j.write_int("sl-RemoteUE-LocalIdentity-r18", sl_remote_ue_local_id_r18);
@@ -2894,6 +2920,9 @@ void rrc_recfg_sidelink_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_recfg_sidelink_s::crit_exts_c_");
@@ -3097,7 +3126,8 @@ void remote_ue_info_sidelink_v1800_ies_s::to_json(json_writer& j) const
     j.write_str("connectionForMP-r18", "true");
   }
   if (sl_dest_id_remote_ue_r18_present) {
-    j.write_str("sl-DestinationIdentityRemoteUE-r18", sl_dest_id_remote_ue_r18.to_string());
+    j.write_fieldname("sl-DestinationIdentityRemoteUE-r18");
+    sl_dest_id_remote_ue_r18.to_json(j);
   }
   if (non_crit_ext_present) {
     j.write_fieldname("nonCriticalExtension");
@@ -3217,6 +3247,9 @@ void remote_ue_info_sidelink_r17_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "remote_ue_info_sidelink_r17_s::crit_exts_c_");
@@ -3285,6 +3318,9 @@ void sbcch_sl_bch_msg_type_c::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext:
+      j.write_fieldname("messageClassExtension");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "sbcch_sl_bch_msg_type_c");
@@ -3346,6 +3382,7 @@ void sbcch_sl_bch_msg_type_c::c1_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "sbcch_sl_bch_msg_type_c::c1_c_");
@@ -3543,6 +3580,9 @@ void ue_cap_enquiry_sidelink_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_cap_enquiry_sidelink_s::crit_exts_c_");
@@ -3857,6 +3897,9 @@ void ue_cap_info_sidelink_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_cap_info_sidelink_s::crit_exts_c_");
@@ -4062,6 +4105,9 @@ void uu_msg_transfer_sidelink_r17_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "uu_msg_transfer_sidelink_r17_s::crit_exts_c_");
@@ -4204,6 +4250,9 @@ void ue_assist_info_sidelink_r17_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_assist_info_sidelink_r17_s::crit_exts_c_");
@@ -4269,7 +4318,8 @@ OCUDUASN_CODE sl_e2_e_qos_info_pc5_r18_s::unpack(cbit_ref& bref)
 void sl_e2_e_qos_info_pc5_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-DestinationIdentityRemoteUE-r18", sl_dest_id_remote_ue_r18.to_string());
+  j.write_fieldname("sl-DestinationIdentityRemoteUE-r18");
+  sl_dest_id_remote_ue_r18.to_json(j);
   j.write_int("sl-E2E-SLRB-Index-r18", sl_e2_e_slrb_idx_r18);
   j.start_array("sl-QoS-InfoList-r18");
   for (const auto& e1 : sl_qos_info_list_r18) {
@@ -4379,6 +4429,9 @@ void ue_info_request_sidelink_r18_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_info_request_sidelink_r18_s::crit_exts_c_");
@@ -4547,6 +4600,9 @@ void ue_info_resp_sidelink_r18_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ue_info_resp_sidelink_r18_s::crit_exts_c_");
@@ -5048,6 +5104,9 @@ void s_cch_msg_type_c::msg_class_ext_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext_future_r17:
+      j.write_fieldname("messageClassExtensionFuture-r17");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "s_cch_msg_type_c::msg_class_ext_c_");
@@ -5260,12 +5319,16 @@ void s_cch_msg_type_c::msg_class_ext_c_::c2_c_::to_json(json_writer& j) const
       c.get<ue_info_resp_sidelink_r18_s>().to_json(j);
       break;
     case types::spare4:
+      j.write_null("spare4");
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "s_cch_msg_type_c::msg_class_ext_c_::c2_c_");
@@ -5453,7 +5516,8 @@ void sl_meas_result_relay_r17_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_fieldname("cellIdentity-r17");
   cell_id_r17.to_json(j);
-  j.write_str("sl-RelayUE-Identity-r17", sl_relay_ue_id_r17.to_string());
+  j.write_fieldname("sl-RelayUE-Identity-r17");
+  sl_relay_ue_id_r17.to_json(j);
   j.write_fieldname("sl-MeasResult-r17");
   sl_meas_result_r17.to_json(j);
   if (sl_meas_quant_r18_present) {

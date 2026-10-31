@@ -408,6 +408,9 @@ void rrc_reject_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_reject_s::crit_exts_c_");
@@ -1293,6 +1296,7 @@ void sl_tx_pwr_r16_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::minusinfinity_r16:
+      j.write_null("minusinfinity-r16");
       break;
     case types::tx_pwr_r16:
       j.write_int("txPower-r16", c);
@@ -2717,7 +2721,8 @@ void sl_psfch_cfg_r16_s::to_json(json_writer& j) const
     j.write_str("sl-PSFCH-Period-r16", sl_psfch_period_r16.to_string());
   }
   if (sl_psfch_rb_set_r16_present) {
-    j.write_str("sl-PSFCH-RB-Set-r16", sl_psfch_rb_set_r16.to_string());
+    j.write_fieldname("sl-PSFCH-RB-Set-r16");
+    sl_psfch_rb_set_r16.to_json(j);
   }
   if (sl_num_mux_cs_pair_r16_present) {
     j.write_str("sl-NumMuxCS-Pair-r16", sl_num_mux_cs_pair_r16.to_string());
@@ -4268,7 +4273,8 @@ void sl_inter_ue_coordination_scheme2_r17_s::to_json(json_writer& j) const
     j.write_str("sl-IUC-Scheme2-r17", "enabled");
   }
   if (sl_rb_set_psfch_r17_present) {
-    j.write_str("sl-RB-SetPSFCH-r17", sl_rb_set_psfch_r17.to_string());
+    j.write_fieldname("sl-RB-SetPSFCH-r17");
+    sl_rb_set_psfch_r17.to_json(j);
   }
   if (sl_type_ue_a_r17_present) {
     j.write_str("sl-TypeUE-A-r17", "enabled");
@@ -5128,7 +5134,8 @@ void sl_res_pool_r16_s::to_json(json_writer& j) const
     j.end_array();
   }
   if (sl_time_res_r16_present) {
-    j.write_str("sl-TimeResource-r16", sl_time_res_r16.to_string());
+    j.write_fieldname("sl-TimeResource-r16");
+    sl_time_res_r16.to_json(j);
   }
   if (sl_pbps_cp_s_cfg_r17.is_present()) {
     j.write_fieldname("sl-PBPS-CPS-Config-r17");
@@ -5187,14 +5194,14 @@ void sl_res_pool_r16_s::to_json(json_writer& j) const
   if (sl_psfch_rb_set_list_r18.is_present()) {
     j.start_array("sl-PSFCH-RB-SetList-r18");
     for (const auto& e1 : *sl_psfch_rb_set_list_r18) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
   if (sl_iuc_rb_set_list_r18.is_present()) {
     j.start_array("sl-IUC-RB-SetList-r18");
     for (const auto& e1 : *sl_iuc_rb_set_list_r18) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -6417,7 +6424,8 @@ void sl_prs_res_pool_r18_s::to_json(json_writer& j) const
     j.write_int("sl-RB-Number-r18", sl_rb_num_r18);
   }
   if (sl_time_res_r18_present) {
-    j.write_str("sl-TimeResource-r18", sl_time_res_r18.to_string());
+    j.write_fieldname("sl-TimeResource-r18");
+    sl_time_res_r18.to_json(j);
   }
   if (sl_pos_allowed_res_sel_cfg_r18_present) {
     j.write_str("sl-PosAllowedResourceSelectionConfig-r18", sl_pos_allowed_res_sel_cfg_r18.to_string());
@@ -7090,7 +7098,8 @@ void sl_sync_cfg_r16_s::to_json(json_writer& j) const
     j.write_int("syncTxThreshOoC-r16", tx_params_r16.sync_tx_thresh_oo_c_r16);
   }
   if (tx_params_r16.sync_info_reserved_r16_present) {
-    j.write_str("syncInfoReserved-r16", tx_params_r16.sync_info_reserved_r16.to_string());
+    j.write_fieldname("syncInfoReserved-r16");
+    tx_params_r16.sync_info_reserved_r16.to_json(j);
   }
   j.end_obj();
   if (gnss_sync_r16_present) {
@@ -10970,7 +10979,7 @@ void sl_s_cch_carrier_set_cfg_r18_s::to_json(json_writer& j) const
   j.start_obj();
   j.start_array("sl-DestinationList-r18");
   for (const auto& e1 : sl_dest_list_r18) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.start_array("sl-SRB-Identity-r18");
@@ -12284,7 +12293,8 @@ OCUDUASN_CODE sl_target_remote_ue_cfg_r18_s::unpack(cbit_ref& bref)
 void sl_target_remote_ue_cfg_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-TargetUE-Identity-r18", sl_target_ue_id_r18.to_string());
+  j.write_fieldname("sl-TargetUE-Identity-r18");
+  sl_target_ue_id_r18.to_json(j);
   j.write_fieldname("sl-SRAP-ConfigU2U-r18");
   sl_srap_cfg_u2_u_r18.to_json(j);
   j.end_obj();
@@ -12333,7 +12343,8 @@ OCUDUASN_CODE sl_u2_u_relay_ue_cfg_r18_s::unpack(cbit_ref& bref)
 void sl_u2_u_relay_ue_cfg_r18_s::to_json(json_writer& j) const
 {
   j.start_obj();
-  j.write_str("sl-L2IdentityRelay-r18", sl_l2_id_relay_r18.to_string());
+  j.write_fieldname("sl-L2IdentityRelay-r18");
+  sl_l2_id_relay_r18.to_json(j);
   if (sl_target_remote_ue_to_add_mod_list_r18.size() > 0) {
     j.start_array("sl-TargetRemoteUE-ToAddModList-r18");
     for (const auto& e1 : sl_target_remote_ue_to_add_mod_list_r18) {
@@ -12344,7 +12355,7 @@ void sl_u2_u_relay_ue_cfg_r18_s::to_json(json_writer& j) const
   if (sl_target_remote_ue_to_release_list_r18.size() > 0) {
     j.start_array("sl-TargetRemoteUE-ToReleaseList-r18");
     for (const auto& e1 : sl_target_remote_ue_to_release_list_r18) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -12438,7 +12449,7 @@ void sl_l2_remote_ue_cfg_r17_s::to_json(json_writer& j) const
   if (sl_u2_u_relay_ue_to_release_list_r18.is_present()) {
     j.start_array("sl-U2U-RelayUE-ToReleaseList-r18");
     for (const auto& e1 : *sl_u2_u_relay_ue_to_release_list_r18) {
-      j.write_str(e1.to_string());
+      e1.to_json(j);
     }
     j.end_array();
   }
@@ -12591,6 +12602,9 @@ void rrc_setup_s::crit_exts_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::crit_exts_future:
+      j.write_fieldname("criticalExtensionsFuture");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "rrc_setup_s::crit_exts_c_");

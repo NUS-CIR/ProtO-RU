@@ -179,6 +179,7 @@ void ul_data_compress_r17_c::to_json(json_writer& j) const
       j.end_obj();
       break;
     case types::drb_continue_udc:
+      j.write_null("drb-ContinueUDC");
       break;
     default:
       log_invalid_choice_id(type_, "ul_data_compress_r17_c");
@@ -615,7 +616,8 @@ void pdcp_cfg_s::to_json(json_writer& j) const
     discard_timer_ext2_r17->to_json(j);
   }
   if (init_rx_deliv_r17_present) {
-    j.write_str("initialRX-DELIV-r17", init_rx_deliv_r17.to_string());
+    j.write_fieldname("initialRX-DELIV-r17");
+    init_rx_deliv_r17.to_json(j);
   }
   if (pdu_set_discard_r18_present) {
     j.write_str("pdu-SetDiscard-r18", "true");
@@ -774,6 +776,7 @@ void pdcp_cfg_s::drb_s_::hdr_compress_c_::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::not_used:
+      j.write_null("notUsed");
       break;
     case types::rohc:
       j.write_fieldname("rohc");

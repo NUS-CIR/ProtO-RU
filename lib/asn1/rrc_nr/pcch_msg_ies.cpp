@@ -117,10 +117,12 @@ void paging_ue_id_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::ng_5_g_s_tmsi:
-      j.write_str("ng-5G-S-TMSI", c.get<fixed_bitstring<48>>().to_string());
+      j.write_fieldname("ng-5G-S-TMSI");
+      c.get<fixed_bitstring<48>>().to_json(j);
       break;
     case types::full_i_rnti:
-      j.write_str("fullI-RNTI", c.get<fixed_bitstring<40>>().to_string());
+      j.write_fieldname("fullI-RNTI");
+      c.get<fixed_bitstring<40>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "paging_ue_id_c");

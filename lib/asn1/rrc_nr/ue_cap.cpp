@@ -913,7 +913,8 @@ void ca_params_eutra_s::to_json(json_writer& j) const
     j.write_str("simultaneousRx-Tx", "supported");
   }
   if (supported_naics_2_crs_ap_present) {
-    j.write_str("supportedNAICS-2CRS-AP", supported_naics_2_crs_ap.to_string());
+    j.write_fieldname("supportedNAICS-2CRS-AP");
+    supported_naics_2_crs_ap.to_json(j);
   }
   if (add_rx_tx_performance_req_present) {
     j.write_str("additionalRx-Tx-PerformanceReq", "supported");
@@ -922,7 +923,8 @@ void ca_params_eutra_s::to_json(json_writer& j) const
     j.write_str("ue-CA-PowerClass-N", "class2");
   }
   if (supported_bw_combination_set_eutra_v1530_present) {
-    j.write_str("supportedBandwidthCombinationSetEUTRA-v1530", supported_bw_combination_set_eutra_v1530.to_string());
+    j.write_fieldname("supportedBandwidthCombinationSetEUTRA-v1530");
+    supported_bw_combination_set_eutra_v1530.to_json(j);
   }
   j.end_obj();
 }
@@ -1216,7 +1218,8 @@ void band_combination_s::to_json(json_writer& j) const
     mrdc_params.to_json(j);
   }
   if (supported_bw_combination_set_present) {
-    j.write_str("supportedBandwidthCombinationSet", supported_bw_combination_set.to_string());
+    j.write_fieldname("supportedBandwidthCombinationSet");
+    supported_bw_combination_set.to_json(j);
   }
   if (pwr_class_v1530_present) {
     j.write_str("powerClass-v1530", "pc2");
@@ -2104,7 +2107,8 @@ void band_combination_v1590_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (supported_bw_combination_set_intra_endc_present) {
-    j.write_str("supportedBandwidthCombinationSetIntraENDC", supported_bw_combination_set_intra_endc.to_string());
+    j.write_fieldname("supportedBandwidthCombinationSetIntraENDC");
+    supported_bw_combination_set_intra_endc.to_json(j);
   }
   j.write_fieldname("mrdc-Parameters-v1590");
   mrdc_params_v1590.to_json(j);
@@ -3418,7 +3422,8 @@ void ul_tx_switching_band_pair_r16_s::to_json(json_writer& j) const
   j.write_int("bandIndexUL2-r16", band_idx_ul2_r16);
   j.write_str("uplinkTxSwitchingPeriod-r16", ul_tx_switching_period_r16.to_string());
   if (ul_tx_switching_dl_interruption_r16_present) {
-    j.write_str("uplinkTxSwitching-DL-Interruption-r16", ul_tx_switching_dl_interruption_r16.to_string());
+    j.write_fieldname("uplinkTxSwitching-DL-Interruption-r16");
+    ul_tx_switching_dl_interruption_r16.to_json(j);
   }
   j.end_obj();
 }
@@ -3943,12 +3948,12 @@ void band_combination_v1630_s::to_json(json_writer& j) const
     mrdc_params_v1630.to_json(j);
   }
   if (supported_tx_band_comb_list_per_bc_sidelink_r16_present) {
-    j.write_str("supportedTxBandCombListPerBC-Sidelink-r16",
-                supported_tx_band_comb_list_per_bc_sidelink_r16.to_string());
+    j.write_fieldname("supportedTxBandCombListPerBC-Sidelink-r16");
+    supported_tx_band_comb_list_per_bc_sidelink_r16.to_json(j);
   }
   if (supported_rx_band_comb_list_per_bc_sidelink_r16_present) {
-    j.write_str("supportedRxBandCombListPerBC-Sidelink-r16",
-                supported_rx_band_comb_list_per_bc_sidelink_r16.to_string());
+    j.write_fieldname("supportedRxBandCombListPerBC-Sidelink-r16");
+    supported_rx_band_comb_list_per_bc_sidelink_r16.to_json(j);
   }
   if (scaling_factor_tx_sidelink_r16.size() > 0) {
     j.start_array("scalingFactorTxSidelink-r16");
@@ -4336,7 +4341,8 @@ void ca_params_nrdc_v1650_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (supported_cell_grouping_r16_present) {
-    j.write_str("supportedCellGrouping-r16", supported_cell_grouping_r16.to_string());
+    j.write_fieldname("supportedCellGrouping-r16");
+    supported_cell_grouping_r16.to_json(j);
   }
   j.end_obj();
 }
@@ -4436,10 +4442,12 @@ void ca_params_nr_v15g0_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (simul_rx_tx_inter_band_ca_per_band_pair_present) {
-    j.write_str("simultaneousRxTxInterBandCAPerBandPair", simul_rx_tx_inter_band_ca_per_band_pair.to_string());
+    j.write_fieldname("simultaneousRxTxInterBandCAPerBandPair");
+    simul_rx_tx_inter_band_ca_per_band_pair.to_json(j);
   }
   if (simul_rx_tx_sul_per_band_pair_present) {
-    j.write_str("simultaneousRxTxSULPerBandPair", simul_rx_tx_sul_per_band_pair.to_string());
+    j.write_fieldname("simultaneousRxTxSULPerBandPair");
+    simul_rx_tx_sul_per_band_pair.to_json(j);
   }
   j.end_obj();
 }
@@ -4500,7 +4508,8 @@ void mrdc_params_v15g0_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (simul_rx_tx_inter_band_end_cp_er_band_pair_present) {
-    j.write_str("simultaneousRxTxInterBandENDCPerBandPair", simul_rx_tx_inter_band_end_cp_er_band_pair.to_string());
+    j.write_fieldname("simultaneousRxTxInterBandENDCPerBandPair");
+    simul_rx_tx_inter_band_end_cp_er_band_pair.to_json(j);
   }
   j.end_obj();
 }
@@ -5919,13 +5928,16 @@ void cross_carrier_sched_scell_sp_cell_r17_s::to_json(json_writer& j) const
     j.write_str("scs15kHz-60kHz-r17", "supported");
   }
   if (supported_scs_combinations_r17.scs30k_hz_30k_hz_r17_present) {
-    j.write_str("scs30kHz-30kHz-r17", supported_scs_combinations_r17.scs30k_hz_30k_hz_r17.to_string());
+    j.write_fieldname("scs30kHz-30kHz-r17");
+    supported_scs_combinations_r17.scs30k_hz_30k_hz_r17.to_json(j);
   }
   if (supported_scs_combinations_r17.scs30k_hz_60k_hz_r17_present) {
-    j.write_str("scs30kHz-60kHz-r17", supported_scs_combinations_r17.scs30k_hz_60k_hz_r17.to_string());
+    j.write_fieldname("scs30kHz-60kHz-r17");
+    supported_scs_combinations_r17.scs30k_hz_60k_hz_r17.to_json(j);
   }
   if (supported_scs_combinations_r17.scs60k_hz_60k_hz_r17_present) {
-    j.write_str("scs60kHz-60kHz-r17", supported_scs_combinations_r17.scs60k_hz_60k_hz_r17.to_string());
+    j.write_fieldname("scs60kHz-60kHz-r17");
+    supported_scs_combinations_r17.scs60k_hz_60k_hz_r17.to_json(j);
   }
   j.end_obj();
   j.write_str("pdcch-MonitoringOccasion-r17", pdcch_monitoring_occasion_r17.to_string());
@@ -6179,22 +6191,28 @@ void ca_params_nr_v1700_s::to_json(json_writer& j) const
     j.write_fieldname("non-AlignedFrameBoundaries-r17");
     j.start_obj();
     if (non_aligned_frame_boundaries_r17.scs15k_hz_15k_hz_r17_present) {
-      j.write_str("scs15kHz-15kHz-r17", non_aligned_frame_boundaries_r17.scs15k_hz_15k_hz_r17.to_string());
+      j.write_fieldname("scs15kHz-15kHz-r17");
+      non_aligned_frame_boundaries_r17.scs15k_hz_15k_hz_r17.to_json(j);
     }
     if (non_aligned_frame_boundaries_r17.scs15k_hz_30k_hz_r17_present) {
-      j.write_str("scs15kHz-30kHz-r17", non_aligned_frame_boundaries_r17.scs15k_hz_30k_hz_r17.to_string());
+      j.write_fieldname("scs15kHz-30kHz-r17");
+      non_aligned_frame_boundaries_r17.scs15k_hz_30k_hz_r17.to_json(j);
     }
     if (non_aligned_frame_boundaries_r17.scs15k_hz_60k_hz_r17_present) {
-      j.write_str("scs15kHz-60kHz-r17", non_aligned_frame_boundaries_r17.scs15k_hz_60k_hz_r17.to_string());
+      j.write_fieldname("scs15kHz-60kHz-r17");
+      non_aligned_frame_boundaries_r17.scs15k_hz_60k_hz_r17.to_json(j);
     }
     if (non_aligned_frame_boundaries_r17.scs30k_hz_30k_hz_r17_present) {
-      j.write_str("scs30kHz-30kHz-r17", non_aligned_frame_boundaries_r17.scs30k_hz_30k_hz_r17.to_string());
+      j.write_fieldname("scs30kHz-30kHz-r17");
+      non_aligned_frame_boundaries_r17.scs30k_hz_30k_hz_r17.to_json(j);
     }
     if (non_aligned_frame_boundaries_r17.scs30k_hz_60k_hz_r17_present) {
-      j.write_str("scs30kHz-60kHz-r17", non_aligned_frame_boundaries_r17.scs30k_hz_60k_hz_r17.to_string());
+      j.write_fieldname("scs30kHz-60kHz-r17");
+      non_aligned_frame_boundaries_r17.scs30k_hz_60k_hz_r17.to_json(j);
     }
     if (non_aligned_frame_boundaries_r17.scs60k_hz_60k_hz_r17_present) {
-      j.write_str("scs60kHz-60kHz-r17", non_aligned_frame_boundaries_r17.scs60k_hz_60k_hz_r17.to_string());
+      j.write_fieldname("scs60kHz-60kHz-r17");
+      non_aligned_frame_boundaries_r17.scs60k_hz_60k_hz_r17.to_json(j);
     }
     j.end_obj();
   }
@@ -6386,8 +6404,8 @@ void band_params_v1710_s::to_json(json_writer& j) const
   if (srs_ant_switching_beyond4_rx_r17_present) {
     j.write_fieldname("srs-AntennaSwitchingBeyond4RX-r17");
     j.start_obj();
-    j.write_str("supportedSRS-TxPortSwitchBeyond4Rx-r17",
-                srs_ant_switching_beyond4_rx_r17.supported_srs_tx_port_switch_beyond4_rx_r17.to_string());
+    j.write_fieldname("supportedSRS-TxPortSwitchBeyond4Rx-r17");
+    srs_ant_switching_beyond4_rx_r17.supported_srs_tx_port_switch_beyond4_rx_r17.to_json(j);
     if (srs_ant_switching_beyond4_rx_r17.entry_num_affect_beyond4_rx_r17_present) {
       j.write_int("entryNumberAffectBeyond4Rx-r17", srs_ant_switching_beyond4_rx_r17.entry_num_affect_beyond4_rx_r17);
     }
@@ -6484,12 +6502,12 @@ void band_combination_v1700_s::to_json(json_writer& j) const
     j.end_array();
   }
   if (supported_band_comb_list_per_bc_sl_relay_discovery_r17_present) {
-    j.write_str("supportedBandCombListPerBC-SL-RelayDiscovery-r17",
-                supported_band_comb_list_per_bc_sl_relay_discovery_r17.to_string());
+    j.write_fieldname("supportedBandCombListPerBC-SL-RelayDiscovery-r17");
+    supported_band_comb_list_per_bc_sl_relay_discovery_r17.to_json(j);
   }
   if (supported_band_comb_list_per_bc_sl_non_relay_discovery_r17_present) {
-    j.write_str("supportedBandCombListPerBC-SL-NonRelayDiscovery-r17",
-                supported_band_comb_list_per_bc_sl_non_relay_discovery_r17.to_string());
+    j.write_fieldname("supportedBandCombListPerBC-SL-NonRelayDiscovery-r17");
+    supported_band_comb_list_per_bc_sl_non_relay_discovery_r17.to_json(j);
   }
   j.end_obj();
 }
@@ -7515,7 +7533,7 @@ void band_params_v1730_s::to_json(json_writer& j) const
   j.start_obj();
   j.start_array("srs-SwitchingAffectedBandsListNR-r17");
   for (const auto& e1 : srs_switching_affected_bands_list_nr_r17) {
-    j.write_str(e1.to_string());
+    e1.to_json(j);
   }
   j.end_array();
   j.end_obj();
@@ -8379,8 +8397,8 @@ void supported_intra_endc_band_combination_r17_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (supported_bw_combination_set_intra_endc_v1790_present) {
-    j.write_str("supportedBandwidthCombinationSetIntraENDC-v1790",
-                supported_bw_combination_set_intra_endc_v1790.to_string());
+    j.write_fieldname("supportedBandwidthCombinationSetIntraENDC-v1790");
+    supported_bw_combination_set_intra_endc_v1790.to_json(j);
   }
   if (mrdc_params_v1790_present) {
     j.write_fieldname("mrdc-Parameters-v1790");
@@ -11222,9 +11240,11 @@ void band_params_v1810_s::srs_ant_switching8_t8_r_r18_s_::downgrade_cfg_r18_c_::
   j.start_obj();
   switch (type_) {
     case types::empty_r18:
+      j.write_null("empty-r18");
       break;
     case types::downgrade_r18:
-      j.write_str("downgrade-r18", c.to_string());
+      j.write_fieldname("downgrade-r18");
+      c.to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "band_params_v1810_s::srs_ant_switching8_t8_r_r18_s_::downgrade_cfg_r18_c_");
@@ -11329,8 +11349,8 @@ void band_combination_v1800_s::to_json(json_writer& j) const
     ca_params_nrdc_v1800.to_json(j);
   }
   if (supported_band_comb_list_per_bc_sl_u2_u_relay_discovery_r18_present) {
-    j.write_str("supportedBandCombListPerBC-SL-U2U-RelayDiscovery-r18",
-                supported_band_comb_list_per_bc_sl_u2_u_relay_discovery_r18.to_string());
+    j.write_fieldname("supportedBandCombListPerBC-SL-U2U-RelayDiscovery-r18");
+    supported_band_comb_list_per_bc_sl_u2_u_relay_discovery_r18.to_json(j);
   }
   if (band_list_v1810.size() > 0) {
     j.start_array("bandList-v1810");
@@ -11387,6 +11407,7 @@ void switching_period_unaffected_band_dual_ul_r18_s::period_unaffected_band_dual
   j.start_obj();
   switch (type_) {
     case types::maintained_ul_trans_r18:
+      j.write_null("maintainedUL-Trans-r18");
       break;
     case types::period_on_ul_bands_r18:
       j.write_str("periodOnULBands-r18", c.to_string());
@@ -11525,7 +11546,8 @@ void ul_tx_switching_band_pair_r18_s::to_json(json_writer& j) const
               ul_tx_switching_period_for_band_pair_r18.switching_period_for1_t_r18.to_string());
   j.end_obj();
   if (ul_tx_switching_dl_interruption_r18_present) {
-    j.write_str("uplinkTxSwitching-DL-Interruption-r18", ul_tx_switching_dl_interruption_r18.to_string());
+    j.write_fieldname("uplinkTxSwitching-DL-Interruption-r18");
+    ul_tx_switching_dl_interruption_r18.to_json(j);
   }
   if (ul_tx_switching_period_unaffected_band_dual_ul_list_r18.size() > 0) {
     j.start_array("uplinkTxSwitchingPeriodUnaffectedBandDualUL-List-r18");
@@ -12896,13 +12918,16 @@ void band_params_sidelink_discovery_r17_s::sl_tx_mode2_partial_sensing_r17_s_::
       j.write_fieldname("fr1-r17");
       j.start_obj();
       if (c.get<fr1_r17_s_>().scs_15k_hz_r17_present) {
-        j.write_str("scs-15kHz-r17", c.get<fr1_r17_s_>().scs_15k_hz_r17.to_string());
+        j.write_fieldname("scs-15kHz-r17");
+        c.get<fr1_r17_s_>().scs_15k_hz_r17.to_json(j);
       }
       if (c.get<fr1_r17_s_>().scs_30k_hz_r17_present) {
-        j.write_str("scs-30kHz-r17", c.get<fr1_r17_s_>().scs_30k_hz_r17.to_string());
+        j.write_fieldname("scs-30kHz-r17");
+        c.get<fr1_r17_s_>().scs_30k_hz_r17.to_json(j);
       }
       if (c.get<fr1_r17_s_>().scs_60k_hz_r17_present) {
-        j.write_str("scs-60kHz-r17", c.get<fr1_r17_s_>().scs_60k_hz_r17.to_string());
+        j.write_fieldname("scs-60kHz-r17");
+        c.get<fr1_r17_s_>().scs_60k_hz_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -12910,10 +12935,12 @@ void band_params_sidelink_discovery_r17_s::sl_tx_mode2_partial_sensing_r17_s_::
       j.write_fieldname("fr2-r17");
       j.start_obj();
       if (c.get<fr2_r17_s_>().scs_60k_hz_r17_present) {
-        j.write_str("scs-60kHz-r17", c.get<fr2_r17_s_>().scs_60k_hz_r17.to_string());
+        j.write_fieldname("scs-60kHz-r17");
+        c.get<fr2_r17_s_>().scs_60k_hz_r17.to_json(j);
       }
       if (c.get<fr2_r17_s_>().scs_120k_hz_r17_present) {
-        j.write_str("scs-120kHz-r17", c.get<fr2_r17_s_>().scs_120k_hz_r17.to_string());
+        j.write_fieldname("scs-120kHz-r17");
+        c.get<fr2_r17_s_>().scs_120k_hz_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -13225,6 +13252,7 @@ void band_params_sidelink_eutra_nr_v1630_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::eutra:
+      j.write_null("eutra");
       break;
     case types::nr:
       j.write_fieldname("nr");
@@ -13307,6 +13335,7 @@ void band_params_sidelink_eutra_nr_v1710_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::eutra:
+      j.write_null("eutra");
       break;
     case types::nr:
       j.write_fieldname("nr");
@@ -13542,13 +13571,16 @@ void band_params_sidelink_eutra_nr_v1710_c::nr_s_::sl_tx_mode2_partial_sensing_r
       j.write_fieldname("fr1-r17");
       j.start_obj();
       if (c.get<fr1_r17_s_>().scs_15k_hz_r17_present) {
-        j.write_str("scs-15kHz-r17", c.get<fr1_r17_s_>().scs_15k_hz_r17.to_string());
+        j.write_fieldname("scs-15kHz-r17");
+        c.get<fr1_r17_s_>().scs_15k_hz_r17.to_json(j);
       }
       if (c.get<fr1_r17_s_>().scs_30k_hz_r17_present) {
-        j.write_str("scs-30kHz-r17", c.get<fr1_r17_s_>().scs_30k_hz_r17.to_string());
+        j.write_fieldname("scs-30kHz-r17");
+        c.get<fr1_r17_s_>().scs_30k_hz_r17.to_json(j);
       }
       if (c.get<fr1_r17_s_>().scs_60k_hz_r17_present) {
-        j.write_str("scs-60kHz-r17", c.get<fr1_r17_s_>().scs_60k_hz_r17.to_string());
+        j.write_fieldname("scs-60kHz-r17");
+        c.get<fr1_r17_s_>().scs_60k_hz_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -13556,10 +13588,12 @@ void band_params_sidelink_eutra_nr_v1710_c::nr_s_::sl_tx_mode2_partial_sensing_r
       j.write_fieldname("fr2-r17");
       j.start_obj();
       if (c.get<fr2_r17_s_>().scs_60k_hz_r17_present) {
-        j.write_str("scs-60kHz-r17", c.get<fr2_r17_s_>().scs_60k_hz_r17.to_string());
+        j.write_fieldname("scs-60kHz-r17");
+        c.get<fr2_r17_s_>().scs_60k_hz_r17.to_json(j);
       }
       if (c.get<fr2_r17_s_>().scs_120k_hz_r17_present) {
-        j.write_str("scs-120kHz-r17", c.get<fr2_r17_s_>().scs_120k_hz_r17.to_string());
+        j.write_fieldname("scs-120kHz-r17");
+        c.get<fr2_r17_s_>().scs_120k_hz_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -18026,7 +18060,8 @@ void mimo_params_per_band_s::to_json(json_writer& j) const
     j.write_str("maxMIMO-LayersForMulti-DCI-mTRP-r16", "supported");
   }
   if (supported_sinr_meas_v1670_present) {
-    j.write_str("supportedSINR-meas-v1670", supported_sinr_meas_v1670.to_string());
+    j.write_fieldname("supportedSINR-meas-v1670");
+    supported_sinr_meas_v1670.to_json(j);
   }
   if (srs_increased_repeat_r17_present) {
     j.write_str("srs-increasedRepetition-r17", "supported");
@@ -25130,7 +25165,8 @@ void band_nr_s::to_json(json_writer& j) const
   j.start_obj();
   j.write_int("bandNR", band_nr);
   if (modified_mpr_behaviour_present) {
-    j.write_str("modifiedMPR-Behaviour", modified_mpr_behaviour.to_string());
+    j.write_fieldname("modifiedMPR-Behaviour");
+    modified_mpr_behaviour.to_json(j);
   }
   if (mimo_params_per_band_present) {
     j.write_fieldname("mimo-ParametersPerBand");
@@ -25195,7 +25231,8 @@ void band_nr_s::to_json(json_writer& j) const
     ch_bws_ul_v1590->to_json(j);
   }
   if (asymmetric_bw_combination_set_present) {
-    j.write_str("asymmetricBandwidthCombinationSet", asymmetric_bw_combination_set.to_string());
+    j.write_fieldname("asymmetricBandwidthCombinationSet");
+    asymmetric_bw_combination_set.to_json(j);
   }
   if (shared_spec_ch_access_params_per_band_r16.is_present()) {
     j.write_fieldname("sharedSpectrumChAccessParamsPerBand-r16");
@@ -25510,16 +25547,20 @@ void band_nr_s::to_json(json_writer& j) const
     pos_srs_rrc_inactive_outside_init_ul_bwp_r17->to_json(j);
   }
   if (ch_bws_dl_scs_480k_hz_fr2_2_r17_present) {
-    j.write_str("channelBWs-DL-SCS-480kHz-FR2-2-r17", ch_bws_dl_scs_480k_hz_fr2_2_r17.to_string());
+    j.write_fieldname("channelBWs-DL-SCS-480kHz-FR2-2-r17");
+    ch_bws_dl_scs_480k_hz_fr2_2_r17.to_json(j);
   }
   if (ch_bws_ul_scs_480k_hz_fr2_2_r17_present) {
-    j.write_str("channelBWs-UL-SCS-480kHz-FR2-2-r17", ch_bws_ul_scs_480k_hz_fr2_2_r17.to_string());
+    j.write_fieldname("channelBWs-UL-SCS-480kHz-FR2-2-r17");
+    ch_bws_ul_scs_480k_hz_fr2_2_r17.to_json(j);
   }
   if (ch_bws_dl_scs_960k_hz_fr2_2_r17_present) {
-    j.write_str("channelBWs-DL-SCS-960kHz-FR2-2-r17", ch_bws_dl_scs_960k_hz_fr2_2_r17.to_string());
+    j.write_fieldname("channelBWs-DL-SCS-960kHz-FR2-2-r17");
+    ch_bws_dl_scs_960k_hz_fr2_2_r17.to_json(j);
   }
   if (ch_bws_ul_scs_960k_hz_fr2_2_r17_present) {
-    j.write_str("channelBWs-UL-SCS-960kHz-FR2-2-r17", ch_bws_ul_scs_960k_hz_fr2_2_r17.to_string());
+    j.write_fieldname("channelBWs-UL-SCS-960kHz-FR2-2-r17");
+    ch_bws_ul_scs_960k_hz_fr2_2_r17.to_json(j);
   }
   if (ul_gap_fr2_r17_present) {
     j.write_str("ul-GapFR2-r17", "supported");
@@ -25621,10 +25662,12 @@ void band_nr_s::to_json(json_writer& j) const
     j.end_obj();
   }
   if (ch_bws_dl_scs_120k_hz_fr2_2_r17_present) {
-    j.write_str("channelBWs-DL-SCS-120kHz-FR2-2-r17", ch_bws_dl_scs_120k_hz_fr2_2_r17.to_string());
+    j.write_fieldname("channelBWs-DL-SCS-120kHz-FR2-2-r17");
+    ch_bws_dl_scs_120k_hz_fr2_2_r17.to_json(j);
   }
   if (ch_bws_ul_scs_120k_hz_fr2_2_r17_present) {
-    j.write_str("channelBWs-UL-SCS-120kHz-FR2-2-r17", ch_bws_ul_scs_120k_hz_fr2_2_r17.to_string());
+    j.write_fieldname("channelBWs-UL-SCS-120kHz-FR2-2-r17");
+    ch_bws_ul_scs_120k_hz_fr2_2_r17.to_json(j);
   }
   if (dmrs_bundling_pusch_rep_type_a_r17_present) {
     j.write_str("dmrs-BundlingPUSCH-RepTypeA-r17", "supported");
@@ -26289,13 +26332,16 @@ void band_nr_s::ch_bws_dl_c_::to_json(json_writer& j) const
       j.write_fieldname("fr1");
       j.start_obj();
       if (c.get<fr1_s_>().scs_15k_hz_present) {
-        j.write_str("scs-15kHz", c.get<fr1_s_>().scs_15k_hz.to_string());
+        j.write_fieldname("scs-15kHz");
+        c.get<fr1_s_>().scs_15k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_30k_hz_present) {
-        j.write_str("scs-30kHz", c.get<fr1_s_>().scs_30k_hz.to_string());
+        j.write_fieldname("scs-30kHz");
+        c.get<fr1_s_>().scs_30k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr1_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr1_s_>().scs_60k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26303,10 +26349,12 @@ void band_nr_s::ch_bws_dl_c_::to_json(json_writer& j) const
       j.write_fieldname("fr2");
       j.start_obj();
       if (c.get<fr2_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr2_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr2_s_>().scs_60k_hz.to_json(j);
       }
       if (c.get<fr2_s_>().scs_120k_hz_present) {
-        j.write_str("scs-120kHz", c.get<fr2_s_>().scs_120k_hz.to_string());
+        j.write_fieldname("scs-120kHz");
+        c.get<fr2_s_>().scs_120k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26482,13 +26530,16 @@ void band_nr_s::ch_bws_ul_c_::to_json(json_writer& j) const
       j.write_fieldname("fr1");
       j.start_obj();
       if (c.get<fr1_s_>().scs_15k_hz_present) {
-        j.write_str("scs-15kHz", c.get<fr1_s_>().scs_15k_hz.to_string());
+        j.write_fieldname("scs-15kHz");
+        c.get<fr1_s_>().scs_15k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_30k_hz_present) {
-        j.write_str("scs-30kHz", c.get<fr1_s_>().scs_30k_hz.to_string());
+        j.write_fieldname("scs-30kHz");
+        c.get<fr1_s_>().scs_30k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr1_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr1_s_>().scs_60k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26496,10 +26547,12 @@ void band_nr_s::ch_bws_ul_c_::to_json(json_writer& j) const
       j.write_fieldname("fr2");
       j.start_obj();
       if (c.get<fr2_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr2_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr2_s_>().scs_60k_hz.to_json(j);
       }
       if (c.get<fr2_s_>().scs_120k_hz_present) {
-        j.write_str("scs-120kHz", c.get<fr2_s_>().scs_120k_hz.to_string());
+        j.write_fieldname("scs-120kHz");
+        c.get<fr2_s_>().scs_120k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26697,13 +26750,16 @@ void band_nr_s::ch_bws_dl_v1590_c_::to_json(json_writer& j) const
       j.write_fieldname("fr1");
       j.start_obj();
       if (c.get<fr1_s_>().scs_15k_hz_present) {
-        j.write_str("scs-15kHz", c.get<fr1_s_>().scs_15k_hz.to_string());
+        j.write_fieldname("scs-15kHz");
+        c.get<fr1_s_>().scs_15k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_30k_hz_present) {
-        j.write_str("scs-30kHz", c.get<fr1_s_>().scs_30k_hz.to_string());
+        j.write_fieldname("scs-30kHz");
+        c.get<fr1_s_>().scs_30k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr1_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr1_s_>().scs_60k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26711,10 +26767,12 @@ void band_nr_s::ch_bws_dl_v1590_c_::to_json(json_writer& j) const
       j.write_fieldname("fr2");
       j.start_obj();
       if (c.get<fr2_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr2_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr2_s_>().scs_60k_hz.to_json(j);
       }
       if (c.get<fr2_s_>().scs_120k_hz_present) {
-        j.write_str("scs-120kHz", c.get<fr2_s_>().scs_120k_hz.to_string());
+        j.write_fieldname("scs-120kHz");
+        c.get<fr2_s_>().scs_120k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26890,13 +26948,16 @@ void band_nr_s::ch_bws_ul_v1590_c_::to_json(json_writer& j) const
       j.write_fieldname("fr1");
       j.start_obj();
       if (c.get<fr1_s_>().scs_15k_hz_present) {
-        j.write_str("scs-15kHz", c.get<fr1_s_>().scs_15k_hz.to_string());
+        j.write_fieldname("scs-15kHz");
+        c.get<fr1_s_>().scs_15k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_30k_hz_present) {
-        j.write_str("scs-30kHz", c.get<fr1_s_>().scs_30k_hz.to_string());
+        j.write_fieldname("scs-30kHz");
+        c.get<fr1_s_>().scs_30k_hz.to_json(j);
       }
       if (c.get<fr1_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr1_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr1_s_>().scs_60k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -26904,10 +26965,12 @@ void band_nr_s::ch_bws_ul_v1590_c_::to_json(json_writer& j) const
       j.write_fieldname("fr2");
       j.start_obj();
       if (c.get<fr2_s_>().scs_60k_hz_present) {
-        j.write_str("scs-60kHz", c.get<fr2_s_>().scs_60k_hz.to_string());
+        j.write_fieldname("scs-60kHz");
+        c.get<fr2_s_>().scs_60k_hz.to_json(j);
       }
       if (c.get<fr2_s_>().scs_120k_hz_present) {
-        j.write_str("scs-120kHz", c.get<fr2_s_>().scs_120k_hz.to_string());
+        j.write_fieldname("scs-120kHz");
+        c.get<fr2_s_>().scs_120k_hz.to_json(j);
       }
       j.end_obj();
       break;
@@ -30244,13 +30307,16 @@ void band_sidelink_r16_s::sl_reception_r16_s_::scs_cp_pattern_rx_sidelink_r16_c_
       j.write_fieldname("fr1-r16");
       j.start_obj();
       if (c.get<fr1_r16_s_>().scs_15k_hz_r16_present) {
-        j.write_str("scs-15kHz-r16", c.get<fr1_r16_s_>().scs_15k_hz_r16.to_string());
+        j.write_fieldname("scs-15kHz-r16");
+        c.get<fr1_r16_s_>().scs_15k_hz_r16.to_json(j);
       }
       if (c.get<fr1_r16_s_>().scs_30k_hz_r16_present) {
-        j.write_str("scs-30kHz-r16", c.get<fr1_r16_s_>().scs_30k_hz_r16.to_string());
+        j.write_fieldname("scs-30kHz-r16");
+        c.get<fr1_r16_s_>().scs_30k_hz_r16.to_json(j);
       }
       if (c.get<fr1_r16_s_>().scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", c.get<fr1_r16_s_>().scs_60k_hz_r16.to_string());
+        j.write_fieldname("scs-60kHz-r16");
+        c.get<fr1_r16_s_>().scs_60k_hz_r16.to_json(j);
       }
       j.end_obj();
       break;
@@ -30258,10 +30324,12 @@ void band_sidelink_r16_s::sl_reception_r16_s_::scs_cp_pattern_rx_sidelink_r16_c_
       j.write_fieldname("fr2-r16");
       j.start_obj();
       if (c.get<fr2_r16_s_>().scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", c.get<fr2_r16_s_>().scs_60k_hz_r16.to_string());
+        j.write_fieldname("scs-60kHz-r16");
+        c.get<fr2_r16_s_>().scs_60k_hz_r16.to_json(j);
       }
       if (c.get<fr2_r16_s_>().scs_120k_hz_r16_present) {
-        j.write_str("scs-120kHz-r16", c.get<fr2_r16_s_>().scs_120k_hz_r16.to_string());
+        j.write_fieldname("scs-120kHz-r16");
+        c.get<fr2_r16_s_>().scs_120k_hz_r16.to_json(j);
       }
       j.end_obj();
       break;
@@ -30461,13 +30529,16 @@ void band_sidelink_r16_s::sl_tx_mode1_r16_s_::scs_cp_pattern_tx_sidelink_mode_on
       j.write_fieldname("fr1-r16");
       j.start_obj();
       if (c.get<fr1_r16_s_>().scs_15k_hz_r16_present) {
-        j.write_str("scs-15kHz-r16", c.get<fr1_r16_s_>().scs_15k_hz_r16.to_string());
+        j.write_fieldname("scs-15kHz-r16");
+        c.get<fr1_r16_s_>().scs_15k_hz_r16.to_json(j);
       }
       if (c.get<fr1_r16_s_>().scs_30k_hz_r16_present) {
-        j.write_str("scs-30kHz-r16", c.get<fr1_r16_s_>().scs_30k_hz_r16.to_string());
+        j.write_fieldname("scs-30kHz-r16");
+        c.get<fr1_r16_s_>().scs_30k_hz_r16.to_json(j);
       }
       if (c.get<fr1_r16_s_>().scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", c.get<fr1_r16_s_>().scs_60k_hz_r16.to_string());
+        j.write_fieldname("scs-60kHz-r16");
+        c.get<fr1_r16_s_>().scs_60k_hz_r16.to_json(j);
       }
       j.end_obj();
       break;
@@ -30475,10 +30546,12 @@ void band_sidelink_r16_s::sl_tx_mode1_r16_s_::scs_cp_pattern_tx_sidelink_mode_on
       j.write_fieldname("fr2-r16");
       j.start_obj();
       if (c.get<fr2_r16_s_>().scs_60k_hz_r16_present) {
-        j.write_str("scs-60kHz-r16", c.get<fr2_r16_s_>().scs_60k_hz_r16.to_string());
+        j.write_fieldname("scs-60kHz-r16");
+        c.get<fr2_r16_s_>().scs_60k_hz_r16.to_json(j);
       }
       if (c.get<fr2_r16_s_>().scs_120k_hz_r16_present) {
-        j.write_str("scs-120kHz-r16", c.get<fr2_r16_s_>().scs_120k_hz_r16.to_string());
+        j.write_fieldname("scs-120kHz-r16");
+        c.get<fr2_r16_s_>().scs_120k_hz_r16.to_json(j);
       }
       j.end_obj();
       break;
@@ -30754,13 +30827,16 @@ void band_sidelink_r16_s::sl_tx_mode2_random_res_sel_r17_s_::scs_cp_pattern_tx_s
       j.write_fieldname("fr1-r17");
       j.start_obj();
       if (c.get<fr1_r17_s_>().scs_15k_hz_r17_present) {
-        j.write_str("scs-15kHz-r17", c.get<fr1_r17_s_>().scs_15k_hz_r17.to_string());
+        j.write_fieldname("scs-15kHz-r17");
+        c.get<fr1_r17_s_>().scs_15k_hz_r17.to_json(j);
       }
       if (c.get<fr1_r17_s_>().scs_30k_hz_r17_present) {
-        j.write_str("scs-30kHz-r17", c.get<fr1_r17_s_>().scs_30k_hz_r17.to_string());
+        j.write_fieldname("scs-30kHz-r17");
+        c.get<fr1_r17_s_>().scs_30k_hz_r17.to_json(j);
       }
       if (c.get<fr1_r17_s_>().scs_60k_hz_r17_present) {
-        j.write_str("scs-60kHz-r17", c.get<fr1_r17_s_>().scs_60k_hz_r17.to_string());
+        j.write_fieldname("scs-60kHz-r17");
+        c.get<fr1_r17_s_>().scs_60k_hz_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -30768,10 +30844,12 @@ void band_sidelink_r16_s::sl_tx_mode2_random_res_sel_r17_s_::scs_cp_pattern_tx_s
       j.write_fieldname("fr2-r17");
       j.start_obj();
       if (c.get<fr2_r17_s_>().scs_60k_hz_r17_present) {
-        j.write_str("scs-60kHz-r17", c.get<fr2_r17_s_>().scs_60k_hz_r17.to_string());
+        j.write_fieldname("scs-60kHz-r17");
+        c.get<fr2_r17_s_>().scs_60k_hz_r17.to_json(j);
       }
       if (c.get<fr2_r17_s_>().scs_120k_hz_r17_present) {
-        j.write_str("scs-120kHz-r17", c.get<fr2_r17_s_>().scs_120k_hz_r17.to_string());
+        j.write_fieldname("scs-120kHz-r17");
+        c.get<fr2_r17_s_>().scs_120k_hz_r17.to_json(j);
       }
       j.end_obj();
       break;
@@ -31758,6 +31836,7 @@ void dummy_pdcch_rach_dl_info_r18_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::not_supported:
+      j.write_null("notSupported");
       break;
     case types::supported:
       j.write_fieldname("supported");
@@ -32344,7 +32423,8 @@ void eutra_params_common_s::to_json(json_writer& j) const
     j.write_str("mfbi-EUTRA", "supported");
   }
   if (modified_mpr_behavior_eutra_present) {
-    j.write_str("modifiedMPR-BehaviorEUTRA", modified_mpr_behavior_eutra.to_string());
+    j.write_fieldname("modifiedMPR-BehaviorEUTRA");
+    modified_mpr_behavior_eutra.to_json(j);
   }
   if (multi_ns_pmax_eutra_present) {
     j.write_str("multiNS-Pmax-EUTRA", "supported");
@@ -36535,7 +36615,8 @@ void feature_set_ul_v1610_s::to_json(json_writer& j) const
     j.write_fieldname("ul-FullPwrMode2-TPMIGroup-r16");
     j.start_obj();
     if (ul_full_pwr_mode2_tpmi_group_r16.two_ports_r16_present) {
-      j.write_str("twoPorts-r16", ul_full_pwr_mode2_tpmi_group_r16.two_ports_r16.to_string());
+      j.write_fieldname("twoPorts-r16");
+      ul_full_pwr_mode2_tpmi_group_r16.two_ports_r16.to_json(j);
     }
     if (ul_full_pwr_mode2_tpmi_group_r16.four_ports_non_coherent_r16_present) {
       j.write_str("fourPortsNonCoherent-r16", ul_full_pwr_mode2_tpmi_group_r16.four_ports_non_coherent_r16.to_string());
@@ -39479,7 +39560,8 @@ void feature_set_ul_per_cc_v1800_s::to_json(json_writer& j) const
       j.write_str("ul-FullPwrTransMode2-r18", codebook_param8_tx_pusch_r18.ul_full_pwr_trans_mode2_r18.to_string());
     }
     if (codebook_param8_tx_pusch_r18.ul_srs_trans_mode2_r18_present) {
-      j.write_str("ul-SRS-TransMode2-r18", codebook_param8_tx_pusch_r18.ul_srs_trans_mode2_r18.to_string());
+      j.write_fieldname("ul-SRS-TransMode2-r18");
+      codebook_param8_tx_pusch_r18.ul_srs_trans_mode2_r18.to_json(j);
     }
     if (codebook_param8_tx_pusch_r18.tpmi_full_pwr_codebook2_r18_present) {
       j.write_str("tpmi-FullPwrCodebook2-r18", codebook_param8_tx_pusch_r18.tpmi_full_pwr_codebook2_r18.to_string());
@@ -41450,6 +41532,16 @@ void high_speed_params_v1650_c::set_inter_rat_meas_enhancement_r16()
 void high_speed_params_v1650_c::to_json(json_writer& j) const
 {
   j.start_obj();
+  switch (type_) {
+    case types::intra_nr_meas_enhancement_r16:
+      j.write_str("intraNR-MeasurementEnhancement-r16", "supported");
+      break;
+    case types::inter_rat_meas_enhancement_r16:
+      j.write_str("interRAT-MeasurementEnhancement-r16", "supported");
+      break;
+    default:
+      log_invalid_choice_id(type_, "high_speed_params_v1650_c");
+  }
   j.end_obj();
 }
 OCUDUASN_CODE high_speed_params_v1650_c::pack(bit_ref& bref) const
@@ -43373,7 +43465,8 @@ void meas_and_mob_params_common_s::to_json(json_writer& j) const
 {
   j.start_obj();
   if (supported_gap_pattern_present) {
-    j.write_str("supportedGapPattern", supported_gap_pattern.to_string());
+    j.write_fieldname("supportedGapPattern");
+    supported_gap_pattern.to_json(j);
   }
   if (ssb_rlm_present) {
     j.write_str("ssb-RLM", "supported");
@@ -43438,7 +43531,8 @@ void meas_and_mob_params_common_s::to_json(json_writer& j) const
     j.write_str("nr-NeedForGap-Reporting-r16", "supported");
   }
   if (supported_gap_pattern_nr_only_r16_present) {
-    j.write_str("supportedGapPattern-NRonly-r16", supported_gap_pattern_nr_only_r16.to_string());
+    j.write_fieldname("supportedGapPattern-NRonly-r16");
+    supported_gap_pattern_nr_only_r16.to_json(j);
   }
   if (supported_gap_pattern_nr_only_nedc_r16_present) {
     j.write_str("supportedGapPattern-NRonly-NEDC-r16", "supported");
@@ -43480,7 +43574,8 @@ void meas_and_mob_params_common_s::to_json(json_writer& j) const
     j.write_str("pcellT312-r16", "supported");
   }
   if (supported_gap_pattern_r16_present) {
-    j.write_str("supportedGapPattern-r16", supported_gap_pattern_r16.to_string());
+    j.write_fieldname("supportedGapPattern-r16");
+    supported_gap_pattern_r16.to_json(j);
   }
   if (concurrent_meas_gap_r17.is_present()) {
     j.write_fieldname("concurrentMeasGap-r17");
@@ -43496,10 +43591,12 @@ void meas_and_mob_params_common_s::to_json(json_writer& j) const
     j.write_str("ncsg-MeasGapPerFR-r17", "supported");
   }
   if (ncsg_meas_gap_patterns_r17_present) {
-    j.write_str("ncsg-MeasGapPatterns-r17", ncsg_meas_gap_patterns_r17.to_string());
+    j.write_fieldname("ncsg-MeasGapPatterns-r17");
+    ncsg_meas_gap_patterns_r17.to_json(j);
   }
   if (ncsg_meas_gap_nr_patterns_r17_present) {
-    j.write_str("ncsg-MeasGapNR-Patterns-r17", ncsg_meas_gap_nr_patterns_r17.to_string());
+    j.write_fieldname("ncsg-MeasGapNR-Patterns-r17");
+    ncsg_meas_gap_nr_patterns_r17.to_json(j);
   }
   if (precfg_ue_autonomous_meas_gap_r17_present) {
     j.write_str("preconfiguredUE-AutonomousMeasGap-r17", "supported");
@@ -43609,7 +43706,8 @@ void meas_and_mob_params_common_s::to_json(json_writer& j) const
     j.write_str("eutra-NoGapMeasurementInsideBWP-r18", "supported");
   }
   if (eutra_meas_emw_r18_present) {
-    j.write_str("eutra-MeasEMW-r18", eutra_meas_emw_r18.to_string());
+    j.write_fieldname("eutra-MeasEMW-r18");
+    eutra_meas_emw_r18.to_json(j);
   }
   if (concurrent_meas_crs_inside_bwp_eutra_r18_present) {
     j.write_str("concurrentMeasCRS-InsideBWP-EUTRA-r18", "supported");
@@ -43740,6 +43838,16 @@ void meas_and_mob_params_common_s::concurrent_meas_gap_r17_c_::set_concurrent_pe
 void meas_and_mob_params_common_s::concurrent_meas_gap_r17_c_::to_json(json_writer& j) const
 {
   j.start_obj();
+  switch (type_) {
+    case types::concurrent_per_ue_only_meas_gap_r17:
+      j.write_str("concurrentPerUE-OnlyMeasGap-r17", "supported");
+      break;
+    case types::concurrent_per_ue_per_fr_comb_meas_gap_r17:
+      j.write_str("concurrentPerUE-PerFRCombMeasGap-r17", "supported");
+      break;
+    default:
+      log_invalid_choice_id(type_, "meas_and_mob_params_common_s::concurrent_meas_gap_r17_c_");
+  }
   j.end_obj();
 }
 OCUDUASN_CODE meas_and_mob_params_common_s::concurrent_meas_gap_r17_c_::pack(bit_ref& bref) const
@@ -47291,16 +47399,20 @@ void phy_params_frx_diff_s::to_json(json_writer& j) const
     j.write_str("dynamicSFI", "supported");
   }
   if (dummy1_present) {
-    j.write_str("dummy1", dummy1.to_string());
+    j.write_fieldname("dummy1");
+    dummy1.to_json(j);
   }
   if (two_fl_dmrs_present) {
-    j.write_str("twoFL-DMRS", two_fl_dmrs.to_string());
+    j.write_fieldname("twoFL-DMRS");
+    two_fl_dmrs.to_json(j);
   }
   if (dummy2_present) {
-    j.write_str("dummy2", dummy2.to_string());
+    j.write_fieldname("dummy2");
+    dummy2.to_json(j);
   }
   if (dummy3_present) {
-    j.write_str("dummy3", dummy3.to_string());
+    j.write_fieldname("dummy3");
+    dummy3.to_json(j);
   }
   if (supported_dmrs_type_dl_present) {
     j.write_str("supportedDMRS-TypeDL", supported_dmrs_type_dl.to_string());
@@ -47318,7 +47430,8 @@ void phy_params_frx_diff_s::to_json(json_writer& j) const
     j.write_str("csi-ReportWithoutCQI", "supported");
   }
   if (one_ports_ptrs_present) {
-    j.write_str("onePortsPTRS", one_ports_ptrs.to_string());
+    j.write_fieldname("onePortsPTRS");
+    one_ports_ptrs.to_json(j);
   }
   if (two_pucch_f0_2_consec_symbols_present) {
     j.write_str("twoPUCCH-F0-2-ConsecSymbols", "supported");
@@ -53681,7 +53794,8 @@ void ue_nr_cap_v1700_s::to_json(json_writer& j) const
     ue_radio_paging_info_r17.to_json(j);
   }
   if (ul_gap_fr2_pattern_r17_present) {
-    j.write_str("ul-GapFR2-Pattern-r17", ul_gap_fr2_pattern_r17.to_string());
+    j.write_fieldname("ul-GapFR2-Pattern-r17");
+    ul_gap_fr2_pattern_r17.to_json(j);
   }
   if (ntn_params_r17_present) {
     j.write_fieldname("ntn-Parameters-r17");

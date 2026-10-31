@@ -516,6 +516,9 @@ void ul_dcch_msg_type_c::msg_class_ext_c_::to_json(json_writer& j) const
       c.to_json(j);
       break;
     case types::msg_class_ext_future_r16:
+      j.write_fieldname("messageClassExtensionFuture-r16");
+      j.start_obj();
+      j.end_obj();
       break;
     default:
       log_invalid_choice_id(type_, "ul_dcch_msg_type_c::msg_class_ext_c_");
@@ -732,14 +735,19 @@ void ul_dcch_msg_type_c::msg_class_ext_c_::c2_c_::to_json(json_writer& j) const
       c.get<indirect_path_fail_info_r18_s>().to_json(j);
       break;
     case types::spare5:
+      j.write_null("spare5");
       break;
     case types::spare4:
+      j.write_null("spare4");
       break;
     case types::spare3:
+      j.write_null("spare3");
       break;
     case types::spare2:
+      j.write_null("spare2");
       break;
     case types::spare1:
+      j.write_null("spare1");
       break;
     default:
       log_invalid_choice_id(type_, "ul_dcch_msg_type_c::msg_class_ext_c_::c2_c_");

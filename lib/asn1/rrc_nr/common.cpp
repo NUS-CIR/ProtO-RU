@@ -310,6 +310,7 @@ void srs_periodicity_and_offset_c::to_json(json_writer& j) const
   j.start_obj();
   switch (type_) {
     case types::sl1:
+      j.write_null("sl1");
       break;
     case types::sl2:
       j.write_int("sl2", c.get<uint8_t>());
@@ -2023,10 +2024,12 @@ void srs_res_s::comb_offset_hop_r18_s_::hop_subset_r18_c_::to_json(json_writer& 
   j.start_obj();
   switch (type_) {
     case types::tx_comb_n4:
-      j.write_str("transmissionComb-n4", c.get<fixed_bitstring<4>>().to_string());
+      j.write_fieldname("transmissionComb-n4");
+      c.get<fixed_bitstring<4>>().to_json(j);
       break;
     case types::tx_comb_n8:
-      j.write_str("transmissionComb-n8", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("transmissionComb-n8");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "srs_res_s::comb_offset_hop_r18_s_::hop_subset_r18_c_");
@@ -2186,13 +2189,16 @@ void srs_res_s::cyclic_shift_hop_r18_s_::hop_subset_r18_c_::to_json(json_writer&
   j.start_obj();
   switch (type_) {
     case types::tx_comb_n2:
-      j.write_str("transmissionComb-n2", c.get<fixed_bitstring<8>>().to_string());
+      j.write_fieldname("transmissionComb-n2");
+      c.get<fixed_bitstring<8>>().to_json(j);
       break;
     case types::tx_comb_n4:
-      j.write_str("transmissionComb-n4", c.get<fixed_bitstring<12>>().to_string());
+      j.write_fieldname("transmissionComb-n4");
+      c.get<fixed_bitstring<12>>().to_json(j);
       break;
     case types::tx_comb_n8:
-      j.write_str("transmissionComb-n8", c.get<fixed_bitstring<6>>().to_string());
+      j.write_fieldname("transmissionComb-n8");
+      c.get<fixed_bitstring<6>>().to_json(j);
       break;
     default:
       log_invalid_choice_id(type_, "srs_res_s::cyclic_shift_hop_r18_s_::hop_subset_r18_c_");

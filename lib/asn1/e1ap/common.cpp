@@ -34,6 +34,7 @@ void private_ie_id_c::to_json(json_writer& j) const
       j.write_int("local", c);
       break;
     case types::global:
+      j.write_null("global");
       break;
     default:
       log_invalid_choice_id(type_, "private_ie_id_c");
