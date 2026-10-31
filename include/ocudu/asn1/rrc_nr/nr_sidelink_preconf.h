@@ -416,3 +416,10 @@ struct sl_precfg_nr_r16_s {
 
 } // namespace rrc_nr
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_freq_cfg_common_r16_s::sl_bwp_list_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_freq_cfg_common_r16_s::sl_pos_bwp_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_tx_profile_list_r17_l::value_type>::ops;

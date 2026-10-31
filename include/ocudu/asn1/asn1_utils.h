@@ -10,12 +10,16 @@
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/support/compiler.h"
 #include "ocudu/support/ocudu_assert.h"
+#include <algorithm>
 #include <any>
 #include <array>
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <new>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 namespace asn1 {
 
@@ -185,131 +189,198 @@ private:
 /*********************
   function helpers
 *********************/
-template <class T>
-class dyn_array
+namespace detail {
+
+/// Element operations of a dyn_array. A null operation means that the element type is trivial for it.
+struct dyn_array_ops {
+  uint32_t elem_size;
+  /// Value-initializes elements.
+  void (*construct)(void* dst, uint32_t n);
+  /// Copy-constructs elements.
+  void (*copy)(void* dst, const void* src, uint32_t n);
+  /// Move-constructs elements and destroys their sources. Ranges may overlap when dst precedes src.
+  void (*relocate)(void* dst, void* src, uint32_t n);
+  /// Destroys elements.
+  void (*destroy)(void* ptr, uint32_t n);
+};
+
+/// Storage and growth of a dyn_array, independent of the element type.
+class dyn_array_base
 {
+public:
+  uint32_t size() const { return size_; }
+  uint32_t capacity() const { return cap_; }
+
+protected:
+  dyn_array_base() = default;
+  dyn_array_base(dyn_array_base&& other) noexcept : data_(other.data_), size_(other.size_), cap_(other.cap_)
+  {
+    other.data_ = nullptr;
+    other.size_ = 0;
+    other.cap_  = 0;
+  }
+  dyn_array_base(const dyn_array_base&)            = delete;
+  dyn_array_base& operator=(const dyn_array_base&) = delete;
+  dyn_array_base& operator=(dyn_array_base&&)      = delete;
+  ~dyn_array_base()                                = default;
+
+  void assign_impl(const dyn_array_ops& ops, const void* src, uint32_t nof_items);
+  void move_impl(const dyn_array_ops& ops, dyn_array_base& other);
+  void reserve_impl(const dyn_array_ops& ops, uint32_t new_cap);
+  void resize_impl(const dyn_array_ops& ops, uint32_t new_size, uint32_t new_cap);
+  void erase_impl(const dyn_array_ops& ops, uint32_t idx);
+  void release_impl(const dyn_array_ops& ops);
+
+  void*    data_ = nullptr;
+  uint32_t size_ = 0;
+  uint32_t cap_  = 0;
+
+private:
+  void reallocate(const dyn_array_ops& ops, uint32_t new_cap);
+};
+
+} // namespace detail
+
+template <class T>
+class dyn_array : private detail::dyn_array_base
+{
+  static_assert(alignof(T) <= __STDCPP_DEFAULT_NEW_ALIGNMENT__, "Over-aligned dyn_array elements are not supported");
+
 public:
   typedef T value_type;
   using iterator       = T*;
   using const_iterator = const T*;
 
   dyn_array() = default;
-  explicit dyn_array(uint32_t new_size) : size_(new_size), cap_(new_size)
-  {
-    if (size_ > 0) {
-      data_ = new T[size_];
-    }
-  }
+  explicit dyn_array(uint32_t new_size) { resize_impl(ops, new_size, 0); }
   dyn_array(const dyn_array<T>& other) : dyn_array(other.data(), other.size()) {}
-  dyn_array(const T* ptr, uint32_t nof_items) : size_(nof_items), cap_(nof_items)
-  {
-    if (size_ > 0) {
-      data_ = new T[cap_];
-      std::copy(ptr, ptr + size_, data_);
-    }
-  }
-  ~dyn_array() { delete[] data_; }
-  uint32_t size() const { return size_; }
-  uint32_t capacity() const { return cap_; }
-  T&       operator[](uint32_t idx)
+  dyn_array(dyn_array<T>&& other) noexcept : detail::dyn_array_base(std::move(other)) {}
+  dyn_array(const T* ptr, uint32_t nof_items) { assign_impl(ops, ptr, nof_items); }
+  ~dyn_array() { release_impl(ops); }
+
+  using detail::dyn_array_base::capacity;
+  using detail::dyn_array_base::size;
+
+  T& operator[](uint32_t idx)
   {
     ocudu_assert(idx < size(), "out-of-bounds access to dyn_array ({} >= {})", idx, size());
-    return data_[idx];
+    return data()[idx];
   }
   const T& operator[](uint32_t idx) const
   {
     ocudu_assert(idx < size(), "out-of-bounds access to dyn_array ({} >= {})", idx, size());
-    return data_[idx];
+    return data()[idx];
   }
   dyn_array<T>& operator=(const dyn_array<T>& other)
   {
-    if (this == &other) {
-      return *this;
+    if (this != &other) {
+      assign_impl(ops, other.data(), other.size());
     }
-    if (cap_ < other.size()) {
-      delete[] data_;
-      data_ = new T[other.size()];
-      cap_  = other.size();
-    }
-    size_ = other.size();
-    std::copy(other.data(), other.data() + other.size(), data());
     return *this;
   }
-  void reserve(uint32_t new_cap)
+  dyn_array<T>& operator=(dyn_array<T>&& other) noexcept
   {
-    if (new_cap > cap_) {
-      T* new_data = new T[new_cap];
-      if (data_ != nullptr) {
-        std::move(data_, data_ + size_, new_data);
-      }
-      cap_ = new_cap;
-      delete[] data_;
-      data_ = new_data;
+    if (this != &other) {
+      move_impl(ops, other);
     }
+    return *this;
   }
-  void resize(uint32_t new_size, uint32_t new_cap = 0)
-  {
-    if (new_size == size_) {
-      return;
-    }
-    if (cap_ >= new_size) {
-      if (new_size > size_) {
-        std::fill(data_ + size_, data_ + new_size, T());
-      }
-      size_ = new_size;
-      return;
-    }
-
-    new_cap     = new_size > new_cap ? new_size : new_cap;
-    T* new_data = nullptr;
-    if (new_cap > 0) {
-      new_data = new T[new_cap];
-      if (data_ != nullptr) {
-        unsigned min_size = std::min(size_, new_size);
-        std::move(data_, data_ + min_size, new_data);
-      }
-    }
-    cap_  = new_cap;
-    size_ = new_size;
-    delete[] data_;
-    data_ = new_data;
-  }
+  void     reserve(uint32_t new_cap) { reserve_impl(ops, new_cap); }
+  void     resize(uint32_t new_size, uint32_t new_cap = 0) { resize_impl(ops, new_size, new_cap); }
   iterator erase(iterator it)
   {
     if (it < begin() or it >= end()) {
       log_warning("Trying to access out-of-bounds iterator.");
       return end();
     }
-
-    std::copy(it + 1, end(), it);
-    size_--;
-
-    return it;
-  }
-  bool operator==(const dyn_array<T>& other) const
-  {
-    return size() == other.size() and std::equal(data_, data_ + size(), other.data_);
+    uint32_t idx = it - begin();
+    erase_impl(ops, idx);
+    return begin() + idx;
   }
   void push_back(const T& elem)
   {
-    resize(size() + 1, size() * 2);
-    data_[size() - 1] = elem;
+    if (size_ == cap_) {
+      // The element may live in the storage that is about to be reallocated.
+      T tmp(elem);
+      reserve_impl(ops, size_ * 2 > size_ + 1 ? size_ * 2 : size_ + 1);
+      new (data() + size_) T(std::move(tmp));
+    } else {
+      new (data() + size_) T(elem);
+    }
+    ++size_;
   }
-  void           clear() { resize(0); }
+  void push_back(T&& elem)
+  {
+    if (size_ == cap_) {
+      // The element may live in the storage that is about to be reallocated.
+      T tmp(std::move(elem));
+      reserve_impl(ops, size_ * 2 > size_ + 1 ? size_ * 2 : size_ + 1);
+      new (data() + size_) T(std::move(tmp));
+    } else {
+      new (data() + size_) T(std::move(elem));
+    }
+    ++size_;
+  }
+  void           clear() { resize_impl(ops, 0, 0); }
   T&             back() { return (*this)[size() - 1]; }
   const T&       back() const { return (*this)[size() - 1]; }
-  T*             data() { return data_; }
-  const T*       data() const { return data_; }
-  iterator       begin() { return data_; }
-  iterator       end() { return data_ + size(); }
-  const_iterator begin() const { return data_; }
-  const_iterator end() const { return data_ + size(); }
+  T*             data() { return static_cast<T*>(data_); }
+  const T*       data() const { return static_cast<const T*>(data_); }
+  iterator       begin() { return data(); }
+  iterator       end() { return data() + size(); }
+  const_iterator begin() const { return data(); }
+  const_iterator end() const { return data() + size(); }
 
 private:
-  T*       data_ = nullptr;
-  uint32_t size_ = 0;
-  uint32_t cap_  = 0;
+  static void construct_elems(void* dst, uint32_t n)
+  {
+    T* d = static_cast<T*>(dst);
+    for (uint32_t i = 0; i != n; ++i) {
+      new (d + i) T();
+    }
+  }
+  static void copy_elems(void* dst, const void* src, uint32_t n)
+  {
+    T*       d = static_cast<T*>(dst);
+    const T* s = static_cast<const T*>(src);
+    for (uint32_t i = 0; i != n; ++i) {
+      new (d + i) T(s[i]);
+    }
+  }
+  static void relocate_elems(void* dst, void* src, uint32_t n)
+  {
+    T* d = static_cast<T*>(dst);
+    T* s = static_cast<T*>(src);
+    for (uint32_t i = 0; i != n; ++i) {
+      new (d + i) T(std::move(s[i]));
+      s[i].~T();
+    }
+  }
+  static void destroy_elems(void* ptr, uint32_t n)
+  {
+    T* p = static_cast<T*>(ptr);
+    for (uint32_t i = 0; i != n; ++i) {
+      p[i].~T();
+    }
+  }
+
+  /// Operations on the elements of this array type.
+  static const detail::dyn_array_ops ops;
 };
+
+template <class T>
+const detail::dyn_array_ops dyn_array<T>::ops = {
+    sizeof(T),
+    std::is_trivially_default_constructible<T>::value ? nullptr : &dyn_array<T>::construct_elems,
+    std::is_trivially_copyable<T>::value ? nullptr : &dyn_array<T>::copy_elems,
+    std::is_trivially_copyable<T>::value ? nullptr : &dyn_array<T>::relocate_elems,
+    std::is_trivially_destructible<T>::value ? nullptr : &dyn_array<T>::destroy_elems};
+
+template <class T>
+bool operator==(const dyn_array<T>& lhs, const dyn_array<T>& rhs)
+{
+  return lhs.size() == rhs.size() and std::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
 
 template <class T, uint32_t MAX_N>
 class bounded_array
@@ -1146,6 +1217,44 @@ struct FixedSeqOfPacker {
    dyn sequence of
 *********************/
 
+namespace detail {
+
+using pack_item_fn   = OCUDUASN_CODE (*)(bit_ref& bref, const void* item, void* packer);
+using unpack_item_fn = OCUDUASN_CODE (*)(cbit_ref& bref, void* item, void* packer);
+using resize_seq_fn  = void* (*)(void* seqof, uint32_t nof_items);
+
+/// Packs the length and the items of a SEQUENCE OF stored contiguously.
+OCUDUASN_CODE pack_dyn_seq_of_items(bit_ref&     bref,
+                                    const void*  items,
+                                    uint32_t     nof_items,
+                                    uint32_t     item_size,
+                                    uint32_t     lb,
+                                    uint32_t     ub,
+                                    bool         aligned,
+                                    pack_item_fn pack_item,
+                                    void*        packer);
+
+/// Unpacks the length and the items of a SEQUENCE OF stored contiguously.
+OCUDUASN_CODE unpack_dyn_seq_of_items(cbit_ref&      bref,
+                                      void*          seqof,
+                                      resize_seq_fn  resize,
+                                      uint32_t       item_size,
+                                      uint32_t       lb,
+                                      uint32_t       ub,
+                                      bool           aligned,
+                                      unpack_item_fn unpack_item,
+                                      void*          unpacker);
+
+template <class ArrayType>
+void* resize_seq_of(void* seqof, uint32_t nof_items)
+{
+  auto& arr = *static_cast<ArrayType*>(seqof);
+  arr.resize(nof_items);
+  return arr.data();
+}
+
+} // namespace detail
+
 template <class ArrayType, class ItemPacker>
 OCUDUASN_CODE pack_dyn_seq_of(bit_ref&         bref,
                               const ArrayType& seqof,
@@ -1154,21 +1263,35 @@ OCUDUASN_CODE pack_dyn_seq_of(bit_ref&         bref,
                               ItemPacker       packer,
                               bool             aligned = false)
 {
-  HANDLE_CODE(pack_length(bref, seqof.size(), lb, ub, aligned));
-  for (uint32_t i = 0; i < seqof.size(); ++i) {
-    HANDLE_CODE(packer.pack(bref, seqof[i]));
-  }
-  return OCUDUASN_SUCCESS;
+  using item_type = typename ArrayType::value_type;
+  return detail::pack_dyn_seq_of_items(
+      bref,
+      seqof.data(),
+      seqof.size(),
+      sizeof(item_type),
+      lb,
+      ub,
+      aligned,
+      [](bit_ref& b, const void* item, void* p) {
+        return static_cast<ItemPacker*>(p)->pack(b, *static_cast<const item_type*>(item));
+      },
+      &packer);
 }
 
 template <class ArrayType>
 OCUDUASN_CODE pack_dyn_seq_of(bit_ref& bref, const ArrayType& seqof, uint32_t lb, uint32_t ub, bool aligned = false)
 {
-  HANDLE_CODE(pack_length(bref, seqof.size(), lb, ub, aligned));
-  for (uint32_t i = 0; i < seqof.size(); ++i) {
-    HANDLE_CODE(seqof[i].pack(bref));
-  }
-  return OCUDUASN_SUCCESS;
+  using item_type = typename ArrayType::value_type;
+  return detail::pack_dyn_seq_of_items(
+      bref,
+      seqof.data(),
+      seqof.size(),
+      sizeof(item_type),
+      lb,
+      ub,
+      aligned,
+      [](bit_ref& b, const void* item, void*) { return static_cast<const item_type*>(item)->pack(b); },
+      nullptr);
 }
 
 template <class ArrayType, class ItemUnpacker>
@@ -1179,25 +1302,35 @@ OCUDUASN_CODE unpack_dyn_seq_of(ArrayType&   seqof,
                                 ItemUnpacker unpacker,
                                 bool         aligned = false)
 {
-  uint32_t nof_items;
-  HANDLE_CODE(unpack_length(nof_items, bref, lb, ub, aligned));
-  seqof.resize(nof_items);
-  for (uint32_t i = 0; i < nof_items; ++i) {
-    HANDLE_CODE(unpacker.unpack(seqof[i], bref));
-  }
-  return OCUDUASN_SUCCESS;
+  using item_type = typename ArrayType::value_type;
+  return detail::unpack_dyn_seq_of_items(
+      bref,
+      &seqof,
+      &detail::resize_seq_of<ArrayType>,
+      sizeof(item_type),
+      lb,
+      ub,
+      aligned,
+      [](cbit_ref& b, void* item, void* p) {
+        return static_cast<ItemUnpacker*>(p)->unpack(*static_cast<item_type*>(item), b);
+      },
+      &unpacker);
 }
 
 template <class ArrayType>
 OCUDUASN_CODE unpack_dyn_seq_of(ArrayType& seqof, cbit_ref& bref, uint32_t lb, uint32_t ub, bool aligned = false)
 {
-  uint32_t nof_items;
-  HANDLE_CODE(unpack_length(nof_items, bref, lb, ub, aligned));
-  seqof.resize(nof_items);
-  for (uint32_t i = 0; i < nof_items; ++i) {
-    HANDLE_CODE(seqof[i].unpack(bref));
-  }
-  return OCUDUASN_SUCCESS;
+  using item_type = typename ArrayType::value_type;
+  return detail::unpack_dyn_seq_of_items(
+      bref,
+      &seqof,
+      &detail::resize_seq_of<ArrayType>,
+      sizeof(item_type),
+      lb,
+      ub,
+      aligned,
+      [](cbit_ref& b, void* item, void*) { return static_cast<item_type*>(item)->unpack(b); },
+      nullptr);
 }
 
 template <class InnerPacker>

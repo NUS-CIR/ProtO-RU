@@ -3879,3 +3879,44 @@ using reset_resp_s = elementary_procedure_option<reset_resp_ies_container>;
 
 } // namespace e2ap
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::e2node_component_cfg_addition_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::e2node_component_cfg_addition_ack_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::e2node_component_cfg_removal_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::e2node_component_cfg_removal_ack_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::e2node_component_cfg_upd_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::e2node_component_cfg_upd_ack_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2ap::ran_functions_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2ap::ran_functions_id_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_functions_id_cause_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_functions_accept_modified_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2ap::ric_sub_load_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_function_load_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ric_sub_load_confirm_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_function_load_confirm_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ric_sub_load_request_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_function_load_request_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ric_sub_suspended_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_function_state_confirm_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ran_function_state_ctrl_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ric_sub_list_with_cause_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::ric_sub_audit_action_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2ap::ric_sub_audit_list_l::value_type>::ops;

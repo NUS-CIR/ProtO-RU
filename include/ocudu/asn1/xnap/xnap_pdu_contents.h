@@ -5011,3 +5011,61 @@ using xn_u_address_ind_s = elementary_procedure_option<xn_u_address_ind_ies_cont
 
 } // namespace xnap
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::activ_nr_cells_and_ss_bs_item_s::ss_bs_activ_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::activ_nr_cells_and_ss_bs_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::qos_flows_activity_notify_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_res_activity_notify_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::bearers_subject_to_counter_check_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::boundary_node_cells_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::to_be_activ_nr_cells_and_ss_bs_item_s::ss_bstobe_activ_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::to_be_activ_nr_cells_and_ss_bs_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::parent_node_cells_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::iab_tnl_address_to_be_released_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::traffic_to_be_added_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::traffic_to_be_modified_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::xnap::traffic_added_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::xnap::traffic_modified_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::traffic_not_added_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::traffic_not_modified_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::xnap::traffic_released_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::traffic_required_to_be_modified_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::traffic_required_modified_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_res_notify_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_sn_change_confirm_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_sn_change_required_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_admitted_to_be_added_sn_mod_resp_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_admitted_to_be_modified_sn_mod_resp_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_admitted_added_add_req_ack_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_admitted_mod_sn_mod_confirm_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_to_be_added_add_req_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_session_to_be_modified_sn_mod_required_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_sessions_to_be_added_sn_mod_request_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::xnap::pdu_sessions_to_be_modified_sn_mod_request_list_l::value_type>::ops;

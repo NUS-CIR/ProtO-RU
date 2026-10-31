@@ -3838,3 +3838,145 @@ private:
 
 } // namespace e2sm
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_param_testing_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::associated_ue_info_s::associated_ue_info_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_param_definition_choice_list_s::ran_param_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_param_definition_choice_structure_s::ran_param_structure_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_action_definition_format1_s::ran_p_to_be_reported_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_param_structure_s::seq_of_ran_params_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_param_list_s::list_of_ran_param_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ric_policy_action_s::ran_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_action_definition_format2_s::ric_policy_conditions_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_action_definition_format3_s::ran_p_insert_ind_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::e2sm_rc_action_definition_format4_ind_item_s::ran_p_insert_ind_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::e2sm_rc_action_definition_format4_style_item_s::ric_insert_ind_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_action_definition_format4_s::ric_insert_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ue_group_definition_s::ue_group_definition_id_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_msg_format1_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_msg_format2_style_item_s::ric_ctrl_action_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_msg_format2_s::ric_ctrl_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_entity_filt_s::entity_specific_ctrl_ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_msg_format3_s::list_of_entity_filts_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_msg_format3_s::entity_agnostic_ctrl_ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_msg_format4_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_outcome_format1_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_outcome_format2_ctrl_outcome_item_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_outcome_format2_style_item_s::ric_ctrl_outcome_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_outcome_format2_s::ric_ctrl_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ctrl_outcome_format3_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::event_trigger_ue_info_s::ue_info_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::event_trigger_ue_event_info_s::ue_event_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_event_trigger_format1_s::msg_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::event_trigger_cell_info_s::cell_info_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_event_trigger_format3_s::e2_node_info_change_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::trigger_type_choice_rrc_state_s::rrc_state_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_event_trigger_format4_s::ue_info_change_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format1_s::ran_p_reported_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format2_item_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format2_s::ue_param_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::neighbour_cell_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format3_s::cell_info_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format5_s::ran_p_requested_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format6_ind_item_s::ran_p_insert_ind_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format6_style_item_s::ric_insert_ind_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_ind_msg_format6_s::ric_insert_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_query_definition_format1_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_query_outcome_format1_item_cell_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_query_outcome_format1_s::cell_info_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_query_outcome_format2_item_ue_s::ran_p_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_rc_query_outcome_format2_s::ue_info_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_event_trigger_s::ric_event_trigger_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_event_trigger_s::ran_l2_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_event_trigger_breakpoint_item_s::
+                        ran_call_process_breakpoint_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_event_trigger_call_process_item_s::
+                        call_process_breakpoints_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_event_trigger_s::ran_call_process_types_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_event_trigger_s::ran_ue_identif_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_event_trigger_s::ran_cell_identif_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_report_item_s::ran_report_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_report_s::ric_report_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_insert_ind_item_s::ran_insert_ind_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_insert_item_s::ric_insert_ind_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_insert_s::ric_insert_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_ctrl_action_item_s::ran_ctrl_action_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_ctrl_item_s::ric_ctrl_action_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_ctrl_item_s::ran_ctrl_outcome_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::list_of_add_supported_formats_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_ctrl_s::ric_ctrl_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_policy_action_item_s::ran_policy_action_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ran_function_definition_policy_action_item_s::ran_policy_condition_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_policy_item_s::ric_policy_action_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_policy_s::ric_policy_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_query_item_s::ran_query_params_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::ran_function_definition_query_s::ric_query_style_list_l_::value_type>::ops;

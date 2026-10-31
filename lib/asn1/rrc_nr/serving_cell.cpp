@@ -25051,3 +25051,102 @@ const char* serving_cell_cfg_s::cjt_scheme_pdsch_r18_opts::to_string() const
   static const char* names[] = {"cjtSchemeA", "cjtSchemeB"};
   return convert_enum_idx(names, 2, value, "serving_cell_cfg_s::cjt_scheme_pdsch_r18_e_");
 }
+
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::srs_pos_cfg_r17_s::srs_pos_res_set_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::srs_pos_cfg_r17_s::srs_pos_res_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::availability_combination_rb_groups_r17_s::rb_set_groups_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::availability_combinations_per_cell_r16_s::availability_combinations_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::availability_combinations_per_cell_r16_s::availability_combinations_rb_groups_r17_l_::value_type>::
+    ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::availability_ind_r16_s::available_comb_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::nr_ns_pmax_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::multi_freq_band_list_nr_sib_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::nr_ns_pmax_list_v1760_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::multi_freq_band_list_nr_sib_v1760_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::nr_ns_pmax_list_aerial_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::multi_freq_band_list_nr_aerial_sib_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::eutra_mbsfn_sf_cfg_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::freq_info_dl_sib_s::scs_specific_carrier_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_aperiodic_trigger_state_s::associated_report_cfg_info_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_aperiodic_trigger_state_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::nzp_csi_rs_res_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::nzp_csi_rs_res_set_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::csi_im_res_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::csi_im_res_set_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::csi_ssb_res_set_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::csi_res_cfg_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::csi_report_cfg_s::report_cfg_type_c_::periodic_s_::pucch_csi_res_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_report_cfg_s::non_pmi_port_ind_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_report_cfg_s::csi_report_sub_cfg_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::csi_report_cfg_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_semi_persistent_on_pusch_trigger_state_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::scell_activation_rs_cfg_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_meas_cfg_s::ltm_csi_report_cfg_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::tdd_ul_dl_cfg_ded_s::slot_specific_cfgs_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::serving_cell_cfg_s::dl_bwp_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ul_cfg_s::ul_bwp_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::srs_tpc_pdcch_cfg_s::srs_cc_set_idxlist_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::srs_carrier_switching_s::srs_tpc_pdcch_group_c_::type_a_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::slot_format_combinations_per_cell_s::slot_format_combinations_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::slot_format_ind_s::slot_format_comb_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::slot_format_ind_s::available_rb_sets_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::slot_format_ind_s::switch_trigger_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::slot_format_ind_s::co_durs_per_cell_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::slot_format_ind_s::co_durs_per_cell_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::pdsch_code_block_group_tx_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::tdd_ul_dl_cfg_ded_iab_mt_r16_s::slot_specific_cfgs_to_add_mod_list_iab_mt_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::intra_cell_guard_bands_per_scs_r16_s::intra_cell_guard_bands_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::serving_cell_cfg_s::intra_cell_guard_bands_dl_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::lte_crs_pattern_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::nr_dl_prs_pdc_res_set_r17_s::res_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mimo_param_r17_s::add_pci_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mimo_param_r17_s::ul_pwr_ctrl_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::lte_neigh_cells_crs_assist_info_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::serving_cell_cfg_s::mc_dci_set_of_cells_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mimo_param_v1850_s::add_tdd_cfg_per_pci_to_add_mod_list_r18_l_::value_type>::ops;

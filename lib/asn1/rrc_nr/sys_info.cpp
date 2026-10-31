@@ -13645,3 +13645,108 @@ const char* sib1_s::uac_barr_info_s_::uac_access_category1_sel_assist_info_c_::t
   static const char* names[] = {"plmnCommon", "individualPLMNList"};
   return convert_enum_idx(names, 2, value, "sib1_s::uac_barr_info_s_::uac_access_category1_sel_assist_info_c_::types");
 }
+
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::plmn_id_info_s::plmn_id_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::plmn_id_info_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::npn_id_r16_c::pni_npn_r16_s_::cag_id_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::npn_id_info_r16_s::npn_id_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::npn_id_info_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::atg_neigh_cell_cfg_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::ssb_mtc4_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::intra_freq_neigh_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::intra_freq_excluded_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::intra_freq_neigh_cell_list_v1610_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sib3_s::intra_freq_cag_cell_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::intra_freq_neigh_cell_list_v1710_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::inter_freq_neigh_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_neigh_cell_list_v1610_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::inter_freq_carrier_freq_info_v1610_s::inter_freq_cag_cell_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_v1610_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_neigh_cell_list_v1710_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_v1700_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_v1720_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_v1730_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_v1760_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::inter_freq_carrier_freq_list_v1800_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::eutra_ns_pmax_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::eutra_multi_band_info_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::eutra_freq_neigh_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::eutra_freq_excluded_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::carrier_freq_list_eutra_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::carrier_freq_list_eutra_v1610_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::carrier_freq_list_eutra_v1700_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::eutra_multi_band_info_list_aerial_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::carrier_freq_list_eutra_v1800_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::hrnn_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_idle_cfg_sib_r16_s::meas_idle_carrier_list_nr_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_idle_cfg_sib_r16_s::meas_idle_carrier_list_eutra_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_idle_cfg_sib_r16_s::meas_resel_carrier_list_nr_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sib15_r17_s::applicable_disaster_info_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::slice_info_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::freq_prio_list_slicing_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sib18_r17_s::gin_elem_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sib18_r17_s::gins_per_sn_pn_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ntn_neigh_cell_cfg_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::pdsch_cfg_broadcast_r17_s::pdsch_cfg_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::pdsch_cfg_broadcast_r17_s::rate_match_pattern_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mbs_fsai_inter_freq_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::coverage_area_info_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sys_info_ies_s::sib_type_and_info_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::pos_sys_info_r16_ies_s::pos_sib_type_and_info_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cell_access_related_info_s::snpn_access_info_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::sib_map_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::si_sched_info_s::sched_info_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::si_request_cfg_s::si_request_res_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::uac_barr_per_cat_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::uac_barr_per_plmn_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::uac_barr_info_set_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::pos_sib_map_info_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::pos_si_sched_info_r16_s::pos_sched_info_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::si_request_cfg_repeat_r18_s::si_request_res_repeat_num2_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::uac_barr_info_set_list_v1700_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::sib_map_v1700_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::si_sched_info_v1700_s::sched_info_list2_r17_l_::value_type>::ops;

@@ -5534,3 +5534,28 @@ const char* sl_meas_result_relay_r17_s::sl_meas_quant_r18_opts::to_string() cons
   static const char* names[] = {"sl-rsrp", "sd-rsrp"};
   return convert_enum_idx(names, 2, value, "sl_meas_result_relay_r17_s::sl_meas_quant_r18_e_");
 }
+
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_params_sidelink_nr_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_params_sidelink_nr_v1710_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::rrc_recfg_sidelink_r16_ies_s::slrb_cfg_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::rrc_recfg_sidelink_v1700_ies_s::sl_rlc_ch_to_add_mod_list_pc5_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::rrc_recfg_sidelink_v1800_ies_s::sl_carrier_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::rrc_recfg_sidelink_v1800_ies_s::sl_rlc_bearer_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::rrc_recfg_sidelink_v1800_ies_s::sl_local_id_pair_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_requested_pos_sib_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ue_cap_info_sidelink_r16_ies_s::supported_band_list_sidelink_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ue_info_request_sidelink_r18_ies_s::sl_e2_e_qos_info_list_pc5_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ue_info_resp_sidelink_r18_ies_s::sl_split_qos_info_list_pc5_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_meas_result_list_relay_r17_l::value_type>::ops;

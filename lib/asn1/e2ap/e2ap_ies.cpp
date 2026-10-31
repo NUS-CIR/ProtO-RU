@@ -2738,3 +2738,5 @@ uint8_t time_to_wait_opts::to_number() const
   static const uint8_t numbers[] = {1, 2, 5, 10, 20, 60};
   return map_enum_number(numbers, 6, value, "time_to_wait_e");
 }
+
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2ap::crit_diagnostics_ie_list_l::value_type>::ops;

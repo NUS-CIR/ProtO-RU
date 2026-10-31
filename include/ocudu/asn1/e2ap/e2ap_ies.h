@@ -1213,3 +1213,6 @@ using time_to_wait_e = enumerated<time_to_wait_opts, true>;
 
 } // namespace e2ap
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2ap::crit_diagnostics_ie_list_l::value_type>::ops;

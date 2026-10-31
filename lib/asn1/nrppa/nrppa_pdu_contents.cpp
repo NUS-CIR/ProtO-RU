@@ -6607,3 +6607,5 @@ void trp_info_resp_ies_container::to_json(json_writer& j) const
   }
   j.end_array();
 }
+
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::nrppa::otdoa_info_type_l::value_type>::ops;

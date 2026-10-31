@@ -777,3 +777,8 @@ struct radio_bearer_cfg_s {
 
 } // namespace rrc_nr
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::srb_to_add_mod_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::drb_to_add_mod_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mrb_to_add_mod_list_r17_l::value_type>::ops;

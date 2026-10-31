@@ -11214,3 +11214,49 @@ uint8_t cell_group_cfg_s::ul_tx_switching_dual_ul_tx_state_r17_opts::to_number()
   static const uint8_t numbers[] = {1, 2};
   return map_enum_number(numbers, 2, value, "cell_group_cfg_s::ul_tx_switching_dual_ul_tx_state_r17_e_");
 }
+
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cfra_s::res_c_::ssb_s_::ssb_res_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cfra_s::res_c_::csirs_s_::csirs_res_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cell_group_cfg_s::rlc_bearer_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sched_request_cfg_s::sched_request_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::tag_cfg_s::tag_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::sched_request_cfg_v1700_s::sched_request_to_add_mod_list_ext_v1700_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mac_cell_group_cfg_s::g_rnti_cfg_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mac_cell_group_cfg_s::dsr_cfg_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::phys_cell_group_cfg_s::pdsch_harq_ack_enh_type3_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cell_group_cfg_s::scell_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cell_group_cfg_s::bh_rlc_ch_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cell_group_cfg_s::uu_relay_rlc_ch_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cell_group_cfg_s::iab_res_cfg_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::intra_band_cc_combination_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::report_ul_tx_direct_current_more_carrier_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ncr_periodic_fwd_res_set_r18_s::periodic_fwd_rsrc_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ncr_fwd_cfg_r18_s::periodic_fwd_rsrc_set_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ncr_aperiodic_fwd_cfg_r18_s::aperiodic_fwd_time_rsrc_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ncr_semi_persistent_fwd_res_set_r18_s::semi_persistent_fwd_rsrc_to_add_mod_list_r18_l_::value_type>::
+    ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ncr_fwd_cfg_r18_s::semi_persistent_fwd_rsrc_set_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ul_tx_switching_band_pair_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ul_tx_switching_associated_band_dual_ul_list_r18_l::value_type>::ops;

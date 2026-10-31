@@ -23656,3 +23656,102 @@ const char* logged_meas_cfg_r16_s::crit_exts_c_::types_opts::to_string() const
   static const char* names[] = {"loggedMeasurementConfiguration-r16", "criticalExtensionsFuture"};
   return convert_enum_idx(names, 2, value, "logged_meas_cfg_r16_s::crit_exts_c_::types");
 }
+
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::plmn_ran_area_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::plmn_ran_area_cfg_s::ran_area_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::plmn_ran_area_cfg_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::candidate_serving_freq_range_list_nr_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mu_si_m_gap_cfg_r17_s::musim_gap_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::mu_si_m_gap_cfg_r17_s::musim_gap_to_add_mod_list_ext_v1820_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ul_excess_delay_cfg_r17_s::excess_delay_drb_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::event_trigger_cfg_s::cell_individual_offset_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_rs_cell_mob_s::csi_rs_res_list_mob_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::cell_global_id_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::tracking_area_id_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::app_layer_meas_cfg_r17_s::meas_cfg_app_layer_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::area_cfg_r16_s::inter_freq_target_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::cag_cfg_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::sn_pn_cfg_cell_id_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::sn_pn_cfg_tai_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::sn_pn_cfg_id_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::srs_res_list_cfg_cli_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::rssi_res_list_cfg_cli_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::csi_rs_res_cfg_mob_s::csi_rs_cell_list_mob_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::freq_prio_list_eutra_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::freq_prio_list_nr_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::slice_info_list_ded_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::freq_prio_list_ded_slicing_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::cells_to_add_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cells_to_add_mod_list_ext_v1710_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cells_to_add_mod_list_ext_v1800_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cells_to_add_mod_list_utra_fdd_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cond_execution_cond_to_add_mod_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cond_recfg_to_add_mod_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::sk_counter_configuration_r18_s::sk_counter_cfg_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::drb_count_msb_info_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ssb_position_qcl_cells_to_add_mod_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ssb_position_qcl_cell_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ssb_to_measure_altitude_based_list_r18_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_obj_nr_s::excluded_cells_to_add_mod_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::ssb_mtc3_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_obj_eutra_s::cells_to_add_mod_list_eutran_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_obj_eutra_s::excluded_cells_to_add_mod_list_eutran_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::meas_obj_to_add_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::event_trigger_cfg_inter_rat_s::cell_individual_offset_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::report_cfg_to_add_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::meas_id_to_add_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::quant_cfg_s::quant_cfg_nr_list_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::meas_gap_cfg_s::gap_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::pos_meas_gap_pre_cfg_to_add_mod_list_r17_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::iab_ip_address_cfg_list_r16_s::iab_ip_address_to_add_mod_list_r16_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::prop_delay_diff_report_cfg_r17_s::neigh_cell_info_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_l2_relay_ue_cfg_r17_s::sl_remote_ue_to_add_mod_list_r17_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::sl_u2_u_remote_ue_cfg_r18_s::sl_source_remote_ue_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sl_l2_relay_ue_cfg_r17_s::sl_u2_u_remote_ue_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::n3_c_indirect_path_cfg_relay_r18_s::n3c_map_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ul_traffic_info_report_cfg_r18_s::pdu_sessions_to_report_ul_traffic_info_list_r18_l_::value_type>::
+    ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ltm_tci_info_r18_s::ltm_dl_or_joint_tci_state_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ltm_tci_info_r18_s::ltm_ul_tci_state_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ltm_cfg_r18_s::ltm_candidate_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ltm_cfg_r18_s::ltm_csi_res_cfg_to_add_mod_list_r18_l_::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::validity_area_list_r16_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::ue_cap_rat_request_list_l::value_type>::ops;

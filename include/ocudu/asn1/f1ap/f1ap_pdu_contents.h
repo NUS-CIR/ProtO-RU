@@ -4190,3 +4190,14 @@ using write_replace_warning_resp_s = elementary_procedure_option<write_replace_w
 
 } // namespace f1ap
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::mc_paging_cell_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::paging_cell_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_associated_lc_f1_conn_list_res_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_associated_lc_f1_conn_list_res_ack_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::trp_info_list_trp_resp_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::trp_info_type_list_trp_req_l::value_type>::ops;

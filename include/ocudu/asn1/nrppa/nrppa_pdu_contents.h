@@ -1224,3 +1224,5 @@ using trp_info_resp_s = elementary_procedure_option<trp_info_resp_ies_container>
 
 } // namespace nrppa
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::nrppa::otdoa_info_type_l::value_type>::ops;

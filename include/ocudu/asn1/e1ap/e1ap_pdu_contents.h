@@ -2949,3 +2949,28 @@ using ul_data_notif_s = elementary_procedure_option<ul_data_notif_ies_container>
 
 } // namespace e1ap
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e1ap::drb_status_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::dl_up_tnl_address_to_upd_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::gnb_cu_cp_tnl_a_to_add_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::gnb_cu_cp_tnl_a_to_rem_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::gnb_cu_cp_tnl_a_to_upd_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::gnb_cu_cp_tnl_a_setup_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::gnb_cu_cp_tnl_a_failed_to_setup_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e1ap::supported_plmns_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::gnb_cu_up_tnl_a_to_rem_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::iab_donor_cu_up_psk_info_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::ul_up_tnl_address_to_upd_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::ue_associated_lc_e1_conn_list_res_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e1ap::ue_associated_lc_e1_conn_list_res_ack_l::value_type>::ops;

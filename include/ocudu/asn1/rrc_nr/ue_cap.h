@@ -18735,3 +18735,281 @@ struct ue_nr_cap_s {
 
 } // namespace rrc_nr
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_s::band_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_params_v1540_s::srs_carrier_switch_c_::nr_s_::srs_switching_times_list_nr_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_params_v1540_s::srs_carrier_switch_c_::eutra_s_::srs_switching_times_list_eutra_l_::value_type>::
+    ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1540_s::band_list_v1540_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1610_s::band_list_v1610_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_ul_tx_switch_r16_s::supported_band_pair_list_nr_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1630_s::scaling_factor_tx_sidelink_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1640_s::two_pucch_grp_cfgs_list_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ca_params_nr_v1690_s::csi_report_cross_pucch_grp_r16_s_::carrier_type_pair_list_r16_l_::value_type>::
+    ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1700_s::mtrp_csi_enhancement_per_bc_r17_s_::
+                        supported_combo_across_ccs_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1700_s::band_list_v1710_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_ul_tx_switch_v1700_s::supported_band_pair_list_nr_v1700_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_ul_tx_switch_v1700_s::ul_tx_switching_band_params_list_v1700_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::ca_params_nr_v1720_s::semi_static_pucch_cell_switch_two_groups_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1720_s::pdcch_blind_detection_mcg_scg_list_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1720_s::pdcch_blind_detection_mixed_list1_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1720_s::pdcch_blind_detection_mixed_list3_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1730_s::band_list_v1730_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1770_s::band_list_v1770_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1780_s::band_list_v1780_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_v1790_s::supported_intra_endc_band_combination_list_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::codebook_paramsetype2_doppler_csi_r18_s::etype2_doppler_n4_r18_s_::
+                        supported_csi_rs_report_setting_list1_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1800_s::non_codebook_csi_rs_srs_per_bc_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1800_s::multi_cell_pdsch_dci_1_3_diff_scs_r18_s_::
+                        combination_carrier_type_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1800_s::pdcch_blind_detection_ca_mixed_ext_r18_c_::
+                        pdcch_blind_detection_ca_mixed_r18_s_::blind_detection_ca_mixed_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nr_v1800_s::pdcch_blind_detection_mcg_scg_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::ca_params_nrdc_v1800_s::pdcch_blind_detection_nrdc_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_v1800_s::band_list_v1810_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+                                                  asn1::dyn_array<asn1::rrc_nr::ul_tx_switching_band_pair_r18_s::
+                                                                      ul_tx_switching_period_unaffected_band_dual_ul_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_ul_tx_switch_v1800_s::supported_band_pair_list_nr_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_ul_tx_switch_v1800_s::ul_tx_switching_add_period_dual_ul_list_r18_l_::value_type>::
+    ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_ul_tx_switch_v1840_s::supported_band_pair_list_nr_v1840_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::band_combination_v1680_s::intraband_concurrent_operation_pwr_class_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_r16_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1630_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1640_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1650_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1670_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1690_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v16e0_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1700_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1720_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1730_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1740_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1760_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1770_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1780_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1790_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1800_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1830_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1840_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_ul_tx_switch_v1860_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1540_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1550_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1560_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1570_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1580_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1590_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v15g0_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v15n0_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1610_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1630_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1640_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1650_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1680_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1690_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1700_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1720_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1730_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1740_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1760_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1770_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1780_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1790_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1800_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1830_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1840_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_v1860_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_list_sl_discovery_r17_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_params_sidelink_eutra_nr_r16_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_params_sidelink_eutra_nr_v1630_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_combination_params_sidelink_eutra_nr_v1710_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_nr_s::prs_processing_cap_outside_m_gin_ppw_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::lower_msd_r18_s::msd_info_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::band_nr_s::lower_msd_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_per_band_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_set_dl_s::dummy4_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_set_dl_s::dummy5_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_set_dl_s::dummy6_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_set_dl_s::dummy7_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_set_dl_v1800_s::dummy_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::feature_set_dl_v1830_s::pdcch_rach_affected_bands_target_band_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::feature_set_dl_v1830_s::pdcch_rach_switching_time_target_band_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::feature_set_dl_v1830_s::pdcch_rach_prep_time_target_band_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1540_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1540_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_v1540_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v15a0_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1610_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1610_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_set_dl_per_cc_v1620_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1630_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1640_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1700_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_v1700_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1710_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_v1700_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1720_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_v1720_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1720_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1730_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_v1730_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_v1780_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_v1780_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1800_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_v1800_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1800_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_v1800_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1830_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_per_cc_v1840_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_v1840_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_v1850_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_ul_per_cc_v1850_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::feature_sets_s::feature_sets_dl_v1860_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::freq_band_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::utra_fdd_params_r16_s::supported_band_list_utra_fdd_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::phy_params_mrdc_s::naics_cap_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::rf_params_s::supported_band_list_nr_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::sidelink_params_nr_r16_s::supported_band_list_sidelink_r16_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::sidelink_params_eutra_r16_s::supported_band_list_sidelink_eutra_r16_l_::value_type>::ops;

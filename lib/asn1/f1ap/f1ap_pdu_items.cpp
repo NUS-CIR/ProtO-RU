@@ -7614,3 +7614,111 @@ const char* ue_multicast_m_rbs_to_be_setup_at_modify_item_ies_o::value_c::types_
   static const char* names[] = {"UE-MulticastMRBs-ToBeSetup-atModify-Item"};
   return convert_enum_idx(names, 1, value, "ue_multicast_m_rbs_to_be_setup_at_modify_item_ies_o::value_c::types");
 }
+
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::activ_cells_map_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bap_hdr_rewriting_added_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bap_hdr_rewriting_remd_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_routing_info_added_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_routing_info_remd_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::bh_chs_failed_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::bh_chs_failed_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::bh_chs_failed_to_be_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::bh_chs_required_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::bh_chs_to_be_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::broadcast_to_be_cancelled_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::candidate_sp_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::cells_allowed_to_be_deactiv_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::cells_broadcast_cancelled_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::cells_broadcast_completed_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::cells_failed_to_be_activ_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::cells_status_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::cells_to_be_broadcast_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::cells_to_be_activ_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::cells_to_be_barred_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::cells_to_be_deactiv_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drb_activity_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drb_notify_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::drbs_failed_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_failed_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::drbs_failed_to_be_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_modified_conf_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::drbs_required_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::drbs_required_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::drbs_to_be_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ded_si_delivery_needed_ue_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::gnb_du_served_cells_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::ncgi_to_be_upd_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::protected_eutra_res_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::neighbour_cell_info_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::served_cells_to_add_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::served_cells_to_modify_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::served_cells_to_delete_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::iab_allocated_tnl_address_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::iab_tnl_addresses_to_rem_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::ul_up_tnl_info_to_upd_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::ue_id_list_for_paging_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::nr_cgi_list_for_restart_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::pws_failed_nr_cgi_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::potential_sp_cell_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::sl_drbs_failed_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::sl_drbs_failed_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::sl_drbs_failed_to_be_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_modified_conf_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::sl_drbs_required_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::sl_drbs_required_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::f1ap::sl_drbs_to_be_setup_mod_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_confirmed_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_required_to_be_modified_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_required_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_setupnew_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_to_be_released_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_to_be_setup_list_l::value_type>::ops;
+template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::f1ap::ue_multicast_m_rbs_to_be_setup_at_modify_list_l::value_type>::ops;

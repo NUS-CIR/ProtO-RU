@@ -2036,3 +2036,40 @@ struct e2sm_kpm_ra_nfunction_description_s {
 
 } // namespace e2sm
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::bin_range_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::dist_meas_bin_range_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::label_info_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::match_cond_report_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::meas_info_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::matching_cond_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::meas_cond_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::matching_ue_cond_per_sub_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::matching_ue_id_per_sub_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::multi_report_action_definition_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::event_param_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::event_triger_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::meas_record_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::meas_data_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::matching_ue_id_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::matching_ue_id_list_per_gp_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::matching_ue_id_per_gp_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::meas_cond_ue_id_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::ue_meas_report_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::multi_report_ind_msg_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_kpm_ra_nfunction_description_s::ric_event_trigger_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::meas_info_action_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::e2sm::e2sm_kpm_ra_nfunction_description_s::ric_report_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::ric_integrated_report_style_item_s::ric_fundamental_level_report_style_list_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::e2sm::e2sm_kpm_ra_nfunction_description_s::ric_integrated_report_style_list_l_::value_type>::ops;

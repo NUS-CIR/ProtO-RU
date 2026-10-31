@@ -970,3 +970,18 @@ struct var_tss_info_r18_s {
 
 } // namespace rrc_nr
 } // namespace asn1
+
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::cells_triggered_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::var_app_layer_idle_cfg_r18_s::app_layer_idle_cfg_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::var_app_layer_plmn_list_cfg_r18_s::plmn_cfg_list_r18_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops asn1::dyn_array<
+    asn1::rrc_nr::var_conn_est_fail_report_list_r17_s::conn_est_fail_report_list_r17_l_::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::var_meas_report_list_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::var_meas_report_list_sl_r16_l::value_type>::ops;
+extern template const asn1::detail::dyn_array_ops
+    asn1::dyn_array<asn1::rrc_nr::var_ra_report_r16_s::id_list_r18_c_::snpn_id_list_r18_l_::value_type>::ops;
