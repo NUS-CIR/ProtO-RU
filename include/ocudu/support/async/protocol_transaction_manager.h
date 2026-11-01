@@ -26,7 +26,15 @@ template <typename ResponseType>
 class protocol_transaction_manager;
 
 /// Error causes for the case of transactions that timed out or were cancelled.
-enum class protocol_transaction_failure { timeout, cancel, abnormal };
+enum class protocol_transaction_failure {
+  /// The transaction's own supervision timer expired before a response arrived.
+  timeout,
+  /// The owner stopped the transaction on purpose, for example, because it cancels the procedure or removes the entity.
+  /// A response could still have arrived.
+  cancel,
+  /// There was a specific failure that caused the transaction to be canceled and no response ever arrives.
+  abnormal
+};
 
 /// Protocol Transaction Awaitable. This awaitable is single-use, after which, the respective transaction_manager class
 /// will reset its underlying event state.
@@ -39,7 +47,7 @@ public:
   using response_type = ResponseType;
   using outcome_type  = expected<ResponseType, protocol_transaction_failure>;
   using event_type    = manual_event<outcome_type>;
-  using awaiter_type  = typename event_type ::awaiter_type;
+  using awaiter_type  = typename event_type::awaiter_type;
 
   protocol_transaction() = default;
   protocol_transaction(manager_type& parent_, unsigned transaction_id_, event_type& ev_) :
@@ -254,9 +262,11 @@ public:
   }
 
   /// Cancel a running transaction.
-  bool cancel_transaction(unsigned transaction_id)
+  /// \param[in] cause Reason recorded for the cancellation. Defaults to \c cancel when no input is given.
+  bool cancel_transaction(unsigned                     transaction_id,
+                          protocol_transaction_failure cause = protocol_transaction_failure::cancel)
   {
-    return set_transaction_outcome(transaction_id, protocol_transaction_failure::cancel);
+    return set_transaction_outcome(transaction_id, cause);
   }
 
 private:

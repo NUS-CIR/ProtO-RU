@@ -240,6 +240,23 @@ public:
     return true;
   }
 
+  [[nodiscard]] bool send_f1ap_ue_context_release_request_and_await_f1ap_ue_context_release_command()
+  {
+    report_fatal_error_if_not(not this->get_du(du_idx).try_pop_dl_pdu(f1ap_pdu),
+                              "there are still F1AP DL messages to pop from DU");
+
+    // DU reports a UE-specific radio link failure while RRC Setup is still pending.
+    test_logger.info("Injecting F1AP UE Context Release Request (DU-initiated, e.g. RLF)");
+    get_du(du_idx).push_ul_pdu(test_helpers::generate_ue_context_release_request(cu_ue_id.value(), du_ue_f1ap_id));
+
+    report_fatal_error_if_not(this->wait_for_f1ap_tx_pdu(du_idx, f1ap_pdu),
+                              "Failed to receive F1AP UE Context Release Command");
+    report_fatal_error_if_not(test_helpers::is_valid_ue_context_release_command(f1ap_pdu),
+                              "Invalid F1AP UE Context Release Command");
+
+    return true;
+  }
+
   [[nodiscard]] bool send_rrc_setup_complete_and_await_f1ap_ue_context_release_command()
   {
     report_fatal_error_if_not(not this->get_du(du_idx).try_pop_dl_pdu(f1ap_pdu),
@@ -411,6 +428,41 @@ TEST_F(cu_cp_setup_test, when_unexpected_ul_nas_transport_message_is_received_du
   // TEST: UE context removed from CU-CP.
   report = this->get_cu_cp().get_metrics_handler().request_metrics_report();
   ASSERT_TRUE(report.ues.empty());
+  ASSERT_EQ(report.dus[0].rrc_metrics.attempted_rrc_connection_establishments.get_count(establishment_cause_t::mo_sig),
+            1u);
+  ASSERT_EQ(
+      report.dus[0].rrc_metrics.failed_rrc_connection_establishments.get_count(establishment_fail_cause_t::no_reply),
+      1u);
+}
+
+TEST_F(cu_cp_setup_test, when_du_initiated_ue_context_release_request_is_received_during_rrc_setup_then_ue_is_released)
+{
+  // Check no UEs.
+  auto report = this->get_cu_cp().get_metrics_handler().request_metrics_report();
+  ASSERT_TRUE(report.ues.empty());
+
+  // Create UE by sending Initial UL RRC Message and await DL RRC Message Transfer.
+  ASSERT_TRUE(send_initial_ul_rrc_message_and_await_dl_rrc_message_transfer());
+
+  // DU reports a UE-specific radio link failure while RRC Setup is still pending, and await F1AP UE Context Release
+  // Command.
+  ASSERT_TRUE(send_f1ap_ue_context_release_request_and_await_f1ap_ue_context_release_command());
+
+  // Verify AMF is not notified (the UE never had an NGAP context).
+  ASSERT_FALSE(this->wait_for_ngap_tx_pdu(ngap_pdu));
+
+  // Injects F1AP UE Context Release Complete.
+  auto rel_complete = test_helpers::generate_ue_context_release_complete(cu_ue_id.value(), du_ue_f1ap_id);
+  get_du(du_idx).push_ul_pdu(rel_complete);
+
+  // TEST: UE context removed from CU-CP.
+  report = this->get_cu_cp().get_metrics_handler().request_metrics_report();
+  ASSERT_TRUE(report.ues.empty());
+  ASSERT_EQ(report.dus[0].rrc_metrics.attempted_rrc_connection_establishments.get_count(establishment_cause_t::mo_sig),
+            1u);
+  ASSERT_EQ(
+      report.dus[0].rrc_metrics.failed_rrc_connection_establishments.get_count(establishment_fail_cause_t::no_reply),
+      1u);
 }
 
 TEST_F(cu_cp_setup_test, when_ue_selects_unsupported_plmn_during_rrc_setup_then_ue_is_released)

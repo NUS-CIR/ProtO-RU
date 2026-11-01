@@ -105,10 +105,10 @@ void rrc_ue_impl::cancel_handover_reconfiguration_transaction(uint8_t transactio
   }
 }
 
-void rrc_ue_impl::cancel_all_transactions()
+void rrc_ue_impl::cancel_all_transactions(protocol_transaction_failure cause)
 {
   logger.log_debug("Cancelling all ongoing RRC transactions");
-  event_mng->cancel_all();
+  event_mng->cancel_all(cause);
 }
 
 void rrc_ue_impl::update_c_rnti(rnti_t crnti)

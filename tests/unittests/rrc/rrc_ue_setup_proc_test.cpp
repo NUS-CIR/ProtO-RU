@@ -65,12 +65,34 @@ TEST_F(rrc_ue_setup, when_setup_complete_timeout_then_ue_deleted)
 
   // Check that UE has been created and was not requested to be released.
   check_ue_release_not_requested();
+  ASSERT_EQ(rrc_ue_rrc_du_notifier.nof_failed_rrc_connection_establishments, 0);
 
   // Tick timer until RRC setup complete timer fires.
   tick_timer();
 
   // Verify that RRC requested UE context release.
   check_ue_release_requested();
+
+  // Verify that the failure was counted as NoReply, per TS 28.552 section 5.1.1.15.3.
+  ASSERT_EQ(rrc_ue_rrc_du_notifier.nof_failed_rrc_connection_establishments, 1);
+  ASSERT_EQ(rrc_ue_rrc_du_notifier.last_establishment_fail_cause, establishment_fail_cause_t::no_reply);
+}
+
+/// Test that a UE-specific failure, which unreceives RRC Setup Complete, is counted as NoReply, TS 28.552
+/// section 5.1.1.15.3.
+TEST_F(rrc_ue_setup, when_setup_transaction_cancelled_abnormally_then_counted_as_no_reply)
+{
+  receive_setup_request();
+
+  check_ue_release_not_requested();
+  ASSERT_EQ(rrc_ue_rrc_du_notifier.nof_failed_rrc_connection_establishments, 0);
+
+  // Simulate a DU-reported UE-specific failure cancelling the pending RRC Setup transaction.
+  get_rrc_ue_control_message_handler()->cancel_all_transactions(protocol_transaction_failure::abnormal);
+  ctrl_worker.run_pending_tasks();
+
+  ASSERT_EQ(rrc_ue_rrc_du_notifier.nof_failed_rrc_connection_establishments, 1);
+  ASSERT_EQ(rrc_ue_rrc_du_notifier.last_establishment_fail_cause, establishment_fail_cause_t::no_reply);
 }
 
 TEST_F(rrc_ue_setup, when_setup_complete_received_initial_ue_message_sent)

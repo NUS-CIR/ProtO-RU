@@ -60,13 +60,21 @@ void rrc_setup_procedure::operator()(coro_context<async_task<void>>& ctx)
   CORO_AWAIT(transaction);
 
   if (!transaction.has_response()) {
-    if (transaction.failure_cause() == protocol_transaction_failure::timeout) {
-      logger.log_warning("\"{}\" timed out after {}ms", name(), procedure_timeout.count());
-      metrics_notifier.on_failed_rrc_connection_establishment(establishment_fail_cause_t::no_reply);
-      rrc_ue.on_ue_release_required(cause_protocol_t::unspecified);
-    } else {
-      logger.log_warning("\"{}\" cancelled", name());
-      // Do nothing. We are likely shutting down the DU processor.
+    switch (transaction.failure_cause()) {
+      case protocol_transaction_failure::timeout:
+        logger.log_warning("\"{}\" timed out after {}ms", name(), procedure_timeout.count());
+        metrics_notifier.on_failed_rrc_connection_establishment(establishment_fail_cause_t::no_reply);
+        rrc_ue.on_ue_release_required(cause_protocol_t::unspecified);
+        break;
+      case protocol_transaction_failure::abnormal:
+        logger.log_info("\"{}\" cancelled due to a UE-specific failure", name());
+        metrics_notifier.on_failed_rrc_connection_establishment(establishment_fail_cause_t::no_reply);
+        break;
+      case protocol_transaction_failure::cancel:
+      default:
+        logger.log_info("\"{}\" cancelled", name());
+        // Do nothing. We are likely shutting down the DU processor.
+        break;
     }
     CORO_EARLY_RETURN();
   }

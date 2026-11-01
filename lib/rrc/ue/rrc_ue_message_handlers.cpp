@@ -406,7 +406,7 @@ void rrc_ue_impl::on_ul_nas_pdu(byte_buffer nas_pdu)
   if (!ngap_notifier.on_ul_nas_transport_message(ul_nas_msg)) {
     logger.log_info(
         "Requesting UE release. Cause: Received unexpected UL NAS Transport message and failed to forward it to NGAP");
-    cancel_all_transactions();
+    cancel_all_transactions(protocol_transaction_failure::abnormal);
     on_ue_release_required(cause_protocol_t::msg_not_compatible_with_receiver_state);
     return;
   }

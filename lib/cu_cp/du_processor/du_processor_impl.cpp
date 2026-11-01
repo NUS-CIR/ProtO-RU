@@ -698,13 +698,14 @@ void du_processor_impl::handle_du_initiated_ue_context_release_request(const f1a
 
   logger.debug("ue={}: Handling DU initiated UE context release request", request.ue_index);
 
-  // The DU requested a UE release, so we cancel all ongoing RRC transactions for the UE.
+  // The DU requested a UE release, so we cancel all ongoing RRC transactions for the UE. This is a UE-specific
+  // abnormal failure.
   auto* rrc_ue = ue->get_rrc_ue();
   if (!rrc_ue) {
     logger.warning("ue={}: Dropping DU initiated UE context release request. RRC UE does not exist", request.ue_index);
     return;
   }
-  rrc_ue->cancel_all_transactions();
+  rrc_ue->cancel_all_transactions(protocol_transaction_failure::abnormal);
 
   // Schedule on UE task scheduler.
   ue->get_task_sched().schedule_async_task(

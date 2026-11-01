@@ -23,10 +23,10 @@ public:
   static constexpr size_t                   MAX_NOF_TRANSACTIONS = 4; // Two bit RRC transaction id
   protocol_transaction_manager<rrc_outcome> transactions;
 
-  void cancel_all()
+  void cancel_all(protocol_transaction_failure cause = protocol_transaction_failure::cancel)
   {
     for (unsigned tid = 0; tid != rrc_ue_event_manager::MAX_NOF_TRANSACTIONS; ++tid) {
-      transactions.cancel_transaction(tid);
+      transactions.cancel_transaction(tid, cause);
     }
   }
 

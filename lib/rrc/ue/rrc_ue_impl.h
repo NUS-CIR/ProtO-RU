@@ -104,7 +104,7 @@ public:
   void                                  set_rrc_state(rrc_state state) override { context.state = state; }
   rrc_state                             get_rrc_state() const override;
   void                                  cancel_handover_reconfiguration_transaction(uint8_t transaction_id) override;
-  void                                  cancel_all_transactions() override;
+  void cancel_all_transactions(protocol_transaction_failure cause = protocol_transaction_failure::cancel) override;
 
   // rrc_ue_context_handler
   rrc_ue_reestablishment_context_response get_context() override;

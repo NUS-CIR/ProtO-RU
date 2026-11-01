@@ -25,6 +25,7 @@
 #include "ocudu/rrc/rrc_ue_config.h"
 #include "ocudu/security/security.h"
 #include "ocudu/support/async/async_task.h"
+#include "ocudu/support/async/protocol_transaction_manager.h"
 #include <chrono>
 #include <variant>
 
@@ -414,7 +415,8 @@ public:
   virtual void cancel_handover_reconfiguration_transaction(uint8_t transaction_id) = 0;
 
   /// \brief Cancel all ongoing transactions.
-  virtual void cancel_all_transactions() = 0;
+  /// \param[in] cause Reason recorded for the cancellation. Defaults to \c cancel when no input is given.
+  virtual void cancel_all_transactions(protocol_transaction_failure cause = protocol_transaction_failure::cancel) = 0;
 };
 
 class rrc_ue_cu_cp_ue_notifier

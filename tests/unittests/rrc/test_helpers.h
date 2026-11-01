@@ -230,7 +230,11 @@ public:
   {
   }
 
-  void on_failed_rrc_connection_establishment(establishment_fail_cause_t cause) override {}
+  void on_failed_rrc_connection_establishment(establishment_fail_cause_t cause) override
+  {
+    ++nof_failed_rrc_connection_establishments;
+    last_establishment_fail_cause = cause;
+  }
 
   void on_successful_rrc_connection_reestablishment() override {}
 
@@ -248,6 +252,10 @@ public:
 
   /// Counts the new RRC connections the RRC UE reported.
   unsigned nof_new_rrc_connections = 0;
+
+  /// Counts the failed RRC connection establishments the RRC UE reported.
+  unsigned                   nof_failed_rrc_connection_establishments = 0;
+  establishment_fail_cause_t last_establishment_fail_cause            = establishment_fail_cause_t::other;
 };
 
 } // namespace ocudu::ocucp
