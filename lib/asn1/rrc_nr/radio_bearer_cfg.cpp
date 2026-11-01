@@ -1845,7 +1845,3 @@ void radio_bearer_cfg_s::to_json(json_writer& j) const
   }
   j.end_obj();
 }
-
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::srb_to_add_mod_list_l::value_type>::ops;
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::drb_to_add_mod_list_l::value_type>::ops;
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::mrb_to_add_mod_list_r17_l::value_type>::ops;

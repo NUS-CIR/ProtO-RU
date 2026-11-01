@@ -3810,8 +3810,3 @@ const char* ue_id_c::types_opts::to_string() const
       "gNB-UEID", "gNB-DU-UEID", "gNB-CU-UP-UEID", "ng-eNB-UEID", "ng-eNB-DU-UEID", "en-gNB-UEID", "eNB-UEID"};
   return convert_enum_idx(names, 7, value, "ue_id_c::types");
 }
-
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::supported_sul_band_list_l::value_type>::ops;
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::nr_freq_band_list_l::value_type>::ops;
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::ue_id_gnb_cu_f1ap_id_list_l::value_type>::ops;
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::e2sm::ue_id_gnb_cu_cp_e1ap_id_list_l::value_type>::ops;

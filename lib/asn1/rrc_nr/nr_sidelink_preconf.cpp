@@ -1554,9 +1554,3 @@ void sl_precfg_nr_r16_s::to_json(json_writer& j) const
   }
   j.end_obj();
 }
-
-template const asn1::detail::dyn_array_ops
-    asn1::dyn_array<asn1::rrc_nr::sl_freq_cfg_common_r16_s::sl_bwp_list_r16_l_::value_type>::ops;
-template const asn1::detail::dyn_array_ops
-    asn1::dyn_array<asn1::rrc_nr::sl_freq_cfg_common_r16_s::sl_pos_bwp_list_r18_l_::value_type>::ops;
-template const asn1::detail::dyn_array_ops asn1::dyn_array<asn1::rrc_nr::sl_tx_profile_list_r17_l::value_type>::ops;

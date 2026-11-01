@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 # Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
-
 # RRC NR ASN1
 add_library(rrc_nr_asn1 STATIC
         common.cpp
@@ -29,6 +28,7 @@ add_library(rrc_nr_asn1 STATIC
         ul_ccch_msg.cpp
         ul_ccch1_msg.cpp
         dl_ccch_msg.cpp
-        rrc_nr.cpp)
+        rrc_nr.cpp
+        rrc_nr_lists.cpp)
 target_compile_options(rrc_nr_asn1 PRIVATE -Os -fno-exceptions)
 target_link_libraries(rrc_nr_asn1 asn1_utils)
