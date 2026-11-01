@@ -13,6 +13,37 @@ using ocudu::span;
 
 namespace asn1 {
 
+OCUDUASN_CODE pack_bits(bit_ref& bref, std::initializer_list<bool> flags)
+{
+  // Flags are packed in words, with the first flag in the most significant bit.
+  const bool* flag = flags.begin();
+  for (auto nof_left = static_cast<uint32_t>(flags.size()); nof_left > 0;) {
+    uint32_t n_bits = std::min(nof_left, 64U);
+    uint64_t word   = 0;
+    for (uint32_t i = 0; i != n_bits; ++i, ++flag) {
+      word = (word << 1U) | static_cast<uint64_t>(*flag);
+    }
+    HANDLE_CODE(bref.pack(word, n_bits));
+    nof_left -= n_bits;
+  }
+  return OCUDUASN_SUCCESS;
+}
+
+OCUDUASN_CODE unpack_bits(cbit_ref& bref, std::initializer_list<bool*> flags)
+{
+  bool* const* flag = flags.begin();
+  for (auto nof_left = static_cast<uint32_t>(flags.size()); nof_left > 0;) {
+    uint32_t n_bits = std::min(nof_left, 64U);
+    uint64_t word   = 0;
+    HANDLE_CODE(bref.unpack(word, n_bits));
+    for (uint32_t i = 0; i != n_bits; ++i, ++flag) {
+      **flag = ((word >> (n_bits - 1U - i)) & 1U) != 0;
+    }
+    nof_left -= n_bits;
+  }
+  return OCUDUASN_SUCCESS;
+}
+
 /************************
        dyn_array
 ************************/

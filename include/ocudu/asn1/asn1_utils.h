@@ -15,6 +15,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <initializer_list>
 #include <limits>
 #include <new>
 #include <string>
@@ -185,6 +186,12 @@ private:
   ocudu::byte_buffer::const_iterator it;
   uint8_t                            offset = 0;
 };
+
+/// Packs one bit per flag, in order.
+OCUDUASN_CODE pack_bits(bit_ref& bref, std::initializer_list<bool> flags);
+
+/// Unpacks one bit into each flag, in order.
+OCUDUASN_CODE unpack_bits(cbit_ref& bref, std::initializer_list<bool*> flags);
 
 /*********************
   function helpers

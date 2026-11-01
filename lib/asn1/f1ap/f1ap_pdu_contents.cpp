@@ -422,9 +422,7 @@ void aperiodic_srs_ext_ies_container::to_json(json_writer& j) const
 // AperiodicSRS ::= SEQUENCE
 OCUDUASN_CODE aperiodic_srs_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(srs_res_trigger_present, 1));
-  HANDLE_CODE(bref.pack(ie_exts_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, srs_res_trigger_present, ie_exts_present}));
 
   HANDLE_CODE(aperiodic.pack(bref));
   if (srs_res_trigger_present) {
@@ -439,9 +437,7 @@ OCUDUASN_CODE aperiodic_srs_s::pack(bit_ref& bref) const
 OCUDUASN_CODE aperiodic_srs_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(srs_res_trigger_present, 1));
-  HANDLE_CODE(bref.unpack(ie_exts_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &srs_res_trigger_present, &ie_exts_present}));
 
   HANDLE_CODE(aperiodic.unpack(bref));
   if (srs_res_trigger_present) {
@@ -17155,9 +17151,7 @@ void semipersistent_srs_ext_ies_container::to_json(json_writer& j) const
 // SemipersistentSRS ::= SEQUENCE
 OCUDUASN_CODE semipersistent_srs_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(srs_spatial_relation_present, 1));
-  HANDLE_CODE(bref.pack(ie_exts_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, srs_spatial_relation_present, ie_exts_present}));
 
   HANDLE_CODE(pack_integer(bref, srs_res_set_id, (uint8_t)0u, (uint8_t)15u, true, true));
   if (srs_spatial_relation_present) {
@@ -17172,9 +17166,7 @@ OCUDUASN_CODE semipersistent_srs_s::pack(bit_ref& bref) const
 OCUDUASN_CODE semipersistent_srs_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(srs_spatial_relation_present, 1));
-  HANDLE_CODE(bref.unpack(ie_exts_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &srs_spatial_relation_present, &ie_exts_present}));
 
   HANDLE_CODE(unpack_integer(srs_res_set_id, bref, (uint8_t)0u, (uint8_t)15u, true, true));
   if (srs_spatial_relation_present) {
@@ -20440,7 +20432,8 @@ void private_ie_container_empty_l::to_json(json_writer& j) const
 // PrivateMessage ::= SEQUENCE
 OCUDUASN_CODE private_msg_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(private_ies.pack(bref));
 
   bref.align_bytes_zero();
@@ -20451,6 +20444,7 @@ OCUDUASN_CODE private_msg_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(private_ies.unpack(bref));
 
   if (ext) {

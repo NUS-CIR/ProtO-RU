@@ -46,7 +46,8 @@ const char* beam_id_c::types_opts::to_string() const
 // NR-CGI ::= SEQUENCE
 OCUDUASN_CODE nr_cgi_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(nr_cell_id.pack(bref));
 
@@ -56,6 +57,7 @@ OCUDUASN_CODE nr_cgi_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(nr_cell_id.unpack(bref));
 
@@ -77,7 +79,8 @@ void nr_cgi_s::to_json(json_writer& j) const
 // EUTRA-CGI ::= SEQUENCE
 OCUDUASN_CODE eutra_cgi_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(eutra_cell_id.pack(bref));
 
@@ -87,6 +90,7 @@ OCUDUASN_CODE eutra_cgi_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(eutra_cell_id.unpack(bref));
 
@@ -244,7 +248,8 @@ const char* cgi_c::types_opts::to_string() const
 // Cell-RNTI ::= SEQUENCE
 OCUDUASN_CODE cell_rnti_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, c_rnti, (uint32_t)0u, (uint32_t)65535u, false, true));
   HANDLE_CODE(cell_global_id.pack(bref));
 
@@ -254,6 +259,7 @@ OCUDUASN_CODE cell_rnti_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(c_rnti, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
   HANDLE_CODE(cell_global_id.unpack(bref));
 
@@ -275,7 +281,8 @@ void cell_rnti_s::to_json(json_writer& j) const
 // GUAMI ::= SEQUENCE
 OCUDUASN_CODE guami_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(amf_region_id.pack(bref));
   HANDLE_CODE(amf_set_id.pack(bref));
@@ -287,6 +294,7 @@ OCUDUASN_CODE guami_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(amf_region_id.unpack(bref));
   HANDLE_CODE(amf_set_id.unpack(bref));
@@ -314,7 +322,8 @@ void guami_s::to_json(json_writer& j) const
 // GUMMEI ::= SEQUENCE
 OCUDUASN_CODE gummei_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(mme_group_id.pack(bref));
   HANDLE_CODE(mme_code.pack(bref));
@@ -325,6 +334,7 @@ OCUDUASN_CODE gummei_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(mme_group_id.unpack(bref));
   HANDLE_CODE(mme_code.unpack(bref));
@@ -714,7 +724,8 @@ const char* enb_id_c::types_opts::to_string() const
 // FreqBandNrItem ::= SEQUENCE
 OCUDUASN_CODE freq_band_nr_item_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, freq_band_ind_nr, (uint16_t)1u, (uint16_t)1024u, true, true));
 
   return OCUDUASN_SUCCESS;
@@ -723,6 +734,7 @@ OCUDUASN_CODE freq_band_nr_item_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(freq_band_ind_nr, bref, (uint16_t)1u, (uint16_t)1024u, true, true));
 
   if (ext) {
@@ -773,7 +785,8 @@ const char* gnb_id_c::types_opts::to_string() const
 // GlobalENB-ID ::= SEQUENCE
 OCUDUASN_CODE global_enb_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(enb_id.pack(bref));
 
@@ -783,6 +796,7 @@ OCUDUASN_CODE global_enb_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(enb_id.unpack(bref));
 
@@ -804,7 +818,8 @@ void global_enb_id_s::to_json(json_writer& j) const
 // GlobalGNB-ID ::= SEQUENCE
 OCUDUASN_CODE global_gnb_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(gnb_id.pack(bref));
 
@@ -814,6 +829,7 @@ OCUDUASN_CODE global_gnb_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(gnb_id.unpack(bref));
 
@@ -998,7 +1014,8 @@ const char* ng_enb_id_c::types_opts::to_string() const
 // GlobalNgENB-ID ::= SEQUENCE
 OCUDUASN_CODE global_ng_enb_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(ng_enb_id.pack(bref));
 
@@ -1008,6 +1025,7 @@ OCUDUASN_CODE global_ng_enb_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(ng_enb_id.unpack(bref));
 
@@ -1165,7 +1183,8 @@ const char* global_ngran_node_id_c::types_opts::to_string() const
 // GlobalenGNB-ID ::= SEQUENCE
 OCUDUASN_CODE globalen_gnb_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(plmn_id.pack(bref));
   HANDLE_CODE(en_gnb_id.pack(bref));
 
@@ -1175,6 +1194,7 @@ OCUDUASN_CODE globalen_gnb_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(plmn_id.unpack(bref));
   HANDLE_CODE(en_gnb_id.unpack(bref));
 
@@ -1311,7 +1331,8 @@ uint8_t group_id_c::types_opts::to_number() const
 // Interface-MessageID ::= SEQUENCE
 OCUDUASN_CODE interface_msg_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_unconstrained_integer(bref, interface_proc_id, false, true));
   HANDLE_CODE(msg_type.pack(bref));
 
@@ -1321,6 +1342,7 @@ OCUDUASN_CODE interface_msg_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_unconstrained_integer(interface_proc_id, bref, false, true));
   HANDLE_CODE(msg_type.unpack(bref));
 
@@ -1347,7 +1369,8 @@ const char* interface_msg_id_s::msg_type_opts::to_string() const
 // InterfaceID-E1 ::= SEQUENCE
 OCUDUASN_CODE interface_id_e1_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(global_gnb_id.pack(bref));
   HANDLE_CODE(pack_integer(bref, gnb_cu_up_id, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
@@ -1357,6 +1380,7 @@ OCUDUASN_CODE interface_id_e1_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(global_gnb_id.unpack(bref));
   HANDLE_CODE(unpack_integer(gnb_cu_up_id, bref, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
@@ -1378,7 +1402,8 @@ void interface_id_e1_s::to_json(json_writer& j) const
 // InterfaceID-F1 ::= SEQUENCE
 OCUDUASN_CODE interface_id_f1_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(global_gnb_id.pack(bref));
   HANDLE_CODE(pack_integer(bref, gnb_du_id, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
@@ -1388,6 +1413,7 @@ OCUDUASN_CODE interface_id_f1_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(global_gnb_id.unpack(bref));
   HANDLE_CODE(unpack_integer(gnb_du_id, bref, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
@@ -1409,7 +1435,8 @@ void interface_id_f1_s::to_json(json_writer& j) const
 // InterfaceID-NG ::= SEQUENCE
 OCUDUASN_CODE interface_id_ng_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(guami.pack(bref));
 
   return OCUDUASN_SUCCESS;
@@ -1418,6 +1445,7 @@ OCUDUASN_CODE interface_id_ng_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(guami.unpack(bref));
 
   if (ext) {
@@ -1437,7 +1465,8 @@ void interface_id_ng_s::to_json(json_writer& j) const
 // InterfaceID-S1 ::= SEQUENCE
 OCUDUASN_CODE interface_id_s1_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(gummei.pack(bref));
 
   return OCUDUASN_SUCCESS;
@@ -1446,6 +1475,7 @@ OCUDUASN_CODE interface_id_s1_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(gummei.unpack(bref));
 
   if (ext) {
@@ -1465,7 +1495,8 @@ void interface_id_s1_s::to_json(json_writer& j) const
 // InterfaceID-W1 ::= SEQUENCE
 OCUDUASN_CODE interface_id_w1_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(global_ng_enb_id.pack(bref));
   HANDLE_CODE(pack_integer(bref, ng_enb_du_id, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
@@ -1475,6 +1506,7 @@ OCUDUASN_CODE interface_id_w1_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(global_ng_enb_id.unpack(bref));
   HANDLE_CODE(unpack_integer(ng_enb_du_id, bref, (uint64_t)0u, (uint64_t)68719476735u, false, true));
 
@@ -1496,7 +1528,8 @@ void interface_id_w1_s::to_json(json_writer& j) const
 // InterfaceID-X2 ::= SEQUENCE
 OCUDUASN_CODE interface_id_x2_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(node_type.pack(bref));
 
   return OCUDUASN_SUCCESS;
@@ -1505,6 +1538,7 @@ OCUDUASN_CODE interface_id_x2_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(node_type.unpack(bref));
 
   if (ext) {
@@ -1660,7 +1694,8 @@ const char* interface_id_x2_s::node_type_c_::types_opts::to_string() const
 // InterfaceID-Xn ::= SEQUENCE
 OCUDUASN_CODE interface_id_xn_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(global_ng_ran_id.pack(bref));
 
   return OCUDUASN_SUCCESS;
@@ -1669,6 +1704,7 @@ OCUDUASN_CODE interface_id_xn_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(global_ng_ran_id.unpack(bref));
 
   if (ext) {
@@ -1966,7 +2002,8 @@ const char* interface_type_opts::to_string() const
 // NR-ARFCN ::= SEQUENCE
 OCUDUASN_CODE nr_arfcn_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, nr_arfcn, (uint32_t)0u, (uint32_t)3279165u, false, true));
 
   return OCUDUASN_SUCCESS;
@@ -1975,6 +2012,7 @@ OCUDUASN_CODE nr_arfcn_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(nr_arfcn, bref, (uint32_t)0u, (uint32_t)3279165u, false, true));
 
   if (ext) {
@@ -1993,7 +2031,8 @@ void nr_arfcn_s::to_json(json_writer& j) const
 // SupportedSULFreqBandItem ::= SEQUENCE
 OCUDUASN_CODE supported_sul_freq_band_item_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, freq_band_ind_nr, (uint16_t)1u, (uint16_t)1024u, true, true));
 
   return OCUDUASN_SUCCESS;
@@ -2002,6 +2041,7 @@ OCUDUASN_CODE supported_sul_freq_band_item_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(freq_band_ind_nr, bref, (uint16_t)1u, (uint16_t)1024u, true, true));
 
   if (ext) {
@@ -2020,7 +2060,8 @@ void supported_sul_freq_band_item_s::to_json(json_writer& j) const
 // NRFrequencyBandItem ::= SEQUENCE
 OCUDUASN_CODE nr_freq_band_item_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, freq_band_ind_nr, (uint16_t)1u, (uint16_t)1024u, true, true));
   HANDLE_CODE(pack_dyn_seq_of(bref, supported_sul_band_list, 0, 32, true));
 
@@ -2030,6 +2071,7 @@ OCUDUASN_CODE nr_freq_band_item_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(freq_band_ind_nr, bref, (uint16_t)1u, (uint16_t)1024u, true, true));
   HANDLE_CODE(unpack_dyn_seq_of(supported_sul_band_list, bref, 0, 32, true));
 
@@ -2061,8 +2103,7 @@ const char* nr_freq_shift7p5khz_opts::to_string() const
 // NRFrequencyInfo ::= SEQUENCE
 OCUDUASN_CODE nr_freq_info_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(freq_shift7p5khz_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, freq_shift7p5khz_present}));
 
   HANDLE_CODE(nr_arfcn.pack(bref));
   HANDLE_CODE(pack_dyn_seq_of(bref, freq_band_list, 1, 32, true));
@@ -2075,8 +2116,7 @@ OCUDUASN_CODE nr_freq_info_s::pack(bit_ref& bref) const
 OCUDUASN_CODE nr_freq_info_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(freq_shift7p5khz_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &freq_shift7p5khz_present}));
 
   HANDLE_CODE(nr_arfcn.unpack(bref));
   HANDLE_CODE(unpack_dyn_seq_of(freq_band_list, bref, 1, 32, true));
@@ -2109,21 +2149,22 @@ void nr_freq_info_s::to_json(json_writer& j) const
 // PartialUEID ::= SEQUENCE
 OCUDUASN_CODE partial_ue_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(amf_ue_ngap_id_present, 1));
-  HANDLE_CODE(bref.pack(guami_present, 1));
-  HANDLE_CODE(bref.pack(gnb_cu_ue_f1ap_id_present, 1));
-  HANDLE_CODE(bref.pack(gnb_cu_cp_ue_e1ap_id_present, 1));
-  HANDLE_CODE(bref.pack(ran_ue_id_present, 1));
-  HANDLE_CODE(bref.pack(m_ng_ran_ue_xnap_id_present, 1));
-  HANDLE_CODE(bref.pack(global_ng_ran_node_id_present, 1));
-  HANDLE_CODE(bref.pack(cell_rnti_present, 1));
-  HANDLE_CODE(bref.pack(ng_enb_cu_ue_w1_ap_id_present, 1));
-  HANDLE_CODE(bref.pack(m_enb_ue_x2ap_id_present, 1));
-  HANDLE_CODE(bref.pack(m_enb_ue_x2ap_id_ext_present, 1));
-  HANDLE_CODE(bref.pack(global_enb_id_present, 1));
-  HANDLE_CODE(bref.pack(mme_ue_s1ap_id_present, 1));
-  HANDLE_CODE(bref.pack(gummei_present, 1));
+  HANDLE_CODE(pack_bits(bref,
+                        {false,
+                         amf_ue_ngap_id_present,
+                         guami_present,
+                         gnb_cu_ue_f1ap_id_present,
+                         gnb_cu_cp_ue_e1ap_id_present,
+                         ran_ue_id_present,
+                         m_ng_ran_ue_xnap_id_present,
+                         global_ng_ran_node_id_present,
+                         cell_rnti_present,
+                         ng_enb_cu_ue_w1_ap_id_present,
+                         m_enb_ue_x2ap_id_present,
+                         m_enb_ue_x2ap_id_ext_present,
+                         global_enb_id_present,
+                         mme_ue_s1ap_id_present,
+                         gummei_present}));
 
   if (amf_ue_ngap_id_present) {
     HANDLE_CODE(pack_integer(bref, amf_ue_ngap_id, (uint64_t)0u, (uint64_t)1099511627775u, false, true));
@@ -2173,21 +2214,22 @@ OCUDUASN_CODE partial_ue_id_s::pack(bit_ref& bref) const
 OCUDUASN_CODE partial_ue_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(amf_ue_ngap_id_present, 1));
-  HANDLE_CODE(bref.unpack(guami_present, 1));
-  HANDLE_CODE(bref.unpack(gnb_cu_ue_f1ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(gnb_cu_cp_ue_e1ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(ran_ue_id_present, 1));
-  HANDLE_CODE(bref.unpack(m_ng_ran_ue_xnap_id_present, 1));
-  HANDLE_CODE(bref.unpack(global_ng_ran_node_id_present, 1));
-  HANDLE_CODE(bref.unpack(cell_rnti_present, 1));
-  HANDLE_CODE(bref.unpack(ng_enb_cu_ue_w1_ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(m_enb_ue_x2ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(m_enb_ue_x2ap_id_ext_present, 1));
-  HANDLE_CODE(bref.unpack(global_enb_id_present, 1));
-  HANDLE_CODE(bref.unpack(mme_ue_s1ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(gummei_present, 1));
+  HANDLE_CODE(unpack_bits(bref,
+                          {&ext,
+                           &amf_ue_ngap_id_present,
+                           &guami_present,
+                           &gnb_cu_ue_f1ap_id_present,
+                           &gnb_cu_cp_ue_e1ap_id_present,
+                           &ran_ue_id_present,
+                           &m_ng_ran_ue_xnap_id_present,
+                           &global_ng_ran_node_id_present,
+                           &cell_rnti_present,
+                           &ng_enb_cu_ue_w1_ap_id_present,
+                           &m_enb_ue_x2ap_id_present,
+                           &m_enb_ue_x2ap_id_ext_present,
+                           &global_enb_id_present,
+                           &mme_ue_s1ap_id_present,
+                           &gummei_present}));
 
   if (amf_ue_ngap_id_present) {
     HANDLE_CODE(unpack_integer(amf_ue_ngap_id, bref, (uint64_t)0u, (uint64_t)1099511627775u, false, true));
@@ -2409,8 +2451,7 @@ uint8_t qos_id_c::types_opts::to_number() const
 // RANfunction-Name ::= SEQUENCE
 OCUDUASN_CODE ra_nfunction_name_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(ran_function_instance_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, ran_function_instance_present}));
 
   HANDLE_CODE(ran_function_short_name.pack(bref));
   HANDLE_CODE(ran_function_e2sm_o_id.pack(bref));
@@ -2424,8 +2465,7 @@ OCUDUASN_CODE ra_nfunction_name_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ra_nfunction_name_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(ran_function_instance_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &ran_function_instance_present}));
 
   HANDLE_CODE(ran_function_short_name.unpack(bref));
   HANDLE_CODE(ran_function_e2sm_o_id.unpack(bref));
@@ -2489,7 +2529,8 @@ uint8_t rrc_class_nr_opts::to_number() const
 // RRC-MessageID ::= SEQUENCE
 OCUDUASN_CODE rrc_msg_id_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(rrc_type.pack(bref));
   HANDLE_CODE(pack_unconstrained_integer(bref, msg_id, false, true));
 
@@ -2499,6 +2540,7 @@ OCUDUASN_CODE rrc_msg_id_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(rrc_type.unpack(bref));
   HANDLE_CODE(unpack_unconstrained_integer(msg_id, bref, false, true));
 
@@ -2629,8 +2671,7 @@ const char* rrc_msg_id_s::rrc_type_c_::types_opts::to_string() const
 // S-NSSAI ::= SEQUENCE
 OCUDUASN_CODE s_nssai_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(sd_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, sd_present}));
 
   HANDLE_CODE(sst.pack(bref));
   if (sd_present) {
@@ -2642,8 +2683,7 @@ OCUDUASN_CODE s_nssai_s::pack(bit_ref& bref) const
 OCUDUASN_CODE s_nssai_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(sd_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &sd_present}));
 
   HANDLE_CODE(sst.unpack(bref));
   if (sd_present) {
@@ -2910,7 +2950,8 @@ const char* serving_cell_pci_c::types_opts::to_string() const
 // UEID-GNB-CU-CP-F1AP-ID-Item ::= SEQUENCE
 OCUDUASN_CODE ue_id_gnb_cu_cp_f1ap_id_item_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, gnb_cu_ue_f1ap_id, (uint64_t)0u, (uint64_t)4294967295u, false, true));
 
   return OCUDUASN_SUCCESS;
@@ -2919,6 +2960,7 @@ OCUDUASN_CODE ue_id_gnb_cu_cp_f1ap_id_item_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(gnb_cu_ue_f1ap_id, bref, (uint64_t)0u, (uint64_t)4294967295u, false, true));
 
   if (ext) {
@@ -2937,7 +2979,8 @@ void ue_id_gnb_cu_cp_f1ap_id_item_s::to_json(json_writer& j) const
 // UEID-GNB-CU-CP-E1AP-ID-Item ::= SEQUENCE
 OCUDUASN_CODE ue_id_gnb_cu_cp_e1ap_id_item_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(pack_integer(bref, gnb_cu_cp_ue_e1ap_id, (uint64_t)0u, (uint64_t)4294967295u, false, true));
 
   return OCUDUASN_SUCCESS;
@@ -2946,6 +2989,7 @@ OCUDUASN_CODE ue_id_gnb_cu_cp_e1ap_id_item_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(gnb_cu_cp_ue_e1ap_id, bref, (uint64_t)0u, (uint64_t)4294967295u, false, true));
 
   if (ext) {
@@ -2967,12 +3011,13 @@ OCUDUASN_CODE ue_id_gnb_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= global_ng_ran_node_id.is_present();
   group_flags[1] |= cell_rnti.is_present();
-  bref.pack(group_flags.any(), 1);
-  HANDLE_CODE(bref.pack(gnb_cu_ue_f1ap_id_list.size() > 0, 1));
-  HANDLE_CODE(bref.pack(gnb_cu_cp_ue_e1ap_id_list.size() > 0, 1));
-  HANDLE_CODE(bref.pack(ran_ue_id_present, 1));
-  HANDLE_CODE(bref.pack(m_ng_ran_ue_xnap_id_present, 1));
-  HANDLE_CODE(bref.pack(global_gnb_id_present, 1));
+  HANDLE_CODE(pack_bits(bref,
+                        {group_flags.any(),
+                         gnb_cu_ue_f1ap_id_list.size() > 0,
+                         gnb_cu_cp_ue_e1ap_id_list.size() > 0,
+                         ran_ue_id_present,
+                         m_ng_ran_ue_xnap_id_present,
+                         global_gnb_id_present}));
 
   HANDLE_CODE(pack_integer(bref, amf_ue_ngap_id, (uint64_t)0u, (uint64_t)1099511627775u, false, true));
   HANDLE_CODE(guami.pack(bref));
@@ -3011,14 +3056,15 @@ OCUDUASN_CODE ue_id_gnb_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ue_id_gnb_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
   bool gnb_cu_ue_f1ap_id_list_present;
-  HANDLE_CODE(bref.unpack(gnb_cu_ue_f1ap_id_list_present, 1));
   bool gnb_cu_cp_ue_e1ap_id_list_present;
-  HANDLE_CODE(bref.unpack(gnb_cu_cp_ue_e1ap_id_list_present, 1));
-  HANDLE_CODE(bref.unpack(ran_ue_id_present, 1));
-  HANDLE_CODE(bref.unpack(m_ng_ran_ue_xnap_id_present, 1));
-  HANDLE_CODE(bref.unpack(global_gnb_id_present, 1));
+  HANDLE_CODE(unpack_bits(bref,
+                          {&ext,
+                           &gnb_cu_ue_f1ap_id_list_present,
+                           &gnb_cu_cp_ue_e1ap_id_list_present,
+                           &ran_ue_id_present,
+                           &m_ng_ran_ue_xnap_id_present,
+                           &global_gnb_id_present}));
 
   HANDLE_CODE(unpack_integer(amf_ue_ngap_id, bref, (uint64_t)0u, (uint64_t)1099511627775u, false, true));
   HANDLE_CODE(guami.unpack(bref));
@@ -3101,8 +3147,7 @@ OCUDUASN_CODE ue_id_gnb_du_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= cell_rnti.is_present();
-  bref.pack(group_flags.any(), 1);
-  HANDLE_CODE(bref.pack(ran_ue_id_present, 1));
+  HANDLE_CODE(pack_bits(bref, {group_flags.any(), ran_ue_id_present}));
 
   HANDLE_CODE(pack_integer(bref, gnb_cu_ue_f1ap_id, (uint64_t)0u, (uint64_t)4294967295u, false, true));
   if (ran_ue_id_present) {
@@ -3123,8 +3168,7 @@ OCUDUASN_CODE ue_id_gnb_du_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ue_id_gnb_du_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(ran_ue_id_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &ran_ue_id_present}));
 
   HANDLE_CODE(unpack_integer(gnb_cu_ue_f1ap_id, bref, (uint64_t)0u, (uint64_t)4294967295u, false, true));
   if (ran_ue_id_present) {
@@ -3160,8 +3204,7 @@ void ue_id_gnb_du_s::to_json(json_writer& j) const
 // UEID-GNB-CU-UP ::= SEQUENCE
 OCUDUASN_CODE ue_id_gnb_cu_up_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(ran_ue_id_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, ran_ue_id_present}));
 
   HANDLE_CODE(pack_integer(bref, gnb_cu_cp_ue_e1ap_id, (uint64_t)0u, (uint64_t)4294967295u, false, true));
   if (ran_ue_id_present) {
@@ -3173,8 +3216,7 @@ OCUDUASN_CODE ue_id_gnb_cu_up_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ue_id_gnb_cu_up_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(ran_ue_id_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &ran_ue_id_present}));
 
   HANDLE_CODE(unpack_integer(gnb_cu_cp_ue_e1ap_id, bref, (uint64_t)0u, (uint64_t)4294967295u, false, true));
   if (ran_ue_id_present) {
@@ -3203,10 +3245,8 @@ OCUDUASN_CODE ue_id_ng_enb_s::pack(bit_ref& bref) const
   ext_groups_packer_guard group_flags;
   group_flags[0] |= global_ng_ran_node_id.is_present();
   group_flags[1] |= cell_rnti.is_present();
-  bref.pack(group_flags.any(), 1);
-  HANDLE_CODE(bref.pack(ng_enb_cu_ue_w1_ap_id_present, 1));
-  HANDLE_CODE(bref.pack(m_ng_ran_ue_xnap_id_present, 1));
-  HANDLE_CODE(bref.pack(global_ng_enb_id_present, 1));
+  HANDLE_CODE(pack_bits(
+      bref, {group_flags.any(), ng_enb_cu_ue_w1_ap_id_present, m_ng_ran_ue_xnap_id_present, global_ng_enb_id_present}));
 
   HANDLE_CODE(pack_integer(bref, amf_ue_ngap_id, (uint64_t)0u, (uint64_t)1099511627775u, false, true));
   HANDLE_CODE(guami.pack(bref));
@@ -3239,10 +3279,8 @@ OCUDUASN_CODE ue_id_ng_enb_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ue_id_ng_enb_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(ng_enb_cu_ue_w1_ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(m_ng_ran_ue_xnap_id_present, 1));
-  HANDLE_CODE(bref.unpack(global_ng_enb_id_present, 1));
+  HANDLE_CODE(unpack_bits(
+      bref, {&ext, &ng_enb_cu_ue_w1_ap_id_present, &m_ng_ran_ue_xnap_id_present, &global_ng_enb_id_present}));
 
   HANDLE_CODE(unpack_integer(amf_ue_ngap_id, bref, (uint64_t)0u, (uint64_t)1099511627775u, false, true));
   HANDLE_CODE(guami.unpack(bref));
@@ -3305,7 +3343,8 @@ OCUDUASN_CODE ue_id_ng_enb_du_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= cell_rnti.is_present();
-  bref.pack(group_flags.any(), 1);
+  HANDLE_CODE(bref.pack(group_flags.any(), 1));
+
   HANDLE_CODE(pack_integer(bref, ng_enb_cu_ue_w1_ap_id, (uint64_t)0u, (uint64_t)4294967295u, false, true));
 
   if (group_flags.any()) {
@@ -3323,6 +3362,7 @@ OCUDUASN_CODE ue_id_ng_enb_du_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(unpack_integer(ng_enb_cu_ue_w1_ap_id, bref, (uint64_t)0u, (uint64_t)4294967295u, false, true));
 
   if (ext) {
@@ -3353,11 +3393,12 @@ OCUDUASN_CODE ue_id_en_gnb_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= cell_rnti.is_present();
-  bref.pack(group_flags.any(), 1);
-  HANDLE_CODE(bref.pack(m_enb_ue_x2ap_id_ext_present, 1));
-  HANDLE_CODE(bref.pack(gnb_cu_ue_f1ap_id_present, 1));
-  HANDLE_CODE(bref.pack(gnb_cu_cp_ue_e1ap_id_list.size() > 0, 1));
-  HANDLE_CODE(bref.pack(ran_ue_id_present, 1));
+  HANDLE_CODE(pack_bits(bref,
+                        {group_flags.any(),
+                         m_enb_ue_x2ap_id_ext_present,
+                         gnb_cu_ue_f1ap_id_present,
+                         gnb_cu_cp_ue_e1ap_id_list.size() > 0,
+                         ran_ue_id_present}));
 
   HANDLE_CODE(pack_integer(bref, m_enb_ue_x2ap_id, (uint16_t)0u, (uint16_t)4095u, false, true));
   if (m_enb_ue_x2ap_id_ext_present) {
@@ -3388,12 +3429,13 @@ OCUDUASN_CODE ue_id_en_gnb_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ue_id_en_gnb_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(m_enb_ue_x2ap_id_ext_present, 1));
-  HANDLE_CODE(bref.unpack(gnb_cu_ue_f1ap_id_present, 1));
   bool gnb_cu_cp_ue_e1ap_id_list_present;
-  HANDLE_CODE(bref.unpack(gnb_cu_cp_ue_e1ap_id_list_present, 1));
-  HANDLE_CODE(bref.unpack(ran_ue_id_present, 1));
+  HANDLE_CODE(unpack_bits(bref,
+                          {&ext,
+                           &m_enb_ue_x2ap_id_ext_present,
+                           &gnb_cu_ue_f1ap_id_present,
+                           &gnb_cu_cp_ue_e1ap_id_list_present,
+                           &ran_ue_id_present}));
 
   HANDLE_CODE(unpack_integer(m_enb_ue_x2ap_id, bref, (uint16_t)0u, (uint16_t)4095u, false, true));
   if (m_enb_ue_x2ap_id_ext_present) {
@@ -3456,10 +3498,8 @@ OCUDUASN_CODE ue_id_enb_s::pack(bit_ref& bref) const
 {
   ext_groups_packer_guard group_flags;
   group_flags[0] |= cell_rnti.is_present();
-  bref.pack(group_flags.any(), 1);
-  HANDLE_CODE(bref.pack(m_enb_ue_x2ap_id_present, 1));
-  HANDLE_CODE(bref.pack(m_enb_ue_x2ap_id_ext_present, 1));
-  HANDLE_CODE(bref.pack(global_enb_id_present, 1));
+  HANDLE_CODE(pack_bits(
+      bref, {group_flags.any(), m_enb_ue_x2ap_id_present, m_enb_ue_x2ap_id_ext_present, global_enb_id_present}));
 
   HANDLE_CODE(pack_integer(bref, mme_ue_s1ap_id, (uint64_t)0u, (uint64_t)4294967295u, false, true));
   HANDLE_CODE(gummei.pack(bref));
@@ -3487,10 +3527,8 @@ OCUDUASN_CODE ue_id_enb_s::pack(bit_ref& bref) const
 OCUDUASN_CODE ue_id_enb_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(m_enb_ue_x2ap_id_present, 1));
-  HANDLE_CODE(bref.unpack(m_enb_ue_x2ap_id_ext_present, 1));
-  HANDLE_CODE(bref.unpack(global_enb_id_present, 1));
+  HANDLE_CODE(
+      unpack_bits(bref, {&ext, &m_enb_ue_x2ap_id_present, &m_enb_ue_x2ap_id_ext_present, &global_enb_id_present}));
 
   HANDLE_CODE(unpack_integer(mme_ue_s1ap_id, bref, (uint64_t)0u, (uint64_t)4294967295u, false, true));
   HANDLE_CODE(gummei.unpack(bref));

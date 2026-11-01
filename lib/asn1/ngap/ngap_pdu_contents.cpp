@@ -17179,7 +17179,8 @@ void private_ie_container_empty_l::to_json(json_writer& j) const
 // PrivateMessage ::= SEQUENCE
 OCUDUASN_CODE private_msg_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(private_ies.pack(bref));
 
   bref.align_bytes_zero();
@@ -17190,6 +17191,7 @@ OCUDUASN_CODE private_msg_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(private_ies.unpack(bref));
 
   if (ext) {

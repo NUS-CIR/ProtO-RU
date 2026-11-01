@@ -9028,11 +9028,12 @@ void supported_plmns_ext_ies_container::to_json(json_writer& j) const
 // SupportedPLMNs-Item ::= SEQUENCE
 OCUDUASN_CODE supported_plmns_item_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(slice_support_list.size() > 0, 1));
-  HANDLE_CODE(bref.pack(nr_cgi_support_list.size() > 0, 1));
-  HANDLE_CODE(bref.pack(qos_params_support_list_present, 1));
-  HANDLE_CODE(bref.pack(ie_exts_present, 1));
+  HANDLE_CODE(pack_bits(bref,
+                        {false,
+                         slice_support_list.size() > 0,
+                         nr_cgi_support_list.size() > 0,
+                         qos_params_support_list_present,
+                         ie_exts_present}));
 
   HANDLE_CODE(plmn_id.pack(bref));
   if (slice_support_list.size() > 0) {
@@ -9053,13 +9054,14 @@ OCUDUASN_CODE supported_plmns_item_s::pack(bit_ref& bref) const
 OCUDUASN_CODE supported_plmns_item_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
   bool slice_support_list_present;
-  HANDLE_CODE(bref.unpack(slice_support_list_present, 1));
   bool nr_cgi_support_list_present;
-  HANDLE_CODE(bref.unpack(nr_cgi_support_list_present, 1));
-  HANDLE_CODE(bref.unpack(qos_params_support_list_present, 1));
-  HANDLE_CODE(bref.unpack(ie_exts_present, 1));
+  HANDLE_CODE(unpack_bits(bref,
+                          {&ext,
+                           &slice_support_list_present,
+                           &nr_cgi_support_list_present,
+                           &qos_params_support_list_present,
+                           &ie_exts_present}));
 
   HANDLE_CODE(plmn_id.unpack(bref));
   if (slice_support_list_present) {
@@ -13532,7 +13534,8 @@ void private_ie_container_empty_l::to_json(json_writer& j) const
 // PrivateMessage ::= SEQUENCE
 OCUDUASN_CODE private_msg_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
+  HANDLE_CODE(bref.pack(false, 1));
+
   HANDLE_CODE(private_ies.pack(bref));
 
   bref.align_bytes_zero();
@@ -13543,6 +13546,7 @@ OCUDUASN_CODE private_msg_s::unpack(cbit_ref& bref)
 {
   bool ext;
   HANDLE_CODE(bref.unpack(ext, 1));
+
   HANDLE_CODE(private_ies.unpack(bref));
 
   if (ext) {

@@ -178,8 +178,7 @@ int8_t paging_ue_id_c::types_opts::to_number() const
 // PagingRecord ::= SEQUENCE
 OCUDUASN_CODE paging_record_s::pack(bit_ref& bref) const
 {
-  bref.pack(false, 1);
-  HANDLE_CODE(bref.pack(access_type_present, 1));
+  HANDLE_CODE(pack_bits(bref, {false, access_type_present}));
 
   HANDLE_CODE(ue_id.pack(bref));
 
@@ -188,8 +187,7 @@ OCUDUASN_CODE paging_record_s::pack(bit_ref& bref) const
 OCUDUASN_CODE paging_record_s::unpack(cbit_ref& bref)
 {
   bool ext;
-  HANDLE_CODE(bref.unpack(ext, 1));
-  HANDLE_CODE(bref.unpack(access_type_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&ext, &access_type_present}));
 
   HANDLE_CODE(ue_id.unpack(bref));
 
@@ -257,9 +255,8 @@ void paging_record_v1800_s::to_json(json_writer& j) const
 // Paging-v1800-IEs ::= SEQUENCE
 OCUDUASN_CODE paging_v1800_ies_s::pack(bit_ref& bref) const
 {
-  HANDLE_CODE(bref.pack(paging_record_list_v1800.size() > 0, 1));
-  HANDLE_CODE(bref.pack(paging_group_list_v1800.size() > 0, 1));
-  HANDLE_CODE(bref.pack(non_crit_ext_present, 1));
+  HANDLE_CODE(
+      pack_bits(bref, {paging_record_list_v1800.size() > 0, paging_group_list_v1800.size() > 0, non_crit_ext_present}));
 
   if (paging_record_list_v1800.size() > 0) {
     HANDLE_CODE(pack_dyn_seq_of(bref, paging_record_list_v1800, 1, 32));
@@ -273,10 +270,9 @@ OCUDUASN_CODE paging_v1800_ies_s::pack(bit_ref& bref) const
 OCUDUASN_CODE paging_v1800_ies_s::unpack(cbit_ref& bref)
 {
   bool paging_record_list_v1800_present;
-  HANDLE_CODE(bref.unpack(paging_record_list_v1800_present, 1));
   bool paging_group_list_v1800_present;
-  HANDLE_CODE(bref.unpack(paging_group_list_v1800_present, 1));
-  HANDLE_CODE(bref.unpack(non_crit_ext_present, 1));
+  HANDLE_CODE(
+      unpack_bits(bref, {&paging_record_list_v1800_present, &paging_group_list_v1800_present, &non_crit_ext_present}));
 
   if (paging_record_list_v1800_present) {
     HANDLE_CODE(unpack_dyn_seq_of(paging_record_list_v1800, bref, 1, 32));
@@ -315,9 +311,8 @@ void paging_v1800_ies_s::to_json(json_writer& j) const
 // Paging-v1700-IEs ::= SEQUENCE
 OCUDUASN_CODE paging_v1700_ies_s::pack(bit_ref& bref) const
 {
-  HANDLE_CODE(bref.pack(paging_record_list_v1700.size() > 0, 1));
-  HANDLE_CODE(bref.pack(paging_group_list_r17.size() > 0, 1));
-  HANDLE_CODE(bref.pack(non_crit_ext_present, 1));
+  HANDLE_CODE(
+      pack_bits(bref, {paging_record_list_v1700.size() > 0, paging_group_list_r17.size() > 0, non_crit_ext_present}));
 
   if (paging_record_list_v1700.size() > 0) {
     HANDLE_CODE(pack_dyn_seq_of(bref, paging_record_list_v1700, 1, 32));
@@ -334,10 +329,9 @@ OCUDUASN_CODE paging_v1700_ies_s::pack(bit_ref& bref) const
 OCUDUASN_CODE paging_v1700_ies_s::unpack(cbit_ref& bref)
 {
   bool paging_record_list_v1700_present;
-  HANDLE_CODE(bref.unpack(paging_record_list_v1700_present, 1));
   bool paging_group_list_r17_present;
-  HANDLE_CODE(bref.unpack(paging_group_list_r17_present, 1));
-  HANDLE_CODE(bref.unpack(non_crit_ext_present, 1));
+  HANDLE_CODE(
+      unpack_bits(bref, {&paging_record_list_v1700_present, &paging_group_list_r17_present, &non_crit_ext_present}));
 
   if (paging_record_list_v1700_present) {
     HANDLE_CODE(unpack_dyn_seq_of(paging_record_list_v1700, bref, 1, 32));
@@ -378,9 +372,7 @@ void paging_v1700_ies_s::to_json(json_writer& j) const
 // Paging ::= SEQUENCE
 OCUDUASN_CODE paging_s::pack(bit_ref& bref) const
 {
-  HANDLE_CODE(bref.pack(paging_record_list.size() > 0, 1));
-  HANDLE_CODE(bref.pack(late_non_crit_ext.size() > 0, 1));
-  HANDLE_CODE(bref.pack(non_crit_ext_present, 1));
+  HANDLE_CODE(pack_bits(bref, {paging_record_list.size() > 0, late_non_crit_ext.size() > 0, non_crit_ext_present}));
 
   if (paging_record_list.size() > 0) {
     HANDLE_CODE(pack_dyn_seq_of(bref, paging_record_list, 1, 32));
@@ -397,10 +389,8 @@ OCUDUASN_CODE paging_s::pack(bit_ref& bref) const
 OCUDUASN_CODE paging_s::unpack(cbit_ref& bref)
 {
   bool paging_record_list_present;
-  HANDLE_CODE(bref.unpack(paging_record_list_present, 1));
   bool late_non_crit_ext_present;
-  HANDLE_CODE(bref.unpack(late_non_crit_ext_present, 1));
-  HANDLE_CODE(bref.unpack(non_crit_ext_present, 1));
+  HANDLE_CODE(unpack_bits(bref, {&paging_record_list_present, &late_non_crit_ext_present, &non_crit_ext_present}));
 
   if (paging_record_list_present) {
     HANDLE_CODE(unpack_dyn_seq_of(paging_record_list, bref, 1, 32));
