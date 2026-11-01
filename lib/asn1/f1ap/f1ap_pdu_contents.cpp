@@ -425,7 +425,6 @@ OCUDUASN_CODE aperiodic_srs_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -6200,7 +6199,6 @@ OCUDUASN_CODE f1_removal_request_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {

@@ -1937,7 +1937,6 @@ OCUDUASN_CODE eutran_bearer_context_mod_confirm_container::unpack(cbit_ref& bref
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -2024,7 +2023,6 @@ OCUDUASN_CODE ng_ran_bearer_context_mod_confirm_container::unpack(cbit_ref& bref
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -5855,7 +5853,6 @@ OCUDUASN_CODE ng_ran_bearer_context_setup_request_container::unpack(cbit_ref& br
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -10936,7 +10933,6 @@ OCUDUASN_CODE eutran_gnb_cu_up_counter_check_request_container::unpack(cbit_ref&
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -11026,7 +11022,6 @@ OCUDUASN_CODE ng_ran_gnb_cu_up_counter_check_request_container::unpack(cbit_ref&
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {

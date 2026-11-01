@@ -150,3 +150,18 @@ TEST_F(asn1_e2ap_test, ric_control_failure_message)
 
   ASSERT_EQ(test_pack_roundtrip(pdu), OCUDUASN_SUCCESS);
 }
+
+TEST_F(asn1_e2ap_test, single_ie_container_skips_unknown_ignored_ies)
+{
+  // E2 Removal Request with an unknown IE of criticality ignore before the Transaction ID IE.
+  uint8_t e2ap_msg[] = {
+      0x00, 0x0d, 0x00, 0x0e, 0x00, 0x00, 0x02, 0x03, 0xe7, 0x40, 0x01, 0x00, 0x00, 0x31, 0x00, 0x02, 0x00, 0x07};
+  byte_buffer buffer = byte_buffer::create(e2ap_msg).value();
+
+  asn1::cbit_ref         bref{buffer};
+  asn1::e2ap::e2ap_pdu_c pdu;
+  ASSERT_EQ(pdu.unpack(bref), OCUDUASN_SUCCESS);
+  ASSERT_EQ(pdu.init_msg().value.type().value,
+            asn1::e2ap::e2ap_elem_procs_o::init_msg_c::types_opts::e2_removal_request);
+  ASSERT_EQ(pdu.init_msg().value.e2_removal_request()->transaction_id, 7);
+}

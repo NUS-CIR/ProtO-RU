@@ -2427,7 +2427,6 @@ OCUDUASN_CODE cfg_successfully_applied_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -5599,7 +5598,6 @@ OCUDUASN_CODE fail_ind_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -12674,7 +12672,6 @@ OCUDUASN_CODE pdu_session_sn_change_confirm_item_ext_ies_container::unpack(cbit_
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -13348,7 +13345,6 @@ OCUDUASN_CODE pdu_session_not_admitted_sn_mod_resp_ext_ies_container::unpack(cbi
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -14007,7 +14003,6 @@ OCUDUASN_CODE pdu_sessions_to_be_added_sn_mod_request_item_ext_ies_container::un
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -16195,7 +16190,6 @@ OCUDUASN_CODE rach_ind_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {

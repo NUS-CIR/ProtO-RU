@@ -2216,7 +2216,6 @@ OCUDUASN_CODE res_type_periodic_pos_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -2343,7 +2342,6 @@ OCUDUASN_CODE res_type_semi_persistent_pos_ext_ies_container::unpack(cbit_ref& b
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -3435,7 +3433,6 @@ OCUDUASN_CODE pos_srs_res_item_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -11612,7 +11609,6 @@ OCUDUASN_CODE geographical_coordinates_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -12100,7 +12096,6 @@ OCUDUASN_CODE time_stamp_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -12305,7 +12300,6 @@ OCUDUASN_CODE measured_results_associated_info_item_ext_ies_container::unpack(cb
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -14451,7 +14445,6 @@ OCUDUASN_CODE prs_angle_item_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -17642,7 +17635,6 @@ OCUDUASN_CODE prs_res_item_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -17961,7 +17953,6 @@ OCUDUASN_CODE prs_cfg_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -18372,7 +18363,6 @@ OCUDUASN_CODE requested_dl_prs_tx_characteristics_ext_ies_container::unpack(cbit
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -19755,7 +19745,6 @@ OCUDUASN_CODE srs_res_set_item_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -20983,7 +20972,6 @@ OCUDUASN_CODE srs_configuration_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -21434,7 +21422,6 @@ OCUDUASN_CODE srs_restype_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -23337,7 +23324,6 @@ OCUDUASN_CODE trp_meas_resp_item_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -24403,7 +24389,6 @@ OCUDUASN_CODE trp_info_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -24704,7 +24689,6 @@ OCUDUASN_CODE trp_meas_quantities_list_item_ext_ies_container::unpack(cbit_ref& 
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -25451,7 +25435,6 @@ OCUDUASN_CODE ue_report_info_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -25596,7 +25579,6 @@ OCUDUASN_CODE ue_tx_teg_assoc_item_ext_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 

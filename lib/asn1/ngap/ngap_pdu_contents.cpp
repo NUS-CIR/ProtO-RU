@@ -857,7 +857,6 @@ OCUDUASN_CODE amf_status_ind_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -5555,7 +5554,6 @@ OCUDUASN_CODE dl_rim_info_transfer_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -19809,7 +19807,6 @@ OCUDUASN_CODE ran_cfg_upd_ack_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 
@@ -20614,7 +20611,6 @@ OCUDUASN_CODE retrieve_ue_info_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -25544,7 +25540,6 @@ OCUDUASN_CODE ue_radio_cap_id_map_request_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -26877,7 +26872,6 @@ OCUDUASN_CODE ul_rim_info_transfer_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
 

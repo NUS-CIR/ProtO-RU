@@ -221,7 +221,6 @@ OCUDUASN_CODE e2_removal_request_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -7657,7 +7656,6 @@ OCUDUASN_CODE ric_assist_halt_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
@@ -11885,7 +11883,6 @@ OCUDUASN_CODE ric_sub_delete_required_ies_container::unpack(cbit_ref& bref)
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
-      break;
     }
   }
   if (nof_mandatory_ies > 0) {
