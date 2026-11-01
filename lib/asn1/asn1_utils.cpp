@@ -1709,14 +1709,8 @@ bool ext_groups_packer_guard::any() const
 
 OCUDUASN_CODE ext_groups_packer_guard::pack(asn1::bit_ref& bref) const
 {
-  // pack number of groups
-  int32_t i = groups.size() - 1;
-  for (; i >= 0; --i) {
-    if (groups[i]) {
-      break;
-    }
-  }
-  uint32_t nof_groups = (uint32_t)i + 1u;
+  // X.691 requires one bit per extension addition of the type, including absent ones after the last present one.
+  uint32_t nof_groups = groups.size();
   HANDLE_CODE(pack_norm_small_non_neg_whole_number(bref, nof_groups - 1));
 
   // pack each group presence flag
