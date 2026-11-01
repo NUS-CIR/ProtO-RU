@@ -424,10 +424,9 @@ OCUDUASN_CODE alt_qos_para_set_item_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (max_data_burst_volume_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)216, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, max_data_burst_volume, (uint16_t)0u, (uint16_t)4095u, true, true));
+    HANDLE_CODE(pack_ie(bref, 216, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, max_data_burst_volume, (uint16_t)0u, (uint16_t)4095u, true, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -439,18 +438,15 @@ OCUDUASN_CODE alt_qos_para_set_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != alt_qos_para_set_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &alt_qos_para_set_item_ext_ies_o::get_crit));
 
     if (id == 216) {
       {
         max_data_burst_volume_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(max_data_burst_volume, bref, (uint16_t)0u, (uint16_t)4095u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(max_data_burst_volume, bref, (uint16_t)0u, (uint16_t)4095u, true, true);
+        }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -1036,10 +1032,8 @@ OCUDUASN_CODE mbsf1_u_info_at_du_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (f1_u_tunnel_not_established_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)207, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(f1_u_tunnel_not_established.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 207, crit_e{crit_e::ignore}, [this, &bref]() { return f1_u_tunnel_not_established.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -1051,18 +1045,13 @@ OCUDUASN_CODE mbsf1_u_info_at_du_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != mbsf1_u_info_at_du_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &mbsf1_u_info_at_du_ext_ies_o::get_crit));
 
     if (id == 207) {
       {
         f1_u_tunnel_not_established_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(f1_u_tunnel_not_established.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return f1_u_tunnel_not_established.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -1160,10 +1149,8 @@ OCUDUASN_CODE location_dependent_mbsf1_u_info_at_du_item_ext_ies_container::pack
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (f1_u_tunnel_not_established_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)207, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(f1_u_tunnel_not_established.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 207, crit_e{crit_e::ignore}, [this, &bref]() { return f1_u_tunnel_not_established.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -1175,18 +1162,13 @@ OCUDUASN_CODE location_dependent_mbsf1_u_info_at_du_item_ext_ies_container::unpa
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != location_dependent_mbsf1_u_info_at_du_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &location_dependent_mbsf1_u_info_at_du_item_ext_ies_o::get_crit));
 
     if (id == 207) {
       {
         f1_u_tunnel_not_established_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(f1_u_tunnel_not_established.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return f1_u_tunnel_not_established.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -2905,10 +2887,9 @@ OCUDUASN_CODE ehc_dl_params_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (max_c_id_ehc_dl_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)137, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, max_c_id_ehc_dl, (uint32_t)1u, (uint32_t)32767u, true, true));
+    HANDLE_CODE(pack_ie(bref, 137, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, max_c_id_ehc_dl, (uint32_t)1u, (uint32_t)32767u, true, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -2920,18 +2901,15 @@ OCUDUASN_CODE ehc_dl_params_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != ehc_dl_params_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &ehc_dl_params_ext_ies_o::get_crit));
 
     if (id == 137) {
       {
         max_c_id_ehc_dl_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(max_c_id_ehc_dl, bref, (uint32_t)1u, (uint32_t)32767u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(max_c_id_ehc_dl, bref, (uint32_t)1u, (uint32_t)32767u, true, true);
+        }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -3145,10 +3123,9 @@ OCUDUASN_CODE udc_params_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (version_id_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)186, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, version_id, (uint8_t)0u, (uint8_t)15u, false, true));
+    HANDLE_CODE(pack_ie(bref, 186, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, version_id, (uint8_t)0u, (uint8_t)15u, false, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -3160,18 +3137,15 @@ OCUDUASN_CODE udc_params_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != udc_params_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &udc_params_ext_ies_o::get_crit));
 
     if (id == 186) {
       {
         version_id_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(version_id, bref, (uint8_t)0u, (uint8_t)15u, false, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(version_id, bref, (uint8_t)0u, (uint8_t)15u, false, true);
+        }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -3380,46 +3354,28 @@ OCUDUASN_CODE pdcp_cfg_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (pdcp_status_report_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)88, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pdcp_status_report_ind.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 88, crit_e{crit_e::ignore}, [this, &bref]() { return pdcp_status_report_ind.pack(bref); }));
   }
   if (add_pdcp_dupl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)104, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(add_pdcp_dupl_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 104, crit_e{crit_e::ignore}, [this, &bref]() { return add_pdcp_dupl_info.pack(bref); }));
   }
   if (ehc_params_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)118, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(ehc_params.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 118, crit_e{crit_e::ignore}, [this, &bref]() { return ehc_params.pack(bref); }));
   }
   if (udc_params_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)153, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(udc_params.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 153, crit_e{crit_e::ignore}, [this, &bref]() { return udc_params.pack(bref); }));
   }
   if (discard_timer_extended_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)177, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(discard_timer_extended.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 177, crit_e{crit_e::reject}, [this, &bref]() { return discard_timer_extended.pack(bref); }));
   }
   if (psi_based_discard_timer_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)214, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(psi_based_discard_timer.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 214, crit_e{crit_e::ignore}, [this, &bref]() { return psi_based_discard_timer.pack(bref); }));
   }
   if (pdcp_sn_gap_report_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)218, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pdcp_sn_gap_report.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 218, crit_e{crit_e::ignore}, [this, &bref]() { return pdcp_sn_gap_report.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -3431,54 +3387,43 @@ OCUDUASN_CODE pdcp_cfg_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdcp_cfg_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdcp_cfg_ext_ies_o::get_crit));
 
     switch (id) {
       case 88: {
         pdcp_status_report_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(pdcp_status_report_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return pdcp_status_report_ind.unpack(bref); }));
         break;
       }
       case 104: {
         add_pdcp_dupl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(add_pdcp_dupl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return add_pdcp_dupl_info.unpack(bref); }));
         break;
       }
       case 118: {
         ehc_params_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(ehc_params.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return ehc_params.unpack(bref); }));
         break;
       }
       case 153: {
         udc_params_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(udc_params.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return udc_params.unpack(bref); }));
         break;
       }
       case 177: {
         discard_timer_extended_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(discard_timer_extended.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return discard_timer_extended.unpack(bref); }));
         break;
       }
       case 214: {
         psi_based_discard_timer_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(psi_based_discard_timer.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return psi_based_discard_timer.unpack(bref); }));
         break;
       }
       case 218: {
         pdcp_sn_gap_report_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(pdcp_sn_gap_report.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return pdcp_sn_gap_report.unpack(bref); }));
         break;
       }
       default:
@@ -3743,16 +3688,14 @@ OCUDUASN_CODE non_dyn_5qi_descriptor_ext_ies_container::pack(bit_ref& bref) cons
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (cn_packet_delay_budget_dl_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)101, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, cn_packet_delay_budget_dl, (uint32_t)1u, (uint32_t)65535u, true, true));
+    HANDLE_CODE(pack_ie(bref, 101, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, cn_packet_delay_budget_dl, (uint32_t)1u, (uint32_t)65535u, true, true);
+    }));
   }
   if (cn_packet_delay_budget_ul_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)102, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, cn_packet_delay_budget_ul, (uint32_t)1u, (uint32_t)65535u, true, true));
+    HANDLE_CODE(pack_ie(bref, 102, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, cn_packet_delay_budget_ul, (uint32_t)1u, (uint32_t)65535u, true, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -3764,24 +3707,22 @@ OCUDUASN_CODE non_dyn_5qi_descriptor_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != non_dyn_5qi_descriptor_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &non_dyn_5qi_descriptor_ext_ies_o::get_crit));
 
     switch (id) {
       case 101: {
         cn_packet_delay_budget_dl_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(cn_packet_delay_budget_dl, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(cn_packet_delay_budget_dl, bref, (uint32_t)1u, (uint32_t)65535u, true, true);
+        }));
         break;
       }
       case 102: {
         cn_packet_delay_budget_ul_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(cn_packet_delay_budget_ul, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(cn_packet_delay_budget_ul, bref, (uint32_t)1u, (uint32_t)65535u, true, true);
+        }));
         break;
       }
       default:
@@ -3933,22 +3874,19 @@ OCUDUASN_CODE dyn_5qi_descriptor_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (extended_packet_delay_budget_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)103, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, extended_packet_delay_budget, (uint32_t)1u, (uint32_t)65535u, true, true));
+    HANDLE_CODE(pack_ie(bref, 103, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, extended_packet_delay_budget, (uint32_t)1u, (uint32_t)65535u, true, true);
+    }));
   }
   if (cn_packet_delay_budget_dl_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)101, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, cn_packet_delay_budget_dl, (uint32_t)1u, (uint32_t)65535u, true, true));
+    HANDLE_CODE(pack_ie(bref, 101, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, cn_packet_delay_budget_dl, (uint32_t)1u, (uint32_t)65535u, true, true);
+    }));
   }
   if (cn_packet_delay_budget_ul_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)102, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, cn_packet_delay_budget_ul, (uint32_t)1u, (uint32_t)65535u, true, true));
+    HANDLE_CODE(pack_ie(bref, 102, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, cn_packet_delay_budget_ul, (uint32_t)1u, (uint32_t)65535u, true, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -3960,30 +3898,29 @@ OCUDUASN_CODE dyn_5qi_descriptor_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != dyn_5qi_descriptor_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &dyn_5qi_descriptor_ext_ies_o::get_crit));
 
     switch (id) {
       case 103: {
         extended_packet_delay_budget_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(extended_packet_delay_budget, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(extended_packet_delay_budget, bref, (uint32_t)1u, (uint32_t)65535u, true, true);
+        }));
         break;
       }
       case 101: {
         cn_packet_delay_budget_dl_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(cn_packet_delay_budget_dl, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(cn_packet_delay_budget_dl, bref, (uint32_t)1u, (uint32_t)65535u, true, true);
+        }));
         break;
       }
       case 102: {
         cn_packet_delay_budget_ul_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(cn_packet_delay_budget_ul, bref, (uint32_t)1u, (uint32_t)65535u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(cn_packet_delay_budget_ul, bref, (uint32_t)1u, (uint32_t)65535u, true, true);
+        }));
         break;
       }
       default:
@@ -4363,10 +4300,9 @@ OCUDUASN_CODE gbr_qos_flow_info_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (alt_qos_para_set_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)124, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, alt_qos_para_set_list, 1, 8, true));
+    HANDLE_CODE(pack_ie(bref, 124, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, alt_qos_para_set_list, 1, 8, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -4378,18 +4314,14 @@ OCUDUASN_CODE gbr_qos_flow_info_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != gbr_qos_flow_info_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &gbr_qos_flow_info_ext_ies_o::get_crit));
 
     if (id == 124) {
       {
         alt_qos_para_set_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(alt_qos_para_set_list, bref, 1, 8, true));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return unpack_dyn_seq_of(alt_qos_para_set_list, bref, 1, 8, true); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -4696,40 +4628,28 @@ OCUDUASN_CODE qos_flow_level_qos_params_ext_ies_container::pack(bit_ref& bref) c
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (qos_monitoring_request_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)87, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(qos_monitoring_request.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 87, crit_e{crit_e::ignore}, [this, &bref]() { return qos_monitoring_request.pack(bref); }));
   }
   if (mcg_offered_gbr_qos_flow_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)126, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mcg_offered_gbr_qos_flow_info.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 126, crit_e{crit_e::ignore}, [this, &bref]() { return mcg_offered_gbr_qos_flow_info.pack(bref); }));
   }
   if (qos_monitoring_report_freq_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)132, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, qos_monitoring_report_freq, (uint16_t)1u, (uint16_t)1800u, true, true));
+    HANDLE_CODE(pack_ie(bref, 132, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, qos_monitoring_report_freq, (uint16_t)1u, (uint16_t)1800u, true, true);
+    }));
   }
   if (qos_monitoring_disabled_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)133, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(qos_monitoring_disabled.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 133, crit_e{crit_e::ignore}, [this, &bref]() { return qos_monitoring_disabled.pack(bref); }));
   }
   if (data_forwarding_source_ip_address_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)142, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(data_forwarding_source_ip_address.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 142, crit_e{crit_e::ignore}, [this, &bref]() { return data_forwarding_source_ip_address.pack(bref); }));
   }
   if (pdu_set_qos_params_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)201, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pdu_set_qos_params.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 201, crit_e{crit_e::ignore}, [this, &bref]() { return pdu_set_qos_params.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -4741,48 +4661,40 @@ OCUDUASN_CODE qos_flow_level_qos_params_ext_ies_container::unpack(cbit_ref& bref
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != qos_flow_level_qos_params_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &qos_flow_level_qos_params_ext_ies_o::get_crit));
 
     switch (id) {
       case 87: {
         qos_monitoring_request_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(qos_monitoring_request.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return qos_monitoring_request.unpack(bref); }));
         break;
       }
       case 126: {
         mcg_offered_gbr_qos_flow_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mcg_offered_gbr_qos_flow_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mcg_offered_gbr_qos_flow_info.unpack(bref); }));
         break;
       }
       case 132: {
         qos_monitoring_report_freq_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(qos_monitoring_report_freq, bref, (uint16_t)1u, (uint16_t)1800u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(qos_monitoring_report_freq, bref, (uint16_t)1u, (uint16_t)1800u, true, true);
+        }));
         break;
       }
       case 133: {
         qos_monitoring_disabled_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(qos_monitoring_disabled.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return qos_monitoring_disabled.unpack(bref); }));
         break;
       }
       case 142: {
         data_forwarding_source_ip_address_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(data_forwarding_source_ip_address.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return data_forwarding_source_ip_address.unpack(bref); }));
         break;
       }
       case 201: {
         pdu_set_qos_params_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(pdu_set_qos_params.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return pdu_set_qos_params.unpack(bref); }));
         break;
       }
       default:
@@ -5064,16 +4976,12 @@ OCUDUASN_CODE tsc_assist_info_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (survival_time_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)152, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, survival_time, (uint32_t)0u, (uint32_t)1920000u, true, true));
+    HANDLE_CODE(pack_ie(bref, 152, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, survival_time, (uint32_t)0u, (uint32_t)1920000u, true, true);
+    }));
   }
   if (n6_jitter_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)202, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(n6_jitter_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 202, crit_e{crit_e::ignore}, [this, &bref]() { return n6_jitter_info.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -5085,24 +4993,20 @@ OCUDUASN_CODE tsc_assist_info_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != tsc_assist_info_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &tsc_assist_info_ext_ies_o::get_crit));
 
     switch (id) {
       case 152: {
         survival_time_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(survival_time, bref, (uint32_t)0u, (uint32_t)1920000u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(survival_time, bref, (uint32_t)0u, (uint32_t)1920000u, true, true);
+        }));
         break;
       }
       case 202: {
         n6_jitter_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(n6_jitter_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return n6_jitter_info.unpack(bref); }));
         break;
       }
       default:
@@ -5490,22 +5394,17 @@ OCUDUASN_CODE qos_flow_qos_param_item_ext_ies_container::pack(bit_ref& bref) con
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (redundant_qos_flow_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)99, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_qos_flow_ind.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 99, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_qos_flow_ind.pack(bref); }));
   }
   if (tsc_traffic_characteristics_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)100, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(tsc_traffic_characteristics.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 100, crit_e{crit_e::ignore}, [this, &bref]() { return tsc_traffic_characteristics.pack(bref); }));
   }
   if (ecn_markingor_congestion_info_report_request_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)203, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(ecn_markingor_congestion_info_report_request.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 203, crit_e{crit_e::ignore}, [this, &bref]() {
+      return ecn_markingor_congestion_info_report_request.pack(bref);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -5517,30 +5416,24 @@ OCUDUASN_CODE qos_flow_qos_param_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != qos_flow_qos_param_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &qos_flow_qos_param_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 99: {
         redundant_qos_flow_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_qos_flow_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_qos_flow_ind.unpack(bref); }));
         break;
       }
       case 100: {
         tsc_traffic_characteristics_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(tsc_traffic_characteristics.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return tsc_traffic_characteristics.unpack(bref); }));
         break;
       }
       case 203: {
         ecn_markingor_congestion_info_report_request_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(ecn_markingor_congestion_info_report_request.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return ecn_markingor_congestion_info_report_request.unpack(bref); }));
         break;
       }
       default:
@@ -5711,10 +5604,9 @@ OCUDUASN_CODE bcmrb_setup_cfg_item_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (f1_u_tnl_info_to_add_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)208, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, f1_u_tnl_info_to_add_list, 1, 512, true));
+    HANDLE_CODE(pack_ie(bref, 208, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, f1_u_tnl_info_to_add_list, 1, 512, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -5726,18 +5618,14 @@ OCUDUASN_CODE bcmrb_setup_cfg_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != bcmrb_setup_cfg_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &bcmrb_setup_cfg_item_ext_ies_o::get_crit));
 
     if (id == 208) {
       {
         f1_u_tnl_info_to_add_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(f1_u_tnl_info_to_add_list, bref, 1, 512, true));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return unpack_dyn_seq_of(f1_u_tnl_info_to_add_list, bref, 1, 512, true); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -5970,16 +5858,14 @@ OCUDUASN_CODE bcmrb_modify_cfg_item_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (f1_u_tnl_info_to_add_or_modify_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)210, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, f1_u_tnl_info_to_add_or_modify_list, 1, 512, true));
+    HANDLE_CODE(pack_ie(bref, 210, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, f1_u_tnl_info_to_add_or_modify_list, 1, 512, true);
+    }));
   }
   if (f1_u_tnl_info_to_release_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)212, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, f1_u_tnl_info_to_release_list, 1, 512, true));
+    HANDLE_CODE(pack_ie(bref, 212, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, f1_u_tnl_info_to_release_list, 1, 512, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -5991,24 +5877,21 @@ OCUDUASN_CODE bcmrb_modify_cfg_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != bcmrb_modify_cfg_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &bcmrb_modify_cfg_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 210: {
         f1_u_tnl_info_to_add_or_modify_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(f1_u_tnl_info_to_add_or_modify_list, bref, 1, 512, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_dyn_seq_of(f1_u_tnl_info_to_add_or_modify_list, bref, 1, 512, true);
+        }));
         break;
       }
       case 212: {
         f1_u_tnl_info_to_release_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(f1_u_tnl_info_to_release_list, bref, 1, 512, true));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return unpack_dyn_seq_of(f1_u_tnl_info_to_release_list, bref, 1, 512, true); }));
         break;
       }
       default:
@@ -6174,10 +6057,9 @@ OCUDUASN_CODE bc_bearer_context_to_modify_ext_ies_container::pack(bit_ref& bref)
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (bc_bearer_context_ngu_tnl_infoat_ngran_request_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)217, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(bc_bearer_context_ngu_tnl_infoat_ngran_request.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 217, crit_e{crit_e::ignore}, [this, &bref]() {
+      return bc_bearer_context_ngu_tnl_infoat_ngran_request.pack(bref);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -6189,18 +6071,14 @@ OCUDUASN_CODE bc_bearer_context_to_modify_ext_ies_container::unpack(cbit_ref& br
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != bc_bearer_context_to_modify_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &bc_bearer_context_to_modify_ext_ies_o::get_crit));
 
     if (id == 217) {
       {
         bc_bearer_context_ngu_tnl_infoat_ngran_request_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(bc_bearer_context_ngu_tnl_infoat_ngran_request.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return bc_bearer_context_ngu_tnl_infoat_ngran_request.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -6474,22 +6352,16 @@ OCUDUASN_CODE qos_flow_item_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (qos_flow_map_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)80, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(qos_flow_map_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 80, crit_e{crit_e::ignore}, [this, &bref]() { return qos_flow_map_ind.pack(bref); }));
   }
   if (data_forwarding_source_ip_address_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)142, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(data_forwarding_source_ip_address.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 142, crit_e{crit_e::ignore}, [this, &bref]() { return data_forwarding_source_ip_address.pack(bref); }));
   }
   if (ecn_markingor_congestion_info_report_status_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)204, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(ecn_markingor_congestion_info_report_status.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 204, crit_e{crit_e::ignore}, [this, &bref]() {
+      return ecn_markingor_congestion_info_report_status.pack(bref);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -6501,30 +6373,24 @@ OCUDUASN_CODE qos_flow_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != qos_flow_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &qos_flow_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 80: {
         qos_flow_map_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(qos_flow_map_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return qos_flow_map_ind.unpack(bref); }));
         break;
       }
       case 142: {
         data_forwarding_source_ip_address_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(data_forwarding_source_ip_address.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return data_forwarding_source_ip_address.unpack(bref); }));
         break;
       }
       case 204: {
         ecn_markingor_congestion_info_report_status_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(ecn_markingor_congestion_info_report_status.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return ecn_markingor_congestion_info_report_status.unpack(bref); }));
         break;
       }
       default:
@@ -7015,10 +6881,9 @@ OCUDUASN_CODE bcmrb_setup_modify_resp_list_item_ext_ies_container::pack(bit_ref&
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (f1_u_tnl_info_added_or_modified_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)211, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, f1_u_tnl_info_added_or_modified_list, 1, 512, true));
+    HANDLE_CODE(pack_ie(bref, 211, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, f1_u_tnl_info_added_or_modified_list, 1, 512, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -7030,18 +6895,15 @@ OCUDUASN_CODE bcmrb_setup_modify_resp_list_item_ext_ies_container::unpack(cbit_r
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != bcmrb_setup_modify_resp_list_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &bcmrb_setup_modify_resp_list_item_ext_ies_o::get_crit));
 
     if (id == 211) {
       {
         f1_u_tnl_info_added_or_modified_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(f1_u_tnl_info_added_or_modified_list, bref, 1, 512, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_dyn_seq_of(f1_u_tnl_info_added_or_modified_list, bref, 1, 512, true);
+        }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -7498,10 +7360,9 @@ OCUDUASN_CODE bcmrb_setup_resp_list_item_ext_ies_container::pack(bit_ref& bref) 
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (f1_u_tnl_info_added_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)209, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, f1_u_tnl_info_added_list, 1, 512, true));
+    HANDLE_CODE(pack_ie(bref, 209, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, f1_u_tnl_info_added_list, 1, 512, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -7513,18 +7374,14 @@ OCUDUASN_CODE bcmrb_setup_resp_list_item_ext_ies_container::unpack(cbit_ref& bre
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != bcmrb_setup_resp_list_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &bcmrb_setup_resp_list_item_ext_ies_o::get_crit));
 
     if (id == 209) {
       {
         f1_u_tnl_info_added_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(f1_u_tnl_info_added_list, bref, 1, 512, true));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return unpack_dyn_seq_of(f1_u_tnl_info_added_list, bref, 1, 512, true); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -8025,10 +7882,9 @@ OCUDUASN_CODE cell_group_info_item_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (nof_tunnels_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)127, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, nof_tunnels, (uint8_t)1u, (uint8_t)4u, true, true));
+    HANDLE_CODE(pack_ie(bref, 127, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, nof_tunnels, (uint8_t)1u, (uint8_t)4u, true, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -8040,18 +7896,14 @@ OCUDUASN_CODE cell_group_info_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != cell_group_info_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &cell_group_info_item_ext_ies_o::get_crit));
 
     if (id == 127) {
       {
         nof_tunnels_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(nof_tunnels, bref, (uint8_t)1u, (uint8_t)4u, true, true));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return unpack_integer(nof_tunnels, bref, (uint8_t)1u, (uint8_t)4u, true, true); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -9133,16 +8985,10 @@ OCUDUASN_CODE up_params_item_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (qos_map_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)107, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(qos_map_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 107, crit_e{crit_e::reject}, [this, &bref]() { return qos_map_info.pack(bref); }));
   }
   if (indirect_path_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)206, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(indirect_path_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 206, crit_e{crit_e::ignore}, [this, &bref]() { return indirect_path_ind.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -9154,24 +9000,18 @@ OCUDUASN_CODE up_params_item_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != up_params_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &up_params_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 107: {
         qos_map_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(qos_map_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return qos_map_info.unpack(bref); }));
         break;
       }
       case 206: {
         indirect_path_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(indirect_path_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return indirect_path_ind.unpack(bref); }));
         break;
       }
       default:
@@ -9576,16 +9416,13 @@ OCUDUASN_CODE drb_modified_item_ng_ran_ext_ies_container::pack(bit_ref& bref) co
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (early_forwarding_count_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)123, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(early_forwarding_count_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 123, crit_e{crit_e::reject}, [this, &bref]() { return early_forwarding_count_info.pack(bref); }));
   }
   if (old_qos_flow_map_ul_endmarkerexpected_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)71, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, old_qos_flow_map_ul_endmarkerexpected, 1, 64, true));
+    HANDLE_CODE(pack_ie(bref, 71, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, old_qos_flow_map_ul_endmarkerexpected, 1, 64, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -9597,24 +9434,20 @@ OCUDUASN_CODE drb_modified_item_ng_ran_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_modified_item_ng_ran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_modified_item_ng_ran_ext_ies_o::get_crit));
 
     switch (id) {
       case 123: {
         early_forwarding_count_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(early_forwarding_count_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return early_forwarding_count_info.unpack(bref); }));
         break;
       }
       case 71: {
         old_qos_flow_map_ul_endmarkerexpected_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(old_qos_flow_map_ul_endmarkerexpected, bref, 1, 64, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_dyn_seq_of(old_qos_flow_map_ul_endmarkerexpected, bref, 1, 64, true);
+        }));
         break;
       }
       default:
@@ -10307,16 +10140,13 @@ OCUDUASN_CODE data_forwarding_info_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (data_forwardingto_ng_ran_qos_flow_info_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)136, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, data_forwardingto_ng_ran_qos_flow_info_list, 1, 64, true));
+    HANDLE_CODE(pack_ie(bref, 136, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, data_forwardingto_ng_ran_qos_flow_info_list, 1, 64, true);
+    }));
   }
   if (pdu_setbased_handling_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)205, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pdu_setbased_handling_ind.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 205, crit_e{crit_e::ignore}, [this, &bref]() { return pdu_setbased_handling_ind.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -10328,24 +10158,20 @@ OCUDUASN_CODE data_forwarding_info_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != data_forwarding_info_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &data_forwarding_info_ext_ies_o::get_crit));
 
     switch (id) {
       case 136: {
         data_forwardingto_ng_ran_qos_flow_info_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(data_forwardingto_ng_ran_qos_flow_info_list, bref, 1, 64, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_dyn_seq_of(data_forwardingto_ng_ran_qos_flow_info_list, bref, 1, 64, true);
+        }));
         break;
       }
       case 205: {
         pdu_setbased_handling_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(pdu_setbased_handling_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return pdu_setbased_handling_ind.unpack(bref); }));
         break;
       }
       default:
@@ -10542,16 +10368,11 @@ OCUDUASN_CODE drb_setup_item_eutran_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (data_forwarding_source_ip_address_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)142, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(data_forwarding_source_ip_address.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 142, crit_e{crit_e::ignore}, [this, &bref]() { return data_forwarding_source_ip_address.pack(bref); }));
   }
   if (security_result_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)173, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(security_result.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 173, crit_e{crit_e::ignore}, [this, &bref]() { return security_result.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -10563,24 +10384,18 @@ OCUDUASN_CODE drb_setup_item_eutran_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_setup_item_eutran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_setup_item_eutran_ext_ies_o::get_crit));
 
     switch (id) {
       case 142: {
         data_forwarding_source_ip_address_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(data_forwarding_source_ip_address.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return data_forwarding_source_ip_address.unpack(bref); }));
         break;
       }
       case 173: {
         security_result_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(security_result.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return security_result.unpack(bref); }));
         break;
       }
       default:
@@ -10826,16 +10641,11 @@ OCUDUASN_CODE drb_setup_mod_item_eutran_ext_ies_container::pack(bit_ref& bref) c
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (security_result_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)173, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(security_result.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 173, crit_e{crit_e::ignore}, [this, &bref]() { return security_result.pack(bref); }));
   }
   if (data_forwarding_source_ip_address_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)142, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(data_forwarding_source_ip_address.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 142, crit_e{crit_e::ignore}, [this, &bref]() { return data_forwarding_source_ip_address.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -10847,24 +10657,18 @@ OCUDUASN_CODE drb_setup_mod_item_eutran_ext_ies_container::unpack(cbit_ref& bref
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_setup_mod_item_eutran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_setup_mod_item_eutran_ext_ies_o::get_crit));
 
     switch (id) {
       case 173: {
         security_result_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(security_result.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return security_result.unpack(bref); }));
         break;
       }
       case 142: {
         data_forwarding_source_ip_address_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(data_forwarding_source_ip_address.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return data_forwarding_source_ip_address.unpack(bref); }));
         break;
       }
       default:
@@ -11632,52 +11436,33 @@ OCUDUASN_CODE drb_to_modify_item_ng_ran_ext_ies_container::pack(bit_ref& bref) c
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (old_qos_flow_map_ul_endmarkerexpected_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)71, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, old_qos_flow_map_ul_endmarkerexpected, 1, 64, true));
+    HANDLE_CODE(pack_ie(bref, 71, crit_e{crit_e::reject}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, old_qos_flow_map_ul_endmarkerexpected, 1, 64, true);
+    }));
   }
   if (drb_qos_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)72, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(drb_qos.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 72, crit_e{crit_e::ignore}, [this, &bref]() { return drb_qos.pack(bref); }));
   }
   if (early_forwarding_count_req_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)122, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(early_forwarding_count_req.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 122, crit_e{crit_e::reject}, [this, &bref]() { return early_forwarding_count_req.pack(bref); }));
   }
   if (early_forwarding_count_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)123, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(early_forwarding_count_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 123, crit_e{crit_e::reject}, [this, &bref]() { return early_forwarding_count_info.pack(bref); }));
   }
   if (daps_request_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)120, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(daps_request_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 120, crit_e{crit_e::ignore}, [this, &bref]() { return daps_request_info.pack(bref); }));
   }
   if (early_data_forwarding_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)140, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(early_data_forwarding_ind.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 140, crit_e{crit_e::ignore}, [this, &bref]() { return early_data_forwarding_ind.pack(bref); }));
   }
   if (sd_tind_mod_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)176, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(sd_tind_mod.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 176, crit_e{crit_e::reject}, [this, &bref]() { return sd_tind_mod.pack(bref); }));
   }
   if (pdcp_count_reset_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)184, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pdcp_count_reset.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 184, crit_e{crit_e::reject}, [this, &bref]() { return pdcp_count_reset.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -11689,60 +11474,50 @@ OCUDUASN_CODE drb_to_modify_item_ng_ran_ext_ies_container::unpack(cbit_ref& bref
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_to_modify_item_ng_ran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_to_modify_item_ng_ran_ext_ies_o::get_crit));
 
     switch (id) {
       case 71: {
         old_qos_flow_map_ul_endmarkerexpected_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(old_qos_flow_map_ul_endmarkerexpected, bref, 1, 64, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_dyn_seq_of(old_qos_flow_map_ul_endmarkerexpected, bref, 1, 64, true);
+        }));
         break;
       }
       case 72: {
         drb_qos_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(drb_qos.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return drb_qos.unpack(bref); }));
         break;
       }
       case 122: {
         early_forwarding_count_req_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(early_forwarding_count_req.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return early_forwarding_count_req.unpack(bref); }));
         break;
       }
       case 123: {
         early_forwarding_count_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(early_forwarding_count_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return early_forwarding_count_info.unpack(bref); }));
         break;
       }
       case 120: {
         daps_request_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(daps_request_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return daps_request_info.unpack(bref); }));
         break;
       }
       case 140: {
         early_data_forwarding_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(early_data_forwarding_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return early_data_forwarding_ind.unpack(bref); }));
         break;
       }
       case 176: {
         sd_tind_mod_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(sd_tind_mod.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return sd_tind_mod.unpack(bref); }));
         break;
       }
       case 184: {
         pdcp_count_reset_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(pdcp_count_reset.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return pdcp_count_reset.unpack(bref); }));
         break;
       }
       default:
@@ -12376,16 +12151,11 @@ OCUDUASN_CODE drb_to_setup_item_eutran_ext_ies_container::pack(bit_ref& bref) co
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (data_forwarding_source_ip_address_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)142, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(data_forwarding_source_ip_address.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 142, crit_e{crit_e::ignore}, [this, &bref]() { return data_forwarding_source_ip_address.pack(bref); }));
   }
   if (security_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)172, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(security_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 172, crit_e{crit_e::reject}, [this, &bref]() { return security_ind.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -12397,24 +12167,18 @@ OCUDUASN_CODE drb_to_setup_item_eutran_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_to_setup_item_eutran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_to_setup_item_eutran_ext_ies_o::get_crit));
 
     switch (id) {
       case 142: {
         data_forwarding_source_ip_address_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(data_forwarding_source_ip_address.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return data_forwarding_source_ip_address.unpack(bref); }));
         break;
       }
       case 172: {
         security_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(security_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return security_ind.unpack(bref); }));
         break;
       }
       default:
@@ -12655,40 +12419,23 @@ OCUDUASN_CODE drb_to_setup_item_ng_ran_ext_ies_container::pack(bit_ref& bref) co
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (drb_qos_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)72, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(drb_qos.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 72, crit_e{crit_e::ignore}, [this, &bref]() { return drb_qos.pack(bref); }));
   }
   if (daps_request_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)120, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(daps_request_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 120, crit_e{crit_e::ignore}, [this, &bref]() { return daps_request_info.pack(bref); }));
   }
   if (ignore_map_rule_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)138, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(ignore_map_rule_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 138, crit_e{crit_e::reject}, [this, &bref]() { return ignore_map_rule_ind.pack(bref); }));
   }
   if (qos_flows_drb_remap_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)141, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(qos_flows_drb_remap.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 141, crit_e{crit_e::reject}, [this, &bref]() { return qos_flows_drb_remap.pack(bref); }));
   }
   if (sd_tind_setup_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)175, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(sd_tind_setup.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 175, crit_e{crit_e::reject}, [this, &bref]() { return sd_tind_setup.pack(bref); }));
   }
   if (special_trigger_purpose_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)198, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(special_trigger_purpose.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 198, crit_e{crit_e::ignore}, [this, &bref]() { return special_trigger_purpose.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -12700,48 +12447,38 @@ OCUDUASN_CODE drb_to_setup_item_ng_ran_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_to_setup_item_ng_ran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_to_setup_item_ng_ran_ext_ies_o::get_crit));
 
     switch (id) {
       case 72: {
         drb_qos_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(drb_qos.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return drb_qos.unpack(bref); }));
         break;
       }
       case 120: {
         daps_request_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(daps_request_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return daps_request_info.unpack(bref); }));
         break;
       }
       case 138: {
         ignore_map_rule_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(ignore_map_rule_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return ignore_map_rule_ind.unpack(bref); }));
         break;
       }
       case 141: {
         qos_flows_drb_remap_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(qos_flows_drb_remap.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return qos_flows_drb_remap.unpack(bref); }));
         break;
       }
       case 175: {
         sd_tind_setup_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(sd_tind_setup.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return sd_tind_setup.unpack(bref); }));
         break;
       }
       case 198: {
         special_trigger_purpose_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(special_trigger_purpose.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return special_trigger_purpose.unpack(bref); }));
         break;
       }
       default:
@@ -12949,16 +12686,11 @@ OCUDUASN_CODE drb_to_setup_mod_item_eutran_ext_ies_container::pack(bit_ref& bref
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (security_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)172, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(security_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 172, crit_e{crit_e::reject}, [this, &bref]() { return security_ind.pack(bref); }));
   }
   if (data_forwarding_source_ip_address_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)142, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(data_forwarding_source_ip_address.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 142, crit_e{crit_e::ignore}, [this, &bref]() { return data_forwarding_source_ip_address.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -12970,24 +12702,18 @@ OCUDUASN_CODE drb_to_setup_mod_item_eutran_ext_ies_container::unpack(cbit_ref& b
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_to_setup_mod_item_eutran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_to_setup_mod_item_eutran_ext_ies_o::get_crit));
 
     switch (id) {
       case 172: {
         security_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(security_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return security_ind.unpack(bref); }));
         break;
       }
       case 142: {
         data_forwarding_source_ip_address_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(data_forwarding_source_ip_address.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return data_forwarding_source_ip_address.unpack(bref); }));
         break;
       }
       default:
@@ -13183,34 +12909,20 @@ OCUDUASN_CODE drb_to_setup_mod_item_ng_ran_ext_ies_container::pack(bit_ref& bref
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (drb_qos_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)72, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(drb_qos.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 72, crit_e{crit_e::ignore}, [this, &bref]() { return drb_qos.pack(bref); }));
   }
   if (ignore_map_rule_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)138, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(ignore_map_rule_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 138, crit_e{crit_e::reject}, [this, &bref]() { return ignore_map_rule_ind.pack(bref); }));
   }
   if (daps_request_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)120, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(daps_request_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 120, crit_e{crit_e::ignore}, [this, &bref]() { return daps_request_info.pack(bref); }));
   }
   if (sd_tind_setup_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)175, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(sd_tind_setup.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 175, crit_e{crit_e::reject}, [this, &bref]() { return sd_tind_setup.pack(bref); }));
   }
   if (special_trigger_purpose_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)198, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(special_trigger_purpose.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 198, crit_e{crit_e::ignore}, [this, &bref]() { return special_trigger_purpose.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -13222,42 +12934,33 @@ OCUDUASN_CODE drb_to_setup_mod_item_ng_ran_ext_ies_container::unpack(cbit_ref& b
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != drb_to_setup_mod_item_ng_ran_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &drb_to_setup_mod_item_ng_ran_ext_ies_o::get_crit));
 
     switch (id) {
       case 72: {
         drb_qos_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(drb_qos.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return drb_qos.unpack(bref); }));
         break;
       }
       case 138: {
         ignore_map_rule_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(ignore_map_rule_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return ignore_map_rule_ind.unpack(bref); }));
         break;
       }
       case 120: {
         daps_request_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(daps_request_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return daps_request_info.unpack(bref); }));
         break;
       }
       case 175: {
         sd_tind_setup_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(sd_tind_setup.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return sd_tind_setup.unpack(bref); }));
         break;
       }
       case 198: {
         special_trigger_purpose_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(special_trigger_purpose.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return special_trigger_purpose.unpack(bref); }));
         break;
       }
       default:
@@ -14417,10 +14120,9 @@ OCUDUASN_CODE gnb_cu_cp_tnl_a_to_rem_item_ext_ies_container::pack(bit_ref& bref)
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (tnl_assoc_transport_layer_address_gnb_cu_up_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)75, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(tnl_assoc_transport_layer_address_gnb_cu_up.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 75, crit_e{crit_e::reject}, [this, &bref]() {
+      return tnl_assoc_transport_layer_address_gnb_cu_up.pack(bref);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -14432,18 +14134,14 @@ OCUDUASN_CODE gnb_cu_cp_tnl_a_to_rem_item_ext_ies_container::unpack(cbit_ref& br
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != gnb_cu_cp_tnl_a_to_rem_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &gnb_cu_cp_tnl_a_to_rem_item_ext_ies_o::get_crit));
 
     if (id == 75) {
       {
         tnl_assoc_transport_layer_address_gnb_cu_up_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(tnl_assoc_transport_layer_address_gnb_cu_up.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return tnl_assoc_transport_layer_address_gnb_cu_up.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -15008,10 +14706,7 @@ OCUDUASN_CODE m4_cfg_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (m4_report_amount_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)147, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(m4_report_amount.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 147, crit_e{crit_e::ignore}, [this, &bref]() { return m4_report_amount.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -15023,18 +14718,13 @@ OCUDUASN_CODE m4_cfg_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != m4_cfg_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &m4_cfg_ext_ies_o::get_crit));
 
     if (id == 147) {
       {
         m4_report_amount_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(m4_report_amount.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return m4_report_amount.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -15171,10 +14861,7 @@ OCUDUASN_CODE m6_cfg_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (m6_report_amount_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)148, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(m6_report_amount.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 148, crit_e{crit_e::ignore}, [this, &bref]() { return m6_report_amount.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -15186,18 +14873,13 @@ OCUDUASN_CODE m6_cfg_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != m6_cfg_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &m6_cfg_ext_ies_o::get_crit));
 
     if (id == 148) {
       {
         m6_report_amount_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(m6_report_amount.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return m6_report_amount.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -15309,10 +14991,7 @@ OCUDUASN_CODE m7_cfg_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (m7_report_amount_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)149, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(m7_report_amount.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 149, crit_e{crit_e::ignore}, [this, &bref]() { return m7_report_amount.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -15324,18 +15003,13 @@ OCUDUASN_CODE m7_cfg_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != m7_cfg_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &m7_cfg_ext_ies_o::get_crit));
 
     if (id == 149) {
       {
         m7_report_amount_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(m7_report_amount.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return m7_report_amount.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -17269,40 +16943,30 @@ OCUDUASN_CODE mc_bearer_context_to_modify_ext_ies_container::pack(bit_ref& bref)
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (mc_forwarding_res_request_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)179, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_forwarding_res_request.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 179, crit_e{crit_e::ignore}, [this, &bref]() { return mc_forwarding_res_request.pack(bref); }));
   }
   if (mc_forwarding_res_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)180, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_forwarding_res_ind.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 180, crit_e{crit_e::ignore}, [this, &bref]() { return mc_forwarding_res_ind.pack(bref); }));
   }
   if (mc_forwarding_res_release_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)182, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_forwarding_res_release.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 182, crit_e{crit_e::ignore}, [this, &bref]() { return mc_forwarding_res_release.pack(bref); }));
   }
   if (mbs_session_associated_info_non_support_to_support_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)185, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mbs_session_associated_info_non_support_to_support.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 185, crit_e{crit_e::ignore}, [this, &bref]() {
+      return mbs_session_associated_info_non_support_to_support.pack(bref);
+    }));
   }
   if (mc_bearer_context_inactivity_timer_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)192, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, mc_bearer_context_inactivity_timer, (uint16_t)1u, (uint16_t)7200u, true, true));
+    HANDLE_CODE(pack_ie(bref, 192, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, mc_bearer_context_inactivity_timer, (uint16_t)1u, (uint16_t)7200u, true, true);
+    }));
   }
   if (mc_bearer_context_status_change_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)193, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_bearer_context_status_change.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 193, crit_e{crit_e::ignore}, [this, &bref]() { return mc_bearer_context_status_change.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -17314,49 +16978,41 @@ OCUDUASN_CODE mc_bearer_context_to_modify_ext_ies_container::unpack(cbit_ref& br
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != mc_bearer_context_to_modify_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &mc_bearer_context_to_modify_ext_ies_o::get_crit));
 
     switch (id) {
       case 179: {
         mc_forwarding_res_request_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_forwarding_res_request.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_forwarding_res_request.unpack(bref); }));
         break;
       }
       case 180: {
         mc_forwarding_res_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_forwarding_res_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_forwarding_res_ind.unpack(bref); }));
         break;
       }
       case 182: {
         mc_forwarding_res_release_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_forwarding_res_release.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_forwarding_res_release.unpack(bref); }));
         break;
       }
       case 185: {
         mbs_session_associated_info_non_support_to_support_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mbs_session_associated_info_non_support_to_support.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return mbs_session_associated_info_non_support_to_support.unpack(bref); }));
         break;
       }
       case 192: {
         mc_bearer_context_inactivity_timer_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(
-            unpack_integer(mc_bearer_context_inactivity_timer, bref, (uint16_t)1u, (uint16_t)7200u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(mc_bearer_context_inactivity_timer, bref, (uint16_t)1u, (uint16_t)7200u, true, true);
+        }));
         break;
       }
       case 193: {
         mc_bearer_context_status_change_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_bearer_context_status_change.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_bearer_context_status_change.unpack(bref); }));
         break;
       }
       default:
@@ -17771,10 +17427,8 @@ OCUDUASN_CODE mc_bearer_context_to_modify_required_ext_ies_container::pack(bit_r
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (mc_forwarding_res_release_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)183, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_forwarding_res_release_ind.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 183, crit_e{crit_e::ignore}, [this, &bref]() { return mc_forwarding_res_release_ind.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -17786,18 +17440,13 @@ OCUDUASN_CODE mc_bearer_context_to_modify_required_ext_ies_container::unpack(cbi
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != mc_bearer_context_to_modify_required_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &mc_bearer_context_to_modify_required_ext_ies_o::get_crit));
 
     if (id == 183) {
       {
         mc_forwarding_res_release_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_forwarding_res_release_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_forwarding_res_release_ind.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -18266,10 +17915,8 @@ OCUDUASN_CODE mc_bearer_context_to_modify_resp_ext_ies_container::pack(bit_ref& 
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (mc_forwarding_res_resp_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)181, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_forwarding_res_resp.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 181, crit_e{crit_e::ignore}, [this, &bref]() { return mc_forwarding_res_resp.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -18281,18 +17928,13 @@ OCUDUASN_CODE mc_bearer_context_to_modify_resp_ext_ies_container::unpack(cbit_re
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != mc_bearer_context_to_modify_resp_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &mc_bearer_context_to_modify_resp_ext_ies_o::get_crit));
 
     if (id == 181) {
       {
         mc_forwarding_res_resp_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_forwarding_res_resp.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_forwarding_res_resp.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -18484,28 +18126,23 @@ OCUDUASN_CODE mc_bearer_context_to_setup_ext_ies_container::pack(bit_ref& bref) 
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (mbs_session_associated_info_non_support_to_support_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)185, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mbs_session_associated_info_non_support_to_support.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 185, crit_e{crit_e::ignore}, [this, &bref]() {
+      return mbs_session_associated_info_non_support_to_support.pack(bref);
+    }));
   }
   if (mbs_area_session_id_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)189, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, mbs_area_session_id, (uint32_t)0u, (uint32_t)65535u, true, true));
+    HANDLE_CODE(pack_ie(bref, 189, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, mbs_area_session_id, (uint32_t)0u, (uint32_t)65535u, true, true);
+    }));
   }
   if (mc_bearer_context_inactivity_timer_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)192, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, mc_bearer_context_inactivity_timer, (uint16_t)1u, (uint16_t)7200u, true, true));
+    HANDLE_CODE(pack_ie(bref, 192, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, mc_bearer_context_inactivity_timer, (uint16_t)1u, (uint16_t)7200u, true, true);
+    }));
   }
   if (mc_bearer_context_status_change_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)193, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mc_bearer_context_status_change.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 193, crit_e{crit_e::ignore}, [this, &bref]() { return mc_bearer_context_status_change.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -18517,37 +18154,33 @@ OCUDUASN_CODE mc_bearer_context_to_setup_ext_ies_container::unpack(cbit_ref& bre
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != mc_bearer_context_to_setup_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &mc_bearer_context_to_setup_ext_ies_o::get_crit));
 
     switch (id) {
       case 185: {
         mbs_session_associated_info_non_support_to_support_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mbs_session_associated_info_non_support_to_support.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(
+            bref, [this, &bref]() { return mbs_session_associated_info_non_support_to_support.unpack(bref); }));
         break;
       }
       case 189: {
         mbs_area_session_id_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(mbs_area_session_id, bref, (uint32_t)0u, (uint32_t)65535u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(mbs_area_session_id, bref, (uint32_t)0u, (uint32_t)65535u, true, true);
+        }));
         break;
       }
       case 192: {
         mc_bearer_context_inactivity_timer_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(
-            unpack_integer(mc_bearer_context_inactivity_timer, bref, (uint16_t)1u, (uint16_t)7200u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(mc_bearer_context_inactivity_timer, bref, (uint16_t)1u, (uint16_t)7200u, true, true);
+        }));
         break;
       }
       case 193: {
         mc_bearer_context_status_change_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mc_bearer_context_status_change.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mc_bearer_context_status_change.unpack(bref); }));
         break;
       }
       default:
@@ -19828,10 +19461,8 @@ OCUDUASN_CODE pdu_session_res_modified_item_ext_ies_container::pack(bit_ref& bre
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (redundant_n_g_dl_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)98, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_dl_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 98, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -19843,18 +19474,13 @@ OCUDUASN_CODE pdu_session_res_modified_item_ext_ies_container::unpack(cbit_ref& 
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_modified_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_modified_item_ext_ies_o::get_crit));
 
     if (id == 98) {
       {
         redundant_n_g_dl_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_dl_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -20052,10 +19678,8 @@ OCUDUASN_CODE pdu_session_res_required_to_modify_item_ext_ies_container::pack(bi
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (redundant_n_g_dl_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)98, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_dl_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 98, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -20067,18 +19691,13 @@ OCUDUASN_CODE pdu_session_res_required_to_modify_item_ext_ies_container::unpack(
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_required_to_modify_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_required_to_modify_item_ext_ies_o::get_crit));
 
     if (id == 98) {
       {
         redundant_n_g_dl_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_dl_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -20232,10 +19851,9 @@ OCUDUASN_CODE redundant_pdu_session_info_ext_ies_container::pack(bit_ref& bref) 
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (pdu_session_pair_id_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)151, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, pdu_session_pair_id, (uint16_t)0u, (uint16_t)255u, true, true));
+    HANDLE_CODE(pack_ie(bref, 151, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, pdu_session_pair_id, (uint16_t)0u, (uint16_t)255u, true, true);
+    }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -20247,18 +19865,15 @@ OCUDUASN_CODE redundant_pdu_session_info_ext_ies_container::unpack(cbit_ref& bre
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != redundant_pdu_session_info_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &redundant_pdu_session_info_ext_ies_o::get_crit));
 
     if (id == 151) {
       {
         pdu_session_pair_id_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(pdu_session_pair_id, bref, (uint16_t)0u, (uint16_t)255u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(pdu_session_pair_id, bref, (uint16_t)0u, (uint16_t)255u, true, true);
+        }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -20370,16 +19985,12 @@ OCUDUASN_CODE pdu_session_res_setup_item_ext_ies_container::pack(bit_ref& bref) 
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (redundant_n_g_dl_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)98, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_dl_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 98, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.pack(bref); }));
   }
   if (redundant_pdu_session_info_used_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)106, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_pdu_session_info_used.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 106, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_pdu_session_info_used.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -20391,24 +20002,18 @@ OCUDUASN_CODE pdu_session_res_setup_item_ext_ies_container::unpack(cbit_ref& bre
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_setup_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_setup_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 98: {
         redundant_n_g_dl_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_dl_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.unpack(bref); }));
         break;
       }
       case 106: {
         redundant_pdu_session_info_used_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_pdu_session_info_used.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_pdu_session_info_used.unpack(bref); }));
         break;
       }
       default:
@@ -20584,10 +20189,8 @@ OCUDUASN_CODE pdu_session_res_setup_mod_item_ext_ies_container::pack(bit_ref& br
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (redundant_n_g_dl_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)98, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_dl_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 98, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -20599,18 +20202,13 @@ OCUDUASN_CODE pdu_session_res_setup_mod_item_ext_ies_container::unpack(cbit_ref&
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_setup_mod_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_setup_mod_item_ext_ies_o::get_crit));
 
     if (id == 98) {
       {
         redundant_n_g_dl_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_dl_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_dl_up_tnl_info.unpack(bref); }));
       }
     } else {
       HANDLE_CODE(skip_ignored_ie(bref, crit, id));
@@ -20865,58 +20463,39 @@ OCUDUASN_CODE pdu_session_res_to_modify_item_ext_ies_container::pack(bit_ref& br
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (snssai_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)69, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::reject}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(snssai.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 69, crit_e{crit_e::reject}, [this, &bref]() { return snssai.pack(bref); }));
   }
   if (common_network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)78, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(common_network_instance.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 78, crit_e{crit_e::ignore}, [this, &bref]() { return common_network_instance.pack(bref); }));
   }
   if (redundant_n_g_ul_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)97, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_ul_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 97, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_ul_up_tnl_info.pack(bref); }));
   }
   if (redundant_common_network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)96, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_common_network_instance.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 96, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_common_network_instance.pack(bref); }));
   }
   if (data_forwardingto_e_utran_info_list_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)131, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_dyn_seq_of(bref, data_forwardingto_e_utran_info_list, 1, 256, true));
+    HANDLE_CODE(pack_ie(bref, 131, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_dyn_seq_of(bref, data_forwardingto_e_utran_info_list, 1, 256, true);
+    }));
   }
   if (security_ind_modify_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)143, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(security_ind_modify.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 143, crit_e{crit_e::ignore}, [this, &bref]() { return security_ind_modify.pack(bref); }));
   }
   if (secondary_pdu_session_data_forwarding_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)190, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(secondary_pdu_session_data_forwarding_info.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 190, crit_e{crit_e::ignore}, [this, &bref]() {
+      return secondary_pdu_session_data_forwarding_info.pack(bref);
+    }));
   }
   if (user_plane_fail_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)219, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(user_plane_fail_ind.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 219, crit_e{crit_e::ignore}, [this, &bref]() { return user_plane_fail_ind.pack(bref); }));
   }
   if (special_trigger_purpose_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)198, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(special_trigger_purpose.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 198, crit_e{crit_e::ignore}, [this, &bref]() { return special_trigger_purpose.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -20928,66 +20507,56 @@ OCUDUASN_CODE pdu_session_res_to_modify_item_ext_ies_container::unpack(cbit_ref&
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_to_modify_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_to_modify_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 69: {
         snssai_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(snssai.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return snssai.unpack(bref); }));
         break;
       }
       case 78: {
         common_network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(common_network_instance.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return common_network_instance.unpack(bref); }));
         break;
       }
       case 97: {
         redundant_n_g_ul_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_ul_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_ul_up_tnl_info.unpack(bref); }));
         break;
       }
       case 96: {
         redundant_common_network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_common_network_instance.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_common_network_instance.unpack(bref); }));
         break;
       }
       case 131: {
         data_forwardingto_e_utran_info_list_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_dyn_seq_of(data_forwardingto_e_utran_info_list, bref, 1, 256, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_dyn_seq_of(data_forwardingto_e_utran_info_list, bref, 1, 256, true);
+        }));
         break;
       }
       case 143: {
         security_ind_modify_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(security_ind_modify.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return security_ind_modify.unpack(bref); }));
         break;
       }
       case 190: {
         secondary_pdu_session_data_forwarding_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(secondary_pdu_session_data_forwarding_info.unpack(bref));
+        HANDLE_CODE(
+            unpack_ie_value(bref, [this, &bref]() { return secondary_pdu_session_data_forwarding_info.unpack(bref); }));
         break;
       }
       case 219: {
         user_plane_fail_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(user_plane_fail_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return user_plane_fail_ind.unpack(bref); }));
         break;
       }
       case 198: {
         special_trigger_purpose_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(special_trigger_purpose.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return special_trigger_purpose.unpack(bref); }));
         break;
       }
       default:
@@ -21302,16 +20871,11 @@ OCUDUASN_CODE pdu_session_res_to_rem_item_ext_ies_container::pack(bit_ref& bref)
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (cause_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)0, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(cause.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 0, crit_e{crit_e::ignore}, [this, &bref]() { return cause.pack(bref); }));
   }
   if (user_plane_error_ind_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)215, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(user_plane_error_ind.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 215, crit_e{crit_e::ignore}, [this, &bref]() { return user_plane_error_ind.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -21323,24 +20887,18 @@ OCUDUASN_CODE pdu_session_res_to_rem_item_ext_ies_container::unpack(cbit_ref& br
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_to_rem_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_to_rem_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 0: {
         cause_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(cause.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return cause.unpack(bref); }));
         break;
       }
       case 215: {
         user_plane_error_ind_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(user_plane_error_ind.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return user_plane_error_ind.unpack(bref); }));
         break;
       }
       default:
@@ -21484,34 +21042,24 @@ OCUDUASN_CODE pdu_session_res_to_setup_item_ext_ies_container::pack(bit_ref& bre
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (common_network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)78, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(common_network_instance.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 78, crit_e{crit_e::ignore}, [this, &bref]() { return common_network_instance.pack(bref); }));
   }
   if (redundant_n_g_ul_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)97, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_ul_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 97, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_ul_up_tnl_info.pack(bref); }));
   }
   if (redundant_common_network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)96, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_common_network_instance.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 96, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_common_network_instance.pack(bref); }));
   }
   if (redundant_pdu_session_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)105, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_pdu_session_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 105, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_pdu_session_info.pack(bref); }));
   }
   if (special_trigger_purpose_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)198, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(special_trigger_purpose.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 198, crit_e{crit_e::ignore}, [this, &bref]() { return special_trigger_purpose.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -21523,42 +21071,33 @@ OCUDUASN_CODE pdu_session_res_to_setup_item_ext_ies_container::unpack(cbit_ref& 
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_to_setup_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_to_setup_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 78: {
         common_network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(common_network_instance.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return common_network_instance.unpack(bref); }));
         break;
       }
       case 97: {
         redundant_n_g_ul_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_ul_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_ul_up_tnl_info.unpack(bref); }));
         break;
       }
       case 96: {
         redundant_common_network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_common_network_instance.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_common_network_instance.unpack(bref); }));
         break;
       }
       case 105: {
         redundant_pdu_session_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_pdu_session_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_pdu_session_info.unpack(bref); }));
         break;
       }
       case 198: {
         special_trigger_purpose_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(special_trigger_purpose.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return special_trigger_purpose.unpack(bref); }));
         break;
       }
       default:
@@ -21796,34 +21335,25 @@ OCUDUASN_CODE pdu_session_res_to_setup_mod_item_ext_ies_container::pack(bit_ref&
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)79, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(pack_integer(bref, network_instance, (uint16_t)1u, (uint16_t)256u, true, true));
+    HANDLE_CODE(pack_ie(bref, 79, crit_e{crit_e::ignore}, [this, &bref]() {
+      return pack_integer(bref, network_instance, (uint16_t)1u, (uint16_t)256u, true, true);
+    }));
   }
   if (common_network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)78, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(common_network_instance.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 78, crit_e{crit_e::ignore}, [this, &bref]() { return common_network_instance.pack(bref); }));
   }
   if (redundant_n_g_ul_up_tnl_info_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)97, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_n_g_ul_up_tnl_info.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 97, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_n_g_ul_up_tnl_info.pack(bref); }));
   }
   if (redundant_common_network_instance_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)96, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(redundant_common_network_instance.pack(bref));
+    HANDLE_CODE(pack_ie(
+        bref, 96, crit_e{crit_e::ignore}, [this, &bref]() { return redundant_common_network_instance.pack(bref); }));
   }
   if (special_trigger_purpose_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)198, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(special_trigger_purpose.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 198, crit_e{crit_e::ignore}, [this, &bref]() { return special_trigger_purpose.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -21835,42 +21365,35 @@ OCUDUASN_CODE pdu_session_res_to_setup_mod_item_ext_ies_container::unpack(cbit_r
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != pdu_session_res_to_setup_mod_item_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &pdu_session_res_to_setup_mod_item_ext_ies_o::get_crit));
 
     switch (id) {
       case 79: {
         network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(unpack_integer(network_instance, bref, (uint16_t)1u, (uint16_t)256u, true, true));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() {
+          return unpack_integer(network_instance, bref, (uint16_t)1u, (uint16_t)256u, true, true);
+        }));
         break;
       }
       case 78: {
         common_network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(common_network_instance.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return common_network_instance.unpack(bref); }));
         break;
       }
       case 97: {
         redundant_n_g_ul_up_tnl_info_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_n_g_ul_up_tnl_info.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_n_g_ul_up_tnl_info.unpack(bref); }));
         break;
       }
       case 96: {
         redundant_common_network_instance_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(redundant_common_network_instance.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return redundant_common_network_instance.unpack(bref); }));
         break;
       }
       case 198: {
         special_trigger_purpose_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(special_trigger_purpose.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return special_trigger_purpose.unpack(bref); }));
         break;
       }
       default:
@@ -22475,16 +21998,11 @@ OCUDUASN_CODE trace_activation_ext_ies_container::pack(bit_ref& bref) const
   HANDLE_CODE(pack_length(bref, nof_ies, 1u, 65535u, true));
 
   if (mdt_cfg_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)112, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(mdt_cfg.pack(bref));
+    HANDLE_CODE(pack_ie(bref, 112, crit_e{crit_e::ignore}, [this, &bref]() { return mdt_cfg.pack(bref); }));
   }
   if (trace_collection_entity_uri_present) {
-    HANDLE_CODE(pack_integer(bref, (uint32_t)116, (uint32_t)0u, (uint32_t)65535u, false, true));
-    HANDLE_CODE(crit_e{crit_e::ignore}.pack(bref));
-    varlength_field_pack_guard varlen_scope(bref, true);
-    HANDLE_CODE(trace_collection_entity_uri.pack(bref));
+    HANDLE_CODE(
+        pack_ie(bref, 116, crit_e{crit_e::ignore}, [this, &bref]() { return trace_collection_entity_uri.pack(bref); }));
   }
 
   return OCUDUASN_SUCCESS;
@@ -22496,24 +22014,18 @@ OCUDUASN_CODE trace_activation_ext_ies_container::unpack(cbit_ref& bref)
 
   for (; nof_ies > 0; --nof_ies) {
     uint32_t id;
-    HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
-    crit_e crit;
-    HANDLE_CODE(crit.unpack(bref));
-    if (crit != trace_activation_ext_ies_o::get_crit(id)) {
-      asn1::log_warning("Unpacked crit does not match object set definition");
-    }
+    crit_e   crit;
+    HANDLE_CODE(unpack_ie_header(bref, id, crit, &trace_activation_ext_ies_o::get_crit));
 
     switch (id) {
       case 112: {
         mdt_cfg_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(mdt_cfg.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return mdt_cfg.unpack(bref); }));
         break;
       }
       case 116: {
         trace_collection_entity_uri_present = true;
-        varlength_field_unpack_guard varlen_scope(bref, true);
-        HANDLE_CODE(trace_collection_entity_uri.unpack(bref));
+        HANDLE_CODE(unpack_ie_value(bref, [this, &bref]() { return trace_collection_entity_uri.unpack(bref); }));
         break;
       }
       default:

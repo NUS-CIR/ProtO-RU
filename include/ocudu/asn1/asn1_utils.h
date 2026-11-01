@@ -2033,6 +2033,35 @@ typedef enumerated<crit_opts> crit_e;
 // Skips an unknown IE when its criticality is ignore.
 OCUDUASN_CODE skip_ignored_ie(cbit_ref& bref, crit_e crit, uint32_t id);
 
+namespace detail {
+
+using pack_ie_value_fn   = OCUDUASN_CODE (*)(const void* pack_value);
+using unpack_ie_value_fn = OCUDUASN_CODE (*)(const void* unpack_value);
+
+OCUDUASN_CODE pack_ie(bit_ref& bref, uint32_t id, crit_e crit, pack_ie_value_fn pack_fn, const void* pack_value);
+OCUDUASN_CODE unpack_ie_value(cbit_ref& bref, unpack_ie_value_fn unpack_fn, const void* unpack_value);
+
+} // namespace detail
+
+/// Packs the id, criticality and open type value of a protocol IE. The value is packed into the given bit_ref.
+template <class PackValue>
+OCUDUASN_CODE pack_ie(bit_ref& bref, uint32_t id, crit_e crit, const PackValue& pack_value)
+{
+  return detail::pack_ie(
+      bref, id, crit, [](const void* fn) { return (*static_cast<const PackValue*>(fn))(); }, &pack_value);
+}
+
+/// Unpacks the open type value of a protocol IE. The value is unpacked from the given cbit_ref.
+template <class UnpackValue>
+OCUDUASN_CODE unpack_ie_value(cbit_ref& bref, const UnpackValue& unpack_value)
+{
+  return detail::unpack_ie_value(
+      bref, [](const void* fn) { return (*static_cast<const UnpackValue*>(fn))(); }, &unpack_value);
+}
+
+/// Unpacks the id and criticality of a protocol IE, and warns when the criticality differs from the expected one.
+OCUDUASN_CODE unpack_ie_header(cbit_ref& bref, uint32_t& id, crit_e& crit, crit_e (*expected_crit)(const uint32_t&));
+
 // Presence ::= ENUMERATED
 struct presence_opts {
   enum options { optional, conditional, mandatory, nulltype } value;

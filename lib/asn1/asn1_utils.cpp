@@ -2010,6 +2010,31 @@ OCUDUASN_CODE skip_ignored_ie(cbit_ref& bref, crit_e crit, uint32_t id)
   return bref.advance_bytes(len);
 }
 
+OCUDUASN_CODE
+detail::pack_ie(bit_ref& bref, uint32_t id, crit_e crit, pack_ie_value_fn pack_fn, const void* pack_value)
+{
+  HANDLE_CODE(pack_integer(bref, id, (uint32_t)0u, (uint32_t)65535u, false, true));
+  HANDLE_CODE(crit.pack(bref));
+  varlength_field_pack_guard varlen_scope(bref, true);
+  return pack_fn(pack_value);
+}
+
+OCUDUASN_CODE detail::unpack_ie_value(cbit_ref& bref, unpack_ie_value_fn unpack_fn, const void* unpack_value)
+{
+  varlength_field_unpack_guard varlen_scope(bref, true);
+  return unpack_fn(unpack_value);
+}
+
+OCUDUASN_CODE unpack_ie_header(cbit_ref& bref, uint32_t& id, crit_e& crit, crit_e (*expected_crit)(const uint32_t&))
+{
+  HANDLE_CODE(unpack_integer(id, bref, (uint32_t)0u, (uint32_t)65535u, false, true));
+  HANDLE_CODE(crit.unpack(bref));
+  if (crit != expected_crit(id)) {
+    log_warning("Unpacked crit does not match object set definition");
+  }
+  return OCUDUASN_SUCCESS;
+}
+
 uint32_t detail::base_empty_obj_set::idx_to_id(uint32_t idx)
 {
   asn1::log_error("object set is empty\n");
