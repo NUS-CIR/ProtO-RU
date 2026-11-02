@@ -24,7 +24,8 @@ scorecard:
     SCORECARD_VERSION: "5.5.0"
     SCORECARD_SHA256: "83b90a05c1540ef1390db1cd5711e5fd04be9c1d8537fb84d39d02092d6a8dff"
     # Dangerous-Workflow, SAST and Token-Permissions are not supported on GitLab.
-    SCORECARD_CHECKS: "Binary-Artifacts,Branch-Protection,CI-Tests,CII-Best-Practices,Code-Review,Contributors,Dependency-Update-Tool,Fuzzing,License,Maintained,Packaging,Pinned-Dependencies,Security-Policy,Signed-Releases,Vulnerabilities"
+    # CI-Tests fails with fast-forward merges, waiting for ossf/scorecard#3701 and ossf/scorecard#5176.
+    SCORECARD_CHECKS: "Binary-Artifacts,Branch-Protection,CII-Best-Practices,Code-Review,Contributors,Dependency-Update-Tool,Fuzzing,License,Maintained,Packaging,Pinned-Dependencies,Security-Policy,Signed-Releases,Vulnerabilities"
     # The job fails, without blocking the pipeline, when the aggregate score drops below this value.
     SCORECARD_MIN_SCORE: "5"
     SCORECARD_RESULTS: scorecard.json
