@@ -43,28 +43,48 @@
 /tests/*/pcap/
 /lib/instrumentation/
 /include/ocudu/instrumentation/
+/lib/ran/
+/include/ocudu/ran/
+/tests/*/ran/
 /apps/
 /CMakeLists.txt
+
+[CLI][1] @fmaroszek
+/apps/**/*cli11*
 
 [Fronthaul][1] @faluco @AleaLC @sauka @jc.gonzalez1
 /lib/ofh/
 /include/ocudu/ofh/
 /tests/*/ofh/
+/lib/ru/ofh/
+/include/ocudu/ru/ofh/
+
+[RU][1] @faluco @AleaLC
 /lib/ru/
 /include/ocudu/ru/
-/lib/radio/
-/include/ocudu/radio/
-/tests/*/radio/
 
 [PHY][1] @xarteaga @dvdgrgrtt @ddries
 /lib/phy/
 /include/ocudu/phy/
 /tests/*/phy/
+
+[HAL][1] @xarteaga @ofontbach
 /lib/hal/
 /include/ocudu/hal/
+
+[RF][1] @xarteaga @joaquim_broquetas
+/lib/radio/
+/include/ocudu/radio/
+/tests/*/radio/
+/lib/ru/dummy/
+/lib/ru/sdr/
+
+[CUDA][1] @theandre @oshtim @pennybacker
 /lib/cuda/
 /include/ocudu/cuda/
 /tests/*/cuda/
+
+[DU-low][1] @faluco @AleaLC @jc.gonzalez1
 /lib/du/du_low/
 /include/ocudu/du/du_low/
 
@@ -75,10 +95,6 @@
 /tests/unittests/fapi/
 /tests/unittests/fapi_adaptor/
 
-[RAN][1] @xarteaga @frankist
-/lib/ran/
-/include/ocudu/ran/
-/tests/*/ran/
 
 [DU-high][1] @frankist @jonathan-srs @carlo-glab
 /lib/scheduler/
@@ -106,7 +122,7 @@
 /tests/*/ntn/
 /tests/integrationtests/du_high/ntn/
 
-[CU-UP][1] @palvarez @falkenberg
+[CU-UP][1] @palvarez @falkenberg @fabian.eckermann
 /lib/cu_up/
 /include/ocudu/cu_up/
 /tests/*/cu_up/
@@ -132,7 +148,7 @@
 /include/ocudu/rlc/
 /tests/*/rlc/
 
-[CU-CP][1] @palvarez @fabian.eckermann
+[CU-CP][1] @palvarez @falkenberg @fabian.eckermann
 /lib/cu_cp/
 /include/ocudu/cu_cp/
 /tests/*/cu_cp/

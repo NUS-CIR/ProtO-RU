@@ -82,5 +82,3 @@ Why is this change required? What problem does it solve?
 - [ ] I have added tests to cover my changes, and all previous tests pass.
 - [ ] I have enabled GitLab Shared Runners in my private OCUDU fork. See the
       [CI setup instructions](https://docs.ocudu.org/dev_guide/contributing_guide/#gitlab-ci)
-
-/assign me /request_review @andrepuschmann @ismael.gomez1
