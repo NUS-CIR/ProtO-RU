@@ -1135,7 +1135,9 @@ f1ap_message ocudu::test_helpers::generate_e_cid_measurement_initiation_request(
     const std::vector<asn1::f1ap::e_c_id_meas_quantities_value_opts::options>& quantities,
     asn1::f1ap::e_c_id_report_characteristics_opts::options                    report_characteristics,
     uint16_t                                                                   lmf_ue_meas_id,
-    uint16_t                                                                   ran_ue_meas_id)
+    uint16_t                                                                   ran_ue_meas_id,
+    std::optional<asn1::f1ap::pos_meas_periodicity_nr_ao_a_opts::options>      meas_periodicity_nr_aoa,
+    std::optional<asn1::f1ap::meas_periodicity_opts::options>                  e_cid_meas_periodicity)
 {
   f1ap_message pdu = {};
 
@@ -1154,6 +1156,34 @@ f1ap_message ocudu::test_helpers::generate_e_cid_measurement_initiation_request(
     req->e_c_id_meas_quantities[i].load_info_obj(ASN1_F1AP_ID_E_C_ID_MEAS_QUANTITIES_ITEM);
     req->e_c_id_meas_quantities[i]->e_c_id_meas_quantities_item().e_c_id_meas_quantities_value = quantities[i];
   }
+
+  if (meas_periodicity_nr_aoa.has_value()) {
+    req->pos_meas_periodicity_nr_ao_a_present = true;
+    req->pos_meas_periodicity_nr_ao_a         = meas_periodicity_nr_aoa.value();
+  }
+  if (e_cid_meas_periodicity.has_value()) {
+    req->e_c_id_meas_periodicity_present = true;
+    req->e_c_id_meas_periodicity         = e_cid_meas_periodicity.value();
+  }
+
+  return pdu;
+}
+
+f1ap_message ocudu::test_helpers::generate_e_cid_measurement_termination_command(gnb_cu_ue_f1ap_id_t cu_ue_id,
+                                                                                 gnb_du_ue_f1ap_id_t du_ue_id,
+                                                                                 uint16_t            lmf_ue_meas_id,
+                                                                                 uint16_t            ran_ue_meas_id)
+{
+  f1ap_message pdu = {};
+
+  pdu.pdu.set_init_msg();
+  pdu.pdu.init_msg().load_info_obj(ASN1_F1AP_ID_E_C_ID_MEAS_TERMINATION);
+
+  auto& cmd              = pdu.pdu.init_msg().value.e_c_id_meas_termination_cmd();
+  cmd->gnb_cu_ue_f1ap_id = to_underlying(cu_ue_id);
+  cmd->gnb_du_ue_f1ap_id = to_underlying(du_ue_id);
+  cmd->lmf_ue_meas_id    = lmf_ue_meas_id;
+  cmd->ran_ue_meas_id    = ran_ue_meas_id;
 
   return pdu;
 }

@@ -101,6 +101,14 @@ public:
     return it == f1ap_ue_id_to_du_ue_id_map.end() ? INVALID_DU_UE_INDEX : it->second;
   }
 
+  /// Stops the periodic E-CID measurement of every UE.
+  void stop_e_cid_measurements()
+  {
+    for (f1ap_du_ue& u : ues) {
+      u.e_cid_meas.reset();
+    }
+  }
+
   size_t nof_ues() const { return ues.size(); }
 
 private:

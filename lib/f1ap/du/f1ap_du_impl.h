@@ -9,6 +9,7 @@
 #include "f1ap_du_connection_handler.h"
 #include "f1ap_du_context.h"
 #include "f1ap_du_metrics_collector_impl.h"
+#include "f1ap_du_positioning_procedure_launcher.h"
 #include "procedures/f1ap_du_ref_time_info_report_procedure.h"
 #include "ocudu/asn1/f1ap/f1ap.h"
 #include "ocudu/f1ap/du/f1ap_du.h"
@@ -24,7 +25,7 @@ class f1ap_ue_executor_mapper;
 class f1c_connection_client;
 class f1ap_event_manager;
 
-class f1ap_du_impl final : public f1ap_du
+class f1ap_du_impl final : public f1ap_du, public f1ap_du_positioning_procedure_launcher
 {
 public:
   f1ap_du_impl(f1c_connection_client&   f1c_client_handler_,
@@ -35,6 +36,9 @@ public:
                f1ap_du_pws_notifier&    pws_notifier_,
                timer_manager&           timers_);
   ~f1ap_du_impl() override;
+
+  /// Returns a task that starts the given positioning measurement procedure when a task loop runs it.
+  async_task<void> start_positioning_measurement_procedure_task(async_task<void> proc) override;
 
   bool             connect_to_cu_cp() override;
   async_task<void> disconnect_from_cu_cp() override;
@@ -140,6 +144,9 @@ private:
   /// Sends an E-CID MEASUREMENT INITIATION FAILURE without a UE context.
   void send_e_cid_measurement_initiation_failure(const asn1::f1ap::e_c_id_meas_initiation_request_s& msg) const;
 
+  /// \brief Handle E-CID MEASUREMENT TERMINATION COMMAND as per TS 38.473, Section 8.13.15.
+  void handle_e_cid_measurement_termination_command(const asn1::f1ap::e_c_id_meas_termination_cmd_s& msg);
+
   /// \brief Handle REFERENCE TIME INFORMATION REPORTING CONTROL as per TS 38.473, Section 8.12.1.
   void handle_ref_time_info_report_ctrl(const asn1::f1ap::ref_time_info_report_ctrl_s& msg);
 
@@ -148,9 +155,6 @@ private:
 
   /// Starts a positioning measurement procedure that runs concurrently with the other procedures.
   void launch_positioning_measurement_procedure(async_task<void> proc);
-
-  /// Returns a task that starts the given positioning measurement procedure when a task loop runs it.
-  async_task<void> start_positioning_measurement_procedure_task(async_task<void> proc);
 
   /// \brief Stops the procedures tied to the CU-CP association, before the association is replaced or removed.
   ///

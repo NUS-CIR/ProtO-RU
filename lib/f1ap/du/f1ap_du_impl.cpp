@@ -453,6 +453,9 @@ void f1ap_du_impl::handle_initiating_message(const init_msg_s& msg)
     case msg_types::e_c_id_meas_initiation_request:
       handle_e_cid_measurement_initiation_request(msg.value.e_c_id_meas_initiation_request());
       break;
+    case msg_types::e_c_id_meas_termination_cmd:
+      handle_e_cid_measurement_termination_command(msg.value.e_c_id_meas_termination_cmd());
+      break;
     case msg_types::positioning_info_request:
       handle_positioning_information_request(msg.value.positioning_info_request());
       break;
@@ -622,7 +625,7 @@ void f1ap_du_impl::handle_e_cid_measurement_initiation_request(const asn1::f1ap:
   // that these procedures do not wait for it. If the UE is removed during the wait, the measurement ends at its timeout
   // and the procedure sends nothing, as no new UE takes the C-RNTI before then.
   async_task<void> proc =
-      launch_async<f1ap_du_e_cid_measurement_initiation_procedure>(msg, du_mng.get_positioning_handler(), ues);
+      launch_async<f1ap_du_e_cid_measurement_initiation_procedure>(msg, du_mng.get_positioning_handler(), ues, *this);
   du_mng.get_ue_handler(ue->context.ue_index)
       .schedule_async_task(start_positioning_measurement_procedure_task(std::move(proc)));
 }
@@ -645,6 +648,10 @@ void f1ap_du_impl::stop_cu_cp_association_procedures()
 {
   // The periodic Reference Time reporting (if any) belongs to the CU-CP association.
   ref_time_proc.reset();
+
+  // The periodic E-CID measurements (if any) belong to the CU-CP association. Their reports go to the gNB-CU that
+  // asked for them, and the dropped report procedures never clear their state.
+  ues.stop_e_cid_measurements();
 
   pos_meas_procs.clear();
   ++pos_meas_assoc_gen;
@@ -682,6 +689,34 @@ void f1ap_du_impl::send_e_cid_measurement_initiation_failure(
   fail->cause.set_misc().value = cause_misc_opts::unspecified;
 
   tx_pdu_notifier->on_new_message(f1ap_msg);
+}
+
+void f1ap_du_impl::handle_e_cid_measurement_termination_command(const asn1::f1ap::e_c_id_meas_termination_cmd_s& msg)
+{
+  gnb_du_ue_f1ap_id_t gnb_du_ue_f1ap_id = int_to_gnb_du_ue_f1ap_id(msg->gnb_du_ue_f1ap_id);
+  f1ap_du_ue*         ue                = ues.find(gnb_du_ue_f1ap_id);
+
+  if (ue == nullptr) {
+    logger.error("Discarding ECIDMeasurementTerminationCommand. Cause: Unrecognized gNB-DU UE F1AP ID={}",
+                 fmt::underlying(gnb_du_ue_f1ap_id));
+    return;
+  }
+
+  if (not ue->e_cid_meas.has_value()) {
+    logger.warning("du_ue={}: Discarding ECIDMeasurementTerminationCommand. Cause: No E-CID measurement is running",
+                   fmt::underlying(gnb_du_ue_f1ap_id));
+    return;
+  }
+
+  if (not ue->e_cid_meas->matches(msg->lmf_ue_meas_id, msg->ran_ue_meas_id)) {
+    logger.warning("du_ue={}: Discarding ECIDMeasurementTerminationCommand. Cause: Measurement identifiers do not "
+                   "match the running measurement",
+                   fmt::underlying(gnb_du_ue_f1ap_id));
+    return;
+  }
+
+  // The command needs no answer, as per TS 38.473 section 8.13.15.
+  ue->e_cid_meas.reset();
 }
 
 std::optional<gnb_cu_ue_f1ap_id_t> f1ap_du_impl::get_gnb_cu_ue_f1ap_id(const du_ue_index_t& ue_index) const
