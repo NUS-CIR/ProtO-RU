@@ -118,7 +118,7 @@ can run the same commands with `podman compose` instead of `docker compose`.
 OS=debian OS_VERSION=bookworm docker compose -f docker/docker-compose.yml build gnb
 
 # Another Ubuntu LTS tag
-OS=ubuntu OS_VERSION=22.04 docker compose -f docker/docker-compose.yml up --build
+OS=ubuntu OS_VERSION=24.04 docker compose -f docker/docker-compose.yml up --build
 
 # Fedora 43 (matches Docker Hub tag fedora:43; install scripts use dnf and /etc/os-release ID=fedora)
 OS=fedora OS_VERSION=43 docker compose -f docker/docker-compose.yml build gnb
