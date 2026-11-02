@@ -16,6 +16,7 @@ set(SOURCES
         f1ap_du_positioning_information_exchange_procedure.cpp
         f1ap_du_trp_information_exchange_procedure.cpp
         f1ap_du_e_cid_measurement_initiation_procedure.cpp
+        f1ap_du_e_cid_measurement_report_procedure.cpp
         f1ap_du_positioning_measurement_procedure.cpp
         f1ap_du_paging_procedure.cpp
         f1ap_du_write_replace_warning_procedure.cpp
