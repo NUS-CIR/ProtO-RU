@@ -19,6 +19,7 @@ resource "gitlab_project" "this" {
   resolve_outdated_diff_discussions                = var.resolve_outdated_diff_discussions
   squash_option                                    = var.squash_option
   allow_merge_on_skipped_pipeline                  = var.allow_merge_on_skipped_pipeline
+  reviewer_assignment_strategy                     = var.reviewer_assignment_strategy
 
   # CI/CD Configuration
   auto_cancel_pending_pipelines = var.auto_cancel_pending_pipelines

@@ -92,6 +92,16 @@ variable "allow_merge_on_skipped_pipeline" {
   default     = false
 }
 
+variable "reviewer_assignment_strategy" {
+  description = "Automatic reviewer assignment for merge requests (Premium/Ultimate), null leaves it unmanaged"
+  type        = string
+  default     = null
+  validation {
+    condition     = var.reviewer_assignment_strategy == null || contains(["disabled", "code_owners"], coalesce(var.reviewer_assignment_strategy, "disabled"))
+    error_message = "Reviewer assignment strategy must be null, disabled or code_owners."
+  }
+}
+
 # CI/CD Configuration
 variable "auto_cancel_pending_pipelines" {
   description = "Auto cancel pending pipelines"
