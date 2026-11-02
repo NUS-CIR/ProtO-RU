@@ -4,94 +4,29 @@
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 /// \file
-/// \brief Unit tests for the configured_grant_scheduler. Verifies that the scheduler correctly places periodic
-/// CG PUSCH grants in the right slots, and that the scheduler output (symbols, RBs, RNTI) matches the CG
-/// configuration.
+/// \brief Unit tests for the CG Type 2 scheduler: activation DCI, confirmation, re-activation and CG resource pool.
 
-#include "tests/test_doubles/scheduler/cell_config_builder_profiles.h"
-#include "tests/test_doubles/scheduler/scheduler_config_helper.h"
-#include "tests/test_doubles/scheduler/scheduler_result_finder.h"
+#include "configured_grant_scheduler_test_fixture.h"
+#include "tests/ocudu_test_requirements.h"
 #include "tests/test_doubles/scheduler/scheduler_test_message_validators.h"
-#include "tests/test_doubles/utils/test_rng_seed.h"
 #include "tests/unittests/scheduler/test_utils/result_test_helpers.h"
-#include "tests/unittests/scheduler/test_utils/scheduler_test_simulator.h"
-#include "ocudu/ran/configured_grant/cg_configuration.h"
 #include "ocudu/ran/du_types.h"
-#include "ocudu/ran/logical_channel/lcid.h"
-#include "ocudu/ran/resource_allocation/resource_allocation_frequency.h"
-#include "ocudu/scheduler/config/cg_builder_params.h"
-#include "ocudu/scheduler/config/pucch_resource_builder_params.h"
-#include "ocudu/scheduler/resource_grid_util.h"
-#include <gtest/gtest.h>
+#include <algorithm>
 #include <limits>
+#include <set>
 
 using namespace ocudu;
 
 namespace {
-/// Helper struct that holds parameters for a single CG test scenario.
-struct cg_test_params {
-  cg_configuration::periodicity_t periodicity    = cg_configuration::periodicity_t::sl40;
-  unsigned                        period_slots   = 40;
-  unsigned                        mcs            = 5;
-  unsigned                        nof_harq_procs = 4;
-  /// When false, the cell is built without CG configured at cell level, so the CG scheduler is not instantiated.
-  bool cell_cg_enabled = true;
-  /// Select Type 2 CG, which requires DCI activation before any CG PUSCH is scheduled.
-  bool type2 = false;
-  /// \brief Number of RBs available for CG at cell level.
-  ///
-  /// Each CG resource takes the number of PRBs one UE needs (10, at the default grant size and MCS), so the default
-  /// leaves a single resource per slot offset and thus lets only one UE be activated on any given offset.
-  unsigned max_nof_cell_cg_rbs = 10;
-  /// When true, periodic SRS is enabled in the cell, which reserves the last symbols of every UL slot.
-  bool srs_enabled = false;
-  /// \brief When true, a second entry is appended to the cell PUSCH time domain resource list.
-  ///
-  /// The default cell carries a single entry, which makes the time domain allocation index the Type 2 activation DCI
-  /// announces carry no information: any index would resolve to the same k2 and symbols. A second, distinct entry
-  /// gives that index a meaning, so that a divergence between the index put in the DCI and the one the CG occasions
-  /// are built from becomes observable.
-  bool extra_pusch_td_alloc = false;
-};
 
-/// \brief Second PUSCH time domain resource allocation, added when \c cg_test_params::extra_pusch_td_alloc is set.
-///
-/// Its symbols differ from those of the default first entry, which is what makes the time domain allocation index
-/// observable. The cell configuration validator requires the list to be sorted by k2 (and, within the same k2, by
-/// decreasing number of symbols) and to be a subset of the entries auto-derived from the duplex configuration, so the
-/// entry can only differ in its symbol allocation.
-constexpr pusch_time_domain_resource_allocation extra_pusch_td_res{
-    .k2       = 4,
-    .map_type = sch_mapping_type::typeA,
-    .symbols  = {0, 12},
-};
+/// Safety margin, in slots, added on top of the CG period when waiting for a CG event to show up.
+constexpr unsigned safety_margin = 20U;
 
-struct cg_duplex_test_params {
-  std::string                            name;
-  std::optional<tdd_ul_dl_config_common> tdd_pattern;
-};
+/// Mirrors configured_grant_type2_sched_impl::max_expected_crc_delay: slots after the first CG transmission of an
+/// activation DCI by which the UE must have confirmed it.
+constexpr unsigned max_expected_crc_delay = 50U;
 
-/// Formatter for duplex test params, used by gtest. Avoids the fallback raw-byte printer, which reads
-/// uninitialized padding bytes.
-void PrintTo(const cg_duplex_test_params& value, ::std::ostream* os)
-{
-  *os << value.name;
-}
-
-/// Builds cell_config_builder_params from duplex test params.
-static cell_config_builder_params make_cell_builder_params(const cg_duplex_test_params& p)
-{
-  auto params = cell_config_builder_profiles::create(p.tdd_pattern.has_value() ? duplex_mode::TDD : duplex_mode::FDD);
-  if (p.tdd_pattern.has_value()) {
-    params.tdd_ul_dl_cfg_common = p.tdd_pattern.value();
-  }
-  return params;
-}
-
-/// \brief Grant parameters carried by a CG Type 2 activation DCI, decoded into the representation the CG PUSCH uses.
-///
-/// With CG Type 2 none of these is configured by RRC: the scheduler picks them when building the activation DCI and
-/// stores them in the UE CG state manager, from which every subsequent CG PUSCH occasion is built.
+/// Grant parameters carried by a CG Type 2 activation DCI, decoded into the representation the CG PUSCH uses.
 struct cg_activation_grant_params {
   /// VRBs the UE is told to transmit the CG PUSCH on.
   vrb_interval vrbs;
@@ -100,214 +35,66 @@ struct cg_activation_grant_params {
   uint8_t  mcs;
 };
 
-/// Base class for all configured_grant_scheduler tests. Provides cell + UE setup with CG enabled and
-/// helper methods to find CG grants in the scheduler output.
-/// \note Kept with internal linkage: configured_grant_scheduler_test.cpp defines a class with the same name and a
-/// different body, and both translation units are linked into the same test binary.
-class configured_grant_scheduler_test : public scheduler_test_simulator, public ::testing::Test
+/// CG Type 2 activation DCI seen in the scheduler output.
+struct cg_activation {
+  /// Slot of the PDCCH that carried the DCI.
+  slot_point                 pdcch_slot;
+  cg_activation_grant_params grant;
+};
+
+/// Base fixture of the CG Type 2 tests, with a Type 2 CG configured in the cell.
+class configured_grant_type2_scheduler_test : public configured_grant_scheduler_test
 {
 protected:
-  static constexpr rnti_t ue_crnti = to_rnti(0x4601);
-  /// CS-RNTI assigned to the test UE. Matches the temporary value used in configured_grant_type1_rrm.cpp.
-  static constexpr rnti_t cs_rnti = to_rnti(0xe0ef);
+  static constexpr rnti_t ue2_crnti = to_rnti(0x4602);
+  static constexpr rnti_t cs_rnti_2 = to_rnti(0xe0f0);
 
-  cg_test_params                           cg_params;
-  sched_cell_configuration_request_message cell_req;
-  unsigned                                 default_cg_offset_;
-
-  explicit configured_grant_scheduler_test(const cg_test_params&             params_        = {},
-                                           const cell_config_builder_params& builder_params = {},
-                                           unsigned                          default_offset = 0) :
-    scheduler_test_simulator(/*tx_rx_delay=*/4, builder_params.scs_common),
-    cg_params(params_),
-    default_cg_offset_(default_offset)
+  explicit configured_grant_type2_scheduler_test(cg_test_params                    params         = {},
+                                                 const cell_config_builder_params& builder_params = {}) :
+    configured_grant_scheduler_test(with_type2(params), builder_params)
   {
-    cell_req = sched_config_helper::make_default_sched_cell_configuration_request(builder_params);
-    if (cg_params.srs_enabled) {
-      // Set before the CG configuration below: the number of PRBs a CG grant needs is derived from the PUSCH symbols
-      // left free by SRS.
-      cell_req.ran.init_bwp.srs_cfg.srs_type_enabled = srs_type::periodic;
-      // SRS resources sit at the end of the slot, so the PUCCH resources have to be capped to the symbols SRS leaves
-      // free, or the two collide in the UL grid. The DU does this through
-      // config_helpers::compute_max_nof_pucch_symbols(), which computes the very same value but is not linked into
-      // this test; its DU-level config validator rejects a cell where the cap is missing.
-      pucch_helper::cap_pucch_symbols(cell_req.ran.init_bwp.pucch.resources,
-                                      NOF_OFDM_SYM_PER_SLOT_NORMAL_CP -
-                                          cell_req.ran.init_bwp.srs_cfg.max_nof_symbols.value());
-    }
-    if (cg_params.cell_cg_enabled) {
-      cell_req.ran.init_bwp.cg_cfg = cg_builder_params{
-          .periodicity        = cg_params.periodicity,
-          .type               = cg_params.type2 ? cg_builder_params::cg_type::type2 : cg_builder_params::cg_type::type1,
-          .mcs                = cg_params.mcs,
-          .nof_harq_processes = cg_params.nof_harq_procs,
-          .max_nof_cell_cg_rbs = cg_params.max_nof_cell_cg_rbs,
-      };
-    }
-    if (cg_params.extra_pusch_td_alloc) {
-      cell_req.ran.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list.push_back(extra_pusch_td_res);
-    }
-    add_cell(cell_req);
   }
 
-  /// Adds the test UE to the scheduler with CG configuration.
-  /// CG is applied via a reconfiguration (not at creation) to match the DRB-gated CG production flow,
-  /// where add_reconf_ue() is the sole entry point for CG scheduler setup.
-  void add_cg_ue(du_ue_index_t           ue_idx         = to_du_ue_index(0),
-                 std::optional<unsigned> cg_slot_offset = std::nullopt,
-                 rnti_t                  crnti          = ue_crnti,
-                 rnti_t                  cs_rnti_val    = cs_rnti,
-                 std::optional<unsigned> cg_start_vrb   = std::nullopt)
+  static cg_test_params with_type2(cg_test_params params)
   {
-    auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
-    ue_req.ue_index = ue_idx;
-    ue_req.crnti    = crnti;
-    ASSERT_TRUE(ue_req.cfg.cells.has_value() and not ue_req.cfg.cells->empty());
-    auto& ue_cell = *ue_req.cfg.cells->front().ded;
-    ASSERT_TRUE(ue_cell.serv_cell_cfg.ul_config.has_value());
-    ASSERT_TRUE(ue_cell.serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
-    ue_cell.serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg->rrc_configured_ul_grant_cfg->time_domain_offset =
-        cg_slot_offset.value_or(default_cg_offset_);
-    if (cg_start_vrb.has_value()) {
-      auto& freq = std::get<ra_frequency_type1_configuration>(
-          ue_cell.serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg->rrc_configured_ul_grant_cfg->freq_domain_res);
-      freq.start_vrb = cg_start_vrb.value();
-    }
-
-    // Step 1: Create the UE without CG — add_reconf_ue() is the sole CG entry point, so CG setup
-    // is deferred to the reconfiguration below. Wait for the creation event to be processed before
-    // issuing the reconfiguration, since handle_ue_reconfiguration_request requires the UE to exist.
-    auto ue_req_no_cg = ue_req;
-    ue_req_no_cg.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.reset();
-    add_ue(ue_req_no_cg, /*wait_notification=*/true);
-
-    // Step 2: Reconfigure to install the CG config, which triggers add_reconf_ue() in the scheduler.
-    sched_ue_reconfiguration_message reconf;
-    reconf.ue_index = ue_idx;
-    reconf.crnti    = crnti;
-    reconf.cfg      = ue_req.cfg;
-    reconf.cs_rnti  = cs_rnti_val;
-    sched->handle_ue_reconfiguration_request(reconf);
-
-    // Step 3: Confirm the UE applied the new config, so it exits the pending_reconf state. Otherwise, the UE stays in
-    // fallback, where HARQ-ACKs are never allocated on CG slots (the UE might not have applied the CG config yet).
-    sched->handle_ue_config_applied(ue_idx);
+    params.type = cg_builder_params::cg_type::type2;
+    return params;
   }
 
-  /// Advances the scheduler until a CG PUSCH for \c search_rnti is seen in the output, or \c max_slots is exhausted.
-  const ul_sched_info* run_until_next_cg_pusch(unsigned max_slots = 0, rnti_t search_rnti = cs_rnti)
+  /// \brief Upper bound, in slots, from an activation DCI to the re-activation DCI that follows when it is not
+  /// confirmed.
+  ///
+  /// The deadline is k2 + max_expected_crc_delay slots after the DCI, and the re-activation DCI then waits for a PDCCH
+  /// slot from which a TDRA row lands on the CG offset, at most one CG period later.
+  unsigned reactivation_window() const
   {
-    if (max_slots == 0) {
-      // The CG PUSCH is booked max_ul_slot_alloc_delay slots ahead, so the first grant appears in last_sched_result()
-      // max_ul_slot_alloc_delay + (period - 1) steps after UE creation. Add extra margin for safety.
-      constexpr unsigned ul_delay = get_max_slot_ul_alloc_delay(/*ntn_cs_koffset=*/0);
-      max_slots                   = ul_delay + cg_params.period_slots + 20;
-    }
-    for (unsigned i = 0; i != max_slots; ++i) {
-      run_slot();
-      const ul_sched_info* grant = find_ue_pusch(search_rnti, *last_sched_result());
-      if (grant != nullptr) {
-        return grant;
-      }
-    }
-    return nullptr;
-  }
-
-  /// Sends a UE reconfiguration with modified CG parameters.
-  void reconf_cg(std::optional<cg_configuration::periodicity_t> new_periodicity = std::nullopt,
-                 std::optional<unsigned>                        new_offset      = std::nullopt,
-                 std::optional<unsigned>                        new_mcs         = std::nullopt)
-  {
-    auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
-    ue_req.ue_index = to_du_ue_index(0);
-    ue_req.crnti    = ue_crnti;
-    auto& cg_cfg    = ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.value();
-
-    if (new_periodicity.has_value()) {
-      cg_cfg.periodicity = new_periodicity.value();
-    }
-    if (new_mcs.has_value()) {
-      cg_cfg.rrc_configured_ul_grant_cfg->mcs = new_mcs.value();
-    }
-    cg_cfg.rrc_configured_ul_grant_cfg->time_domain_offset = new_offset.value_or(default_cg_offset_);
-
-    sched_ue_reconfiguration_message reconf;
-    reconf.ue_index = to_du_ue_index(0);
-    reconf.crnti    = ue_crnti;
-    reconf.cfg      = ue_req.cfg;
-    reconf.cs_rnti  = cs_rnti;
-    sched->handle_ue_reconfiguration_request(reconf);
-
-    // Confirm the UE applied the new config, so it exits the pending_reconf state (see add_cg_ue()).
-    sched->handle_ue_config_applied(to_du_ue_index(0));
-  }
-
-  /// Sends a UE reconfiguration that removes the CG configuration (cg_cfg reset to nullopt).
-  void remove_cg_via_reconfig() const
-  {
-    auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
-    ue_req.ue_index = to_du_ue_index(0);
-    ue_req.crnti    = ue_crnti;
-    ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.reset();
-
-    sched_ue_reconfiguration_message reconf;
-    reconf.ue_index = to_du_ue_index(0);
-    reconf.crnti    = ue_crnti;
-    reconf.cfg      = ue_req.cfg;
-    reconf.cs_rnti  = cs_rnti;
-    sched->handle_ue_reconfiguration_request(reconf);
-  }
-
-  /// Sends a CRC indication for a CG PUSCH grant with the given CRC result and SINR.
-  void send_cg_crc(const ul_sched_info& grant, slot_point pusch_slot, bool crc_ok, std::optional<float> sinr_dB) const
-  {
-    ul_crc_indication crc_ind;
-    crc_ind.cell_index = to_du_cell_index(0);
-    crc_ind.sl_rx      = pusch_slot;
-    ul_crc_pdu_indication pdu{};
-    pdu.rnti           = grant.pusch_cfg.rnti;
-    pdu.ue_index       = grant.context.ue_index;
-    pdu.harq_id        = grant.pusch_cfg.harq_id;
-    pdu.tb_crc_success = crc_ok;
-    pdu.ul_sinr_dB     = sinr_dB;
-    crc_ind.crcs.push_back(pdu);
-    sched->handle_crc_indication(crc_ind);
+    return SCHEDULER_MAX_K2 + max_expected_crc_delay + cg_params.period_slots + 2 * safety_margin;
   }
 
   /// \brief Creates the UE without any CG configuration, and waits for the creation to be processed.
   ///
-  /// CG is installed separately by install_type2_cg(), since add_reconf_ue() is the sole entry point for CG scheduler
-  /// setup and a reconfiguration requires the UE to already exist. Keeping the two steps apart also lets a test
-  /// install the CG on several UEs within the same slot.
+  /// The CG is installed separately by install_type2_cg(), which lets a test install it on several UEs in one slot.
   void create_ue_without_cg(du_ue_index_t ue_idx = to_du_ue_index(0), rnti_t crnti = ue_crnti)
   {
     auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
     ue_req.ue_index = ue_idx;
     ue_req.crnti    = crnti;
     ASSERT_TRUE(ue_req.cfg.cells.has_value() and not ue_req.cfg.cells->empty());
-    ASSERT_TRUE(ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config.has_value());
-    ASSERT_TRUE(ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
     ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.reset();
     add_ue(ue_req, /*wait_notification=*/true);
   }
 
   /// \brief Installs the Type 2 CG configuration on an existing UE, which triggers add_reconf_ue() in the scheduler.
   ///
-  /// Unlike the Type 1 flow, no RRC-ConfiguredUplinkGrant is touched: with Type 2 the grant parameters are only known
-  /// once the activation DCI is sent.
-  ///
-  /// \param notify_config_applied When true, the configuration-applied indication is sent, which is what makes the
-  /// scheduler consider the UE ready for Type 2 activation (start_ue_cg_activation()).
+  /// \param notify_config_applied When true, the configuration-applied indication is sent, which makes the scheduler
+  /// consider the UE ready for Type 2 activation.
   void install_type2_cg(bool          notify_config_applied,
                         du_ue_index_t ue_idx      = to_du_ue_index(0),
                         rnti_t        crnti       = ue_crnti,
                         rnti_t        cs_rnti_val = cs_rnti)
   {
-    auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
-    ue_req.ue_index = ue_idx;
-    ue_req.crnti    = crnti;
+    auto ue_req = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
     ASSERT_TRUE(ue_req.cfg.cells.has_value() and not ue_req.cfg.cells->empty());
-    ASSERT_TRUE(ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config.has_value());
     ASSERT_TRUE(ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
 
     sched_ue_reconfiguration_message reconf;
@@ -332,11 +119,23 @@ protected:
     ASSERT_NO_FATAL_FAILURE(install_type2_cg(notify_config_applied, ue_idx, crnti, cs_rnti_val));
   }
 
+  /// \brief Adds the two test UEs so that they become ready for activation in the same slot.
+  ///
+  /// Both UEs are created before the CG is installed on either, with no slot run in between. Otherwise the first UE
+  /// could be activated while the second is still being created.
+  void add_both_ues()
+  {
+    ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(0), ue_crnti));
+    ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(1), ue2_crnti));
+    ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(0), ue_crnti, cs_rnti));
+    ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(1), ue2_crnti, cs_rnti_2));
+  }
+
   /// \brief Advances the scheduler until an UL PDCCH for \c search_rnti shows up in the output.
   ///
   /// \return The slot the PDCCH was found in, or an invalid slot_point if \c max_slots was exhausted.
-  /// \note The CG Type 2 activation DCI is addressed to the CS-RNTI, as per TS 38.213, Section 10.2, so searching
-  /// for that RNTI already isolates it from any dynamic grant addressed to the C-RNTI.
+  /// \note The CG Type 2 activation DCI is addressed to the CS-RNTI, as per TS 38.213, Section 10.2, which isolates it
+  /// from any dynamic grant addressed to the C-RNTI.
   slot_point run_until_next_ul_pdcch(unsigned max_slots, rnti_t search_rnti = cs_rnti)
   {
     for (unsigned i = 0; i != max_slots; ++i) {
@@ -348,17 +147,44 @@ protected:
     return {};
   }
 
+  /// \brief Advances the scheduler until the next activation DCI for \c search_rnti, and checks that it is one.
+  ///
+  /// \return The activation DCI, or nullopt if none showed up within \c max_slots.
+  std::optional<cg_activation> run_until_cg_activation(unsigned max_slots, rnti_t search_rnti = cs_rnti)
+  {
+    const slot_point pdcch_slot = run_until_next_ul_pdcch(max_slots, search_rnti);
+    if (not pdcch_slot.valid()) {
+      return std::nullopt;
+    }
+    const pdcch_ul_information& pdcch = *find_ue_ul_pdcch(search_rnti);
+    check_cg_activation_dci(pdcch);
+    return cg_activation{pdcch_slot, decode_cg_activation_dci(pdcch)};
+  }
+
+  /// \brief Adds a Type 2 CG UE and runs until its first activation DCI.
+  ///
+  /// \param[out] activation The activation DCI, when not null.
+  void activate_ue(cg_activation* activation  = nullptr,
+                   du_ue_index_t  ue_idx      = to_du_ue_index(0),
+                   rnti_t         crnti       = ue_crnti,
+                   rnti_t         cs_rnti_val = cs_rnti)
+  {
+    ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true, ue_idx, crnti, cs_rnti_val));
+    const std::optional<cg_activation> act =
+        run_until_cg_activation(cg_params.period_slots + safety_margin, cs_rnti_val);
+    ASSERT_TRUE(act.has_value()) << "No CG Type 2 activation DCI was allocated";
+    if (activation != nullptr) {
+      *activation = *act;
+    }
+  }
+
   /// \brief Reconfigures the test UE with a modified Type 2 CG configuration, and confirms the new configuration.
   ///
-  /// No RRC-configured grant is touched, as a Type 2 CG has none; the number of CG HARQ processes is enough to make
-  /// the new CG configuration compare different from the installed one.
+  /// A new number of CG HARQ processes is enough to make the new CG configuration differ from the installed one.
   void reconf_type2_cg(unsigned new_nof_harq_procs)
   {
-    auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
-    ue_req.ue_index = to_du_ue_index(0);
-    ue_req.crnti    = ue_crnti;
+    auto ue_req = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
     ASSERT_TRUE(ue_req.cfg.cells.has_value() and not ue_req.cfg.cells->empty());
-    ASSERT_TRUE(ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config.has_value());
     ASSERT_TRUE(ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.has_value());
     ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg->nof_harq_processes = new_nof_harq_procs;
 
@@ -368,13 +194,11 @@ protected:
     reconf.cfg      = ue_req.cfg;
     reconf.cs_rnti  = cs_rnti;
     sched->handle_ue_reconfiguration_request(reconf);
-
-    // Confirm the UE applied the new config, so it exits the pending_reconf state and is offered for activation again.
     sched->handle_ue_config_applied(to_du_ue_index(0));
   }
 
-  /// Sends the CG activation confirmation, which takes the UE out of the scheduler's pending-activation list and
-  /// stops the activation from being retried.
+  /// \brief Sends the CG activation confirmation, which stops the activation from being retried.
+  ///
   /// \param slot_rx Slot of the PUSCH that carried the MAC CE; the last scheduled slot when invalid.
   void confirm_cg_activation(du_ue_index_t ue_idx  = to_du_ue_index(0),
                              rnti_t        crnti   = ue_crnti,
@@ -390,8 +214,8 @@ protected:
 
   /// \brief Reports UL pending bytes for the test UE.
   ///
-  /// A single report is enough: CG PUSCH allocations deliberately leave the logical channel buffers untouched (see
-  /// allocate_cg_opportunity()), so the pending bytes persist across occasions.
+  /// A single report is enough: CG PUSCH allocations leave the logical channel buffers untouched, so the pending bytes
+  /// persist across occasions.
   void push_ul_data(rnti_t crnti = ue_crnti, du_ue_index_t ue_idx = to_du_ue_index(0))
   {
     push_bsr(ul_bsr_indication_message{
@@ -405,22 +229,35 @@ protected:
     run_until_all_pending_tasks_completion();
   }
 
-  /// Checks that the DCI carried by \c pdcch is a CG Type 2 activation, i.e. that it is a DCI format 0_1 scrambled
-  /// with the CS-RNTI whose NDI, HARQ process number and RV are all zero, as per TS 38.213, Section 10.2,
-  /// Table 10.2-1.
-  static void assert_is_cg_activation_dci(const pdcch_ul_information& pdcch)
+  /// \brief Checks that the next \c nof_periods CG PUSCHs of the test UE are one CG period apart.
+  ///
+  /// Starts from the next CG PUSCH occasion.
+  void check_cg_puschs_are_periodic(unsigned nof_periods = 4)
+  {
+    ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "No CG PUSCH occasion was scheduled";
+    slot_point prev_slot = last_result_slot();
+    for (unsigned i = 0; i != nof_periods; ++i) {
+      ASSERT_NE(run_until_next_cg_pusch(cg_params.period_slots + safety_margin), nullptr)
+          << "CG PUSCH occasion " << i + 1 << " never arrived";
+      EXPECT_EQ(last_result_slot() - prev_slot, static_cast<int>(cg_params.period_slots))
+          << "CG PUSCH occasion " << i + 1 << " is not one CG period after the previous one";
+      prev_slot = last_result_slot();
+    }
+  }
+
+  /// Checks that \c pdcch carries a CG Type 2 activation, as per TS 38.213, Section 10.2, Table 10.2-1.
+  static void check_cg_activation_dci(const pdcch_ul_information& pdcch)
   {
     ASSERT_EQ(pdcch.dci.type(), dci_ul_rnti_config_type::cs_rnti_f0_1);
     const dci_0_1_cs_rnti_configuration& dci = pdcch.dci.as_cs_rnti_f0_1();
-    ASSERT_FALSE(dci.new_data_indicator);
-    ASSERT_EQ(dci.harq_process_number, 0);
-    ASSERT_EQ(dci.redundancy_version, 0);
+    EXPECT_FALSE(dci.new_data_indicator);
+    EXPECT_EQ(dci.harq_process_number, 0);
+    EXPECT_EQ(dci.redundancy_version, 0);
   }
 
   /// \brief Decodes the grant parameters carried by a CG Type 2 activation DCI.
   ///
-  /// The frequency allocation is encoded as a type-1 RIV over the UE's active UL BWP, which this test setup leaves
-  /// equal to the cell's initial UL BWP.
+  /// The frequency allocation is a type-1 RIV over the UE's active UL BWP, which is the cell's initial UL BWP here.
   cg_activation_grant_params decode_cg_activation_dci(const pdcch_ul_information& pdcch) const
   {
     const dci_0_1_cs_rnti_configuration& dci = pdcch.dci.as_cs_rnti_f0_1();
@@ -435,48 +272,21 @@ protected:
     return params;
   }
 
-  /// \brief Runs the scheduler until the CG Type 2 activation DCI is allocated.
-  /// \return The grant parameters the DCI carried, or nullopt if no activation DCI showed up within \c max_slots.
-  std::optional<cg_activation_grant_params> run_until_cg_activation(unsigned max_slots)
+  /// Returns the entry of the cell PUSCH time domain resource list an activation DCI points to.
+  const pusch_time_domain_resource_allocation& pusch_td_res(const cg_activation_grant_params& grant) const
   {
-    if (not run_until_next_ul_pdcch(max_slots).valid()) {
-      return std::nullopt;
-    }
-    const pdcch_ul_information* pdcch = find_ue_ul_pdcch(cs_rnti);
-    if (pdcch == nullptr) {
-      return std::nullopt;
-    }
-    return decode_cg_activation_dci(*pdcch);
+    const auto& pusch_td_list = cell_cfg().params.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
+    // Checked here rather than by the caller: an index out of the list is a scheduler bug, not a test setup issue.
+    EXPECT_LT(grant.time_resource, pusch_td_list.size()) << "the activation DCI points outside the PUSCH TD list";
+    return pusch_td_list[std::min<unsigned>(grant.time_resource, pusch_td_list.size() - 1)];
   }
 };
 
-class configured_grant_type2_scheduler_test : public configured_grant_scheduler_test
-{
-protected:
-  configured_grant_type2_scheduler_test() : configured_grant_scheduler_test(cg_test_params{.type2 = true}) {}
-};
-
-/// Safety margin, in slots, added on top of the CG period when waiting for a CG event to show up.
-constexpr unsigned safety_margin = 20U;
-
-/// Mirrors configured_grant_type2_sched_impl::max_expected_crc_delay: slots after the first CG transmission of an
-/// activation DCI by which the UE must have confirmed it.
-constexpr unsigned max_expected_crc_delay = 50U;
-
-/// \brief Upper bound, in slots, from an activation DCI to the re-activation DCI that follows when it is not confirmed.
-///
-/// The deadline is k2 + max_expected_crc_delay slots after the DCI, and the re-activation DCI then waits for a PDCCH
-/// slot from which a TDRA row lands on the CG offset, at most one CG period later. Rounded up generously: this is only
-/// how long a test waits before giving up.
-static unsigned reactivation_window(unsigned period_slots)
-{
-  return SCHEDULER_MAX_K2 + max_expected_crc_delay + period_slots + 2 * safety_margin;
-}
-
 TEST_F(configured_grant_type2_scheduler_test, add_reconf_ue_does_not_schedule_cg_before_ue_is_ready)
 {
-  // Do not send the configuration-applied indication: Type 2 must not allocate a DCI or PUSCH until
-  // start_ue_cg_activation() is invoked by that indication.
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // No configuration-applied indication, so start_ue_cg_activation() is never called.
   ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/false));
 
   for (unsigned i = 0; i != cg_params.period_slots + safety_margin; ++i) {
@@ -486,102 +296,111 @@ TEST_F(configured_grant_type2_scheduler_test, add_reconf_ue_does_not_schedule_cg
   }
 }
 
-/// Slots of the UL PDCCHs and CG PUSCHs of the test UE seen over a run of slots.
-struct cg_activity {
-  std::vector<slot_point> pdcch_slots;
-  std::vector<slot_point> pusch_slots;
+TEST_F(configured_grant_type2_scheduler_test, activation_dci_sets_the_ul_sch_indicator)
+{
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // An UL-SCH indicator of 0, with no CSI or SRS request, is a combination the UE is not expected to receive and may
+  // discard, as per TS 38.212, Section 7.3.1.1.2.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
+  EXPECT_EQ(find_ue_ul_pdcch(cs_rnti)->dci.as_cs_rnti_f0_1().ul_sch_indicator, 1U);
+  ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "No CG PUSCH followed the activation DCI";
+}
+
+/// Type 2 tests run for a CG period above and below max_expected_crc_delay.
+class configured_grant_type2_period_test : public configured_grant_type2_scheduler_test,
+                                           public ::testing::WithParamInterface<cg_period_test_params>
+{
+protected:
+  configured_grant_type2_period_test() :
+    configured_grant_type2_scheduler_test(
+        cg_test_params{.periodicity = GetParam().periodicity, .period_slots = GetParam().period_slots})
+  {
+  }
 };
 
-TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_resent_for_the_same_grant)
+TEST_P(configured_grant_type2_period_test, unconfirmed_activation_is_resent_for_the_same_grant)
 {
-  // The UE confirms every activation DCI it receives with a CG Confirmation MAC CE. With no confirmation by the
-  // deadline, the scheduler must send a new activation DCI for the same grant, as the UE may already be transmitting on
-  // it. No UL data is reported: the re-activation must not depend on it.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  const std::optional<cg_activation_grant_params> first =
-      run_until_cg_activation(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first.has_value()) << "No CG Type 2 activation DCI was allocated";
-  const slot_point first_pdcch_slot = last_result_slot();
+  // No UL data is reported: the re-activation must not depend on it.
+  cg_activation first;
+  ASSERT_NO_FATAL_FAILURE(activate_ue(&first));
 
-  const std::optional<cg_activation_grant_params> second =
-      run_until_cg_activation(reactivation_window(cg_params.period_slots));
+  const std::optional<cg_activation> second = run_until_cg_activation(reactivation_window());
   ASSERT_TRUE(second.has_value()) << "the unconfirmed CG Type 2 activation was never re-sent";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
-
-  EXPECT_GT(last_result_slot(), first_pdcch_slot + static_cast<int>(max_expected_crc_delay))
+  EXPECT_GT(second->pdcch_slot, first.pdcch_slot + static_cast<int>(max_expected_crc_delay))
       << "the activation was re-sent before its confirmation deadline";
-  EXPECT_EQ(second->vrbs, first->vrbs) << "the re-activation DCI moved the UE to other RBs";
-  EXPECT_EQ(second->mcs, first->mcs) << "the re-activation DCI changed the MCS";
+  EXPECT_EQ(second->grant.vrbs, first.grant.vrbs) << "the re-activation DCI moved the UE to other RBs";
+  EXPECT_EQ(second->grant.mcs, first.grant.mcs) << "the re-activation DCI changed the MCS";
 }
+
+INSTANTIATE_TEST_SUITE_P(cg_periods,
+                         configured_grant_type2_period_test,
+                         ::testing::Values(cg_period_test_params{cg_configuration::periodicity_t::sl10, 10},
+                                           cg_period_test_params{cg_configuration::periodicity_t::sl40, 40}),
+                         [](const auto& p) { return fmt::format("period_{}_slots", p.param.period_slots); });
 
 TEST_F(configured_grant_type2_scheduler_test, cg_puschs_keep_their_offset_while_the_activation_is_unconfirmed)
 {
-  // The UE may already be transmitting on the grant, so its CG occasions must keep being allocated while the
-  // activation is unconfirmed, and the re-activation DCI must not move them to another offset.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  cg_activity activity;
-  for (unsigned i = 0, e = 2 * reactivation_window(cg_params.period_slots); i != e; ++i) {
+  // The UE may already transmit on the grant, so its occasions continue, and a re-activation must not move them.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
+
+  std::vector<slot_point> pdcch_slots;
+  std::vector<slot_point> pusch_slots;
+  for (unsigned i = 0, e = 2 * reactivation_window(); i != e; ++i) {
     run_slot();
     if (find_ue_ul_pdcch(cs_rnti) != nullptr) {
-      activity.pdcch_slots.push_back(last_result_slot());
+      pdcch_slots.push_back(last_result_slot());
     }
     if (find_ue_pusch(cs_rnti, *last_sched_result()) != nullptr) {
-      activity.pusch_slots.push_back(last_result_slot());
+      pusch_slots.push_back(last_result_slot());
     }
   }
-  ASSERT_FALSE(activity.pdcch_slots.empty()) << "the unconfirmed CG Type 2 activation was never re-sent";
-  ASSERT_FALSE(activity.pusch_slots.empty()) << "no CG PUSCH was allocated while the activation was unconfirmed";
+  ASSERT_FALSE(pdcch_slots.empty()) << "the unconfirmed CG Type 2 activation was never re-sent";
+  ASSERT_FALSE(pusch_slots.empty()) << "no CG PUSCH was allocated while the activation was unconfirmed";
 
-  const unsigned offset = activity.pusch_slots.front().count() % cg_params.period_slots;
-  for (slot_point sl : activity.pusch_slots) {
-    EXPECT_EQ(sl.count() % cg_params.period_slots, offset)
-        << fmt::format("the CG PUSCH of slot {} left the CG offset", sl);
-  }
-  for (unsigned i = 1; i != activity.pusch_slots.size(); ++i) {
-    EXPECT_EQ(activity.pusch_slots[i] - activity.pusch_slots[i - 1], static_cast<int>(cg_params.period_slots))
-        << "a CG occasion was skipped while the activation was unconfirmed";
+  for (unsigned i = 1; i != pusch_slots.size(); ++i) {
+    EXPECT_EQ(pusch_slots[i] - pusch_slots[i - 1], static_cast<int>(cg_params.period_slots))
+        << fmt::format("the CG PUSCH of slot {} is not one CG period after the previous one", pusch_slots[i]);
   }
 }
 
 TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_resent_until_confirmed)
 {
-  // Each activation DCI gets a confirmation deadline of its own, and the re-activations stop once the UE confirms.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  const slot_point second_pdcch_slot = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots));
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
+
+  const slot_point second_pdcch_slot = run_until_next_ul_pdcch(reactivation_window());
   ASSERT_TRUE(second_pdcch_slot.valid()) << "CG Type 2 activation was not re-sent a first time";
 
-  const slot_point third_pdcch_slot = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots));
+  const slot_point third_pdcch_slot = run_until_next_ul_pdcch(reactivation_window());
   ASSERT_TRUE(third_pdcch_slot.valid()) << "CG Type 2 activation was not re-sent a second time";
   EXPECT_GT(third_pdcch_slot, second_pdcch_slot + static_cast<int>(max_expected_crc_delay))
       << "the second re-activation did not wait for the deadline of the first one";
 
   confirm_cg_activation();
-  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window(cg_params.period_slots)).valid())
+  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window()).valid())
       << "CG Type 2 activation was re-sent after the UE confirmed it";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, late_confirmation_of_an_earlier_activation_dci_confirms_the_grant)
 {
-  // Every activation DCI carries the same grant, so a confirmation that answers an earlier DCI confirms the grant just
-  // as well as one that answers the latest.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
-  const slot_point first_pdcch_slot = last_result_slot();
-  ASSERT_TRUE(run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots)).valid())
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // Every activation DCI carries the same grant, so confirming an earlier one confirms the grant.
+  cg_activation first;
+  ASSERT_NO_FATAL_FAILURE(activate_ue(&first));
+  ASSERT_TRUE(run_until_next_ul_pdcch(reactivation_window()).valid())
       << "the unconfirmed CG Type 2 activation was never re-sent";
 
   // The CG Confirmation MAC CE drawn by the first DCI, carried by a PUSCH that precedes the re-activation.
-  confirm_cg_activation(to_du_ue_index(0), ue_crnti, first_pdcch_slot + 1);
+  confirm_cg_activation(to_du_ue_index(0), ue_crnti, first.pdcch_slot + 1);
 
-  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window(cg_params.period_slots)).valid())
+  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window()).valid())
       << "a late confirmation did not confirm the grant";
 }
 
@@ -590,8 +409,7 @@ struct cg_crc_confirmation_params {
   std::string          name;
   bool                 crc_ok;
   std::optional<float> sinr_dB;
-  /// Only a CRC OK proves the UE holds the grant.
-  bool confirms;
+  bool                 confirms;
 };
 
 /// Formatter for CRC confirmation params, used by gtest. Avoids the fallback raw-byte printer, which reads
@@ -601,26 +419,23 @@ void PrintTo(const cg_crc_confirmation_params& value, ::std::ostream* os)
   *os << value.name;
 }
 
-class configured_grant_type2_crc_confirmation_test : public configured_grant_scheduler_test,
+class configured_grant_type2_crc_confirmation_test : public configured_grant_type2_scheduler_test,
                                                      public ::testing::WithParamInterface<cg_crc_confirmation_params>
-{
-protected:
-  configured_grant_type2_crc_confirmation_test() : configured_grant_scheduler_test(cg_test_params{.type2 = true}) {}
-};
+{};
 
 TEST_P(configured_grant_type2_crc_confirmation_test, only_a_crc_ok_confirms_the_activation)
 {
-  // A CRC OK on a CG PUSCH proves the UE holds the grant, as only this UE transmits on its CG resource. A CRC KO does
-  // not, whatever its SINR: the UE may not have transmitted at all.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // Only this UE transmits on its CG resource, so a CRC OK proves it holds the grant. A CRC KO does not, whatever its
+  // SINR: the UE may not have transmitted at all.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
 
   const ul_sched_info* grant = run_until_next_cg_pusch();
   ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
   send_cg_crc(*grant, last_result_slot(), GetParam().crc_ok, GetParam().sinr_dB);
 
-  const bool reactivated = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots)).valid();
+  const bool reactivated = run_until_next_ul_pdcch(reactivation_window()).valid();
   EXPECT_NE(reactivated, GetParam().confirms)
       << (GetParam().confirms ? "CG Type 2 activation was re-sent although a CRC OK confirmed it"
                               : "CG Type 2 activation was taken as confirmed by a CRC KO");
@@ -639,25 +454,14 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST_F(configured_grant_type2_scheduler_test, ue_reconfiguration_without_cg_is_handled)
 {
-  // CG is DRB-gated, so a UE is created without it and goes through at least one reconfiguration that still carries no
-  // CG config (e.g. the SRB2/DRB setup preceding CG). The CG scheduler must tolerate that: it used to assume every
-  // reconfiguration it saw carried a CG config, which brought the gNB down on the first UE that attached.
-  auto ue_req     = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
-  ue_req.ue_index = to_du_ue_index(0);
-  ue_req.crnti    = ue_crnti;
-  ASSERT_TRUE(ue_req.cfg.cells.has_value() and not ue_req.cfg.cells->empty());
-  ue_req.cfg.cells->front().ded->serv_cell_cfg.ul_config->init_ul_bwp.cg_cfg.reset();
-  add_ue(ue_req, /*wait_notification=*/true);
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  sched_ue_reconfiguration_message reconf;
-  reconf.ue_index = to_du_ue_index(0);
-  reconf.crnti    = ue_crnti;
-  // Same config as at creation: still no CG.
-  reconf.cfg = ue_req.cfg;
-  sched->handle_ue_reconfiguration_request(reconf);
+  // CG is DRB-gated, so a UE goes through reconfigurations that carry no CG config, e.g. the SRB2/DRB setup.
+  ASSERT_NO_FATAL_FAILURE(create_ue_without_cg());
+  // Sends a reconfiguration with no CG config to a UE that has none.
+  remove_cg_via_reconfig();
   sched->handle_ue_config_applied(to_du_ue_index(0));
 
-  // No CG PUSCH may be scheduled either, since this UE has no CG configured.
   for (unsigned i = 0; i != cg_params.period_slots + safety_margin; ++i) {
     run_slot();
     ASSERT_EQ(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr) << "CG PUSCH scheduled for a UE without CG";
@@ -666,43 +470,31 @@ TEST_F(configured_grant_type2_scheduler_test, ue_reconfiguration_without_cg_is_h
 
 TEST_F(configured_grant_type2_scheduler_test, cg_resources_are_returned_to_the_pool_when_ue_is_removed)
 {
-  // Each activation takes one resource out of the cell-wide Type 2 resource pool, which holds one resource per usable
-  // slot offset of the CG period (36 for this cell configuration). rem_ue() must give that resource back: if it does
-  // not, every add/activate/remove cycle leaks one and activation silently stops working once the pool runs dry.
-  // Looping more times than the pool is deep is what turns such a leak into an observable failure, so nof_cycles must
-  // stay comfortably above the pool size.
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // The pool holds one resource per usable slot offset (36 for this cell), so more cycles than that turn a resource
+  // leaked by rem_ue() into a failed activation.
   constexpr unsigned nof_cycles = 60;
 
   for (unsigned i = 0; i != nof_cycles; ++i) {
-    ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true)) << "cycle=" << i;
-
-    ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-        << "CG Type 2 activation stopped working at cycle=" << i
-        << ": the resource pool was likely drained by resources that were not returned on UE removal";
-
-    // Complete the lifecycle the way a real UE would, so the resource is held by an activated UE (rather than one
-    // still pending activation) by the time it is removed.
+    ASSERT_NO_FATAL_FAILURE(activate_ue()) << "cycle=" << i << ": the resource pool was likely drained";
+    // Remove the UE once activated, rather than while still pending activation.
     confirm_cg_activation();
     run_slot();
-
     rem_ue_and_wait();
   }
 }
 
 TEST_F(configured_grant_type2_scheduler_test, config_applied_after_confirmation_does_not_activate_twice)
 {
-  // A configuration-applied indication can arrive with no CG reconfiguration in between, e.g. for an RRC
-  // reconfiguration that leaves the CG untouched. A UE is dropped from the pending-activation list once it confirms its
-  // activation, so the CG scheduler must not mistake this for a UE that still needs one: a second activation would
-  // leave the UE in the periodic wheel at two offsets, transmitting at twice its configured periodicity, and the
-  // resource taken by the first activation would never return to the pool.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // A configuration-applied indication can arrive with no CG reconfiguration in between. A second activation would put
+  // the UE in the wheel at two offsets and leak the resource of the first one.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
   confirm_cg_activation();
   run_slot();
 
-  // Measure the steady-state CG PUSCH rate over a few CG periods.
   const unsigned window_slots         = 3 * cg_params.period_slots;
   unsigned       nof_cg_puschs_before = 0;
   for (unsigned i = 0; i != window_slots; ++i) {
@@ -716,280 +508,103 @@ TEST_F(configured_grant_type2_scheduler_test, config_applied_after_confirmation_
   sched->handle_ue_config_applied(to_du_ue_index(0));
 
   unsigned nof_cg_puschs_after = 0;
-  unsigned nof_extra_dcis      = 0;
   for (unsigned i = 0; i != window_slots; ++i) {
     run_slot();
     if (find_ue_pusch(cs_rnti, *last_sched_result()) != nullptr) {
       ++nof_cg_puschs_after;
     }
-    if (find_ue_ul_pdcch(cs_rnti) != nullptr) {
-      ++nof_extra_dcis;
-    }
+    EXPECT_EQ(find_ue_ul_pdcch(cs_rnti), nullptr) << "a second activation DCI was sent for an already-activated UE";
   }
-
-  EXPECT_EQ(nof_extra_dcis, 0U) << "a second activation DCI was sent for an already-activated UE";
-  EXPECT_EQ(nof_cg_puschs_after, nof_cg_puschs_before)
-      << "the CG PUSCH rate changed after a repeated configuration-applied indication: the UE was activated twice";
+  EXPECT_EQ(nof_cg_puschs_after, nof_cg_puschs_before) << "the CG PUSCH rate changed: the UE was activated twice";
 }
 
-/// Type 2 CG whose period is shorter than max_expected_crc_delay, so several CG occasions elapse before the
-/// confirmation deadline.
-class configured_grant_type2_short_period_test : public configured_grant_scheduler_test
-{
-protected:
-  configured_grant_type2_short_period_test() :
-    configured_grant_scheduler_test(
-        cg_test_params{.periodicity = cg_configuration::periodicity_t::sl10, .period_slots = 10, .type2 = true})
-  {
-  }
-};
-
-TEST_F(configured_grant_type2_short_period_test, unconfirmed_activation_is_resent_for_the_same_grant)
-{
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-
-  const std::optional<cg_activation_grant_params> first =
-      run_until_cg_activation(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first.has_value()) << "No CG Type 2 activation DCI was allocated";
-
-  const std::optional<cg_activation_grant_params> second =
-      run_until_cg_activation(reactivation_window(cg_params.period_slots));
-  ASSERT_TRUE(second.has_value()) << "the unconfirmed CG Type 2 activation was never re-sent";
-  EXPECT_EQ(second->vrbs, first->vrbs) << "the re-activation DCI moved the UE to other RBs";
-}
-
-TEST_F(configured_grant_type2_scheduler_test, activation_dci_f0_1_is_a_valid_cg_activation)
-{
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
-
-  const pdcch_ul_information* pdcch = find_ue_ul_pdcch(cs_rnti);
-  ASSERT_NE(pdcch, nullptr);
-  ASSERT_EQ(pdcch->dci.type(), dci_ul_rnti_config_type::cs_rnti_f0_1);
-  const dci_0_1_cs_rnti_configuration& dci = pdcch->dci.as_cs_rnti_f0_1();
-
-  // Activation signature, as per TS 38.213, Section 10.2, Table 10.2-1.
-  EXPECT_FALSE(dci.new_data_indicator);
-  EXPECT_EQ(dci.harq_process_number, 0);
-  EXPECT_EQ(dci.redundancy_version, 0);
-
-  // The CG PUSCH carries UL-SCH. A value of 0 tells the UE not to transmit UL-SCH on the PUSCH and, together with an
-  // all-zero CSI request and SRS request, forms a combination a UE "is not expected to receive" and may discard
-  // outright, as per TS 38.212, Section 7.3.1.1.2.
-  EXPECT_EQ(dci.ul_sch_indicator, 1U) << "UL-SCH indicator must be set, otherwise the UE transmits nothing";
-
-  // The activation must actually result in periodic CG PUSCHs.
-  ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "No CG PUSCH followed the DCI 0_1 activation";
-}
-
-/// \brief Fixture covering the contract between the CG Type 2 activation DCI and the CG PUSCH occasions that follow.
+/// \brief Fixture for the contract between the activation DCI and the CG PUSCH occasions that follow.
 ///
-/// The UE only ever sees the activation DCI, whereas the scheduler builds every CG occasion from the copy of the same
-/// parameters it stashed in the UE CG state manager. Any divergence between the two means the UE transmits on
-/// resources the gNB does not decode, without either side noticing.
-class configured_grant_type2_dci_contract_test : public configured_grant_scheduler_test
+/// The UE only sees the DCI, while the scheduler builds every occasion from its own copy of the grant. Any mismatch
+/// means the UE transmits on resources the gNB does not decode.
+class configured_grant_type2_dci_contract_test : public configured_grant_type2_scheduler_test
 {
 protected:
   configured_grant_type2_dci_contract_test() :
-    configured_grant_scheduler_test(cg_test_params{.type2 = true, .extra_pusch_td_alloc = true})
+    configured_grant_type2_scheduler_test(cg_test_params{.extra_pusch_td_alloc = true})
   {
-  }
-
-  /// \brief Adds the test UE, activates its CG and advances to the first CG PUSCH occasion that follows.
-  /// \param[out] dci_params Grant parameters carried by the activation DCI.
-  /// \param[out] grant First CG PUSCH occasion the scheduler built from them.
-  void activate_ue_and_get_first_cg_pusch(cg_activation_grant_params& dci_params, const ul_sched_info*& grant)
-  {
-    ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-
-    const std::optional<cg_activation_grant_params> params =
-        run_until_cg_activation(cg_params.period_slots + safety_margin);
-    ASSERT_TRUE(params.has_value()) << "No CG Type 2 activation DCI was allocated";
-    dci_params = params.value();
-
-    grant = run_until_next_cg_pusch();
-    ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
   }
 };
 
-TEST_F(configured_grant_type2_dci_contract_test, cg_pusch_rbs_match_activation_dci)
+TEST_F(configured_grant_type2_dci_contract_test, cg_pusch_matches_the_activation_dci)
 {
-  cg_activation_grant_params dci_params{};
-  const ul_sched_info*       grant = nullptr;
-  ASSERT_NO_FATAL_FAILURE(activate_ue_and_get_first_cg_pusch(dci_params, grant));
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  cg_activation act;
+  ASSERT_NO_FATAL_FAILURE(activate_ue(&act));
+  const ul_sched_info* grant = run_until_next_cg_pusch();
+  ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
 
   ASSERT_TRUE(grant->pusch_cfg.rbs.is_type1()) << "Expected a type-1 (contiguous) VRB allocation";
-  EXPECT_EQ(grant->pusch_cfg.rbs.type1(), dci_params.vrbs)
-      << "the CG PUSCH sits on different VRBs than the activation DCI told the UE to transmit on";
-}
+  EXPECT_EQ(grant->pusch_cfg.rbs.type1(), act.grant.vrbs) << "the CG PUSCH VRBs differ from the activation DCI";
+  EXPECT_EQ(grant->pusch_cfg.symbols, pusch_td_res(act.grant).symbols)
+      << "the CG PUSCH symbols differ from the TD allocation of the activation DCI";
+  EXPECT_EQ(grant->pusch_cfg.mcs_index.value(), act.grant.mcs) << "the CG PUSCH MCS differs from the activation DCI";
+  // A Type 2 grant takes its MCS from the cell-level CG configuration.
+  EXPECT_EQ(act.grant.mcs, cg_params.mcs) << "the activation DCI does not carry the cell-configured CG MCS";
 
-TEST_F(configured_grant_type2_dci_contract_test, cg_pusch_symbols_match_activation_dci)
-{
-  cg_activation_grant_params dci_params{};
-  const ul_sched_info*       grant = nullptr;
-  ASSERT_NO_FATAL_FAILURE(activate_ue_and_get_first_cg_pusch(dci_params, grant));
-
-  // The DCI carries the TD allocation as an index into the cell PUSCH time domain resource list; the symbols the
-  // scheduler grants must be the ones that entry describes.
-  const auto& pusch_td_list = cell_cfg().params.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
-  ASSERT_LT(dci_params.time_resource, pusch_td_list.size())
-      << "the activation DCI points outside the cell PUSCH time domain resource list";
-  EXPECT_EQ(grant->pusch_cfg.symbols, pusch_td_list[dci_params.time_resource].symbols)
-      << "the CG PUSCH uses different symbols than the TD allocation announced in the activation DCI";
-}
-
-TEST_F(configured_grant_type2_dci_contract_test, cg_pusch_mcs_and_tbs_match_activation_dci)
-{
-  cg_activation_grant_params dci_params{};
-  const ul_sched_info*       grant = nullptr;
-  ASSERT_NO_FATAL_FAILURE(activate_ue_and_get_first_cg_pusch(dci_params, grant));
-
-  EXPECT_EQ(grant->pusch_cfg.mcs_index.value(), dci_params.mcs)
-      << "the CG PUSCH uses a different MCS than the one announced in the activation DCI";
-  // Unlike CG Type 1, a Type 2 grant takes its MCS from the cell-level CG configuration, not from the UE-dedicated one.
-  EXPECT_EQ(dci_params.mcs, cg_params.mcs) << "the activation DCI does not carry the cell-configured CG MCS";
-
-  // The TBS is computed once, at activation, from the VRBs and TD allocation the DCI announced, and then cached and
-  // reused by every occasion; is_valid_ul_sched_info() recomputes it from the grant's own fields and checks the
-  // resulting code rate, so a stale or wrongly computed TBS fails here.
+  // The TBS is computed once at activation and reused by every occasion. is_valid_ul_sched_info() recomputes it from
+  // the grant's fields, so a stale or wrong TBS fails here.
   EXPECT_GT(grant->pusch_cfg.tb_size_bytes.value(), 0U);
   EXPECT_TRUE(test_helper::is_valid_ul_sched_info(*grant))
       << "CG PUSCH TBS/code-rate inconsistent with the grant parameters announced in the activation DCI";
 }
 
-TEST_F(configured_grant_type2_dci_contract_test, first_cg_pusch_lands_k2_slots_after_the_activation_dci)
-{
-  // The phase of the CG occasions is derived at activation as (activation slot + k2) % CG period, with k2 taken from
-  // the TD allocation the DCI announced. As k2 is shorter than the CG period, the first occasion must land exactly k2
-  // slots after the activation DCI: any other phase means the UE and the gNB disagree on when the grant recurs, and
-  // the UE would transmit into slots the gNB does not even reserve.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-
-  const slot_point pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
-  const pdcch_ul_information* pdcch = find_ue_ul_pdcch(cs_rnti);
-  ASSERT_NE(pdcch, nullptr);
-  const cg_activation_grant_params dci_params = decode_cg_activation_dci(*pdcch);
-
-  const auto& pusch_td_list = cell_cfg().params.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
-  ASSERT_LT(dci_params.time_resource, pusch_td_list.size());
-  const unsigned k2 = pusch_td_list[dci_params.time_resource].k2;
-  ASSERT_LT(k2, cg_params.period_slots) << "this test assumes a k2 shorter than the CG period";
-
-  ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "No CG PUSCH occasion followed the activation DCI";
-  EXPECT_EQ(last_result_slot() - pdcch_slot, static_cast<int>(k2))
-      << "the first CG PUSCH occasion does not sit k2 slots after the activation DCI";
-}
-
 /// \brief Fixture whose CG period is shorter than the k2 the activation DCI announces.
 ///
-/// The occasion phase is (activation slot + k2) % period, so with a period at or below k2 that phase recurs at least
-/// once between the activation PDCCH and the UE's first transmission. Those earlier occasions belong to the grant the
-/// UE is only about to receive, so it does not transmit on them.
-class configured_grant_type2_short_period_vs_k2_test : public configured_grant_scheduler_test
+/// The occasion phase is (activation slot + k2) % period, so the phase recurs between the activation PDCCH and the
+/// UE's first transmission. The UE does not transmit on those earlier occasions.
+class configured_grant_type2_short_period_vs_k2_test : public configured_grant_type2_scheduler_test
 {
 protected:
   configured_grant_type2_short_period_vs_k2_test() :
-    configured_grant_scheduler_test(
-        cg_test_params{.periodicity = cg_configuration::periodicity_t::sl4, .period_slots = 4, .type2 = true})
+    configured_grant_type2_scheduler_test(
+        cg_test_params{.periodicity = cg_configuration::periodicity_t::sl4, .period_slots = 4})
   {
   }
 };
 
 TEST_F(configured_grant_type2_short_period_vs_k2_test, no_cg_pusch_is_scheduled_before_the_first_transmission)
 {
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  const slot_point pdcch_slot = run_until_next_ul_pdcch(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(pdcch_slot.valid()) << "No CG Type 2 activation DCI was allocated";
-  const pdcch_ul_information* pdcch = find_ue_ul_pdcch(cs_rnti);
-  ASSERT_NE(pdcch, nullptr);
-  const cg_activation_grant_params dci_params = decode_cg_activation_dci(*pdcch);
+  cg_activation act;
+  ASSERT_NO_FATAL_FAILURE(activate_ue(&act));
+  const unsigned k2 = pusch_td_res(act.grant).k2;
 
-  const auto& pusch_td_list = cell_cfg().params.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
-  ASSERT_LT(dci_params.time_resource, pusch_td_list.size());
-  const unsigned k2 = pusch_td_list[dci_params.time_resource].k2;
+  // Guard against a vacuous pass: with k2 below the period, no occasion precedes the first transmission.
+  ASSERT_GE(k2, cg_params.period_slots) << "this test needs a k2 of at least the CG period";
 
-  // Guard against a vacuous pass: with a k2 below the period there is no occasion between the activation and the first
-  // transmission, and the gate under test would never be consulted.
-  ASSERT_GE(k2, cg_params.period_slots)
-      << "this test needs a k2 of at least the CG period, otherwise no occasion precedes the first transmission";
-
-  // Every slot from the activation up to the first transmission must be free of CG PUSCHs. The activation slot itself
-  // is checked first: with k2 equal to the period the occasion phase lands on it, and run_slot() has already produced
-  // its result, so advancing before looking would step straight over the case under test.
+  // The activation slot is checked first: with k2 equal to the period, the occasion phase lands on it.
   EXPECT_EQ(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
       << "a CG PUSCH was scheduled in the very slot that carried the activation DCI";
   for (unsigned i = 1; i != k2; ++i) {
     run_slot();
     EXPECT_EQ(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
-        << "a CG PUSCH was scheduled " << i << " slots after the activation DCI, before the UE's first transmission at "
+        << "a CG PUSCH was scheduled " << i << " slots after the activation DCI, before the first transmission at "
         << "k2=" << k2;
   }
 
-  // The first transmission itself must be there.
   run_slot();
   EXPECT_NE(find_ue_pusch(cs_rnti, *last_sched_result()), nullptr)
       << "no CG PUSCH at the first transmission slot, k2=" << k2 << " slots after the activation DCI";
-  EXPECT_EQ(last_result_slot() - pdcch_slot, static_cast<int>(k2));
+  EXPECT_EQ(last_result_slot() - act.pdcch_slot, static_cast<int>(k2));
 }
 
-TEST_F(configured_grant_type2_scheduler_test, cg_puschs_recur_at_the_configured_cg_period)
-{
-  // Once activated, the UE must get one CG PUSCH occasion per CG period and no more: a wheel filled at the wrong
-  // stride would give the UE a different UL rate than the one its CG configuration grants it, which no existing test
-  // would notice, as they only ever check that some CG PUSCH shows up.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
-  // Confirm the activation, so that the missed-activation detector cannot release the grant midway and shift the
-  // occasion phase under the test.
-  confirm_cg_activation();
-
-  ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "No CG PUSCH occasion followed the activation DCI";
-  slot_point prev_slot = last_result_slot();
-
-  constexpr unsigned nof_periods_checked = 4;
-  for (unsigned i = 0; i != nof_periods_checked; ++i) {
-    ASSERT_NE(run_until_next_cg_pusch(cg_params.period_slots + safety_margin), nullptr)
-        << "CG PUSCH occasion " << i + 1 << " never arrived";
-    EXPECT_EQ(last_result_slot() - prev_slot, static_cast<int>(cg_params.period_slots))
-        << "CG PUSCH occasion " << i + 1 << " is not spaced from the previous one by the configured CG period";
-    prev_slot = last_result_slot();
-  }
-}
-
-/// \brief Fixture for CG Type 2 tests with more than one UE.
+/// \brief Fixture for CG Type 2 tests with two UEs on the same slot offset.
 ///
-/// The CG band is widened so that several CG resources fit side by side at each slot offset, which is what lets two
-/// UEs be activated on the same offset.
-class configured_grant_type2_multi_ue_test : public configured_grant_scheduler_test
+/// The CG band holds four CG resources per slot offset.
+class configured_grant_type2_multi_ue_test : public configured_grant_type2_scheduler_test
 {
 protected:
-  static constexpr rnti_t ue2_crnti = to_rnti(0x4602);
-  static constexpr rnti_t cs_rnti_2 = to_rnti(0xe0f0);
-
-  /// Wide enough for four CG resources of one UE each, at the default grant size and MCS.
-  static constexpr unsigned wide_cg_band_rbs = 40;
-
   configured_grant_type2_multi_ue_test() :
-    configured_grant_scheduler_test(cg_test_params{.type2 = true, .max_nof_cell_cg_rbs = wide_cg_band_rbs})
+    configured_grant_type2_scheduler_test(cg_test_params{.max_nof_cell_cg_rbs = 40})
   {
-  }
-
-  /// \brief Adds both test UEs so that they become ready for activation in the same slot.
-  ///
-  /// The UEs are created first, and only then is the CG installed on both, with no slot run in between. Adding them
-  /// one at a time would let the first one be activated while the second is still being created, which would place
-  /// them on two different slot offsets and defeat the purpose of these tests.
-  void add_both_ues()
-  {
-    ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(0), ue_crnti));
-    ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(1), ue2_crnti));
-    ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(0), ue_crnti, cs_rnti));
-    ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(1), ue2_crnti, cs_rnti_2));
   }
 
   /// \brief Advances until a slot in which both UEs have a CG PUSCH, and reports their VRBs.
@@ -1016,10 +631,8 @@ protected:
 
 TEST_F(configured_grant_type2_multi_ue_test, ues_activated_on_the_same_slot_offset_get_disjoint_vrbs)
 {
-  // Both UEs become ready in the same slot, so the activation procedure runs for both against the same slot offset and
-  // has to hand each its own CG resource. Should they ever be given the same one, their CG PUSCHes would land on the
-  // same RBs in the same slot, and neither would be decodable. cg_type2_resource_manager guarantees the resources of
-  // one offset are disjoint, but nothing else checks that the scheduler asks it for one resource per UE.
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
   ASSERT_NO_FATAL_FAILURE(add_both_ues());
 
   vrb_interval vrbs_ue1;
@@ -1034,8 +647,9 @@ TEST_F(configured_grant_type2_multi_ue_test, ues_activated_on_the_same_slot_offs
 
 TEST_F(configured_grant_type2_multi_ue_test, removing_one_activated_ue_preserves_the_cg_grants_of_the_other)
 {
-  // rem_ue() unwinds the removed UE's wheel entries using the offset and period recorded when it was activated. A
-  // sweep that is too wide would take the other UE's entries down with it and silently stop its CG.
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // rem_ue() unwinds the removed UE's wheel entries, which must leave the other UE's entries in place.
   ASSERT_NO_FATAL_FAILURE(add_both_ues());
 
   vrb_interval vrbs_ue1;
@@ -1057,75 +671,49 @@ TEST_F(configured_grant_type2_multi_ue_test, removing_one_activated_ue_preserves
   EXPECT_GE(nof_ue2_grants, 2U) << "removing one UE took the other UE's CG occasions out of the slot wheel too";
 }
 
-/// CG Type 2 with the default CG band, which holds a single CG resource per slot offset.
-class configured_grant_type2_single_resource_test : public configured_grant_scheduler_test
+TEST_F(configured_grant_type2_scheduler_test, second_ue_is_activated_on_a_different_slot_offset)
 {
-protected:
-  static constexpr rnti_t ue2_crnti = to_rnti(0x4602);
-  static constexpr rnti_t cs_rnti_2 = to_rnti(0xe0f0);
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  configured_grant_type2_single_resource_test() : configured_grant_scheduler_test(cg_test_params{.type2 = true}) {}
-
-  /// Adds both test UEs so that they become ready for activation in the same slot, and therefore contend for the
-  /// single CG resource of the same slot offset.
-  void add_both_ues()
-  {
-    ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(0), ue_crnti));
-    ASSERT_NO_FATAL_FAILURE(create_ue_without_cg(to_du_ue_index(1), ue2_crnti));
-    ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(0), ue_crnti, cs_rnti));
-    ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, to_du_ue_index(1), ue2_crnti, cs_rnti_2));
-  }
-};
-
-TEST_F(configured_grant_type2_single_resource_test, second_ue_is_activated_on_a_different_slot_offset)
-{
-  // Only one CG resource exists per slot offset here, so the second UE cannot be activated in the same slot as the
-  // first: activate_ue() finds no free resource at that offset and gives up for the slot. It must then succeed on a
-  // later slot, which puts it on a different offset. Were the exhausted offset not honoured, both UEs would be handed
-  // the same RBs in the same slot; were the retry not attempted, the second UE would never transmit at all.
+  // The default CG band holds one resource per slot offset, so the second UE cannot take the first UE's offset. Its
+  // activation must be retried on a later slot, at another offset.
   ASSERT_NO_FATAL_FAILURE(add_both_ues());
 
-  std::optional<slot_point> ue1_pusch_slot;
-  std::optional<slot_point> ue2_pusch_slot;
+  bool ue1_has_cg_pusch = false;
+  bool ue2_has_cg_pusch = false;
   for (unsigned i = 0; i != 2 * (cg_params.period_slots + safety_margin); ++i) {
     run_slot();
-    if (not ue1_pusch_slot.has_value() and find_ue_pusch(cs_rnti, *last_sched_result()) != nullptr) {
-      ue1_pusch_slot = last_result_slot();
-    }
-    if (not ue2_pusch_slot.has_value() and find_ue_pusch(cs_rnti_2, *last_sched_result()) != nullptr) {
-      ue2_pusch_slot = last_result_slot();
-    }
-    // A slot carrying a CG PUSCH for both UEs would mean they share the single resource of that offset.
-    ASSERT_FALSE(find_ue_pusch(cs_rnti, *last_sched_result()) != nullptr and
-                 find_ue_pusch(cs_rnti_2, *last_sched_result()) != nullptr)
+    const bool ue1_pusch = find_ue_pusch(cs_rnti, *last_sched_result()) != nullptr;
+    const bool ue2_pusch = find_ue_pusch(cs_rnti_2, *last_sched_result()) != nullptr;
+    ASSERT_FALSE(ue1_pusch and ue2_pusch)
         << "both UEs were given a CG PUSCH in the same slot, although the offset holds a single CG resource";
+    ue1_has_cg_pusch |= ue1_pusch;
+    ue2_has_cg_pusch |= ue2_pusch;
   }
 
-  ASSERT_TRUE(ue1_pusch_slot.has_value()) << "the first UE was never activated";
-  ASSERT_TRUE(ue2_pusch_slot.has_value())
-      << "the second UE was never activated: its activation was not retried after the first attempt found the slot "
-         "offset exhausted";
+  ASSERT_TRUE(ue1_has_cg_pusch) << "the first UE was never activated";
+  ASSERT_TRUE(ue2_has_cg_pusch) << "the second UE was never activated after its first slot offset was exhausted";
 }
 
-/// CG Type 2 in a cell with periodic SRS, which reserves the last symbols of every UL slot. The extra PUSCH time
-/// domain resource is what gives the activation procedure an entry that fits in the remaining symbols.
-class configured_grant_type2_srs_test : public configured_grant_scheduler_test
+/// \brief CG Type 2 in a cell with periodic SRS, which reserves the last symbols of every UL slot.
+///
+/// The extra PUSCH TD allocation fits in the symbols SRS leaves free. With 12 symbols instead of 14, the grant needs
+/// 12 RBs.
+class configured_grant_type2_srs_test : public configured_grant_type2_scheduler_test
 {
 protected:
   configured_grant_type2_srs_test() :
-    // With SRS enabled the CG PUSCH gets 12 symbols instead of 14, so the same grant size needs 12 RBs rather than
-    // the 10 the default CG band holds.
-    configured_grant_scheduler_test(
-        cg_test_params{.type2 = true, .max_nof_cell_cg_rbs = 12, .srs_enabled = true, .extra_pusch_td_alloc = true})
+    configured_grant_type2_scheduler_test(
+        cg_test_params{.max_nof_cell_cg_rbs = 12, .srs_enabled = true, .extra_pusch_td_alloc = true})
   {
   }
 };
 
 TEST_F(configured_grant_type2_srs_test, activation_picks_a_td_allocation_that_avoids_the_srs_symbols)
 {
-  // A CG Type 2 grant has no PDCCH of its own, so its symbols are fixed once at activation and used every period. If
-  // the activation picked a TD allocation reaching into the SRS region, the CG PUSCH would collide with the SRS of
-  // every UE in the cell on every single occasion.
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // The CG symbols are fixed at activation, so a TD allocation reaching into SRS would collide on every occasion.
   ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
 
   const ul_sched_info* grant = run_until_next_cg_pusch();
@@ -1137,8 +725,7 @@ TEST_F(configured_grant_type2_srs_test, activation_picks_a_td_allocation_that_av
   EXPECT_LE(grant->pusch_cfg.symbols.stop(), first_srs_symbol)
       << "the CG PUSCH reaches into the symbols reserved for SRS";
 
-  // Guard against a vacuous pass: the cell must carry a TD allocation that does collide with SRS, so that the
-  // activation had to actually skip one.
+  // Guard against a vacuous pass: some TD allocation of the cell must collide with SRS.
   const auto& pusch_td_list = cell_cfg().params.ul_cfg_common.init_ul_bwp.pusch_cfg_common->pusch_td_alloc_list;
   EXPECT_TRUE(std::any_of(pusch_td_list.begin(),
                           pusch_td_list.end(),
@@ -1150,41 +737,31 @@ TEST_F(configured_grant_type2_srs_test, activation_picks_a_td_allocation_that_av
 
 TEST_F(configured_grant_type2_scheduler_test, discarded_activation_pdcch_is_resent_without_waiting_for_the_deadline)
 {
-  // When the lower layers discard the PDCCHs of a slot, the activation DCI never reaches the UE. The scheduler must
-  // re-send it as soon as the error indication arrives, for the same grant, rather than wait for the confirmation
-  // deadline.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  const std::optional<cg_activation_grant_params> first =
-      run_until_cg_activation(cg_params.period_slots + safety_margin);
-  ASSERT_TRUE(first.has_value()) << "No CG Type 2 activation DCI was allocated";
-  const slot_point first_pdcch_slot = last_result_slot();
+  cg_activation first;
+  ASSERT_NO_FATAL_FAILURE(activate_ue(&first));
 
   scheduler_slot_handler::error_outcome err{};
   err.pdcch_discarded = true;
-  sched->handle_error_indication(first_pdcch_slot, to_du_cell_index(0), err);
+  sched->handle_error_indication(first.pdcch_slot, to_du_cell_index(0), err);
 
-  const std::optional<cg_activation_grant_params> retry =
-      run_until_cg_activation(cg_params.period_slots + safety_margin);
+  const std::optional<cg_activation> retry = run_until_cg_activation(cg_params.period_slots + safety_margin);
   ASSERT_TRUE(retry.has_value()) << "the CG Type 2 activation was never re-sent after its PDCCH was discarded";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
-  EXPECT_LT(last_result_slot() - first_pdcch_slot, static_cast<int>(max_expected_crc_delay))
+  EXPECT_LT(retry->pdcch_slot - first.pdcch_slot, static_cast<int>(max_expected_crc_delay))
       << "the re-activation did not follow the error indication promptly";
-  EXPECT_EQ(retry->vrbs, first->vrbs) << "the re-activation DCI moved the UE to other RBs";
+  EXPECT_EQ(retry->grant.vrbs, first.grant.vrbs) << "the re-activation DCI moved the UE to other RBs";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, removing_a_ue_still_pending_activation_is_clean)
 {
-  // A UE can be released in between the configuration-applied indication, which queues it for activation, and the
-  // slot its activation DCI would have been sent in. rem_ue() has to drop it from the pending-activation list: a
-  // stale entry left there would have run_ues_activation() call activate_ue() with a UE index the repository no
-  // longer holds, which dereferences a null UE on the very next slot. Such a UE holds no CG resource and sits at no
-  // offset of the slot wheel either, so nothing may be returned to the pool on its behalf.
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // Such a UE holds no CG resource and no wheel entry, so its removal must not return anything to the pool.
   constexpr unsigned nof_cycles = 10;
 
   for (unsigned i = 0; i != nof_cycles; ++i) {
-    // No slot is run between the configuration-applied indication and the removal, so the reconfiguration, the
-    // indication and the removal are all processed in the same slot and the UE never reaches activation.
+    // No slot is run before the removal, so the UE never reaches activation.
     ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true)) << "cycle=" << i;
     rem_ue_and_wait();
 
@@ -1197,70 +774,47 @@ TEST_F(configured_grant_type2_scheduler_test, removing_a_ue_still_pending_activa
     }
   }
 
-  // The CG resource pool and the slot wheel must have been left untouched by those removals: a UE added now still
-  // gets activated and served.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "a UE could no longer be activated after other UEs had been removed while pending activation";
+  // The pool and the wheel are untouched: a new UE still gets activated and served.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
   confirm_cg_activation();
   EXPECT_NE(run_until_next_cg_pusch(), nullptr) << "the newly activated UE was given no CG PUSCH occasion";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, reconfiguration_of_an_activated_ue_requires_a_new_activation)
 {
-  // A reconfiguration tears the CG down (add_reconf_ue() -> rem_ue()), since the UE has to be told the parameters of
-  // its new grant with a fresh activation DCI. Two things must hold afterwards: the UE is activated again, and the
-  // wheel entries the first activation inserted are gone. Were they left behind, the UE would sit in the wheel at two
-  // offsets at once and transmit at twice the rate its CG configuration grants it, on resources that the resource
-  // manager has meanwhile handed to somebody else.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // A CG reconfiguration tears the CG down, so the UE needs a new activation DCI, and the wheel entries of the first
+  // activation must be gone. Otherwise the UE sits at two offsets and transmits twice per period.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
   confirm_cg_activation();
   ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "Pre-condition: the UE must have CG occasions before the reconfig";
 
-  constexpr unsigned reconfigured_nof_harq_procs = 8;
-  ASSERT_NO_FATAL_FAILURE(reconf_type2_cg(reconfigured_nof_harq_procs));
+  ASSERT_NO_FATAL_FAILURE(reconf_type2_cg(/*new_nof_harq_procs=*/8));
 
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "the reconfigured UE was never activated again, so its CG stayed down";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
+  ASSERT_TRUE(run_until_cg_activation(cg_params.period_slots + safety_margin).has_value())
+      << "the reconfigured UE was never activated again";
   confirm_cg_activation();
-
-  ASSERT_NE(run_until_next_cg_pusch(), nullptr) << "CG PUSCH occasions did not resume after the re-activation";
-  slot_point prev_slot = last_result_slot();
-
-  constexpr unsigned nof_periods_checked = 4;
-  for (unsigned i = 0; i != nof_periods_checked; ++i) {
-    ASSERT_NE(run_until_next_cg_pusch(cg_params.period_slots + safety_margin), nullptr)
-        << "CG PUSCH occasion " << i + 1 << " never arrived after the re-activation";
-    EXPECT_EQ(last_result_slot() - prev_slot, static_cast<int>(cg_params.period_slots))
-        << "the reconfigured UE is getting CG occasions more often than its CG period: the entries of the previous "
-           "activation were left in the slot wheel";
-    prev_slot = last_result_slot();
-  }
+  ASSERT_NO_FATAL_FAILURE(check_cg_puschs_are_periodic());
 }
 
 TEST_F(configured_grant_type2_scheduler_test, reconfiguration_that_leaves_the_cg_unchanged_does_not_disturb_it)
 {
-  // Most reconfigurations a UE goes through do not touch its CG: a DRB being added, a measurement configuration
-  // changing, and so on. None of those is a reason to take the grant away. Tearing it down would cost the UE a full
-  // re-activation round trip and a gap in its CG occasions every time, and would move it to a new slot offset and a
-  // new set of RBs for no reason at all.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // Most reconfigurations do not touch the CG, e.g. a DRB setup. Tearing the grant down would cost a re-activation and
+  // a gap in the CG occasions every time.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
   confirm_cg_activation();
 
   const ul_sched_info* grant_before = run_until_next_cg_pusch();
   ASSERT_NE(grant_before, nullptr) << "Pre-condition: the UE must have CG occasions before the reconfiguration";
   ASSERT_TRUE(grant_before->pusch_cfg.rbs.is_type1());
   const vrb_interval vrbs_before = grant_before->pusch_cfg.rbs.type1();
-  // The phase of the CG occasions within the CG period. It is fixed at activation, so it changes if and only if the
-  // UE has been re-activated.
+  // The phase is fixed at activation, so it changes only if the UE was re-activated.
   const unsigned phase_before = last_result_slot().count() % cg_params.period_slots;
 
-  // Reconfigure the UE with exactly the configuration it already has, CG included.
+  // Reconfigure the UE with the configuration it already has, CG included.
   ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true));
 
   unsigned nof_cg_puschs = 0;
@@ -1283,57 +837,45 @@ TEST_F(configured_grant_type2_scheduler_test, reconfiguration_that_leaves_the_cg
 
 TEST_F(configured_grant_type2_scheduler_test, unconfirmed_activation_is_paused_while_the_ue_is_in_fallback)
 {
-  // A reconfiguration puts the UE in fallback until it applies the new configuration, during which the size of the DCI
-  // format 0_1 it decodes is not known. An activation still awaiting confirmation must not be re-sent in that window,
-  // and must resume once the UE applies the configuration.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "No CG Type 2 activation DCI was allocated";
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // In fallback, the size of the DCI format 0_1 the UE decodes is not known.
+  ASSERT_NO_FATAL_FAILURE(activate_ue());
 
   // A reconfiguration that leaves the CG unchanged, not yet applied by the UE.
   ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/false));
-  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window(cg_params.period_slots)).valid())
+  EXPECT_FALSE(run_until_next_ul_pdcch(2 * reactivation_window()).valid())
       << "a CG Type 2 activation DCI was sent while the UE was in fallback";
 
   sched->handle_ue_config_applied(to_du_ue_index(0));
-  const slot_point resumed_pdcch_slot = run_until_next_ul_pdcch(reactivation_window(cg_params.period_slots));
-  ASSERT_TRUE(resumed_pdcch_slot.valid()) << "the activation did not resume after the UE applied its configuration";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
+  EXPECT_TRUE(run_until_cg_activation(reactivation_window()).has_value())
+      << "the activation did not resume after the UE applied its configuration";
 }
 
 TEST_F(configured_grant_type2_scheduler_test, cell_deactivation_returns_cg_resources_to_the_pool)
 {
-  // On cell deactivation the UEs are dropped straight from the UE repository, without going through rem_ue(), so the
-  // CG scheduler has to hand their resources back itself. If it does not, every deactivation cycle leaks the resource
-  // of each activated UE and activation silently stops working once the pool runs dry. Cycling more times than the
-  // pool is deep is what turns such a leak into an observable failure, so nof_cycles must stay comfortably above the
-  // pool size (36 resources for this cell configuration).
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // Cell deactivation drops the UEs without rem_ue(), so the CG scheduler frees their resources itself. More cycles
+  // than the pool size (36) turn a leak into a failed activation.
   constexpr unsigned nof_cycles = 60;
 
   for (unsigned i = 0; i != nof_cycles; ++i) {
-    // Each cycle uses new RNTIs: the resource manager hands a UE back the resource it already holds, so with the same
-    // RNTI a resource that was not returned would be reused rather than leaked.
+    // New RNTIs every cycle: the resource manager hands a UE back the resource it already holds, which would hide a
+    // leak.
     const rnti_t cycle_crnti   = to_rnti(to_underlying(ue_crnti) + i);
     const rnti_t cycle_cs_rnti = to_rnti(to_underlying(cs_rnti) - i);
-    ASSERT_NO_FATAL_FAILURE(
-        add_type2_cg_ue(/*notify_config_applied=*/true, to_du_ue_index(0), cycle_crnti, cycle_cs_rnti))
-        << "cycle=" << i;
+    ASSERT_NO_FATAL_FAILURE(activate_ue(nullptr, to_du_ue_index(0), cycle_crnti, cycle_cs_rnti))
+        << "cycle=" << i << ": the resource pool was likely drained";
 
-    ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin, cycle_cs_rnti).valid())
-        << "CG Type 2 activation stopped working at cycle=" << i
-        << ": the resource pool was likely drained by resources that were not returned on cell deactivation";
-
-    // Hold the resource as an activated UE rather than one still pending activation, which is the case the cell
-    // deactivation path has to clean up.
+    // Deactivate the cell while the UE is activated rather than pending activation.
     confirm_cg_activation(to_du_ue_index(0), cycle_crnti);
     run_slot();
 
-    // Bring the cell down and straight back up. No slot is run in between: a deactivated cell scheduler expects no
-    // slot indication until it is re-enabled.
+    // No slot is run in between: a deactivated cell scheduler expects no slot indication.
     sched->handle_cell_deactivation_request(to_du_cell_index(0));
     sched->handle_cell_activation_request(to_du_cell_index(0));
-    // The cell deactivation already dropped the UE from the scheduling, but its configuration is only released by the
-    // UE removal that the DU sends once the cell is stopped, which frees the UE index for the next cycle.
+    // The UE removal that the DU sends once the cell is stopped frees the UE index for the next cycle.
     rem_ue(to_du_ue_index(0));
     run_slot();
   }
@@ -1341,21 +883,17 @@ TEST_F(configured_grant_type2_scheduler_test, cell_deactivation_returns_cg_resou
 
 /// \brief CG Type 2 on an F1AP-created UE that is still awaiting its C-RNTI MAC CE.
 ///
-/// While contention resolution is pending, the CG scheduler is not told about the UE at all: the reconfiguration that
-/// installs the CG is skipped, and so is the configuration-applied indication that would queue it for activation. The
-/// deferred setup is caught up when the C-RNTI CE arrives, which is the only path that reaches add_reconf_ue() with
-/// no previous configuration.
-class configured_grant_type2_fallback_ue_test : public configured_grant_scheduler_test
+/// While contention resolution is pending, the CG reconfiguration and the configuration-applied indication do not reach
+/// the CG scheduler. The C-RNTI CE catches the setup up, which is the only path to add_reconf_ue() with no previous
+/// configuration.
+class configured_grant_type2_fallback_ue_test : public configured_grant_type2_scheduler_test
 {
 protected:
   static constexpr du_ue_index_t ue_idx = to_du_ue_index(0);
 
-  configured_grant_type2_fallback_ue_test() : configured_grant_scheduler_test(cg_test_params{.type2 = true}) {}
-
   /// \brief Creates the UE in fallback via the F1AP path (no UL-CCCH slot, no CFRA), without CG configuration.
   ///
-  /// \note scheduler_test_simulator::add_ue() is bypassed, as it auto-completes contention resolution by sending the
-  /// C-RNTI CE right after the creation request, whereas this fixture must keep the UE awaiting that CE.
+  /// \note scheduler_test_simulator::add_ue() is bypassed, as it sends the C-RNTI CE right after the creation request.
   void add_fallback_crnti_ce_ue()
   {
     auto ue_req               = sched_config_helper::create_default_sched_ue_creation_request(cell_req.ran);
@@ -1376,10 +914,9 @@ protected:
 
 TEST_F(configured_grant_type2_fallback_ue_test, cg_activation_is_deferred_until_the_crnti_ce_is_received)
 {
-  add_fallback_crnti_ce_ue();
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  // Install the CG configuration while contention resolution is still pending. Both the CG scheduler registration and
-  // the configuration-applied indication are skipped for a UE in fallback, so nothing may happen yet.
+  ASSERT_NO_FATAL_FAILURE(add_fallback_crnti_ce_ue());
   ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, ue_idx));
 
   for (unsigned i = 0; i != cg_params.period_slots + safety_margin; ++i) {
@@ -1390,38 +927,32 @@ TEST_F(configured_grant_type2_fallback_ue_test, cg_activation_is_deferred_until_
         << "a CG PUSCH was scheduled while contention resolution was still pending";
   }
 
-  // C-RNTI CE received: contention resolution completes and the deferred CG setup is caught up.
   sched->handle_crnti_ce_received(ue_idx);
 
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
-      << "the UE was never activated after its C-RNTI CE was received, so its CG stayed down for good";
-  ASSERT_NO_FATAL_FAILURE(assert_is_cg_activation_dci(*find_ue_ul_pdcch(cs_rnti)));
+  ASSERT_TRUE(run_until_cg_activation(cg_params.period_slots + safety_margin).has_value())
+      << "the UE was never activated after its C-RNTI CE was received";
   confirm_cg_activation(ue_idx);
-
   EXPECT_NE(run_until_next_cg_pusch(), nullptr) << "No CG PUSCH followed the activation";
 
-  // The UE must still be removable cleanly afterwards.
   rem_ue_and_wait(ue_idx);
 }
 
 TEST_F(configured_grant_type2_fallback_ue_test, cg_and_dynamic_grants_use_disjoint_harq_processes)
 {
-  // The first HARQ processes of a UE with CG are reserved for its CG occasions; a dynamic UL grant handed one of them
-  // would overwrite a CG transmission still awaiting its CRC. This checks the split holds for a UE whose CG setup was
-  // completed by the C-RNTI CE, which is the path that reaches add_reconf_ue() with no previous configuration.
-  //
-  // The reservation itself is established by ue_cell::handle_reconfiguration_request(), which runs for every
-  // reconfiguration. CG can only ever be installed by one, since the CS-RNTI its PUSCH is built with is carried by
-  // the reconfiguration message alone, so that is always the path taken.
-  add_fallback_crnti_ce_ue();
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
+  // The first HARQ processes of a UE with CG are reserved for its CG occasions, by
+  // ue_cell::handle_reconfiguration_request(). A dynamic grant on one of them would overwrite a CG transmission still
+  // awaiting its CRC.
+  ASSERT_NO_FATAL_FAILURE(add_fallback_crnti_ce_ue());
   ASSERT_NO_FATAL_FAILURE(install_type2_cg(/*notify_config_applied=*/true, ue_idx));
   sched->handle_crnti_ce_received(ue_idx);
 
-  ASSERT_TRUE(run_until_next_ul_pdcch(cg_params.period_slots + safety_margin).valid())
+  ASSERT_TRUE(run_until_cg_activation(cg_params.period_slots + safety_margin).has_value())
       << "the UE was never activated after its C-RNTI CE was received";
   confirm_cg_activation(ue_idx);
 
-  // Give the UE UL data, so that it is also served by dynamic grants competing for the same HARQ entity.
+  // UL data, so that dynamic grants compete for the same HARQ entity.
   push_ul_data(ue_crnti, ue_idx);
 
   unsigned nof_cg_grants      = 0;
@@ -1436,7 +967,7 @@ TEST_F(configured_grant_type2_fallback_ue_test, cg_and_dynamic_grants_use_disjoi
     if (const ul_sched_info* dyn_grant = find_ue_pusch(ue_crnti, *last_sched_result()); dyn_grant != nullptr) {
       ++nof_dynamic_grants;
       EXPECT_GE(dyn_grant->pusch_cfg.harq_id, to_harq_id(cg_params.nof_harq_procs))
-          << "a dynamic PUSCH was given a HARQ process reserved for CG, so the CG HARQ processes were never reserved";
+          << "a dynamic PUSCH was given a HARQ process reserved for CG";
     }
   }
 
@@ -1445,61 +976,74 @@ TEST_F(configured_grant_type2_fallback_ue_test, cg_and_dynamic_grants_use_disjoi
   EXPECT_GT(nof_dynamic_grants, 0U) << "the UE was given no dynamic UL grant, so no HARQ contention was exercised";
 }
 
-class configured_grant_type2_scheduler_duplex_test : public configured_grant_scheduler_test,
-                                                     public ::testing::WithParamInterface<cg_duplex_test_params>
+/// CG Type 2 in FDD and TDD cells. In TDD, the activation needs a DL slot for the PDCCH and a TDRA row whose k2 lands
+/// on a UL slot.
+class configured_grant_type2_duplex_test : public configured_grant_type2_scheduler_test,
+                                           public ::testing::WithParamInterface<cg_duplex_test_params>
 {
 protected:
-  configured_grant_type2_scheduler_duplex_test() :
-    configured_grant_scheduler_test(cg_test_params{.type2 = true}, make_cell_builder_params(GetParam()))
+  configured_grant_type2_duplex_test() :
+    configured_grant_type2_scheduler_test(cg_test_params{}, make_cell_builder_params(GetParam()))
   {
   }
 };
 
-TEST_P(configured_grant_type2_scheduler_duplex_test, cg_grants_are_allocated_after_ue_is_ready_for_activation)
+TEST_P(configured_grant_type2_duplex_test, cg_puschs_start_k2_slots_after_the_activation_dci_and_recur_every_period)
 {
-  // The configuration-applied indication causes start_ue_cg_activation() to enqueue the UE for Type 2
-  // activation.
-  ASSERT_NO_FATAL_FAILURE(add_type2_cg_ue(/*notify_config_applied=*/true));
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
 
-  ASSERT_NE(run_until_next_cg_pusch(), nullptr)
-      << "No CG PUSCH was scheduled after the UE became ready for Type 2 activation";
+  // The occasion phase is (activation slot + k2) % period. With k2 below the period, the first occasion lands exactly
+  // k2 slots after the activation DCI. Any other phase means the UE transmits in slots the gNB does not reserve.
+  cg_activation act;
+  ASSERT_NO_FATAL_FAILURE(activate_ue(&act));
+  const unsigned k2 = pusch_td_res(act.grant).k2;
+  ASSERT_LT(k2, cg_params.period_slots) << "this test assumes a k2 shorter than the CG period";
+
+  const ul_sched_info* grant = run_until_next_cg_pusch();
+  ASSERT_NE(grant, nullptr) << "No CG PUSCH occasion followed the activation DCI";
+  EXPECT_EQ(last_result_slot() - act.pdcch_slot, static_cast<int>(k2))
+      << "the first CG PUSCH occasion is not k2 slots after the activation DCI";
+  EXPECT_EQ(grant->pusch_cfg.symbols, pusch_td_res(act.grant).symbols);
+
+  // Confirm the activation, so that a re-activation cannot interfere with the occasions checked below.
+  confirm_cg_activation();
+  ASSERT_NO_FATAL_FAILURE(check_cg_puschs_are_periodic());
 }
 
 INSTANTIATE_TEST_SUITE_P(
     cg_duplex,
-    configured_grant_type2_scheduler_duplex_test,
-    ::testing::Values(
-        cg_duplex_test_params{"FDD", std::nullopt},
-        cg_duplex_test_params{"TDD_6D1S3U", tdd_ul_dl_config_common{subcarrier_spacing::kHz30, {10, 6, 10, 3, 0}}},
-        cg_duplex_test_params{"TDD_3D1S6U", tdd_ul_dl_config_common{subcarrier_spacing::kHz30, {10, 3, 10, 6, 0}}}),
+    configured_grant_type2_duplex_test,
+    ::testing::Values(cg_duplex_test_params{"FDD", duplex_mode::FDD, std::nullopt, 0},
+                      cg_duplex_test_params{"TDD_6D1S3U",
+                                            duplex_mode::TDD,
+                                            tdd_ul_dl_config_common{subcarrier_spacing::kHz30, {10, 6, 10, 3, 0}},
+                                            0},
+                      cg_duplex_test_params{"TDD_3D1S6U",
+                                            duplex_mode::TDD,
+                                            tdd_ul_dl_config_common{subcarrier_spacing::kHz30, {10, 3, 10, 6, 0}},
+                                            0}),
     [](const auto& p) { return p.param.name; });
 
 /// \brief Fixture in which more UEs become ready for activation in one slot than the per-slot cap allows.
 ///
-/// run_ues_activation() rations the activation DCIs to MAX_CG_ACTIVATION_PDCCHS_PER_SLOT, so that a burst of UEs does
-/// not take the PDCCH space the dynamic grants need. CG_CONFIRMATIONS_POOL_SIZE is sized on that cap holding.
-class configured_grant_type2_activation_cap_test : public configured_grant_scheduler_test
+/// run_ues_activation() caps the activation DCIs per slot to MAX_CG_ACTIVATION_PDCCHS_PER_SLOT, on which
+/// CG_CONFIRMATIONS_POOL_SIZE is sized.
+class configured_grant_type2_activation_cap_test : public configured_grant_type2_scheduler_test
 {
 protected:
   /// Enough UEs that the cap has to defer at least one of them.
   static constexpr unsigned nof_ues = MAX_CG_ACTIVATION_PDCCHS_PER_SLOT + 2;
-  /// Wide enough for one CG resource per UE, at the default grant size and MCS, so that no UE is held back for want
-  /// of a resource rather than by the cap.
-  static constexpr unsigned wide_cg_band_rbs = 10 * nof_ues;
 
+  /// One CG resource per UE, so that only the cap holds UEs back.
   configured_grant_type2_activation_cap_test() :
-    configured_grant_scheduler_test(cg_test_params{.type2 = true, .max_nof_cell_cg_rbs = wide_cg_band_rbs})
+    configured_grant_type2_scheduler_test(cg_test_params{.max_nof_cell_cg_rbs = 10 * nof_ues})
   {
   }
 
   static rnti_t crnti_of(unsigned i) { return to_rnti(static_cast<uint16_t>(fmt::underlying(ue_crnti) + i)); }
   static rnti_t cs_rnti_of(unsigned i) { return to_rnti(static_cast<uint16_t>(fmt::underlying(cs_rnti) + i)); }
 
-  /// \brief Adds every UE so that they all become ready for activation in the same slot.
-  ///
-  /// All the UEs are created first and the CG installed on them only afterwards, with no slot run in between: adding
-  /// them one at a time would let the earlier ones be activated while the later ones are still being created, and no
-  /// slot would ever see more activations pending than the cap allows.
+  /// Adds every UE so that they all become ready for activation in the same slot (see add_both_ues()).
   void add_all_ues()
   {
     for (unsigned i = 0; i != nof_ues; ++i) {
@@ -1511,8 +1055,7 @@ protected:
     }
   }
 
-  /// Counts the CG Type 2 activation DCIs in the last scheduler result, which are the only format 0_1 DCIs addressed
-  /// to a CS-RNTI.
+  /// Counts the CG Type 2 activation DCIs in the last scheduler result.
   unsigned count_activation_dcis() const
   {
     const auto& ul_pdcchs = last_sched_result()->dl.ul_pdcchs;
@@ -1524,6 +1067,8 @@ protected:
 
 TEST_F(configured_grant_type2_activation_cap_test, no_slot_carries_more_activation_dcis_than_the_cap)
 {
+  OCUDU_TEST_REQUIREMENTS("MVP-FUNC-BW-16-3");
+
   ASSERT_NO_FATAL_FAILURE(add_all_ues());
 
   unsigned         max_activations_in_a_slot = 0;
@@ -1543,10 +1088,9 @@ TEST_F(configured_grant_type2_activation_cap_test, no_slot_carries_more_activati
     }
   }
 
-  // Guard against a vacuous pass: unless some slot actually reached the cap, the assertion above never bit.
+  // Guard against a vacuous pass: some slot must reach the cap.
   ASSERT_EQ(max_activations_in_a_slot, MAX_CG_ACTIVATION_PDCCHS_PER_SLOT)
       << "no slot ever reached the activation cap, so the limit was never the binding constraint";
-
   // The cap must defer activations, not starve them.
   ASSERT_EQ(activated_ues.size(), nof_ues) << "some UEs were never activated after the cap deferred them";
 }
