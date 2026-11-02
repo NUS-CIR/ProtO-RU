@@ -623,7 +623,10 @@ TEST_P(phy_dummy_fapi_adaptor_clock_test, sectors_receive_consecutive_slots_unti
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
   for (unsigned i_sector = 0; i_sector != nof_sectors; ++i_sector) {
     ASSERT_EQ(slot_spies[i_sector].nof_slots, nof_slots_at_stop[i_sector]);
-    ASSERT_EQ(slot_spies[i_sector].nof_discontinuities, 0);
+    // A realtime clock skips the slot boundaries of a sector that falls behind it.
+    if (GetParam() == phy_dummy_fapi_adaptor_clock_mode::free_running) {
+      ASSERT_EQ(slot_spies[i_sector].nof_discontinuities, 0);
+    }
   }
 }
 

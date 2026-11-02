@@ -23,9 +23,9 @@ public:
 
   ~phy_dummy_fapi_sector_executor() { stop(); }
 
-  /// Defers the given task. The task is not run once the executor is stopped.
+  /// Defers the given task and returns true on success. The task is not run once the executor is stopped.
   template <typename Func>
-  void defer(const char* task_name, Func&& task)
+  bool defer(const char* task_name, Func&& task)
   {
     if (!executor.defer([token = stop_control.get_token(), task = std::forward<Func>(task)]() mutable {
           if (!token.is_stop_requested()) {
@@ -34,7 +34,9 @@ public:
         })) {
       logger.warning(
           "Sector#{}: PHY dummy FAPI adaptor failed to dispatch {}. Cause: task queue is full", sector_id, task_name);
+      return false;
     }
+    return true;
   }
 
   /// Stops running the deferred tasks and waits for the pending ones to finish.
