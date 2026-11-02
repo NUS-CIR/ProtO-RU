@@ -25,7 +25,18 @@ static unsigned    nof_repetitions = 10000;
 static unsigned    nof_rb          = 106;
 static bool        silent          = false;
 
-static std::vector<channel_topology> channel_topology_list{{1, 1}, {2, 1}, {2, 2}, {4, 1}, {4, 2}, {4, 3}, {4, 4}};
+static std::vector<channel_topology> channel_topology_list{{1, 1},
+                                                           {2, 1},
+                                                           {2, 2},
+                                                           {4, 1},
+                                                           {4, 2},
+                                                           {4, 3},
+                                                           {4, 4},
+                                                           {8, 4},
+                                                           {8, 5},
+                                                           {8, 6},
+                                                           {8, 7},
+                                                           {8, 8}};
 
 static void usage(const char* prog)
 {

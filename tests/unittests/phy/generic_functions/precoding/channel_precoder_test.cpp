@@ -305,5 +305,5 @@ INSTANTIATE_TEST_SUITE_P(RandomWeights,
                              // Number of RB.
                              ::testing::Values(13, 51, MAX_NOF_PRBS),
                              // Number of antenna ports.
-                             ::testing::Values(1, 2, 4)));
+                             ::testing::Values(1, 2, 4, 8)));
 } // namespace
