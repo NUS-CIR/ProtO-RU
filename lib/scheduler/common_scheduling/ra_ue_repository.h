@@ -109,6 +109,24 @@ public:
     return ctx;
   }
 
+  /// \brief Restarts the RA attempt of the Msg3-tracking entry of \c preamble's TC-RNTI with the new preamble.
+  /// \return Pointer to the restarted entry; \c nullptr if no Msg3-tracking entry exists for this exact TC-RNTI.
+  ra_ue_context*
+  restart(const rach_indication_message::preamble& preamble, slot_point prach_slot_rx, ssb_id_t ssb_index)
+  {
+    iterator it = find(preamble.tc_rnti);
+    if (it == end() or it->is_msgb_success_rar()) {
+      return nullptr;
+    }
+    // The UE abandoned the previous attempt, so its Msg3 must not be retransmitted.
+    it->harq_ent.cancel_retxs();
+    it->preamble        = preamble;
+    it->prach_slot_rx   = prach_slot_rx;
+    it->ssb_index       = ssb_index;
+    it->pending_removal = false;
+    return &*it;
+  }
+
   /// Adds a new RA UE entry as soon as MsgA CRC=OK is known, before the RA scheduler commits the successRAR grant
   /// (can lag by several slots). No Msg3 HARQ is allocated, since contention is already resolved.
   /// \return Pointer to the new entry; \c nullptr on a TC-RNTI ring-key collision.

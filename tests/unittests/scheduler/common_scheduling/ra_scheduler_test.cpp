@@ -1690,6 +1690,51 @@ TEST_F(ra_scheduler_cfra_test, when_msg3_retx_starves_then_tc_rnti_is_released_f
       << "TC-RNTI reuse after the retx timeout was rejected -- pending_msg3s leaked";
 }
 
+/// Fixture for a CFRA UE whose Msg3 is never retransmitted.
+class ra_scheduler_cfra_no_msg3_retx_test : public ra_scheduler_cfra_test
+{
+protected:
+  ra_scheduler_cfra_no_msg3_retx_test() : ra_scheduler_cfra_test(make_expert_cfg()) {}
+
+  static scheduler_expert_config make_expert_cfg()
+  {
+    scheduler_expert_config cfg{};
+    cfg.ra.max_nof_msg3_harq_retxs = 0;
+    return cfg;
+  }
+};
+
+/// Verify that a CFRA UE that missed its RAR gets a new RAR for its retransmitted dedicated preamble, while the
+/// ra-ContentionResolutionTimer of its previous attempt is still running.
+TEST_F(ra_scheduler_cfra_no_msg3_retx_test, when_cfra_preamble_is_retransmitted_then_new_rar_is_scheduled)
+{
+  const rnti_t tc_rnti = cfra_crnti;
+  handle_rach_indication(create_cfra_rach_indication(tc_rnti));
+  const slot_point first_prach_slot = next_slot_rx();
+
+  // The UE missed the RAR, so its Msg3 is never received.
+  for (unsigned i = 0, max_slots = 1000; i < max_slots and tracker.nof_msg3_newtxs() == 0; ++i) {
+    run_slot();
+  }
+  ASSERT_EQ(tracker.nof_msg3_newtxs(), 1) << "Msg3 new-tx was not scheduled";
+  ASSERT_EQ(tracker.nof_rars(), 1);
+  send_cfra_crc(tc_rnti, false);
+
+  handle_rach_indication(create_cfra_rach_indication(tc_rnti));
+  const unsigned conres_timer_slots =
+      cell_cfg.params.ul_cfg_common.init_ul_bwp.rach_cfg_common->ra_con_res_timer.count() *
+      get_nof_slots_per_subframe(cell_cfg.scs_common());
+  ASSERT_LT(next_slot_rx() - first_prach_slot, conres_timer_slots)
+      << "The retransmitted preamble must arrive while the previous attempt is still alive";
+
+  for (unsigned i = 0, max_slots = 1000; i < max_slots and tracker.nof_msg3_newtxs() < 2; ++i) {
+    run_slot();
+  }
+  ASSERT_EQ(tracker.nof_rars(), 2) << "No RAR was scheduled for the retransmitted CFRA preamble";
+  ASSERT_EQ(tracker.nof_msg3_newtxs(), 2);
+  ASSERT_EQ(tracker.nof_msg3_retxs(), 0);
+}
+
 /// Verify that a CRC carrying a UE index is filtered when its RNTI does not belong to a UE undergoing a CFRA.
 ///
 /// This is the CBRA UE that has already completed RA: its C-RNTI is the TC-RNTI that the RA scheduler still holds

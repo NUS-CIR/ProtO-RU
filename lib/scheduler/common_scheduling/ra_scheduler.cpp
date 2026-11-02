@@ -497,6 +497,18 @@ void ra_scheduler::handle_msg1_occasion(const rach_indication_message::occasion&
 
     // Create a new UE RA context.
     ra_ue_context* msg3_entry = ra_ue_repo.add(preamble, prach_slot_rx, *ssb_index);
+    if (msg3_entry == nullptr and
+        ra_helper::is_msg1_cf_preamble(*cell_cfg.params.ul_cfg_common.init_ul_bwp.rach_cfg_common,
+                                       preamble.preamble_id)) {
+      // A CFRA UE that misses its RAR retransmits the dedicated preamble (TS 38.321, 5.1.4), which carries the same
+      // C-RNTI as the stale attempt, so the attempt is restarted to send a new RAR.
+      msg3_entry = ra_ue_repo.restart(preamble, prach_slot_rx, *ssb_index);
+      if (msg3_entry != nullptr) {
+        logger.info("pci={} rnti={}: Restarting the contention-free RA. Cause: Dedicated preamble retransmitted",
+                    cell_cfg.params.pci,
+                    preamble.tc_rnti);
+      }
+    }
     if (msg3_entry == nullptr) {
       logger.warning("pci={}: PRACH ignored, as the allocated TC-RNTI={} is already under use",
                      cell_cfg.params.pci,
@@ -1305,6 +1317,12 @@ auto ra_scheduler::schedule_rar(std::vector<pending_rar_alloc>::iterator rar_it,
     }
     pusch_res_max_grants = std::min(pusch_res_max_grants, max_allocs_on_free_rbs);
 
+    // A restarted CFRA attempt keeps the Msg3 HARQ of the previous attempt until that HARQ gets its CRC.
+    auto has_free_msg3_harq = [this](rnti_t rnti) {
+      auto msg3_it = ra_ue_repo.find(rnti);
+      return msg3_it != ra_ue_repo.end() and msg3_it->harq_ent.has_empty_ul_harqs();
+    };
+
     // >> Register Msg3 grants for this PUSCH resource as successful.
     unsigned last_crb = msg3_crbs.start();
     for (unsigned i = 0; i != pusch_res_max_grants; ++i) {
@@ -1312,7 +1330,7 @@ auto ra_scheduler::schedule_rar(std::vector<pending_rar_alloc>::iterator rar_it,
       // does not fit stays in the list to be retried in a later slot.
       rnti_t rnti_to_alloc = rnti_t::INVALID_RNTI;
       for (int k = static_cast<int>(remaining_ues.size()) - 1; k >= 0; --k) {
-        if (can_allocate_rar_ul_grant(remaining_ues[k], msg3_alloc)) {
+        if (has_free_msg3_harq(remaining_ues[k]) and can_allocate_rar_ul_grant(remaining_ues[k], msg3_alloc)) {
           rnti_to_alloc = remaining_ues[k];
           remaining_ues.erase(remaining_ues.begin() + k);
           break;
