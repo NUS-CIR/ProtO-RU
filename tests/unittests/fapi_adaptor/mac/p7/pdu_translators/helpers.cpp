@@ -739,6 +739,7 @@ mac_ul_sched_result_test_helper ocudu::unittests::build_valid_mac_ul_sched_resul
 {
   mac_ul_sched_result_test_helper helper;
   helper.srs                  = build_valid_srs_pdu();
+  helper.srs.pdu.bwp_cfg      = &helper.srs.bwp_cfg;
   mac_ul_sched_result& result = helper.result;
   result.slot                 = slot_point(4, generate_sfn(), generate_slot());
   result.ul_res               = helper.sched_result;
@@ -768,6 +769,7 @@ mac_ul_sched_result_test_helper unittests::build_valid_mac_ul_sched_result_with_
 {
   mac_ul_sched_result_test_helper helper;
   helper.srs                  = build_valid_srs_pdu();
+  helper.srs.pdu.bwp_cfg      = &helper.srs.bwp_cfg;
   mac_ul_sched_result& result = helper.result;
   result.slot                 = slot_point(4, generate_sfn(), generate_slot());
   result.ul_res               = helper.sched_result;
