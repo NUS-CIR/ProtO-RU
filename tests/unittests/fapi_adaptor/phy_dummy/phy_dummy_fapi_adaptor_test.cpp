@@ -558,7 +558,8 @@ bool wait_for(const Func& condition, std::chrono::milliseconds timeout = std::ch
   return true;
 }
 
-class phy_dummy_fapi_adaptor_clock_test : public ::testing::TestWithParam<phy_dummy_fapi_adaptor_clock_mode>
+/// Runs the PHY dummy FAPI adaptor with its own clock.
+class phy_dummy_fapi_adaptor_clock_test : public ::testing::Test
 {
 protected:
   phy_dummy_fapi_adaptor_clock_test() :
@@ -567,9 +568,11 @@ protected:
     sector_workers{std::make_unique<task_worker>("fapi_sector0", 64),
                    std::make_unique<task_worker>("fapi_sector1", 64)},
     sector_executors{make_task_executor(*sector_workers[0]), make_task_executor(*sector_workers[1])},
-    dummy(create_phy_dummy_fapi_adaptor({.scs                        = test_scs,
-                                         .nof_sectors                = nof_sectors,
-                                         .clock_mode                 = GetParam(),
+    dummy(create_phy_dummy_fapi_adaptor({.scs         = test_scs,
+                                         .nof_sectors = nof_sectors,
+                                         // A realtime clock needs the sectors to keep up with the slot rate, which a
+                                         // unit test cannot guarantee.
+                                         .clock_mode                 = phy_dummy_fapi_adaptor_clock_mode::free_running,
                                          .ul_indication_delay_slots  = test_ul_delay,
                                          .max_processing_delay_slots = test_proc_delay},
                                         {.logger           = ocudulog::fetch_basic_logger("FAPI"),
@@ -597,7 +600,7 @@ protected:
 
 } // namespace
 
-TEST_P(phy_dummy_fapi_adaptor_clock_test, sectors_receive_consecutive_slots_until_stopped)
+TEST_F(phy_dummy_fapi_adaptor_clock_test, sectors_receive_consecutive_slots_until_stopped)
 {
   for (unsigned i_sector = 0; i_sector != nof_sectors; ++i_sector) {
     dummy->get_sector_adaptor(i_sector).get_p5_sector_adaptor().get_p5_requests_gateway().send_start_request({});
@@ -623,17 +626,9 @@ TEST_P(phy_dummy_fapi_adaptor_clock_test, sectors_receive_consecutive_slots_unti
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
   for (unsigned i_sector = 0; i_sector != nof_sectors; ++i_sector) {
     ASSERT_EQ(slot_spies[i_sector].nof_slots, nof_slots_at_stop[i_sector]);
-    // A realtime clock skips the slot boundaries of a sector that falls behind it.
-    if (GetParam() == phy_dummy_fapi_adaptor_clock_mode::free_running) {
-      ASSERT_EQ(slot_spies[i_sector].nof_discontinuities, 0);
-    }
+    ASSERT_EQ(slot_spies[i_sector].nof_discontinuities, 0);
   }
 }
-
-INSTANTIATE_TEST_SUITE_P(phy_dummy_fapi_adaptor_clock,
-                         phy_dummy_fapi_adaptor_clock_test,
-                         ::testing::Values(phy_dummy_fapi_adaptor_clock_mode::realtime,
-                                           phy_dummy_fapi_adaptor_clock_mode::free_running));
 
 int main(int argc, char** argv)
 {

@@ -87,8 +87,6 @@ public:
 
   /// \brief Handles a new slot boundary.
   ///
-  /// The slot boundary is skipped if the previous one is still pending in the sector executor.
-  ///
   /// \param[in] slot       Slot notified in the SLOT.indication, in advance of the current time.
   /// \param[in] time_point Transmission time of the notified slot.
   void handle_slot_boundary(slot_point_extended slot, std::chrono::system_clock::time_point time_point);
@@ -182,8 +180,6 @@ private:
   circular_vector<std::optional<slot_point>, true> late_slots;
   /// Last processed slot boundary and running flag, packed for the clock.
   std::atomic<uint32_t> progress{invalid_progress};
-  /// Whether a slot boundary is pending in the sector executor.
-  std::atomic<bool> slot_boundary_pending{false};
   /// Uplink indication contexts pending notification, indexed by slot count.
   spmc_slot_ring<ul_slot_ind_context> ul_repository;
   /// Padding-only MAC PDU used as the content of all received transport blocks.

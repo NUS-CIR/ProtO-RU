@@ -97,21 +97,7 @@ phy_dummy_fapi_p7_sector_adaptor::phy_dummy_fapi_p7_sector_adaptor(const phy_dum
 void phy_dummy_fapi_p7_sector_adaptor::handle_slot_boundary(slot_point_extended                   slot,
                                                             std::chrono::system_clock::time_point time_point)
 {
-  // A sector that falls behind the clock skips slot boundaries instead of filling the executor queue, which would
-  // drop the P5 and P7 requests.
-  if (slot_boundary_pending.exchange(true, std::memory_order_acq_rel)) {
-    logger.warning("Sector#{}: Real-time failure in PHY dummy FAPI adaptor: Skipping slot boundary {}. Cause: previous "
-                   "slot boundary still pending",
-                   sector_id,
-                   slot.without_hyper_sfn());
-    return;
-  }
-  if (!executor.defer("slot boundary", [this, slot, time_point]() {
-        slot_boundary_pending.store(false, std::memory_order_release);
-        process_slot_boundary(slot, time_point);
-      })) {
-    slot_boundary_pending.store(false, std::memory_order_release);
-  }
+  executor.defer("slot boundary", [this, slot, time_point]() { process_slot_boundary(slot, time_point); });
 }
 
 phy_dummy_fapi_p7_sector_adaptor::slot_boundary_progress phy_dummy_fapi_p7_sector_adaptor::get_progress() const
