@@ -2319,6 +2319,15 @@ static bool validate_cells_unit_config(span<const du_high_unit_cell_config> conf
 
 static bool validate_test_mode_unit_config(const du_high_unit_config& config)
 {
+  const unsigned last_test_rnti = static_cast<unsigned>(config.test_mode_cfg.test_ue.rnti) +
+                                  config.test_mode_cfg.test_ue.nof_ues * config.cells_cfg.size() - 1;
+  if (last_test_rnti > static_cast<unsigned>(rnti_t::MAX_CRNTI)) {
+    fmt::print("For test mode, the RNTI of the last test UE exceeds the maximum C-RNTI ({:#x} > {:#x})\n",
+               last_test_rnti,
+               static_cast<unsigned>(rnti_t::MAX_CRNTI));
+    return false;
+  }
+
   if ((config.test_mode_cfg.test_ue.ri > 1) and
       not config.cells_cfg.front().cell.pdcch_cfg.dedicated.dci_format_0_1_and_1_1) {
     fmt::print("For test mode, RI shall not be set if UE is configured to use DCI format 1_0\n");

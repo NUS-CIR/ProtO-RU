@@ -419,7 +419,7 @@ void mac_test_mode_cell_adapter::on_new_downlink_scheduler_results(const mac_dl_
       continue;
     }
 
-    // Only the Msg4 carries the RRCSetup on SRB0, so its first transmission is the Msg4 of a new test UE.
+    // First new tx of an SRB0 SDU marks the RRCSetup of a new test UE.
     const auto& lchs = grant.tb_list[0].lc_chs_to_sched;
     if (std::any_of(lchs.begin(), lchs.end(), [](const auto& lc) {
           return lc.lcid.is_sdu() and lc.lcid.to_lcid() == LCID_SRB0;
@@ -445,10 +445,10 @@ void mac_test_mode_cell_adapter::handle_msg4(const dl_msg_alloc& grant, slot_poi
     auto rx_pdu = create_test_pdu_with_bsr(cell_index, sl_tx, crnti, to_harq_id(0));
     if (not rx_pdu.has_value()) {
       logger.warning("TEST_MODE c-rnti={}: Unable to create test PDU with BSR", crnti);
-      return;
+    } else {
+      // In case of PUSCH test mode is enabled, push a BSR to trigger the first PUSCH.
+      pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
     }
-    // In case of PUSCH test mode is enabled, push a BSR to trigger the first PUSCH.
-    pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
   }
 
   // Notify test mode controller about the UE establishment.
@@ -456,6 +456,10 @@ void mac_test_mode_cell_adapter::handle_msg4(const dl_msg_alloc& grant, slot_poi
 
   // Push an UL PDU that will serve as rrcSetupComplete and get the UE out of fallback mode.
   auto rx_pdu = create_test_pdu_with_rrc_setup_complete(cell_index, sl_tx, crnti, to_harq_id(0));
+  if (not rx_pdu.has_value()) {
+    logger.warning("TEST_MODE c-rnti={}: Unable to create test PDU with rrcSetupComplete", crnti);
+    return;
+  }
   pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
 }
 
@@ -646,6 +650,10 @@ async_task<mac_ue_create_response> mac_test_mode_adapter::handle_ue_create_reque
 {
   if (is_test_ue(cfg.crnti)) {
     // It is the test UE.
+    const unsigned rnti_offset = static_cast<unsigned>(cfg.crnti) - static_cast<unsigned>(test_ue.rnti);
+    ocudu_assert(rnti_offset / test_ue.nof_ues == cfg.sched_cfg.cells.value()[0].cell_index,
+                 "Test UE rnti={} does not belong to its PCell",
+                 cfg.crnti);
     mac_ue_create_request cfg_copy = cfg;
     cfg_copy.initial_fallback      = true;
 
