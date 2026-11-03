@@ -145,10 +145,18 @@ static void log_ru_ofh_performance_metrics_verbose(fmt::basic_memory_buffer<char
                  validate_fp_value(msg_tx_metrics.message_tx_avg_latency_us));
 
   fmt::format_to(std::back_inserter(buffer),
-                 "{} nof_late_dl_rgs={} nof_late_ul_req={} nof_late_cp_dl={} nof_late_up_dl={} nof_late_cp_ul={}",
+                 "{} nof_late_dl_rgs={} nof_late_ul_req={}; dl_rg_arrival_symbols_before_ota: earliest={} latest={} "
+                 "avg={:.2f}; ul_req_arrival_symbols_before_ota: earliest={} latest={} avg={:.2f}; nof_late_cp_dl={} "
+                 "nof_late_up_dl={} nof_late_cp_ul={}",
                  "tx_kpis:",
-                 cell_metrics.tx_metrics.dl_metrics.nof_late_dl_grids,
-                 cell_metrics.tx_metrics.ul_metrics.nof_late_ul_requests,
+                 cell_metrics.tx_metrics.dl_metrics.dl_grid_arrival.nof_late_requests,
+                 cell_metrics.tx_metrics.ul_metrics.ul_request_arrival.nof_late_requests,
+                 cell_metrics.tx_metrics.dl_metrics.dl_grid_arrival.earliest_request_in_symbols,
+                 cell_metrics.tx_metrics.dl_metrics.dl_grid_arrival.latest_request_in_symbols,
+                 validate_fp_value(cell_metrics.tx_metrics.dl_metrics.dl_grid_arrival.average_request_in_symbols),
+                 cell_metrics.tx_metrics.ul_metrics.ul_request_arrival.earliest_request_in_symbols,
+                 cell_metrics.tx_metrics.ul_metrics.ul_request_arrival.latest_request_in_symbols,
+                 validate_fp_value(cell_metrics.tx_metrics.ul_metrics.ul_request_arrival.average_request_in_symbols),
                  cell_metrics.tx_metrics.dl_metrics.nof_late_cp_dl,
                  cell_metrics.tx_metrics.dl_metrics.nof_late_up_dl,
                  cell_metrics.tx_metrics.ul_metrics.nof_late_cp_ul);

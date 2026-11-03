@@ -13,6 +13,6 @@ namespace ocudu {
 // Note: keep each version on a single line together with its name, the CI extracts it with grep.
 
 /// Version of the JSON metrics, as reported to the remote control metrics subscribers.
-constexpr const char* metrics_interface_version = "1.0";
+constexpr const char* metrics_interface_version = "1.1";
 
 } // namespace ocudu

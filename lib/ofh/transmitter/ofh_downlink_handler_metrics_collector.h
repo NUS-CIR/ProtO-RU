@@ -42,9 +42,9 @@ public:
     if (df_uplane_collector) {
       df_uplane_collector->collect_metrics(metrics.dl_up_metrics);
     }
-    metrics.nof_late_dl_grids = window_checker.get_nof_lates_and_reset();
-    metrics.nof_late_cp_dl    = nof_late_cp_dl.exchange(0, std::memory_order_relaxed);
-    metrics.nof_late_up_dl    = nof_late_up_dl.exchange(0, std::memory_order_relaxed);
+    window_checker.collect_arrival_metrics(metrics.dl_grid_arrival);
+    metrics.nof_late_cp_dl = nof_late_cp_dl.exchange(0, std::memory_order_relaxed);
+    metrics.nof_late_up_dl = nof_late_up_dl.exchange(0, std::memory_order_relaxed);
   }
 
 private:

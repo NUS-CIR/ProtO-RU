@@ -160,15 +160,28 @@ static nlohmann::json generate_message_transmitter(const ofh::message_transmitte
   return json;
 }
 
+static nlohmann::json generate_request_arrival(const ofh::tx_request_arrival_metrics& metrics)
+{
+  nlohmann::json json;
+
+  json["earliest_symbols_before_ota"] = metrics.earliest_request_in_symbols;
+  json["latest_symbols_before_ota"]   = metrics.latest_request_in_symbols;
+  json["average_symbols_before_ota"]  = validate_fp_value(metrics.average_request_in_symbols);
+
+  return json;
+}
+
 static nlohmann::json generate_transmitter_statistics(const ofh::transmitter_metrics& metrics)
 {
   nlohmann::json json;
 
-  json["late_dl_slots"]         = metrics.dl_metrics.nof_late_dl_grids;
-  json["late_ul_slot_requests"] = metrics.ul_metrics.nof_late_ul_requests;
+  json["late_dl_slots"]         = metrics.dl_metrics.dl_grid_arrival.nof_late_requests;
+  json["late_ul_slot_requests"] = metrics.ul_metrics.ul_request_arrival.nof_late_requests;
   json["late_cp_dl_messages"]   = metrics.dl_metrics.nof_late_cp_dl;
   json["late_up_dl_messages"]   = metrics.dl_metrics.nof_late_up_dl;
   json["late_cp_ul_messages"]   = metrics.ul_metrics.nof_late_cp_ul;
+  json["dl_grid_arrival"]       = generate_request_arrival(metrics.dl_metrics.dl_grid_arrival);
+  json["ul_request_arrival"]    = generate_request_arrival(metrics.ul_metrics.ul_request_arrival);
 
   return json;
 }

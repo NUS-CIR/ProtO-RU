@@ -472,13 +472,17 @@ public:
           }
         }
         if (nof_lates) {
-          logger.info(
-              "Sector #{}: dropped {} {} {} message(s) that were not serialized or transmitted in time for slot '{}'",
-              sector,
-              nof_lates,
-              pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
-              pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
-              late_slot);
+          logger.info("Sector #{}: dropped {} {} {} message(s) for slot '{}' that were still pending in the "
+                      "transmitter queue after the transmission window closed. The delay may originate upstream (e.g. "
+                      "MAC/PHY delivering resource grid close to the deadline); check the '{}' metric",
+                      sector,
+                      nof_lates,
+                      pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
+                      pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
+                      late_slot,
+                      pool_frames_data_direction == ofh::data_direction::downlink
+                          ? "dl_rg_arrival_symbols_before_ota"
+                          : "ul_req_arrival_symbols_before_ota");
         }
       }
     }
@@ -511,13 +515,17 @@ public:
           }
         }
         if (nof_lates) {
-          logger.info(
-              "Sector #{}: dropped {} {} {} message(s) that were not serialized or transmitted in time for slot '{}'",
-              sector,
-              nof_lates,
-              pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
-              pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
-              late_slot);
+          logger.info("Sector #{}: dropped {} {} {} message(s) for slot '{}' that were still pending in the "
+                      "transmitter queue after the transmission window closed. The delay may originate upstream (e.g. "
+                      "MAC/PHY delivering resource grid close to the deadline); check the '{}' metric",
+                      sector,
+                      nof_lates,
+                      pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
+                      pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
+                      late_slot,
+                      pool_frames_data_direction == ofh::data_direction::downlink
+                          ? "dl_rg_arrival_symbols_before_ota"
+                          : "ul_req_arrival_symbols_before_ota");
         }
       }
     }

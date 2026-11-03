@@ -35,8 +35,8 @@ public:
       df_metrics_collector->collect_metrics(metrics.ul_cp_metrics);
     }
     metrics.ul_cp_metrics.nof_dispatch_failures = nof_dispatch_failures.exchange(0, std::memory_order_relaxed);
-    metrics.nof_late_ul_requests                = window_checker.get_nof_lates_and_reset();
     metrics.nof_late_cp_ul                      = nof_late_cp_ul.exchange(0, std::memory_order_relaxed);
+    window_checker.collect_arrival_metrics(metrics.ul_request_arrival);
   }
 
 private:
