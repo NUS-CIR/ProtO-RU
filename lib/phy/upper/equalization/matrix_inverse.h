@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
+/// \file
+/// \brief Hermitian positive definite matrix inversion for SIMD matrices.
+
 #pragma once
 
 #include "ocudu/ocuduvec/simd.h"
@@ -11,75 +14,86 @@ namespace ocudu {
 
 #if OCUDU_SIMD_CF_SIZE
 
-template <unsigned N, unsigned Index>
-struct squared_matrix_inverse_s {
-  static simd_sel_t compute(simd_cf_t out[N][N], simd_cf_t in[N][N])
-  {
-    static constexpr unsigned i         = Index;
-    const simd_f_t            zero_simd = ocudu_simd_f_set1(0);
+/// \brief Inverts a Hermitian positive definite matrix, such as a Gram matrix.
+///
+/// Each SIMD lane holds an independent matrix, so the function inverts \c OCUDU_SIMD_CF_SIZE matrices simultaneously.
+///
+/// The input matrix \f$A\f$ is factorized as
+/// \f[
+/// A = L D L^H
+/// \f]
+/// with \f$L\f$ unit lower triangular and \f$D\f$ real diagonal. The inverse is then
+/// \f[
+/// A^{-1} = W^H D^{-1} W, \qquad W = L^{-1}
+/// \f]
+///
+/// Only the diagonal and the lower triangle of the input are read.
+///
+/// \tparam     N   Matrix dimensions.
+/// \param[out] out Inverse matrix.
+/// \param[in]  in  Hermitian input matrix.
+/// \return A mask of the lanes whose matrix is positive definite.
+template <unsigned N>
+simd_sel_t hpd_matrix_inverse(simd_cf_t out[N][N], const simd_cf_t in[N][N])
+{
+  const simd_f_t zero  = ocudu_simd_f_zero();
+  simd_sel_t     is_pd = ocudu_simd_sel_set_ones();
 
-    // Find the pivot row.
-    simd_cf_t pivot = in[i][i];
-
-    // Calculate pivot squared norm and determine if it is possible to invert.
-    simd_f_t   pivot_norm    = ocudu_simd_cf_norm_sq(pivot);
-    simd_sel_t isnormal_mask = ocudu_simd_f_gt(pivot_norm, zero_simd);
-
-    // Invert pivot.
-    simd_cf_t pivot_inv = ocudu_simd_cf_mul(ocudu_simd_cf_conj(pivot), ocudu_simd_f_precise_rcp(pivot_norm));
-
-    // Normalize the pivot row.
-    out[i][i] = ocudu_simd_cf_set1(1);
-    for (unsigned j = i + 1; j != N; ++j) {
-      in[i][j] *= pivot_inv;
+  // Factorization in = L D L^H, with d(j) = D(j, j), d_inv(j) = 1 / d(j) and e(i, j) = L(i, j) d(j). The following
+  // columns reuse e.
+  simd_f_t  d_inv[N];
+  simd_cf_t lo[N][N];
+  simd_cf_t e[N][N];
+  for (unsigned j = 0; j != N; ++j) {
+    // d(j) = in(j, j) - sum_k |L(j, k)|^2 d(k), where |L(j, k)|^2 d(k) = Re(L(j, k) conj(e(j, k))).
+    simd_f_t d_j = ocudu_simd_cf_re(in[j][j]);
+    for (unsigned k = 0; k != j; ++k) {
+      d_j -= ocudu_simd_cf_re(lo[j][k]) * ocudu_simd_cf_re(e[j][k]) +
+             ocudu_simd_cf_im(lo[j][k]) * ocudu_simd_cf_im(e[j][k]);
     }
-    for (unsigned j = 0; j != i + 1; ++j) {
-      out[i][j] *= pivot_inv;
-    }
+    is_pd    = ocudu_simd_sel_and(is_pd, ocudu_simd_f_gt(d_j, zero));
+    d_inv[j] = ocudu_simd_f_precise_rcp(d_j);
 
-    // Make other rows zero in the current column.
-    for (unsigned k = 0; k != N; ++k) {
-      simd_cf_t factor = in[k][i];
-      if (k != i) {
-        for (unsigned j = i; j != N; ++j) {
-          in[k][j] -= factor * in[i][j];
-        }
-        for (unsigned j = 0; j != i; ++j) {
-          out[k][j] -= factor * out[i][j];
-        }
-        out[k][i] = -factor * out[i][i];
+    // L(i, j) = (in(i, j) - sum_k L(i, k) conj(L(j, k)) d(k)) / d(j).
+    for (unsigned i = j + 1; i != N; ++i) {
+      e[i][j] = in[i][j];
+      for (unsigned k = 0; k != j; ++k) {
+        e[i][j] -= ocudu_simd_cf_conjprod(lo[i][k], e[j][k]);
+      }
+      lo[i][j] = e[i][j] * d_inv[j];
+    }
+  }
+
+  // W = L^-1, unit lower triangular: W(i, j) = -L(i, j) - sum_{k = j + 1}^{i - 1} L(i, k) W(k, j).
+  simd_cf_t w[N][N];
+  for (unsigned j = 0; j != N; ++j) {
+    for (unsigned i = j + 1; i != N; ++i) {
+      w[i][j] = -lo[i][j];
+      for (unsigned k = j + 1; k != i; ++k) {
+        w[i][j] -= lo[i][k] * w[k][j];
       }
     }
-
-    // Advance to the next row.
-    simd_sel_t isnormal_mask_next = squared_matrix_inverse_s<N, Index + 1>::compute(out, in);
-
-    // Combine the current row mask with the next.
-    return ocudu_simd_sel_and(isnormal_mask, isnormal_mask_next);
   }
-};
 
-template <unsigned N>
-struct squared_matrix_inverse_s<N, N> {
-  static simd_sel_t compute(simd_cf_t[N][N], simd_cf_t[N][N]) { return ocudu_simd_sel_set_ones(); }
-};
-
-/// \brief Perform a matrix inversion.
-/// \tparam        N    Matrix dimensions.
-/// \param[out]    out  Resultant matrix.
-/// \param[in,out] in   Input matrix, it becomes an identity matrix.
-/// \return \c true if the matrix is invertible, otherwise \c false.
-template <unsigned N>
-simd_sel_t squared_matrix_inverse(simd_cf_t out[N][N], simd_cf_t in[N][N])
-{
-  // Create an identity matrix on the output.
+  // in^-1 = W^H D^-1 W: out(i, j) = sum_{k >= i} conj(W(k, i)) W(k, j) / d(k) for i >= j, with W(k, k) = 1. The upper
+  // triangle is the conjugate of the lower one, and the diagonal is real.
   for (unsigned i = 0; i != N; ++i) {
-    for (unsigned j = 0; j != N; ++j) {
-      out[i][j] = ocudu_simd_cf_set1((i == j) ? 1 : 0);
+    simd_f_t diag = d_inv[i];
+    for (unsigned k = i + 1; k != N; ++k) {
+      diag += ocudu_simd_cf_norm_sq(w[k][i]) * d_inv[k];
+    }
+    out[i][i] = ocudu_simd_cf_make(diag);
+
+    for (unsigned j = 0; j != i; ++j) {
+      out[i][j] = w[i][j] * d_inv[i];
+      for (unsigned k = i + 1; k != N; ++k) {
+        out[i][j] += ocudu_simd_cf_conjprod(w[k][j], w[k][i]) * d_inv[k];
+      }
+      out[j][i] = ocudu_simd_cf_conj(out[i][j]);
     }
   }
 
-  return squared_matrix_inverse_s<N, 0>::compute(out, in);
+  return is_pd;
 }
 
 #endif // OCUDU_SIMD_CF_SIZE
