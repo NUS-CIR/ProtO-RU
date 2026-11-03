@@ -175,9 +175,11 @@ security_status integrity_engine_nia2_non_cmac::verify_integrity(byte_buffer& bu
       }
     }
     // Integrity failure.
+    security::sec_mac mac_rx;
+    std::copy(m_rx.begin(), m_rx.end(), mac_rx.begin());
     logger.warning("Integrity check failed. count={}", count);
     logger.warning("K_int: {}", k_128_int);
-    logger.warning("MAC-I received: {:x}", m_rx);
+    logger.warning("MAC-I received: {}", mac_rx);
     logger.warning("MAC-I expected: {}", m_exp);
     logger.warning(v.begin(), v.end(), "Message input:");
     return security_status::integrity_failure;
