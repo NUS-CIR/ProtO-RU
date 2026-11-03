@@ -201,8 +201,9 @@ private:
                                                                      cell_resource_allocator&                 res_alloc,
                                                                      slot_point pdcch_slot);
 
-  /// Returns true if an RAR UL grant can be scheduled for the given UE in the given slot.
-  bool can_allocate_rar_ul_grant(rnti_t crnti, const cell_slot_resource_allocator& slot_alloc) const;
+  /// \brief Returns true if an RAR UL grant can be scheduled for the given UE in the given slot.
+  /// \param is_retx If false, the Msg3 HARQ must also be available.
+  bool can_allocate_rar_ul_grant(rnti_t crnti, const cell_slot_resource_allocator& slot_alloc, bool is_retx) const;
 
   /// \brief Returns the UE cell associated with a C-RNTI that is still undergoing a CFRA.
   /// \return \c nullptr if the C-RNTI does not belong to a UE of this cell undergoing a CFRA.

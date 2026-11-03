@@ -871,10 +871,17 @@ const ue_cell* ra_scheduler::find_cfra_ue(rnti_t crnti) const
   return ue_cc;
 }
 
-bool ra_scheduler::can_allocate_rar_ul_grant(rnti_t crnti, const cell_slot_resource_allocator& slot_alloc) const
+bool ra_scheduler::can_allocate_rar_ul_grant(rnti_t                              crnti,
+                                             const cell_slot_resource_allocator& slot_alloc,
+                                             bool                                is_retx) const
 {
   auto msg3_it = ra_ue_repo.find(crnti);
   if (msg3_it == ra_ue_repo.end()) {
+    return false;
+  }
+  // Msg3 uses HARQ-Id 0 (TS 38.321, 5.4.2.1), which a restarted CFRA attempt only gets back once the Msg3 of the
+  // previous attempt gets its CRC.
+  if (not is_retx and msg3_it->harq_ent.ul_harq(to_harq_id(0)).has_value()) {
     return false;
   }
   // A UE cannot be granted two PUSCHs in the same slot, so a new Msg3 must land after the last one allocated.
@@ -1317,12 +1324,6 @@ auto ra_scheduler::schedule_rar(std::vector<pending_rar_alloc>::iterator rar_it,
     }
     pusch_res_max_grants = std::min(pusch_res_max_grants, max_allocs_on_free_rbs);
 
-    // A restarted CFRA attempt keeps the Msg3 HARQ of the previous attempt until that HARQ gets its CRC.
-    auto has_free_msg3_harq = [this](rnti_t rnti) {
-      auto msg3_it = ra_ue_repo.find(rnti);
-      return msg3_it != ra_ue_repo.end() and msg3_it->harq_ent.has_empty_ul_harqs();
-    };
-
     // >> Register Msg3 grants for this PUSCH resource as successful.
     unsigned last_crb = msg3_crbs.start();
     for (unsigned i = 0; i != pusch_res_max_grants; ++i) {
@@ -1330,7 +1331,7 @@ auto ra_scheduler::schedule_rar(std::vector<pending_rar_alloc>::iterator rar_it,
       // does not fit stays in the list to be retried in a later slot.
       rnti_t rnti_to_alloc = rnti_t::INVALID_RNTI;
       for (int k = static_cast<int>(remaining_ues.size()) - 1; k >= 0; --k) {
-        if (has_free_msg3_harq(remaining_ues[k]) and can_allocate_rar_ul_grant(remaining_ues[k], msg3_alloc)) {
+        if (can_allocate_rar_ul_grant(remaining_ues[k], msg3_alloc, false)) {
           rnti_to_alloc = remaining_ues[k];
           remaining_ues.erase(remaining_ues.begin() + k);
           break;
@@ -1632,7 +1633,7 @@ void ra_scheduler::schedule_msg3_retx(cell_resource_allocator& res_alloc, ra_ue_
       continue;
     }
 
-    if (not can_allocate_rar_ul_grant(msg3_ctx.preamble.tc_rnti, pusch_alloc)) {
+    if (not can_allocate_rar_ul_grant(msg3_ctx.preamble.tc_rnti, pusch_alloc, true)) {
       continue;
     }
 
