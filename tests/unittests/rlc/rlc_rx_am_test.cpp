@@ -716,10 +716,12 @@ TEST_P(rlc_rx_am_test_concurrent_tx, status_report_never_older_with_concurrent_t
   uint32_t       nof_older  = 0;
   uint32_t       nof_reads  = 0;
 
+  const uint32_t sdu_size = 4;
+
   auto rx = [&](uint32_t sn) {
     std::list<std::vector<uint8_t>> pdu_list;
     byte_buffer                     sdu;
-    ASSERT_NO_FATAL_FAILURE(create_pdus(pdu_list, sdu, sn % mod, 4, 4, sn % mod, /*poll=*/true));
+    ASSERT_NO_FATAL_FAILURE(create_pdus(pdu_list, sdu, sn % mod, sdu_size, sdu_size, sn % mod, /*poll=*/true));
     rlc->handle_pdu(byte_buffer_slice::create(std::move(pdu_list.front())).value());
     tester->sdu_queue = {};
     ue_worker.run_pending_tasks();
@@ -728,6 +730,8 @@ TEST_P(rlc_rx_am_test_concurrent_tx, status_report_never_older_with_concurrent_t
 
   // Unwraps ack_sn relative to total_rx and checks monotonicity, matching the unwrapping in the TX entity.
   auto tx_check = [&](uint32_t ack_sn) {
+    // Maps ack_sn from modular [0, mod) space into absolute [0, total_rx] space,
+    // mirroring the same unwrapping the TX entity applies.
     const uint32_t ack = total_rx - (total_rx + mod - ack_sn) % mod;
     if (!first_read && ack < prev_ack) {
       ++nof_older;
