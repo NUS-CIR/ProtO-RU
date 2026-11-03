@@ -1288,8 +1288,8 @@ public:
     logger.info("E2 setup request received");
     return launch_async([](coro_context<async_task<e2_setup_response_message>>& ctx) {
       CORO_BEGIN(ctx);
-      e2_setup_response_message response;
-      response.success = true;
+      e2_setup_response_message response = {};
+      response.success                   = true;
       CORO_RETURN(response);
     });
   }

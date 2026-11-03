@@ -46,8 +46,8 @@ public:
   async_task<e2_setup_response_message> handle_e2_setup_request(const e2_setup_request_message&) override
   {
     ++setup_call_count;
-    e2_setup_response_message resp;
-    resp.success = (setup_call_count > setup_fail_count);
+    e2_setup_response_message resp = {};
+    resp.success                   = (setup_call_count > setup_fail_count);
     return launch_async([resp](coro_context<async_task<e2_setup_response_message>>& ctx) mutable {
       CORO_BEGIN(ctx);
       CORO_RETURN(resp);
