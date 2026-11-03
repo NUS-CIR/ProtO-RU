@@ -7395,9 +7395,8 @@ OCUDUASN_CODE sl_rlc_cfg_r16_c::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::sl_am_rlc_r16:
-      bool c_get_sl_am_rlc_r16_s_ext;
-      HANDLE_CODE(
-          unpack_bits(bref, {&c_get_sl_am_rlc_r16_s_ext, &c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16_present}));
+      bool sl_am_rlc_r16_ext;
+      HANDLE_CODE(unpack_bits(bref, {&sl_am_rlc_r16_ext, &c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16_present}));
       if (c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16_present) {
         HANDLE_CODE(c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16.unpack(bref));
       }
@@ -7405,19 +7404,18 @@ OCUDUASN_CODE sl_rlc_cfg_r16_c::unpack(cbit_ref& bref)
       HANDLE_CODE(c.get<sl_am_rlc_r16_s_>().sl_poll_pdu_r16.unpack(bref));
       HANDLE_CODE(c.get<sl_am_rlc_r16_s_>().sl_poll_byte_r16.unpack(bref));
       HANDLE_CODE(c.get<sl_am_rlc_r16_s_>().sl_max_retx_thres_r16.unpack(bref));
-      if (c_get_sl_am_rlc_r16_s_ext) {
+      if (sl_am_rlc_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::sl_um_rlc_r16:
-      bool c_get_sl_um_rlc_r16_s_ext;
-      HANDLE_CODE(
-          unpack_bits(bref, {&c_get_sl_um_rlc_r16_s_ext, &c.get<sl_um_rlc_r16_s_>().sl_sn_field_len_um_r16_present}));
+      bool sl_um_rlc_r16_ext;
+      HANDLE_CODE(unpack_bits(bref, {&sl_um_rlc_r16_ext, &c.get<sl_um_rlc_r16_s_>().sl_sn_field_len_um_r16_present}));
       if (c.get<sl_um_rlc_r16_s_>().sl_sn_field_len_um_r16_present) {
         HANDLE_CODE(c.get<sl_um_rlc_r16_s_>().sl_sn_field_len_um_r16.unpack(bref));
       }
-      if (c_get_sl_um_rlc_r16_s_ext) {
+      if (sl_um_rlc_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -8105,9 +8103,9 @@ OCUDUASN_CODE sl_pqi_r16_c::unpack(cbit_ref& bref)
       HANDLE_CODE(unpack_integer(c.get<uint16_t>(), bref, (uint16_t)0u, (uint16_t)255u));
       break;
     case types::sl_non_standardized_pqi_r16:
-      bool c_get_sl_non_standardized_pqi_r16_s_ext;
+      bool sl_non_standardized_pqi_r16_ext;
       HANDLE_CODE(unpack_bits(bref,
-                              {&c_get_sl_non_standardized_pqi_r16_s_ext,
+                              {&sl_non_standardized_pqi_r16_ext,
                                &c.get<sl_non_standardized_pqi_r16_s_>().sl_res_type_r16_present,
                                &c.get<sl_non_standardized_pqi_r16_s_>().sl_prio_level_r16_present,
                                &c.get<sl_non_standardized_pqi_r16_s_>().sl_packet_delay_budget_r16_present,
@@ -8137,7 +8135,7 @@ OCUDUASN_CODE sl_pqi_r16_c::unpack(cbit_ref& bref)
         HANDLE_CODE(unpack_integer(
             c.get<sl_non_standardized_pqi_r16_s_>().sl_max_data_burst_volume_r16, bref, (uint16_t)0u, (uint16_t)4095u));
       }
-      if (c_get_sl_non_standardized_pqi_r16_s_ext) {
+      if (sl_non_standardized_pqi_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -8950,25 +8948,25 @@ OCUDUASN_CODE sl_event_trigger_cfg_r16_s::sl_event_id_r16_c_::unpack(cbit_ref& b
   set(e);
   switch (type_) {
     case types::event_s1_r16:
-      bool c_get_event_s1_r16_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_s1_r16_s_ext, 1));
+      bool event_s1_r16_ext;
+      HANDLE_CODE(bref.unpack(event_s1_r16_ext, 1));
       HANDLE_CODE(c.get<event_s1_r16_s_>().s1_thres_r16.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_s1_r16_s_>().sl_report_on_leave_r16, 1));
       HANDLE_CODE(unpack_integer(c.get<event_s1_r16_s_>().sl_hysteresis_r16, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_s1_r16_s_>().sl_time_to_trigger_r16.unpack(bref));
-      if (c_get_event_s1_r16_s_ext) {
+      if (event_s1_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::event_s2_r16:
-      bool c_get_event_s2_r16_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_s2_r16_s_ext, 1));
+      bool event_s2_r16_ext;
+      HANDLE_CODE(bref.unpack(event_s2_r16_ext, 1));
       HANDLE_CODE(c.get<event_s2_r16_s_>().s2_thres_r16.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_s2_r16_s_>().sl_report_on_leave_r16, 1));
       HANDLE_CODE(unpack_integer(c.get<event_s2_r16_s_>().sl_hysteresis_r16, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_s2_r16_s_>().sl_time_to_trigger_r16.unpack(bref));
-      if (c_get_event_s2_r16_s_ext) {
+      if (event_s2_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }

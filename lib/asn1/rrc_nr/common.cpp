@@ -1626,27 +1626,27 @@ OCUDUASN_CODE srs_res_s::res_type_c_::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::aperiodic:
-      bool c_get_aperiodic_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_aperiodic_s_ext, 1));
-      if (c_get_aperiodic_s_ext) {
+      bool aperiodic_ext;
+      HANDLE_CODE(bref.unpack(aperiodic_ext, 1));
+      if (aperiodic_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::semi_persistent:
-      bool c_get_semi_persistent_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_semi_persistent_s_ext, 1));
+      bool semi_persistent_ext;
+      HANDLE_CODE(bref.unpack(semi_persistent_ext, 1));
       HANDLE_CODE(c.get<semi_persistent_s_>().periodicity_and_offset_sp.unpack(bref));
-      if (c_get_semi_persistent_s_ext) {
+      if (semi_persistent_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::periodic:
-      bool c_get_periodic_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_periodic_s_ext, 1));
+      bool periodic_ext;
+      HANDLE_CODE(bref.unpack(periodic_ext, 1));
       HANDLE_CODE(c.get<periodic_s_>().periodicity_and_offset_p.unpack(bref));
-      if (c_get_periodic_s_ext) {
+      if (periodic_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }

@@ -22371,20 +22371,20 @@ OCUDUASN_CODE dl_prs_qcl_info_r17_c::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::ssb_r17:
-      bool c_get_ssb_r17_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_ssb_r17_s_ext, 1));
+      bool ssb_r17_ext;
+      HANDLE_CODE(bref.unpack(ssb_r17_ext, 1));
       HANDLE_CODE(unpack_integer(c.get<ssb_r17_s_>().ssb_idx_r17, bref, (uint8_t)0u, (uint8_t)63u));
       HANDLE_CODE(c.get<ssb_r17_s_>().rs_type_r17.unpack(bref));
-      if (c_get_ssb_r17_s_ext) {
+      if (ssb_r17_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::dl_prs_r17:
-      bool c_get_dl_prs_r17_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_dl_prs_r17_s_ext, 1));
+      bool dl_prs_r17_ext;
+      HANDLE_CODE(bref.unpack(dl_prs_r17_ext, 1));
       HANDLE_CODE(unpack_integer(c.get<dl_prs_r17_s_>().qcl_dl_prs_res_id_r17, bref, (uint8_t)0u, (uint8_t)63u));
-      if (c_get_dl_prs_r17_s_ext) {
+      if (dl_prs_r17_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }

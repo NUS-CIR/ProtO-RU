@@ -1801,38 +1801,36 @@ OCUDUASN_CODE sl_rlc_cfg_pc5_r16_c::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::sl_am_rlc_r16:
-      bool c_get_sl_am_rlc_r16_s_ext;
-      HANDLE_CODE(
-          unpack_bits(bref, {&c_get_sl_am_rlc_r16_s_ext, &c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16_present}));
+      bool sl_am_rlc_r16_ext;
+      HANDLE_CODE(unpack_bits(bref, {&sl_am_rlc_r16_ext, &c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16_present}));
       if (c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16_present) {
         HANDLE_CODE(c.get<sl_am_rlc_r16_s_>().sl_sn_field_len_am_r16.unpack(bref));
       }
-      if (c_get_sl_am_rlc_r16_s_ext) {
+      if (sl_am_rlc_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::sl_um_bi_dir_rlc_r16:
-      bool c_get_sl_um_bi_dir_rlc_r16_s_ext;
+      bool sl_um_bi_dir_rlc_r16_ext;
       HANDLE_CODE(unpack_bits(
-          bref, {&c_get_sl_um_bi_dir_rlc_r16_s_ext, &c.get<sl_um_bi_dir_rlc_r16_s_>().sl_sn_field_len_um_r16_present}));
+          bref, {&sl_um_bi_dir_rlc_r16_ext, &c.get<sl_um_bi_dir_rlc_r16_s_>().sl_sn_field_len_um_r16_present}));
       if (c.get<sl_um_bi_dir_rlc_r16_s_>().sl_sn_field_len_um_r16_present) {
         HANDLE_CODE(c.get<sl_um_bi_dir_rlc_r16_s_>().sl_sn_field_len_um_r16.unpack(bref));
       }
-      if (c_get_sl_um_bi_dir_rlc_r16_s_ext) {
+      if (sl_um_bi_dir_rlc_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::sl_um_uni_dir_rlc_r16:
-      bool c_get_sl_um_uni_dir_rlc_r16_s_ext;
+      bool sl_um_uni_dir_rlc_r16_ext;
       HANDLE_CODE(unpack_bits(
-          bref,
-          {&c_get_sl_um_uni_dir_rlc_r16_s_ext, &c.get<sl_um_uni_dir_rlc_r16_s_>().sl_sn_field_len_um_r16_present}));
+          bref, {&sl_um_uni_dir_rlc_r16_ext, &c.get<sl_um_uni_dir_rlc_r16_s_>().sl_sn_field_len_um_r16_present}));
       if (c.get<sl_um_uni_dir_rlc_r16_s_>().sl_sn_field_len_um_r16_present) {
         HANDLE_CODE(c.get<sl_um_uni_dir_rlc_r16_s_>().sl_sn_field_len_um_r16.unpack(bref));
       }
-      if (c_get_sl_um_uni_dir_rlc_r16_s_ext) {
+      if (sl_um_uni_dir_rlc_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -2415,21 +2413,20 @@ OCUDUASN_CODE sl_rlc_bearer_cfg_r18_c::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::srb:
-      bool c_get_srb_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_srb_s_ext, 1));
+      bool srb_ext;
+      HANDLE_CODE(bref.unpack(srb_ext, 1));
       HANDLE_CODE(unpack_integer(c.get<srb_s_>().sl_srb_id_with_dupl, bref, (uint8_t)1u, (uint8_t)3u));
       HANDLE_CODE(unpack_integer(c.get<srb_s_>().sl_rlc_bearer_cfg_idx_r18, bref, (uint16_t)1u, (uint16_t)512u));
-      if (c_get_srb_s_ext) {
+      if (srb_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::drb:
-      bool c_get_drb_s_ext;
-      HANDLE_CODE(unpack_bits(bref,
-                              {&c_get_drb_s_ext,
-                               &c.get<drb_s_>().sl_rlc_cfg_pc5_r18_present,
-                               &c.get<drb_s_>().sl_mac_lc_ch_cfg_pc5_r18_present}));
+      bool drb_ext;
+      HANDLE_CODE(unpack_bits(
+          bref,
+          {&drb_ext, &c.get<drb_s_>().sl_rlc_cfg_pc5_r18_present, &c.get<drb_s_>().sl_mac_lc_ch_cfg_pc5_r18_present}));
       HANDLE_CODE(unpack_integer(c.get<drb_s_>().slrb_pc5_cfg_idx_r18, bref, (uint16_t)1u, (uint16_t)512u));
       HANDLE_CODE(unpack_integer(c.get<drb_s_>().sl_rlc_bearer_cfg_idx_r18, bref, (uint16_t)1u, (uint16_t)512u));
       if (c.get<drb_s_>().sl_rlc_cfg_pc5_r18_present) {
@@ -2438,7 +2435,7 @@ OCUDUASN_CODE sl_rlc_bearer_cfg_r18_c::unpack(cbit_ref& bref)
       if (c.get<drb_s_>().sl_mac_lc_ch_cfg_pc5_r18_present) {
         HANDLE_CODE(c.get<drb_s_>().sl_mac_lc_ch_cfg_pc5_r18.unpack(bref));
       }
-      if (c_get_drb_s_ext) {
+      if (drb_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }

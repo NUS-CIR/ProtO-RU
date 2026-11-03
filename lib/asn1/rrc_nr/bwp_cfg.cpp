@@ -441,30 +441,30 @@ OCUDUASN_CODE srs_pos_res_set_r16_s::res_type_r16_c_::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::aperiodic_r16:
-      bool c_get_aperiodic_r16_s_ext;
+      bool aperiodic_r16_ext;
       bool aperiodic_srs_res_trigger_list_r16_present;
-      HANDLE_CODE(unpack_bits(bref, {&c_get_aperiodic_r16_s_ext, &aperiodic_srs_res_trigger_list_r16_present}));
+      HANDLE_CODE(unpack_bits(bref, {&aperiodic_r16_ext, &aperiodic_srs_res_trigger_list_r16_present}));
       if (aperiodic_srs_res_trigger_list_r16_present) {
         HANDLE_CODE(unpack_dyn_seq_of(
             c.get<aperiodic_r16_s_>().aperiodic_srs_res_trigger_list_r16, bref, 1, 3, integer_packer<uint8_t>(1, 3)));
       }
-      if (c_get_aperiodic_r16_s_ext) {
+      if (aperiodic_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::semi_persistent_r16:
-      bool c_get_semi_persistent_r16_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_semi_persistent_r16_s_ext, 1));
-      if (c_get_semi_persistent_r16_s_ext) {
+      bool semi_persistent_r16_ext;
+      HANDLE_CODE(bref.unpack(semi_persistent_r16_ext, 1));
+      if (semi_persistent_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::periodic_r16:
-      bool c_get_periodic_r16_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_periodic_r16_s_ext, 1));
-      if (c_get_periodic_r16_s_ext) {
+      bool periodic_r16_ext;
+      HANDLE_CODE(bref.unpack(periodic_r16_ext, 1));
+      if (periodic_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -2006,9 +2006,9 @@ OCUDUASN_CODE slot_offset_for_remaining_hops_r18_s::slot_offset_remaining_hops_r
   set(e);
   switch (type_) {
     case types::aperiodic_r18:
-      bool c_get_aperiodic_r18_s_ext;
+      bool aperiodic_r18_ext;
       HANDLE_CODE(unpack_bits(bref,
-                              {&c_get_aperiodic_r18_s_ext,
+                              {&aperiodic_r18_ext,
                                &c.get<aperiodic_r18_s_>().slot_offset_r18_present,
                                &c.get<aperiodic_r18_s_>().start_position_r18_present}));
       if (c.get<aperiodic_r18_s_>().slot_offset_r18_present) {
@@ -2017,15 +2017,15 @@ OCUDUASN_CODE slot_offset_for_remaining_hops_r18_s::slot_offset_remaining_hops_r
       if (c.get<aperiodic_r18_s_>().start_position_r18_present) {
         HANDLE_CODE(unpack_integer(c.get<aperiodic_r18_s_>().start_position_r18, bref, (uint8_t)0u, (uint8_t)13u));
       }
-      if (c_get_aperiodic_r18_s_ext) {
+      if (aperiodic_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::semi_persistent_r18:
-      bool c_get_semi_persistent_r18_s_ext;
+      bool semi_persistent_r18_ext;
       HANDLE_CODE(unpack_bits(bref,
-                              {&c_get_semi_persistent_r18_s_ext,
+                              {&semi_persistent_r18_ext,
                                &c.get<semi_persistent_r18_s_>().periodicity_and_offset_sp_r18_present,
                                &c.get<semi_persistent_r18_s_>().periodicity_and_offset_sp_ext_r18_present,
                                &c.get<semi_persistent_r18_s_>().start_position_r18_present}));
@@ -2039,15 +2039,15 @@ OCUDUASN_CODE slot_offset_for_remaining_hops_r18_s::slot_offset_remaining_hops_r
         HANDLE_CODE(
             unpack_integer(c.get<semi_persistent_r18_s_>().start_position_r18, bref, (uint8_t)0u, (uint8_t)13u));
       }
-      if (c_get_semi_persistent_r18_s_ext) {
+      if (semi_persistent_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::periodic_r18:
-      bool c_get_periodic_r18_s_ext;
+      bool periodic_r18_ext;
       HANDLE_CODE(unpack_bits(bref,
-                              {&c_get_periodic_r18_s_ext,
+                              {&periodic_r18_ext,
                                &c.get<periodic_r18_s_>().periodicity_and_offset_p_r18_present,
                                &c.get<periodic_r18_s_>().periodicity_and_offset_p_ext_r18_present,
                                &c.get<periodic_r18_s_>().start_position_r18_present}));
@@ -2060,7 +2060,7 @@ OCUDUASN_CODE slot_offset_for_remaining_hops_r18_s::slot_offset_remaining_hops_r
       if (c.get<periodic_r18_s_>().start_position_r18_present) {
         HANDLE_CODE(unpack_integer(c.get<periodic_r18_s_>().start_position_r18, bref, (uint8_t)0u, (uint8_t)13u));
       }
-      if (c_get_periodic_r18_s_ext) {
+      if (periodic_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -2583,12 +2583,12 @@ OCUDUASN_CODE srs_pos_res_r16_s::res_type_r16_c_::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::aperiodic_r16:
-      bool c_get_aperiodic_r16_s_ext;
-      HANDLE_CODE(unpack_bits(bref, {&c_get_aperiodic_r16_s_ext, &c.get<aperiodic_r16_s_>().slot_offset_r16_present}));
+      bool aperiodic_r16_ext;
+      HANDLE_CODE(unpack_bits(bref, {&aperiodic_r16_ext, &c.get<aperiodic_r16_s_>().slot_offset_r16_present}));
       if (c.get<aperiodic_r16_s_>().slot_offset_r16_present) {
         HANDLE_CODE(unpack_integer(c.get<aperiodic_r16_s_>().slot_offset_r16, bref, (uint8_t)1u, (uint8_t)32u));
       }
-      if (c_get_aperiodic_r16_s_ext) {
+      if (aperiodic_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -6190,14 +6190,14 @@ OCUDUASN_CODE rate_match_pattern_s::pattern_type_c_::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::bitmaps:
-      bool c_get_bitmaps_s_ext;
-      HANDLE_CODE(unpack_bits(bref, {&c_get_bitmaps_s_ext, &c.get<bitmaps_s_>().periodicity_and_pattern_present}));
+      bool bitmaps_ext;
+      HANDLE_CODE(unpack_bits(bref, {&bitmaps_ext, &c.get<bitmaps_s_>().periodicity_and_pattern_present}));
       HANDLE_CODE(c.get<bitmaps_s_>().res_blocks.unpack(bref));
       HANDLE_CODE(c.get<bitmaps_s_>().symbols_in_res_block.unpack(bref));
       if (c.get<bitmaps_s_>().periodicity_and_pattern_present) {
         HANDLE_CODE(c.get<bitmaps_s_>().periodicity_and_pattern.unpack(bref));
       }
-      if (c_get_bitmaps_s_ext) {
+      if (bitmaps_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -7735,16 +7735,16 @@ OCUDUASN_CODE search_space_s::search_space_type_c_::unpack(cbit_ref& bref)
                                &c.get<common_s_>().dci_format2_2_present,
                                &c.get<common_s_>().dci_format2_3_present}));
       if (c.get<common_s_>().dci_format0_0_and_format1_0_present) {
-        bool c_get_common_s__dci_format0_0_and_format1_0_ext;
-        HANDLE_CODE(bref.unpack(c_get_common_s__dci_format0_0_and_format1_0_ext, 1));
-        if (c_get_common_s__dci_format0_0_and_format1_0_ext) {
+        bool common_dci_format0_0_and_format1_0_ext;
+        HANDLE_CODE(bref.unpack(common_dci_format0_0_and_format1_0_ext, 1));
+        if (common_dci_format0_0_and_format1_0_ext) {
           ext_groups_unpacker unknown_ext_unpacker(bref);
           HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
         }
       }
       if (c.get<common_s_>().dci_format2_0_present) {
-        bool c_get_common_s__dci_format2_0_ext;
-        HANDLE_CODE(bref.unpack(c_get_common_s__dci_format2_0_ext, 1));
+        bool common_dci_format2_0_ext;
+        HANDLE_CODE(bref.unpack(common_dci_format2_0_ext, 1));
         HANDLE_CODE(unpack_bits(bref,
                                 {&c.get<common_s_>().dci_format2_0.nrof_candidates_sfi.aggregation_level1_present,
                                  &c.get<common_s_>().dci_format2_0.nrof_candidates_sfi.aggregation_level2_present,
@@ -7766,36 +7766,35 @@ OCUDUASN_CODE search_space_s::search_space_type_c_::unpack(cbit_ref& bref)
         if (c.get<common_s_>().dci_format2_0.nrof_candidates_sfi.aggregation_level16_present) {
           HANDLE_CODE(c.get<common_s_>().dci_format2_0.nrof_candidates_sfi.aggregation_level16.unpack(bref));
         }
-        if (c_get_common_s__dci_format2_0_ext) {
+        if (common_dci_format2_0_ext) {
           ext_groups_unpacker unknown_ext_unpacker(bref);
           HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
         }
       }
       if (c.get<common_s_>().dci_format2_1_present) {
-        bool c_get_common_s__dci_format2_1_ext;
-        HANDLE_CODE(bref.unpack(c_get_common_s__dci_format2_1_ext, 1));
-        if (c_get_common_s__dci_format2_1_ext) {
+        bool common_dci_format2_1_ext;
+        HANDLE_CODE(bref.unpack(common_dci_format2_1_ext, 1));
+        if (common_dci_format2_1_ext) {
           ext_groups_unpacker unknown_ext_unpacker(bref);
           HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
         }
       }
       if (c.get<common_s_>().dci_format2_2_present) {
-        bool c_get_common_s__dci_format2_2_ext;
-        HANDLE_CODE(bref.unpack(c_get_common_s__dci_format2_2_ext, 1));
-        if (c_get_common_s__dci_format2_2_ext) {
+        bool common_dci_format2_2_ext;
+        HANDLE_CODE(bref.unpack(common_dci_format2_2_ext, 1));
+        if (common_dci_format2_2_ext) {
           ext_groups_unpacker unknown_ext_unpacker(bref);
           HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
         }
       }
       if (c.get<common_s_>().dci_format2_3_present) {
-        bool c_get_common_s__dci_format2_3_ext;
-        HANDLE_CODE(
-            unpack_bits(bref, {&c_get_common_s__dci_format2_3_ext, &c.get<common_s_>().dci_format2_3.dummy1_present}));
+        bool common_dci_format2_3_ext;
+        HANDLE_CODE(unpack_bits(bref, {&common_dci_format2_3_ext, &c.get<common_s_>().dci_format2_3.dummy1_present}));
         if (c.get<common_s_>().dci_format2_3.dummy1_present) {
           HANDLE_CODE(c.get<common_s_>().dci_format2_3.dummy1.unpack(bref));
         }
         HANDLE_CODE(c.get<common_s_>().dci_format2_3.dummy2.unpack(bref));
-        if (c_get_common_s__dci_format2_3_ext) {
+        if (common_dci_format2_3_ext) {
           ext_groups_unpacker unknown_ext_unpacker(bref);
           HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
         }
@@ -9427,29 +9426,28 @@ OCUDUASN_CODE search_space_ext_v1800_s::search_space_type_r18_c_::unpack(cbit_re
   set(e);
   switch (type_) {
     case types::common_r18:
-      bool c_get_common_r18_s_ext;
-      HANDLE_CODE(unpack_bits(bref, {&c_get_common_r18_s_ext, &c.get<common_r18_s_>().dci_format2_9_r18_present}));
+      bool common_r18_ext;
+      HANDLE_CODE(unpack_bits(bref, {&common_r18_ext, &c.get<common_r18_s_>().dci_format2_9_r18_present}));
       if (c.get<common_r18_s_>().dci_format2_9_r18_present) {
-        bool c_get_common_r18_s__dci_format2_9_r18_ext;
-        HANDLE_CODE(bref.unpack(c_get_common_r18_s__dci_format2_9_r18_ext, 1));
-        if (c_get_common_r18_s__dci_format2_9_r18_ext) {
+        bool common_r18_dci_format2_9_r18_ext;
+        HANDLE_CODE(bref.unpack(common_r18_dci_format2_9_r18_ext, 1));
+        if (common_r18_dci_format2_9_r18_ext) {
           ext_groups_unpacker unknown_ext_unpacker(bref);
           HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
         }
       }
-      if (c_get_common_r18_s_ext) {
+      if (common_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::ue_specific_r18:
-      bool c_get_ue_specific_r18_s_ext;
-      HANDLE_CODE(
-          unpack_bits(bref, {&c_get_ue_specific_r18_s_ext, &c.get<ue_specific_r18_s_>().dci_formats_mc_r18_present}));
+      bool ue_specific_r18_ext;
+      HANDLE_CODE(unpack_bits(bref, {&ue_specific_r18_ext, &c.get<ue_specific_r18_s_>().dci_formats_mc_r18_present}));
       if (c.get<ue_specific_r18_s_>().dci_formats_mc_r18_present) {
         HANDLE_CODE(c.get<ue_specific_r18_s_>().dci_formats_mc_r18.unpack(bref));
       }
-      if (c_get_ue_specific_r18_s_ext) {
+      if (ue_specific_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -31181,24 +31179,23 @@ OCUDUASN_CODE srs_res_set_s::res_type_c_::unpack(cbit_ref& bref)
       HANDLE_CODE(c.get<aperiodic_s_>().unpack(bref));
       break;
     case types::semi_persistent:
-      bool c_get_semi_persistent_s_ext;
-      HANDLE_CODE(
-          unpack_bits(bref, {&c_get_semi_persistent_s_ext, &c.get<semi_persistent_s_>().associated_csi_rs_present}));
+      bool semi_persistent_ext;
+      HANDLE_CODE(unpack_bits(bref, {&semi_persistent_ext, &c.get<semi_persistent_s_>().associated_csi_rs_present}));
       if (c.get<semi_persistent_s_>().associated_csi_rs_present) {
         HANDLE_CODE(unpack_integer(c.get<semi_persistent_s_>().associated_csi_rs, bref, (uint8_t)0u, (uint8_t)191u));
       }
-      if (c_get_semi_persistent_s_ext) {
+      if (semi_persistent_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::periodic:
-      bool c_get_periodic_s_ext;
-      HANDLE_CODE(unpack_bits(bref, {&c_get_periodic_s_ext, &c.get<periodic_s_>().associated_csi_rs_present}));
+      bool periodic_ext;
+      HANDLE_CODE(unpack_bits(bref, {&periodic_ext, &c.get<periodic_s_>().associated_csi_rs_present}));
       if (c.get<periodic_s_>().associated_csi_rs_present) {
         HANDLE_CODE(unpack_integer(c.get<periodic_s_>().associated_csi_rs, bref, (uint8_t)0u, (uint8_t)191u));
       }
-      if (c_get_periodic_s_ext) {
+      if (periodic_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }

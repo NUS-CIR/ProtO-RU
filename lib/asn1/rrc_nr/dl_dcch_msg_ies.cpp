@@ -248,21 +248,21 @@ OCUDUASN_CODE srs_pos_res_set_linked_for_agg_bw_r18_s::srs_linked_cfg_r18_c_::un
   set(e);
   switch (type_) {
     case types::rrc_connected_state_r18:
-      bool c_get_rrc_connected_state_r18_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_rrc_connected_state_r18_s_ext, 1));
+      bool rrc_connected_state_r18_ext;
+      HANDLE_CODE(bref.unpack(rrc_connected_state_r18_ext, 1));
       HANDLE_CODE(c.get<rrc_connected_state_r18_s_>().serving_cell_and_bwp_id_r18.unpack(bref));
-      if (c_get_rrc_connected_state_r18_s_ext) {
+      if (rrc_connected_state_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::rrc_inactive_state_r18:
-      bool c_get_rrc_inactive_state_r18_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_rrc_inactive_state_r18_s_ext, 1));
+      bool rrc_inactive_state_r18_ext;
+      HANDLE_CODE(bref.unpack(rrc_inactive_state_r18_ext, 1));
       HANDLE_CODE(c.get<rrc_inactive_state_r18_s_>().scs_specific_carrier_r18.unpack(bref));
       HANDLE_CODE(
           unpack_integer(c.get<rrc_inactive_state_r18_s_>().freq_info_r18, bref, (uint32_t)0u, (uint32_t)3279165u));
-      if (c_get_rrc_inactive_state_r18_s_ext) {
+      if (rrc_inactive_state_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
@@ -12448,88 +12448,88 @@ OCUDUASN_CODE event_trigger_cfg_inter_rat_s::event_id_c_::unpack(cbit_ref& bref)
   set(e);
   switch (type_) {
     case types::event_b1:
-      bool c_get_event_b1_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_b1_s_ext, 1));
+      bool event_b1_ext;
+      HANDLE_CODE(bref.unpack(event_b1_ext, 1));
       HANDLE_CODE(c.get<event_b1_s_>().b1_thres_eutra.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_b1_s_>().report_on_leave, 1));
       HANDLE_CODE(unpack_integer(c.get<event_b1_s_>().hysteresis, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_b1_s_>().time_to_trigger.unpack(bref));
-      if (c_get_event_b1_s_ext) {
+      if (event_b1_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::event_b2:
-      bool c_get_event_b2_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_b2_s_ext, 1));
+      bool event_b2_ext;
+      HANDLE_CODE(bref.unpack(event_b2_ext, 1));
       HANDLE_CODE(c.get<event_b2_s_>().b2_thres1.unpack(bref));
       HANDLE_CODE(c.get<event_b2_s_>().b2_thres2_eutra.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_b2_s_>().report_on_leave, 1));
       HANDLE_CODE(unpack_integer(c.get<event_b2_s_>().hysteresis, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_b2_s_>().time_to_trigger.unpack(bref));
-      if (c_get_event_b2_s_ext) {
+      if (event_b2_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
       break;
     case types::event_b1_utra_fdd_r16: {
       varlength_field_unpack_guard varlen_scope(bref, false);
-      bool                         c_get_event_b1_utra_fdd_r16_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_b1_utra_fdd_r16_s_ext, 1));
+      bool                         event_b1_utra_fdd_r16_ext;
+      HANDLE_CODE(bref.unpack(event_b1_utra_fdd_r16_ext, 1));
       HANDLE_CODE(c.get<event_b1_utra_fdd_r16_s_>().b1_thres_utra_fdd_r16.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_b1_utra_fdd_r16_s_>().report_on_leave_r16, 1));
       HANDLE_CODE(unpack_integer(c.get<event_b1_utra_fdd_r16_s_>().hysteresis_r16, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_b1_utra_fdd_r16_s_>().time_to_trigger_r16.unpack(bref));
-      if (c_get_event_b1_utra_fdd_r16_s_ext) {
+      if (event_b1_utra_fdd_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
     } break;
     case types::event_b2_utra_fdd_r16: {
       varlength_field_unpack_guard varlen_scope(bref, false);
-      bool                         c_get_event_b2_utra_fdd_r16_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_b2_utra_fdd_r16_s_ext, 1));
+      bool                         event_b2_utra_fdd_r16_ext;
+      HANDLE_CODE(bref.unpack(event_b2_utra_fdd_r16_ext, 1));
       HANDLE_CODE(c.get<event_b2_utra_fdd_r16_s_>().b2_thres1_r16.unpack(bref));
       HANDLE_CODE(c.get<event_b2_utra_fdd_r16_s_>().b2_thres2_utra_fdd_r16.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_b2_utra_fdd_r16_s_>().report_on_leave_r16, 1));
       HANDLE_CODE(unpack_integer(c.get<event_b2_utra_fdd_r16_s_>().hysteresis_r16, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_b2_utra_fdd_r16_s_>().time_to_trigger_r16.unpack(bref));
-      if (c_get_event_b2_utra_fdd_r16_s_ext) {
+      if (event_b2_utra_fdd_r16_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
     } break;
     case types::event_y1_relay_r17: {
       varlength_field_unpack_guard varlen_scope(bref, false);
-      bool                         c_get_event_y1_relay_r17_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_y1_relay_r17_s_ext, 1));
+      bool                         event_y1_relay_r17_ext;
+      HANDLE_CODE(bref.unpack(event_y1_relay_r17_ext, 1));
       HANDLE_CODE(c.get<event_y1_relay_r17_s_>().y1_thres1_r17.unpack(bref));
       HANDLE_CODE(c.get<event_y1_relay_r17_s_>().y1_thres2_relay_r17.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_y1_relay_r17_s_>().report_on_leave_r17, 1));
       HANDLE_CODE(unpack_integer(c.get<event_y1_relay_r17_s_>().hysteresis_r17, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_y1_relay_r17_s_>().time_to_trigger_r17.unpack(bref));
-      if (c_get_event_y1_relay_r17_s_ext) {
+      if (event_y1_relay_r17_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
     } break;
     case types::event_y2_relay_r17: {
       varlength_field_unpack_guard varlen_scope(bref, false);
-      bool                         c_get_event_y2_relay_r17_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_y2_relay_r17_s_ext, 1));
+      bool                         event_y2_relay_r17_ext;
+      HANDLE_CODE(bref.unpack(event_y2_relay_r17_ext, 1));
       HANDLE_CODE(c.get<event_y2_relay_r17_s_>().y2_thres_relay_r17.unpack(bref));
       HANDLE_CODE(bref.unpack(c.get<event_y2_relay_r17_s_>().report_on_leave_r17, 1));
       HANDLE_CODE(unpack_integer(c.get<event_y2_relay_r17_s_>().hysteresis_r17, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_y2_relay_r17_s_>().time_to_trigger_r17.unpack(bref));
-      if (c_get_event_y2_relay_r17_s_ext) {
+      if (event_y2_relay_r17_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
     } break;
     case types::event_z1_relay_r18: {
       varlength_field_unpack_guard varlen_scope(bref, false);
-      bool                         c_get_event_z1_relay_r18_s_ext;
-      HANDLE_CODE(bref.unpack(c_get_event_z1_relay_r18_s_ext, 1));
+      bool                         event_z1_relay_r18_ext;
+      HANDLE_CODE(bref.unpack(event_z1_relay_r18_ext, 1));
       HANDLE_CODE(bref.unpack(c.get<event_z1_relay_r18_s_>().z1_thres1_relay_r18.sd_rsrp_r18_present, 1));
       HANDLE_CODE(c.get<event_z1_relay_r18_s_>().z1_thres1_relay_r18.sl_rsrp_r18.unpack(bref));
       if (c.get<event_z1_relay_r18_s_>().z1_thres1_relay_r18.sd_rsrp_r18_present) {
@@ -12539,7 +12539,7 @@ OCUDUASN_CODE event_trigger_cfg_inter_rat_s::event_id_c_::unpack(cbit_ref& bref)
       HANDLE_CODE(bref.unpack(c.get<event_z1_relay_r18_s_>().report_on_leave_r18, 1));
       HANDLE_CODE(unpack_integer(c.get<event_z1_relay_r18_s_>().hysteresis_r18, bref, (uint8_t)0u, (uint8_t)30u));
       HANDLE_CODE(c.get<event_z1_relay_r18_s_>().time_to_trigger_r18.unpack(bref));
-      if (c_get_event_z1_relay_r18_s_ext) {
+      if (event_z1_relay_r18_ext) {
         ext_groups_unpacker unknown_ext_unpacker(bref);
         HANDLE_CODE(unknown_ext_unpacker.consume_remaining_groups(bref));
       }
