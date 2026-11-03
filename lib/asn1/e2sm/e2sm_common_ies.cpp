@@ -3008,7 +3008,7 @@ void ue_id_gnb_cu_cp_e1ap_id_item_s::to_json(json_writer& j) const
 // UEID-GNB ::= SEQUENCE
 OCUDUASN_CODE ue_id_gnb_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= global_ng_ran_node_id.is_present();
   group_flags[1] |= cell_rnti.is_present();
   HANDLE_CODE(pack_bits(bref,
@@ -3145,7 +3145,7 @@ void ue_id_gnb_s::to_json(json_writer& j) const
 // UEID-GNB-DU ::= SEQUENCE
 OCUDUASN_CODE ue_id_gnb_du_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= cell_rnti.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ran_ue_id_present}));
 
@@ -3242,7 +3242,7 @@ void ue_id_gnb_cu_up_s::to_json(json_writer& j) const
 // UEID-NG-ENB ::= SEQUENCE
 OCUDUASN_CODE ue_id_ng_enb_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= global_ng_ran_node_id.is_present();
   group_flags[1] |= cell_rnti.is_present();
   HANDLE_CODE(pack_bits(
@@ -3341,7 +3341,7 @@ void ue_id_ng_enb_s::to_json(json_writer& j) const
 // UEID-NG-ENB-DU ::= SEQUENCE
 OCUDUASN_CODE ue_id_ng_enb_du_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= cell_rnti.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -3391,7 +3391,7 @@ void ue_id_ng_enb_du_s::to_json(json_writer& j) const
 // UEID-EN-GNB ::= SEQUENCE
 OCUDUASN_CODE ue_id_en_gnb_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= cell_rnti.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -3496,7 +3496,7 @@ void ue_id_en_gnb_s::to_json(json_writer& j) const
 // UEID-ENB ::= SEQUENCE
 OCUDUASN_CODE ue_id_enb_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= cell_rnti.is_present();
   HANDLE_CODE(pack_bits(
       bref, {group_flags.any(), m_enb_ue_x2ap_id_present, m_enb_ue_x2ap_id_ext_present, global_enb_id_present}));

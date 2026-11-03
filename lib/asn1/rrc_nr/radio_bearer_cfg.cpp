@@ -286,7 +286,7 @@ uint8_t discard_timer_for_low_importance_r18_opts::to_number() const
 // PDCP-Config ::= SEQUENCE
 OCUDUASN_CODE pdcp_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= ciphering_disabled_present;
   group_flags[1] |= discard_timer_ext_r16.is_present();
   group_flags[1] |= more_than_two_rlc_drb_r16.is_present();
@@ -916,7 +916,7 @@ uint16_t pdcp_cfg_s::t_reordering_opts::to_number() const
 // SRB-ToAddMod ::= SEQUENCE
 OCUDUASN_CODE srb_to_add_mod_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= srb_id_v1700_present;
   group_flags[1] |= srb_id_v1800_present;
   group_flags[1] |= n3c_bearer_associated_r18_present;
@@ -1088,7 +1088,7 @@ const char* sdap_cfg_s::sdap_hdr_ul_opts::to_string() const
 // DRB-ToAddMod ::= SEQUENCE
 OCUDUASN_CODE drb_to_add_mod_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= daps_cfg_r16_present;
   group_flags[1] |= n3c_bearer_associated_r18_present;
   HANDLE_CODE(pack_bits(
@@ -1638,7 +1638,7 @@ void mrb_to_add_mod_r17_s::to_json(json_writer& j) const
 // RadioBearerConfig ::= SEQUENCE
 OCUDUASN_CODE radio_bearer_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= mrb_to_add_mod_list_r17.is_present();
   group_flags[0] |= mrb_to_release_list_r17.is_present();
   group_flags[0] |= srb4_to_add_mod_r17.is_present();

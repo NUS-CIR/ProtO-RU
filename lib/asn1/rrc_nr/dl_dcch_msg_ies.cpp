@@ -942,7 +942,7 @@ const char* nr_rs_type_opts::to_string() const
 // CondTriggerConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE cond_trigger_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= nes_event_r18_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -1331,7 +1331,7 @@ const char* cond_trigger_cfg_r16_s::cond_event_id_c_::types_opts::to_string() co
 // GapConfig ::= SEQUENCE
 OCUDUASN_CODE gap_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= ref_serv_cell_ind_present;
   group_flags[1] |= ref_fr2_serv_cell_async_ca_r16_present;
   group_flags[1] |= mgl_r16_present;
@@ -1887,7 +1887,7 @@ void mu_si_m_gap_ext_v1820_s::to_json(json_writer& j) const
 // MUSIM-GapConfig-r17 ::= SEQUENCE
 OCUDUASN_CODE mu_si_m_gap_cfg_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= musim_gap_to_add_mod_list_ext_v1820.is_present();
   group_flags[0] |= musim_gap_keep_r18_present;
   HANDLE_CODE(pack_bits(bref,
@@ -2206,7 +2206,7 @@ void ul_excess_delay_cfg_r17_s::to_json(json_writer& j) const
 // PeriodicalReportConfig ::= SEQUENCE
 OCUDUASN_CODE periodical_report_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= meas_rssi_report_cfg_r16.is_present();
   group_flags[0] |= include_common_location_info_r16_present;
   group_flags[0] |= include_bt_meas_r16.is_present();
@@ -2539,7 +2539,7 @@ void cell_individual_offset_list_r18_s::to_json(json_writer& j) const
 // EventTriggerConfig ::= SEQUENCE
 OCUDUASN_CODE event_trigger_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= meas_rssi_report_cfg_r16.is_present();
   group_flags[0] |= use_t312_r16_present;
   group_flags[0] |= include_common_location_info_r16_present;
@@ -3809,7 +3809,7 @@ uint8_t event_trigger_cfg_s::report_on_best_cell_change_r18_opts::to_number() co
 // ReportCGI ::= SEQUENCE
 OCUDUASN_CODE report_cgi_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= use_autonomous_gaps_r16_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -3857,7 +3857,7 @@ void report_cgi_s::to_json(json_writer& j) const
 // ReportSFTD-NR ::= SEQUENCE
 OCUDUASN_CODE report_sftd_nr_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= report_sftd_neigh_meas_present;
   group_flags[0] |= drx_sftd_neigh_meas_present;
   group_flags[0] |= cells_for_which_to_report_sftd.is_present();
@@ -4674,7 +4674,7 @@ const char* rat_type_opts::to_string() const
 // CSI-RS-Resource-Mobility ::= SEQUENCE
 OCUDUASN_CODE csi_rs_res_mob_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= slot_cfg_r17.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), associated_ssb_present}));
 
@@ -5801,7 +5801,7 @@ const char* app_layer_idle_inactive_cfg_r18_s::qoe_meas_type_r18_opts::to_string
 // RAN-VisibleParameters-r17 ::= SEQUENCE
 OCUDUASN_CODE ran_visible_params_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_visible_report_srb_r18_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -5909,7 +5909,7 @@ uint8_t ran_visible_params_r17_s::ran_visible_report_srb_r18_opts::to_number() c
 // MeasConfigAppLayer-r17 ::= SEQUENCE
 OCUDUASN_CODE meas_cfg_app_layer_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= report_srb_r18_present;
   group_flags[0] |= app_layer_meas_prio_r18_present;
   group_flags[0] |= app_layer_idle_inactive_cfg_r18.is_present();
@@ -6063,7 +6063,7 @@ uint8_t meas_cfg_app_layer_r17_s::report_srb_r18_opts::to_number() const
 // AppLayerMeasConfig-r17 ::= SEQUENCE
 OCUDUASN_CODE app_layer_meas_cfg_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= rrc_seg_allowed_srb5_r18_present;
   group_flags[0] |= idle_inactive_report_allowed_r18_present;
   HANDLE_CODE(pack_bits(bref,
@@ -7388,7 +7388,7 @@ void cli_res_cfg_r16_s::to_json(json_writer& j) const
 // CSI-RS-ResourceConfigMobility ::= SEQUENCE
 OCUDUASN_CODE csi_rs_res_cfg_mob_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ref_serv_cell_idx_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -8100,7 +8100,7 @@ void freq_prio_ded_slicing_r17_s::to_json(json_writer& j) const
 // CellReselectionPriorities ::= SEQUENCE
 OCUDUASN_CODE cell_resel_priorities_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= freq_prio_list_ded_slicing_r17.is_present();
   HANDLE_CODE(pack_bits(
       bref, {group_flags.any(), freq_prio_list_eutra.size() > 0, freq_prio_list_nr.size() > 0, t320_present}));
@@ -8719,7 +8719,7 @@ void subsequent_cond_recfg_r18_s::to_json(json_writer& j) const
 // CondReconfigToAddMod-r16 ::= SEQUENCE
 OCUDUASN_CODE cond_recfg_to_add_mod_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= cond_execution_cond_scg_r17.size() > 0;
   group_flags[1] |= cond_execution_cond_pscell_r18.is_present();
   group_flags[1] |= subsequent_cond_recfg_r18.is_present();
@@ -8930,7 +8930,7 @@ void sk_counter_configuration_r18_s::to_json(json_writer& j) const
 // ConditionalReconfiguration-r16 ::= SEQUENCE
 OCUDUASN_CODE conditional_recfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= scpac_ref_cfg_r18.is_present();
   group_flags[0] |= serving_security_cell_set_id_r18_present;
   group_flags[0] |= sk_counter_cfg_r18.is_present();
@@ -9373,7 +9373,7 @@ void ssb_to_measure_altitude_based_r18_s::to_json(json_writer& j) const
 // SSB-ConfigMobility ::= SEQUENCE
 OCUDUASN_CODE ssb_cfg_mob_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= ssb_position_qcl_common_r16_present;
   group_flags[0] |= ssb_position_qcl_cells_to_add_mod_list_r16.is_present();
   group_flags[0] |= ssb_position_qcl_cells_to_rem_list_r16.is_present();
@@ -9971,7 +9971,7 @@ uint8_t ssb_mtc3_r16_s::dur_r16_opts::to_number() const
 // RMTC-Config-r16 ::= SEQUENCE
 OCUDUASN_CODE rmtc_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= rmtc_bw_r17_present;
   group_flags[0] |= meas_dur_symbols_v1700_present;
   group_flags[0] |= ref_scs_cp_v1700_present;
@@ -10185,7 +10185,7 @@ uint16_t t312_r16_opts::to_number() const
 // MeasObjectNR ::= SEQUENCE
 OCUDUASN_CODE meas_obj_nr_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= freq_band_ind_nr_present;
   group_flags[0] |= meas_cycle_scell_present;
   group_flags[1] |= smtc3list_r16.is_present();
@@ -10716,7 +10716,7 @@ void eutra_excluded_cell_s::to_json(json_writer& j) const
 // MeasObjectEUTRA ::= SEQUENCE
 OCUDUASN_CODE meas_obj_eutra_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= associated_meas_gap_r17_present;
   group_flags[1] |= meas_seq_r18_present;
   HANDLE_CODE(pack_bits(bref,
@@ -11544,7 +11544,7 @@ void meas_report_quant_utra_fdd_r16_s::to_json(json_writer& j) const
 // PeriodicalReportConfigInterRAT ::= SEQUENCE
 OCUDUASN_CODE periodical_report_cfg_inter_rat_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= report_quant_utra_fdd_r16.is_present();
   group_flags[1] |= include_common_location_info_r16_present;
   group_flags[1] |= include_bt_meas_r16.is_present();
@@ -11942,7 +11942,7 @@ uint8_t meas_trigger_quant_utra_fdd_r16_c::types_opts::to_number() const
 // EventTriggerConfigInterRAT ::= SEQUENCE
 OCUDUASN_CODE event_trigger_cfg_inter_rat_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= report_quant_utra_fdd_r16.is_present();
   group_flags[1] |= include_common_location_info_r16_present;
   group_flags[1] |= include_bt_meas_r16.is_present();
@@ -12577,7 +12577,7 @@ int8_t event_trigger_cfg_inter_rat_s::report_amount_opts::to_number() const
 // ReportCGI-EUTRA ::= SEQUENCE
 OCUDUASN_CODE report_cgi_eutra_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= use_autonomous_gaps_r16_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -13717,7 +13717,7 @@ void filt_cfg_cli_r16_s::to_json(json_writer& j) const
 // QuantityConfig ::= SEQUENCE
 OCUDUASN_CODE quant_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= quant_cfg_eutra.is_present();
   group_flags[1] |= quant_cfg_utra_fdd_r16.is_present();
   group_flags[1] |= quant_cfg_cli_r16.is_present();
@@ -14118,7 +14118,7 @@ uint8_t pos_gap_cfg_r17_s::gap_type_r17_opts::to_number() const
 // MeasGapConfig ::= SEQUENCE
 OCUDUASN_CODE meas_gap_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= gap_fr1.is_present();
   group_flags[0] |= gap_ue.is_present();
   group_flags[1] |= gap_to_add_mod_list_r17.is_present();
@@ -14266,7 +14266,7 @@ void meas_gap_cfg_s::to_json(json_writer& j) const
 // MeasGapSharingConfig ::= SEQUENCE
 OCUDUASN_CODE meas_gap_sharing_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= gap_sharing_fr1.is_present();
   group_flags[0] |= gap_sharing_ue.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), gap_sharing_fr2_present}));
@@ -14505,7 +14505,7 @@ const char* meas_win_cfg_r18_s::win_dur_r18_opts::to_number_string() const
 // MeasConfig ::= SEQUENCE
 OCUDUASN_CODE meas_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= interfreq_cfg_no_gap_r16_present;
   group_flags[1] |= effective_meas_win_cfg_r18.is_present();
   HANDLE_CODE(pack_bits(bref,
@@ -16843,7 +16843,7 @@ void sl_u2_u_remote_ue_cfg_r18_s::to_json(json_writer& j) const
 // SL-L2RelayUE-Config-r17 ::= SEQUENCE
 OCUDUASN_CODE sl_l2_relay_ue_cfg_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_u2_u_remote_ue_to_add_mod_list_r18.is_present();
   group_flags[0] |= sl_u2_u_remote_ue_to_release_list_r18.is_present();
   HANDLE_CODE(pack_bits(
@@ -20360,7 +20360,7 @@ void multicast_cfg_inactive_r18_s::to_json(json_writer& j) const
 // SuspendConfig ::= SEQUENCE
 OCUDUASN_CODE suspend_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= sl_ue_id_remote_r17_present;
   group_flags[0] |= sdt_cfg_r17.is_present();
   group_flags[0] |= srs_pos_rrc_inactive_r17.is_present();
@@ -20594,7 +20594,7 @@ void validity_area_r16_s::to_json(json_writer& j) const
 // MeasIdleConfigDedicated-r16 ::= SEQUENCE
 OCUDUASN_CODE meas_idle_cfg_ded_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= meas_resel_carrier_list_nr_r18.is_present();
   group_flags[0] |= meas_idle_validity_dur_r18_present;
   group_flags[0] |= meas_resel_validity_dur_r18_present;

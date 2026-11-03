@@ -15,7 +15,7 @@ using namespace asn1::e2sm;
 // AdditionalSupportedFormat ::= SEQUENCE
 OCUDUASN_CODE add_supported_format_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= ric_ctrl_outcome_format_type_present;
   group_flags[1] |= ric_ctrl_action_id_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
@@ -1379,7 +1379,7 @@ void ran_param_definition_choice_structure_s::to_json(json_writer& j) const
 // CallProcessBreakpoint-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE call_process_breakpoint_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -1475,7 +1475,7 @@ const char* cause_ri_cservice_opts::to_string() const
 // CellIdentification-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE cell_identif_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -1528,7 +1528,7 @@ void cell_identif_ran_param_item_s::to_json(json_writer& j) const
 // ControlAction-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE ctrl_action_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -1581,7 +1581,7 @@ void ctrl_action_ran_param_item_s::to_json(json_writer& j) const
 // ControlOutcome-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE ctrl_outcome_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -1634,7 +1634,7 @@ void ctrl_outcome_ran_param_item_s::to_json(json_writer& j) const
 // E2SM-RC-ActionDefinition-Format1-Item ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_action_definition_format1_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -2104,7 +2104,7 @@ void ric_policy_action_ran_param_item_s::to_json(json_writer& j) const
 // RIC-PolicyAction ::= SEQUENCE
 OCUDUASN_CODE ric_policy_action_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ric_policy_decision_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ran_params_list.size() > 0}));
 
@@ -2173,7 +2173,7 @@ const char* ric_policy_action_s::ric_policy_decision_opts::to_string() const
 // E2SM-RC-ActionDefinition-Format2-Item ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_action_definition_format2_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ric_policy_condition_id_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ric_policy_condition_definition.size() > 0}));
 
@@ -2270,7 +2270,7 @@ void e2sm_rc_action_definition_format2_s::to_json(json_writer& j) const
 // E2SM-RC-ActionDefinition-Format3-Item ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_action_definition_format3_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -2366,7 +2366,7 @@ void e2sm_rc_action_definition_format3_s::to_json(json_writer& j) const
 // E2SM-RC-ActionDefinition-Format4-RANP-Item ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_action_definition_format4_ranp_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -7212,7 +7212,7 @@ uint16_t serving_cell_cfg_common_s::ssb_subcarrier_spacing_opts::to_number() con
 // E2SM-RC-IndicationMessage-Format3-Item ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_ind_msg_format3_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= mib.size() > 0;
   group_flags[1] |= serving_cell_cfg_common.is_present();
   HANDLE_CODE(pack_bits(
@@ -8125,7 +8125,7 @@ void e2sm_rc_query_outcome_format1_item_params_s::to_json(json_writer& j) const
 // E2SM-RC-QueryOutcome-Format1-ItemCell ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_query_outcome_format1_item_cell_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= serving_cell_cfg_common.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), neighbour_relation_table_present}));
 
@@ -8551,7 +8551,7 @@ void ran_function_definition_event_trigger_style_item_s::to_json(json_writer& j)
 // L2Parameters-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE l2_params_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -8689,7 +8689,7 @@ void ran_function_definition_event_trigger_call_process_item_s::to_json(json_wri
 // UEIdentification-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE ue_identif_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -8841,7 +8841,7 @@ void ran_function_definition_event_trigger_s::to_json(json_writer& j) const
 // Report-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE report_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -8985,7 +8985,7 @@ void ran_function_definition_report_s::to_json(json_writer& j) const
 // InsertIndication-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE insert_ind_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -9178,7 +9178,7 @@ void ran_function_definition_insert_s::to_json(json_writer& j) const
 // RANFunctionDefinition-Control-Action-Item ::= SEQUENCE
 OCUDUASN_CODE ran_function_definition_ctrl_action_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ue_group_ctrl_action_supported_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ran_ctrl_action_params_list.size() > 0}));
 
@@ -9251,7 +9251,7 @@ const char* ran_function_definition_ctrl_action_item_s::ue_group_ctrl_action_sup
 // RANFunctionDefinition-Control-Item ::= SEQUENCE
 OCUDUASN_CODE ran_function_definition_ctrl_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= list_of_add_supported_formats.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -9394,7 +9394,7 @@ void ran_function_definition_ctrl_s::to_json(json_writer& j) const
 // PolicyAction-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE policy_action_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -9447,7 +9447,7 @@ void policy_action_ran_param_item_s::to_json(json_writer& j) const
 // PolicyCondition-RANParameter-Item ::= SEQUENCE
 OCUDUASN_CODE policy_condition_ran_param_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_param_definition.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -9777,7 +9777,7 @@ void ran_function_definition_query_s::to_json(json_writer& j) const
 // E2SM-RC-RANFunctionDefinition ::= SEQUENCE
 OCUDUASN_CODE e2sm_rc_ran_function_definition_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ran_function_definition_query.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),

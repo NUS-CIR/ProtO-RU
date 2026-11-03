@@ -130,7 +130,7 @@ void sl_bwp_disc_pool_cfg_common_r17_s::to_json(json_writer& j) const
 // SL-BWP-ConfigCommon-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_bwp_cfg_common_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sl_bwp_pool_cfg_common_ps_r17.is_present();
   group_flags[0] |= sl_bwp_disc_pool_cfg_common_r17.is_present();
   group_flags[1] |= sl_bwp_pool_cfg_common_a2_x_r18.is_present();
@@ -353,7 +353,7 @@ void sl_pos_bwp_cfg_common_r18_s::to_json(json_writer& j) const
 // SL-FreqConfigCommon-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_freq_cfg_common_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sl_unlicensed_freq_cfg_common_r18.is_present();
   group_flags[0] |= sl_pos_bwp_list_r18.is_present();
   group_flags[1] |= add_spec_emission_v1860_present;
@@ -1001,7 +1001,7 @@ const char* sl_tx_profile_r17_opts::to_string() const
 // SidelinkPreconfigNR-r16 ::= SEQUENCE
 OCUDUASN_CODE sidelink_precfg_nr_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= sl_drx_pre_cfg_gc_bc_r17.is_present();
   group_flags[0] |= sl_tx_profile_list_r17.is_present();
   group_flags[0] |= sl_precfg_disc_cfg_r17.is_present();
@@ -1498,7 +1498,7 @@ void sidelink_precfg_nr_v16k0_s::to_json(json_writer& j) const
 // SL-PreconfigurationNR-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_precfg_nr_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sidelink_precfg_nr_v16k0.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 

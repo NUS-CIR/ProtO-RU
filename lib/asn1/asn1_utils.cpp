@@ -1690,6 +1690,11 @@ unpack(std::string& s, cbit_ref& bref, size_t lb, size_t ub, size_t alb, size_t 
       ext group
 *********************/
 
+ext_groups_packer_guard::ext_groups_packer_guard(uint32_t nof_groups) : groups(nof_groups)
+{
+  std::fill(groups.data(), groups.data() + groups.size(), false);
+}
+
 bool& ext_groups_packer_guard::operator[](uint32_t idx)
 {
   if (idx >= groups.size()) {

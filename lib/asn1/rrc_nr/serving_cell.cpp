@@ -127,7 +127,7 @@ uint8_t rsrp_change_thres_r17_opts::to_number() const
 // SCS-SpecificCarrier ::= SEQUENCE
 OCUDUASN_CODE scs_specific_carrier_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= tx_direct_current_location_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -187,7 +187,7 @@ void scs_specific_carrier_s::to_json(json_writer& j) const
 // TDD-UL-DL-Pattern ::= SEQUENCE
 OCUDUASN_CODE tdd_ul_dl_pattern_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dl_ul_tx_periodicity_v1530_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -465,7 +465,7 @@ void availability_combination_rb_groups_r17_s::to_json(json_writer& j) const
 // AvailabilityCombinationsPerCell-r16 ::= SEQUENCE
 OCUDUASN_CODE availability_combinations_per_cell_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= availability_combinations_rb_groups_r17.is_present();
   group_flags[1] |= position_in_dci_ai_rb_groups_v1720_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), position_in_dci_ai_r16_present}));
@@ -1371,7 +1371,7 @@ uint16_t paging_cycle_opts::to_number() const
 // PCCH-Config ::= SEQUENCE
 OCUDUASN_CODE pcch_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= nrof_pdcch_monitoring_occasion_per_ssb_in_po_r16_present;
   group_flags[1] |= ran_paging_in_idle_po_r17_present;
   group_flags[1] |= first_pdcch_monitoring_occasion_of_po_v1710.is_present();
@@ -2317,7 +2317,7 @@ void freq_info_dl_sib_v1800_s::to_json(json_writer& j) const
 // DownlinkConfigCommonSIB ::= SEQUENCE
 OCUDUASN_CODE dl_cfg_common_sib_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= pei_cfg_r17.is_present();
   group_flags[0] |= init_dl_bwp_red_cap_r17.is_present();
   group_flags[1] |= freq_info_dl_v1800.is_present();
@@ -2417,7 +2417,7 @@ void dl_cfg_common_sib_s::to_json(json_writer& j) const
 // FrequencyInfoUL-SIB ::= SEQUENCE
 OCUDUASN_CODE freq_info_ul_sib_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= freq_band_list_aerial_r18.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -2820,7 +2820,7 @@ void ul_cfg_common_sib_v1760_s::to_json(json_writer& j) const
 // ServingCellConfigCommonSIB ::= SEQUENCE
 OCUDUASN_CODE serving_cell_cfg_common_sib_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= ch_access_mode_r16.is_present();
   group_flags[0] |= discovery_burst_win_len_r16_present;
   group_flags[0] |= high_speed_cfg_r16.is_present();
@@ -3339,7 +3339,7 @@ void co_durs_per_cell_r17_s::to_json(json_writer& j) const
 // CSI-AssociatedReportConfigInfo ::= SEQUENCE
 OCUDUASN_CODE csi_associated_report_cfg_info_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= res_for_ch2_r17.is_present();
   group_flags[0] |= csi_ssb_res_set_ext_present;
   group_flags[1] |= res_for_ch_td_cp_r18.is_present();
@@ -4116,7 +4116,7 @@ const char* csi_associated_report_cfg_info_s::apply_indicated_tci_state2_r18_c_:
 // CSI-AperiodicTriggerState ::= SEQUENCE
 OCUDUASN_CODE csi_aperiodic_trigger_state_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= ap_csi_mux_mode_r17_present;
   group_flags[1] |= ltm_associated_report_cfg_info_r18_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
@@ -4462,7 +4462,7 @@ void csi_im_res_set_s::to_json(json_writer& j) const
 // NZP-CSI-RS-Resource ::= SEQUENCE
 OCUDUASN_CODE nzp_csi_rs_res_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= subcarrier_spacing_r18_present;
   group_flags[0] |= absolute_freq_point_a_r18_present;
   group_flags[0] |= cp_r18_present;
@@ -4585,7 +4585,7 @@ int8_t nzp_csi_rs_res_s::pwr_ctrl_offset_ss_opts::to_number() const
 // NZP-CSI-RS-ResourceSet ::= SEQUENCE
 OCUDUASN_CODE nzp_csi_rs_res_set_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= aperiodic_trigger_offset_r16_present;
   group_flags[1] |= pdc_info_r17_present;
   group_flags[1] |= cmr_grouping_and_pairing_r17.is_present();
@@ -4736,7 +4736,7 @@ const char* nzp_csi_rs_res_set_s::repeat_opts::to_string() const
 // CSI-SSB-ResourceSet ::= SEQUENCE
 OCUDUASN_CODE csi_ssb_res_set_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= serving_add_pci_list_r17.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -4801,7 +4801,7 @@ void csi_ssb_res_set_s::to_json(json_writer& j) const
 // CSI-ResourceConfig ::= SEQUENCE
 OCUDUASN_CODE csi_res_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= csi_ssb_res_set_list_ext_r17_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -13845,7 +13845,7 @@ uint8_t csi_report_sub_cfg_r18_s::report_sub_cfg_params_r18_c_::types_opts::to_n
 // CSI-ReportConfig ::= SEQUENCE
 OCUDUASN_CODE csi_report_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(6);
   group_flags[0] |= semi_persistent_on_pusch_v1530.is_present();
   group_flags[1] |= semi_persistent_on_pusch_v1610.is_present();
   group_flags[1] |= aperiodic_v1610.is_present();
@@ -15835,7 +15835,7 @@ const char* csi_report_cfg_s::group_based_beam_report_v1800_s_::report_mode_r18_
 // CSI-SemiPersistentOnPUSCH-TriggerState ::= SEQUENCE
 OCUDUASN_CODE csi_semi_persistent_on_pusch_trigger_state_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sp_csi_mux_mode_r17_present;
   group_flags[1] |= csi_report_sub_cfg_trigger_list_r18.is_present();
   group_flags[1] |= ltm_associated_report_cfg_info_r18_present;
@@ -16348,7 +16348,7 @@ const char* ltm_csi_report_cfg_r18_s::ltm_report_cfg_type_r18_c_::types_opts::to
 // CSI-MeasConfig ::= SEQUENCE
 OCUDUASN_CODE csi_meas_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= report_trigger_size_dci_0_2_r16_present;
   group_flags[1] |= scell_activation_rs_cfg_to_add_mod_list_r17.is_present();
   group_flags[1] |= scell_activation_rs_cfg_to_release_list_r17.is_present();
@@ -17629,7 +17629,7 @@ uint8_t pusch_code_block_group_tx_s::max_code_block_groups_per_transport_block_o
 // PUSCH-ServingCellConfig ::= SEQUENCE
 OCUDUASN_CODE pusch_serving_cell_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= max_mimo_layers_present;
   group_flags[0] |= processing_type2_enabled_present;
   group_flags[1] |= max_mimo_layers_dci_0_2_r16.is_present();
@@ -18422,7 +18422,7 @@ void srs_pos_tx_hop_r18_s::to_json(json_writer& j) const
 // UplinkConfig ::= SEQUENCE
 OCUDUASN_CODE ul_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= pwr_boost_pi2_bpsk_present;
   group_flags[0] |= ul_ch_bw_per_scs_list.is_present();
   group_flags[1] |= enable_pl_rs_upd_for_pusch_srs_r16_present;
@@ -18700,7 +18700,7 @@ void slot_format_combination_s::to_json(json_writer& j) const
 // SlotFormatCombinationsPerCell ::= SEQUENCE
 OCUDUASN_CODE slot_format_combinations_per_cell_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= enable_cfg_ul_r16_present;
   HANDLE_CODE(pack_bits(
       bref,
@@ -18809,7 +18809,7 @@ void search_space_switch_trigger_r16_s::to_json(json_writer& j) const
 // SlotFormatIndicator ::= SEQUENCE
 OCUDUASN_CODE slot_format_ind_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= available_rb_sets_to_add_mod_list_r16.is_present();
   group_flags[0] |= available_rb_sets_to_release_list_r16.is_present();
   group_flags[0] |= switch_trigger_to_add_mod_list_r16.is_present();
@@ -19051,7 +19051,7 @@ void slot_format_ind_s::to_json(json_writer& j) const
 // PDCCH-ServingCellConfig ::= SEQUENCE
 OCUDUASN_CODE pdcch_serving_cell_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= availability_ind_r16.is_present();
   group_flags[0] |= search_space_switch_timer_r16_present;
   group_flags[1] |= search_space_switch_timer_v1710_present;
@@ -19187,7 +19187,7 @@ uint8_t pdsch_code_block_group_tx_s::max_code_block_groups_per_transport_block_o
 // PDSCH-ServingCellConfig ::= SEQUENCE
 OCUDUASN_CODE pdsch_serving_cell_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= max_mimo_layers_present;
   group_flags[0] |= processing_type2_enabled_present;
   group_flags[1] |= pdsch_code_block_group_tx_list_r16.is_present();
@@ -19363,7 +19363,7 @@ uint8_t pdsch_serving_cell_cfg_s::nrof_harq_processes_for_pdsch_opts::to_number(
 // CrossCarrierSchedulingConfig ::= SEQUENCE
 OCUDUASN_CODE cross_carrier_sched_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= carrier_ind_size_r16.is_present();
   group_flags[0] |= enable_default_beam_for_cc_s_r16_present;
   group_flags[1] |= ccs_blind_detection_split_r17_present;
@@ -22411,7 +22411,7 @@ const char* dl_prs_qcl_info_r17_c::types_opts::to_string() const
 // NR-DL-PRS-Resource-r17 ::= SEQUENCE
 OCUDUASN_CODE nr_dl_prs_res_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dl_prs_res_symbol_offset_v1800_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), dl_prs_qcl_info_r17_present}));
 
@@ -24022,7 +24022,7 @@ void mimo_param_v1850_s::to_json(json_writer& j) const
 // ServingCellConfig ::= SEQUENCE
 OCUDUASN_CODE serving_cell_cfg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(9);
   group_flags[0] |= lte_crs_to_match_around.is_present();
   group_flags[0] |= rate_match_pattern_to_add_mod_list.is_present();
   group_flags[0] |= rate_match_pattern_to_release_list.is_present();

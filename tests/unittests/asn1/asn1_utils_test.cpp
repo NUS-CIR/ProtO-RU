@@ -844,6 +844,29 @@ TEST(asn1_enumerated, bit_width_is_ceil_log2_of_nof_root_values)
   }
 }
 
+TEST(asn1_ext_groups_packer_guard, sized_guard_packs_like_grown_guard)
+{
+  ext_groups_packer_guard sized(3);
+  ASSERT_FALSE(sized.any());
+  sized[1] = true;
+  ASSERT_TRUE(sized.any());
+
+  ext_groups_packer_guard grown;
+  grown[0] |= false;
+  grown[1] |= true;
+  grown[2] |= false;
+
+  byte_buffer sized_buf;
+  bit_ref     sized_bref(sized_buf);
+  ASSERT_EQ(OCUDUASN_SUCCESS, sized.pack(sized_bref));
+  byte_buffer grown_buf;
+  bit_ref     grown_bref(grown_buf);
+  ASSERT_EQ(OCUDUASN_SUCCESS, grown.pack(grown_bref));
+  ASSERT_EQ(sized_buf, grown_buf);
+  // Number of groups minus one as a normally small number (7 bits), then one presence bit per group.
+  ASSERT_EQ(7 + 3, sized_bref.distance());
+}
+
 class EnumBoolTest
 {
 public:

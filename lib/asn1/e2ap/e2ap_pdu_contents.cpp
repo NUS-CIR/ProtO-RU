@@ -7104,7 +7104,7 @@ const char* ric_action_to_be_remd_for_mod_item_ies_o::value_c::types_opts::to_st
 // RICaction-ToBeSetup-Item ::= SEQUENCE
 OCUDUASN_CODE ric_action_to_be_setup_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ric_action_execution_order_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ric_action_definition.size() > 0, ric_subsequent_action_present}));
 

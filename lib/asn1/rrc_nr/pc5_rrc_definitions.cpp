@@ -72,7 +72,7 @@ uint8_t band_params_sidelink_v1710_s::tx_iuc_scheme2_mode2_sidelink_r17_opts::to
 // BandSidelinkPC5-r16 ::= SEQUENCE
 OCUDUASN_CODE band_sidelink_pc5_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= csi_report_sidelink_r16.is_present();
   group_flags[0] |= rank_two_reception_r16_present;
   group_flags[0] |= sl_open_loop_pc_rsrp_report_sidelink_r16_present;
@@ -661,7 +661,7 @@ void mib_sidelink_s::to_json(json_writer& j) const
 // SL-MeasQuantityResult-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_meas_quant_result_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_rsrp_ded_sl_prs_rp_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), sl_rsrp_r16_present}));
 
@@ -721,7 +721,7 @@ void sl_meas_quant_result_r16_s::to_json(json_writer& j) const
 // SL-MeasResult-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_meas_result_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_result_sl_prs_r18.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), sl_result_dmrs_r16_present}));
 
@@ -1150,7 +1150,7 @@ const char* notif_msg_sidelink_r17_s::crit_exts_c_::types_opts::to_string() cons
 // PDCP-ParametersSidelink-r16 ::= SEQUENCE
 OCUDUASN_CODE pdcp_params_sidelink_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= pdcp_dupl_srb_sidelink_r18_present;
   group_flags[0] |= pdcp_dupl_drb_sidelink_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), out_of_order_delivery_sidelink_r16_present}));
@@ -1851,7 +1851,7 @@ const char* sl_rlc_cfg_pc5_r16_c::types_opts::to_string() const
 // SL-LogicalChannelConfigPC5-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_lc_ch_cfg_pc5_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_lc_ch_id_v1800_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -5444,7 +5444,7 @@ void s_cch_msg_s::to_json(json_writer& j) const
 // SL-MeasResultRelay-r17 ::= SEQUENCE
 OCUDUASN_CODE sl_meas_result_relay_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_meas_quant_r18_present;
   group_flags[0] |= sl_relay_ind_mp_r18_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));

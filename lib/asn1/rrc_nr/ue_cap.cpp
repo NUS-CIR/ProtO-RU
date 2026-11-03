@@ -464,7 +464,7 @@ uint16_t aggr_bw_opts::to_number() const
 // AppLayerMeasParameters-r17 ::= SEQUENCE
 OCUDUASN_CODE app_layer_meas_params_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= qoe_idle_inactive_meas_report_r18_present;
   group_flags[0] |= qoe_nrdc_meas_report_r18_present;
   group_flags[0] |= qoe_add_memory_meas_report_r18_present;
@@ -1021,7 +1021,7 @@ uint8_t ca_params_nr_s::supported_num_tag_opts::to_number() const
 // MRDC-Parameters ::= SEQUENCE
 OCUDUASN_CODE mrdc_params_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dual_pa_architecture_present;
   group_flags[0] |= intra_band_endc_support_present;
   group_flags[0] |= ul_timing_align_eutra_nr_present;
@@ -3462,7 +3462,7 @@ uint8_t ul_tx_switching_band_pair_r16_s::ul_tx_switching_period_r16_opts::to_num
 // BandCombination-UplinkTxSwitch-r16 ::= SEQUENCE
 OCUDUASN_CODE band_combination_ul_tx_switch_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ul_tx_switching_pusch_trans_coherence_r16_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -15811,7 +15811,7 @@ void codebook_combo_param_multi_trp_r17_s::to_json(json_writer& j) const
 // MIMO-ParametersPerBand ::= SEQUENCE
 OCUDUASN_CODE mimo_params_per_band_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(11);
   group_flags[0] |= dummy6_present;
   group_flags[0] |= beam_management_ssb_csi_rs.is_present();
   group_flags[0] |= beam_switch_timing.is_present();
@@ -20730,7 +20730,7 @@ void shared_spec_ch_access_params_per_band_v1650_s::to_json(json_writer& j) cons
 // FR2-2-AccessParamsPerBand-r17 ::= SEQUENCE
 OCUDUASN_CODE fr2_2_access_params_per_band_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= mod64_qam_pusch_fr2_2_r17_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -23391,7 +23391,7 @@ void mac_params_per_band_r18_s::to_json(json_writer& j) const
 // BandNR ::= SEQUENCE
 OCUDUASN_CODE band_nr_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(20);
   group_flags[0] |= max_ul_duty_cycle_pc2_fr1_present;
   group_flags[1] |= pucch_spatial_rel_info_mac_ce_present;
   group_flags[1] |= pwr_boosting_pi2_bpsk_present;
@@ -29796,7 +29796,7 @@ uint8_t shared_spec_ch_access_params_sidelink_per_band_r18_s::sl_multiple_prb_co
 // BandSidelink-r16 ::= SEQUENCE
 OCUDUASN_CODE band_sidelink_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= sl_tx_mode2_r16.is_present();
   group_flags[0] |= congestion_ctrl_sidelink_r16.is_present();
   group_flags[0] |= fewer_symbol_slot_sidelink_r16_present;
@@ -32557,7 +32557,7 @@ void e_red_cap_params_r18_s::to_json(json_writer& j) const
 // EUTRA-ParametersCommon ::= SEQUENCE
 OCUDUASN_CODE eutra_params_common_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= ne_dc_present;
   group_flags[1] |= nr_ho_to_en_dc_r16_present;
   HANDLE_CODE(pack_bits(bref,
@@ -40782,7 +40782,7 @@ int16_t feature_set_ul_per_cc_v1850_s::two_pusch_non_cb_multi_dci_s_tx2_p_add_ti
 // FeatureSets ::= SEQUENCE
 OCUDUASN_CODE feature_sets_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(14);
   group_flags[0] |= feature_sets_dl_v1540.is_present();
   group_flags[0] |= feature_sets_ul_v1540.is_present();
   group_flags[0] |= feature_sets_ul_per_cc_v1540.is_present();
@@ -41872,7 +41872,7 @@ void high_speed_params_v1700_s::to_json(json_writer& j) const
 // IMS-ParametersCommon ::= SEQUENCE
 OCUDUASN_CODE ims_params_common_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= voice_over_scg_bearer_eutra_5_gc_present;
   group_flags[1] |= voice_fallback_ind_eps_r16_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), voice_over_eutra_5_gc_present}));
@@ -42106,7 +42106,7 @@ void utra_fdd_params_r16_s::to_json(json_writer& j) const
 // InterRAT-Parameters ::= SEQUENCE
 OCUDUASN_CODE inter_rat_params_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= utra_fdd_r16.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), eutra_present}));
 
@@ -42168,7 +42168,7 @@ void inter_rat_params_s::to_json(json_writer& j) const
 // MAC-ParametersCommon ::= SEQUENCE
 OCUDUASN_CODE mac_params_common_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(7);
   group_flags[0] |= recommended_bit_rate_present;
   group_flags[0] |= recommended_bit_rate_query_present;
   group_flags[1] |= recommended_bit_rate_multiplier_r16_present;
@@ -42464,7 +42464,7 @@ void mac_params_common_s::to_json(json_writer& j) const
 // MAC-ParametersXDD-Diff ::= SEQUENCE
 OCUDUASN_CODE mac_params_xdd_diff_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= secondary_drx_group_r16_present;
   group_flags[1] |= enhanced_skip_ul_tx_dyn_r16_present;
   group_flags[1] |= enhanced_skip_ul_tx_cfg_r16_present;
@@ -43030,7 +43030,7 @@ void mac_params_v1700_s::to_json(json_writer& j) const
 // MAC-ParametersSidelinkCommon-r16 ::= SEQUENCE
 OCUDUASN_CODE mac_params_sidelink_common_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= drx_on_sidelink_r17_present;
   group_flags[1] |= sl_lbt_fail_dectection_recovery_r18_present;
   HANDLE_CODE(pack_bits(
@@ -43203,7 +43203,7 @@ void mbs_params_r17_s::to_json(json_writer& j) const
 // MeasAndMobParametersCommon ::= SEQUENCE
 OCUDUASN_CODE meas_and_mob_params_common_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(12);
   group_flags[0] |= event_b_meas_and_report_present;
   group_flags[0] |= ho_fdd_tdd_present;
   group_flags[0] |= eutra_cgi_report_present;
@@ -44215,7 +44215,7 @@ uint8_t meas_and_mob_params_common_s::ltm_fast_ue_processing_r18_s_::fr1_and_fr2
 // MeasAndMobParametersXDD-Diff ::= SEQUENCE
 OCUDUASN_CODE meas_and_mob_params_xdd_diff_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= ho_inter_f_present;
   group_flags[0] |= ho_lte_epc_present;
   group_flags[0] |= ho_lte_5_gc_present;
@@ -44303,7 +44303,7 @@ void meas_and_mob_params_xdd_diff_s::to_json(json_writer& j) const
 // MeasAndMobParametersFRX-Diff ::= SEQUENCE
 OCUDUASN_CODE meas_and_mob_params_frx_diff_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= ho_inter_f_present;
   group_flags[0] |= ho_lte_epc_present;
   group_flags[0] |= ho_lte_5_gc_present;
@@ -45571,7 +45571,7 @@ void nrdc_params_v1700_s::to_json(json_writer& j) const
 // Phy-ParametersCommon ::= SEQUENCE
 OCUDUASN_CODE phy_params_common_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(14);
   group_flags[0] |= dummy_present;
   group_flags[1] |= max_num_search_spaces_present;
   group_flags[1] |= rate_matching_ctrl_resrc_set_dyn_present;
@@ -47260,7 +47260,7 @@ uint8_t phy_params_common_s::bwp_switching_multi_dormancy_cc_dci_0_3_and_1_3_r18
 // Phy-ParametersXDD-Diff ::= SEQUENCE
 OCUDUASN_CODE phy_params_xdd_diff_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dl_sched_offset_pdsch_type_a_present;
   group_flags[0] |= dl_sched_offset_pdsch_type_b_present;
   group_flags[0] |= ul_sched_offset_present;
@@ -47336,7 +47336,7 @@ void phy_params_xdd_diff_s::to_json(json_writer& j) const
 // Phy-ParametersFRX-Diff ::= SEQUENCE
 OCUDUASN_CODE phy_params_frx_diff_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(7);
   group_flags[0] |= csi_rs_im_reception_for_feedback.is_present();
   group_flags[0] |= csi_rs_proc_framework_for_srs.is_present();
   group_flags[0] |= csi_report_framework.is_present();
@@ -47997,7 +47997,7 @@ phy_params_frx_diff_s::max_total_res_for_one_freq_range_r16_s_::max_num_res_acro
 // Phy-ParametersFR1 ::= SEQUENCE
 OCUDUASN_CODE phy_params_fr1_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= pdsch_re_map_fr1_per_slot_present;
   group_flags[1] |= pdcch_monitoring_single_span_first4_sym_r16_present;
   group_flags[2] |= k1_range_ext_atg_r18_present;
@@ -48212,7 +48212,7 @@ uint8_t phy_params_fr1_s::delta_pwr_class_report_r18_opts::to_number() const
 // Phy-ParametersFR2 ::= SEQUENCE
 OCUDUASN_CODE phy_params_fr2_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= pcell_fr2_present;
   group_flags[0] |= pdsch_re_map_fr2_per_slot_present;
   group_flags[1] |= default_spatial_relation_pathloss_rs_r16_present;
@@ -48551,7 +48551,7 @@ void ue_nr_cap_add_frx_mode_s::to_json(json_writer& j) const
 // UE-BasedPerfMeas-Parameters-r16 ::= SEQUENCE
 OCUDUASN_CODE ue_based_perf_meas_params_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sig_based_log_mdt_override_protect_r17_present;
   group_flags[0] |= multiple_cef_report_r17_present;
   group_flags[0] |= excess_packet_delay_r17_present;
@@ -48683,7 +48683,7 @@ void ue_based_perf_meas_params_r16_s::to_json(json_writer& j) const
 // SON-Parameters-r16 ::= SEQUENCE
 OCUDUASN_CODE son_params_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= rlf_report_cho_r17_present;
   group_flags[0] |= rlf_report_daps_r17_present;
   group_flags[0] |= success_ho_report_r17_present;
@@ -48946,7 +48946,7 @@ void ntn_params_v1820_s::to_json(json_writer& j) const
 // PDCP-Parameters ::= SEQUENCE
 OCUDUASN_CODE pdcp_params_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= drb_iab_r16_present;
   group_flags[0] |= non_drb_iab_r16_present;
   group_flags[0] |= extended_discard_timer_r16_present;
@@ -49349,7 +49349,7 @@ void pdcp_params_sidelink_r18_s::to_json(json_writer& j) const
 // Phy-ParametersMRDC ::= SEQUENCE
 OCUDUASN_CODE phy_params_mrdc_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sp_cell_placement.is_present();
   group_flags[1] |= tdd_pcell_ul_tx_all_ul_sf_r16_present;
   group_flags[1] |= fdd_pcell_ul_tx_all_ul_sf_r16_present;
@@ -49751,7 +49751,7 @@ void pow_sav_params_v1700_s::to_json(json_writer& j) const
 // RF-Parameters ::= SEQUENCE
 OCUDUASN_CODE rf_params_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(22);
   group_flags[0] |= supported_band_combination_list_v1540.is_present();
   group_flags[0] |= srs_switching_time_requested_present;
   group_flags[1] |= supported_band_combination_list_v1550.is_present();
@@ -50809,7 +50809,7 @@ void rf_params_s::to_json(json_writer& j) const
 // RF-ParametersMRDC ::= SEQUENCE
 OCUDUASN_CODE rf_params_mrdc_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(22);
   group_flags[0] |= srs_switching_time_requested_present;
   group_flags[0] |= supported_band_combination_list_v1540.is_present();
   group_flags[1] |= supported_band_combination_list_v1550.is_present();
@@ -51994,7 +51994,7 @@ void rf_params_mrdc_v16e0_s::to_json(json_writer& j) const
 // RLC-Parameters ::= SEQUENCE
 OCUDUASN_CODE rlc_params_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= extended_t_poll_retx_r16_present;
   group_flags[0] |= extended_t_status_prohibit_r16_present;
   group_flags[1] |= am_with_long_sn_red_cap_r17_present;
@@ -52155,7 +52155,7 @@ void red_cap_params_v1740_s::to_json(json_writer& j) const
 // RelayParameters-r17 ::= SEQUENCE
 OCUDUASN_CODE relay_params_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= relay_ue_u2_u_operation_l2_r18_present;
   group_flags[0] |= remote_ue_u2_u_operation_l2_r18_present;
   group_flags[0] |= remote_ue_u2_n_path_switch_operation_l2_r18_present;
@@ -52295,7 +52295,7 @@ void relay_params_r17_s::to_json(json_writer& j) const
 // SDAP-Parameters ::= SEQUENCE
 OCUDUASN_CODE sdap_params_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sdap_qos_iab_r16_present;
   group_flags[0] |= sdap_hdr_iab_r16_present;
   group_flags[1] |= sdap_qos_ncr_r18_present;
@@ -52393,7 +52393,7 @@ void ue_sidelink_cap_add_xdd_mode_r16_s::to_json(json_writer& j) const
 // SidelinkParametersNR-r16 ::= SEQUENCE
 OCUDUASN_CODE sidelink_params_nr_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= relay_params_r17.is_present();
   group_flags[1] |= p0_olpc_sidelink_r17_present;
   group_flags[2] |= pdcp_params_sidelink_r18.is_present();

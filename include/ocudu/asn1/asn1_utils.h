@@ -1617,6 +1617,10 @@ private:
 class ext_groups_packer_guard
 {
 public:
+  ext_groups_packer_guard() = default;
+  /// Starts with the given number of groups, all absent.
+  explicit ext_groups_packer_guard(uint32_t nof_groups);
+
   bool&         operator[](uint32_t idx);
   OCUDUASN_CODE pack(bit_ref& bref) const;
 

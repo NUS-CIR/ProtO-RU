@@ -414,7 +414,7 @@ void dist_meas_bin_range_item_s::to_json(json_writer& j) const
 // MeasurementLabel ::= SEQUENCE
 OCUDUASN_CODE meas_label_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= ssb_idx_present;
   group_flags[1] |= non_go_b_b_fmode_idx_present;
   group_flags[2] |= mimo_mode_idx_present;
@@ -1158,7 +1158,7 @@ void match_cond_report_item_s::to_json(json_writer& j) const
 // MeasurementInfoItem ::= SEQUENCE
 OCUDUASN_CODE meas_info_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= match_cond_report_list.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -1219,7 +1219,7 @@ void meas_info_item_s::to_json(json_writer& j) const
 // E2SM-KPM-ActionDefinition-Format1 ::= SEQUENCE
 OCUDUASN_CODE e2sm_kpm_action_definition_format1_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dist_meas_bin_range_info.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), cell_global_id_present}));
 
@@ -1929,7 +1929,7 @@ void matching_cond_item_s::to_json(json_writer& j) const
 // MeasurementCondItem ::= SEQUENCE
 OCUDUASN_CODE meas_cond_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= bin_range_def.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -2033,7 +2033,7 @@ void e2sm_kpm_action_definition_format3_s::to_json(json_writer& j) const
 // MatchingUeCondPerSubItem ::= SEQUENCE
 OCUDUASN_CODE matching_ue_cond_per_sub_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= lc_or_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -3609,7 +3609,7 @@ uint8_t e2sm_kpm_event_trigger_definition_s::event_definition_formats_c_::types_
 // E2SM-KPM-IndicationHeader-Format1 ::= SEQUENCE
 OCUDUASN_CODE e2sm_kpm_ind_hdr_format1_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= job_id_present;
   HANDLE_CODE(pack_bits(
       bref,
@@ -4273,7 +4273,7 @@ uint8_t matching_ue_id_per_gp_item_s::matched_per_gp_c_::types_opts::to_number()
 // MeasurementCondUEidItem ::= SEQUENCE
 OCUDUASN_CODE meas_cond_ue_id_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= matching_ue_id_per_gp.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), matching_ue_id_list.size() > 0}));
 
@@ -5005,7 +5005,7 @@ void ric_event_trigger_style_item_s::to_json(json_writer& j) const
 // MeasurementInfo-Action-Item ::= SEQUENCE
 OCUDUASN_CODE meas_info_action_item_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= bin_range_def.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), meas_id_present}));
 
@@ -5205,7 +5205,7 @@ const char* ric_integrated_report_style_item_s::ric_multiple_individual_report_s
 // E2SM-KPM-RANfunction-Description ::= SEQUENCE
 OCUDUASN_CODE e2sm_kpm_ra_nfunction_description_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ric_integrated_report_style_list.is_present();
   HANDLE_CODE(
       pack_bits(bref, {group_flags.any(), ric_event_trigger_style_list.size() > 0, ric_report_style_list.size() > 0}));

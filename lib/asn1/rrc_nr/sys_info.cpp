@@ -15,7 +15,7 @@ using namespace asn1::rrc_nr;
 // PLMN-IdentityInfo ::= SEQUENCE
 OCUDUASN_CODE plmn_id_info_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= iab_support_r16_present;
   group_flags[1] |= tracking_area_list_r17.is_present();
   group_flags[1] |= gnb_id_len_r17_present;
@@ -330,7 +330,7 @@ const char* npn_id_r16_c::types_opts::to_string() const
 // NPN-IdentityInfo-r16 ::= SEQUENCE
 OCUDUASN_CODE npn_id_info_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= gnb_id_len_r17_present;
   group_flags[1] |= mobile_iab_support_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ranac_r16_present, iab_support_r16_present}));
@@ -1360,7 +1360,7 @@ void ssb_mtc4_r17_s::to_json(json_writer& j) const
 // SIB2 ::= SEQUENCE
 OCUDUASN_CODE sib2_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= relaxed_meas_r16.is_present();
   group_flags[1] |= cell_equivalent_size_r17_present;
   group_flags[1] |= relaxed_meas_r17.is_present();
@@ -1749,7 +1749,7 @@ int8_t sib2_s::cell_resel_info_common_s_::speed_state_resel_pars_s_::q_hyst_sf_s
 
 OCUDUASN_CODE sib2_s::intra_freq_cell_resel_info_s_::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(6);
   group_flags[0] |= t_resel_nr_sf.is_present();
   group_flags[1] |= smtc2_lp_r16.is_present();
   group_flags[1] |= ssb_position_qcl_common_r16_present;
@@ -2356,7 +2356,7 @@ void intra_freq_neigh_cell_info_v1710_s::to_json(json_writer& j) const
 // SIB3 ::= SEQUENCE
 OCUDUASN_CODE sib3_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= intra_freq_neigh_cell_list_v1610.is_present();
   group_flags[0] |= intra_freq_allowed_cell_list_r16.is_present();
   group_flags[0] |= intra_freq_cag_cell_list_r16.is_present();
@@ -3338,7 +3338,7 @@ void inter_freq_carrier_freq_info_v1800_s::to_json(json_writer& j) const
 // SIB4 ::= SEQUENCE
 OCUDUASN_CODE sib4_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(6);
   group_flags[0] |= inter_freq_carrier_freq_list_v1610.is_present();
   group_flags[1] |= inter_freq_carrier_freq_list_v1700.is_present();
   group_flags[2] |= inter_freq_carrier_freq_list_v1720.is_present();
@@ -4010,7 +4010,7 @@ void carrier_freq_eutra_v1800_s::to_json(json_writer& j) const
 // SIB5 ::= SEQUENCE
 OCUDUASN_CODE sib5_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= carrier_freq_list_eutra_v1610.is_present();
   group_flags[1] |= carrier_freq_list_eutra_v1700.is_present();
   group_flags[1] |= idle_mode_meas_voice_fallback_r17_present;
@@ -4429,7 +4429,7 @@ void ref_time_info_r16_s::to_json(json_writer& j) const
 // SIB9 ::= SEQUENCE
 OCUDUASN_CODE sib9_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= ref_time_info_r16.is_present();
   group_flags[1] |= event_id_tss_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), time_info_present, late_non_crit_ext.size() > 0}));
@@ -4995,7 +4995,7 @@ uint8_t meas_validity_dur_r18_opts::to_number() const
 // MeasIdleConfigSIB-r16 ::= SEQUENCE
 OCUDUASN_CODE meas_idle_cfg_sib_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= meas_idle_carrier_list_nr_less_than5_m_hz_r18.is_present();
   group_flags[0] |= meas_resel_carrier_list_nr_r18.is_present();
   group_flags[0] |= meas_resel_carrier_list_nr_less_than5_m_hz_r18.is_present();
@@ -6409,7 +6409,7 @@ void sat_switch_with_re_sync_r18_s::to_json(json_writer& j) const
 // SIB19-r17 ::= SEQUENCE
 OCUDUASN_CODE sib19_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= ntn_neigh_cell_cfg_list_ext_v1720.is_present();
   group_flags[1] |= moving_ref_location_r18.size() > 0;
   group_flags[1] |= ntn_cov_enh_r18.is_present();
@@ -7228,7 +7228,7 @@ void cfr_cfg_mcch_mtch_r17_s::to_json(json_writer& j) const
 // SIB20-r17 ::= SEQUENCE
 OCUDUASN_CODE sib20_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= cfr_cfg_mcch_mtch_red_cap_r18.is_present();
   group_flags[0] |= mcch_cfg_red_cap_r18.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), cfr_cfg_mcch_mtch_r17_present, late_non_crit_ext.size() > 0}));
@@ -10516,7 +10516,7 @@ void sn_pn_access_info_r17_s::to_json(json_writer& j) const
 // CellAccessRelatedInfo ::= SEQUENCE
 OCUDUASN_CODE cell_access_related_info_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= cell_reserved_for_future_use_r16_present;
   group_flags[0] |= npn_id_info_list_r16.is_present();
   group_flags[1] |= snpn_access_info_list_r17.is_present();
@@ -11694,7 +11694,7 @@ si_request_cfg_repeat_r18_s::rach_occasions_si_r18_s_::ssb_per_rach_occasion_r18
 // PosSI-SchedulingInfo-r16 ::= SEQUENCE
 OCUDUASN_CODE pos_si_sched_info_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= pos_si_request_cfg_red_cap_r17.is_present();
   group_flags[1] |= pos_si_request_cfg_msg1_repeat_r18.is_present();
   group_flags[1] |= pos_si_request_cfg_sul_msg1_repeat_r18.is_present();

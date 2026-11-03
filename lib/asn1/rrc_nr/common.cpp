@@ -920,7 +920,7 @@ const char* spatial_relation_info_pdc_r17_s::ref_sig_c_::types_opts::to_string()
 // SRS-Resource ::= SEQUENCE
 OCUDUASN_CODE srs_res_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= res_map_r16.is_present();
   group_flags[1] |= spatial_relation_info_pdc_r17.is_present();
   group_flags[1] |= res_map_r17.is_present();

@@ -541,7 +541,7 @@ void allowed_aggr_bw_r17_s::to_json(json_writer& j) const
 // L1-MeasConfigNRDC-r18 ::= SEQUENCE
 OCUDUASN_CODE l1_meas_cfg_nrdc_r18_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= max_ssbs_l1_meas_no_gap_scg_ext_r18_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -886,7 +886,7 @@ void ltm_res_cfg_nrdc_r18_s::to_json(json_writer& j) const
 // ConfigRestrictInfoSCG ::= SEQUENCE
 OCUDUASN_CODE cfg_restrict_info_scg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(9);
   group_flags[0] |= sel_band_entries_mn_list.is_present();
   group_flags[0] |= pdcch_blind_detection_scg_present;
   group_flags[0] |= max_num_rohc_context_sessions_sn_present;
@@ -3624,7 +3624,7 @@ void results_per_csi_rs_idx_s::to_json(json_writer& j) const
 // CGI-InfoNR ::= SEQUENCE
 OCUDUASN_CODE cgi_info_nr_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= npn_id_info_list_r16.is_present();
   group_flags[1] |= cell_reserved_for_other_use_r16_present;
   HANDLE_CODE(
@@ -3737,7 +3737,7 @@ void cgi_info_nr_s::to_json(json_writer& j) const
 // MeasResultNR ::= SEQUENCE
 OCUDUASN_CODE meas_result_nr_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= cgi_info.is_present();
   group_flags[1] |= cho_candidate_r17_present;
   group_flags[1] |= cho_cfg_r17.is_present();
@@ -4073,7 +4073,7 @@ void meas_result_cell_sftd_nr_s::to_json(json_writer& j) const
 // MeasConfigMN ::= SEQUENCE
 OCUDUASN_CODE meas_cfg_mn_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= meas_gap_cfg_fr2.is_present();
   group_flags[1] |= inter_freq_no_gap_r16_present;
   HANDLE_CODE(pack_bits(
@@ -4218,7 +4218,7 @@ const char* affected_freq_range_r18_s::affected_bw_r18_opts::to_string() const
 // VictimSystemType-r16 ::= SEQUENCE
 OCUDUASN_CODE victim_sys_type_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= uwb_r18_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -4565,7 +4565,7 @@ const char* idc_tdm_assist_r18_s::active_dur_r18_c_::types_opts::to_string() con
 // MRDC-AssistanceInfo ::= SEQUENCE
 OCUDUASN_CODE mrdc_assist_info_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= overheat_assist_scg_r16.size() > 0;
   group_flags[1] |= overheat_assist_scg_fr2_2_r17.size() > 0;
   group_flags[2] |= affected_carrier_freq_range_comb_list_r18.is_present();
@@ -4737,7 +4737,7 @@ uint8_t ph_ul_carrier_mcg_s::ph_type1or3_opts::to_number() const
 // PH-InfoMCG ::= SEQUENCE
 OCUDUASN_CODE ph_info_mcg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= two_srs_pusch_repeat_r17_present;
   group_flags[1] |= two_srs_multipanel_scheme_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ph_supplementary_ul_present}));
@@ -8348,7 +8348,7 @@ void meas_result2_eutra_r16_s::to_json(json_writer& j) const
 // PerRAAttemptInfo-r16 ::= SEQUENCE
 OCUDUASN_CODE per_ra_attempt_info_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= fallback_to_four_step_ra_r17_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), contention_detected_r16_present, dl_rsrp_above_thres_r16_present}));
 
@@ -10079,7 +10079,7 @@ const char* per_ra_info_v1800_c::types_opts::to_string() const
 // FailureReportSCG ::= SEQUENCE
 OCUDUASN_CODE fail_report_scg_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= location_info_r16.is_present();
   group_flags[0] |= fail_type_v1610_present;
   group_flags[1] |= prev_pscell_id_r17.is_present();
@@ -10333,7 +10333,7 @@ uint16_t fail_report_scg_s::fail_type_v1610_opts::to_number() const
 // FailureReportSCG-EUTRA ::= SEQUENCE
 OCUDUASN_CODE fail_report_scg_eutra_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= location_info_r16.is_present();
   HANDLE_CODE(pack_bits(
       bref, {group_flags.any(), meas_result_freq_list_mrdc.size() > 0, meas_result_scg_fail_mrdc.size() > 0}));
@@ -12246,7 +12246,7 @@ void meas_result_logging2_nr_r16_s::to_json(json_writer& j) const
 // LogMeasInfo-r16 ::= SEQUENCE
 OCUDUASN_CODE log_meas_info_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= in_dev_coex_detected_r17_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -13336,7 +13336,7 @@ void max_mimo_layer_pref_fr2_2_r17_s::to_json(json_writer& j) const
 // RAN-VisibleMeasurements-r17 ::= SEQUENCE
 OCUDUASN_CODE ran_visible_meass_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= pdu_session_id_list_ext_v1800.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -13747,7 +13747,7 @@ void meas_result_for_rssi_r16_s::to_json(json_writer& j) const
 // MeasResultsPerCellIdleEUTRA-r16 ::= SEQUENCE
 OCUDUASN_CODE meas_results_per_cell_idle_eutra_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= validity_status_r18_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -13952,7 +13952,7 @@ void results_per_ssb_idx_idle_r16_s::to_json(json_writer& j) const
 // MeasResultsPerCellIdleNR-r16 ::= SEQUENCE
 OCUDUASN_CODE meas_results_per_cell_idle_nr_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= validity_status_r18_present;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -14813,7 +14813,7 @@ void ul_pdcp_excess_delay_result_r17_s::to_json(json_writer& j) const
 // MeasResults ::= SEQUENCE
 OCUDUASN_CODE meas_results_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= meas_result_serv_freq_list_eutra_scg.is_present();
   group_flags[0] |= meas_result_serv_freq_list_nr_scg.is_present();
   group_flags[0] |= meas_result_sftd_eutra.is_present();
@@ -16499,7 +16499,7 @@ const char* visited_pscell_info_r17_s::visited_cell_id_r17_c_::types_opts::to_st
 // VisitedCellInfo-r16 ::= SEQUENCE
 OCUDUASN_CODE visited_cell_info_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= visited_pscell_info_list_report_r17.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), visited_cell_id_r16_present}));
 
@@ -17720,7 +17720,7 @@ uint8_t sib_type_r18_opts::to_number() const
 // RA-InformationCommon-r16 ::= SEQUENCE
 OCUDUASN_CODE ra_info_common_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(5);
   group_flags[0] |= per_ra_info_list_v1660.is_present();
   group_flags[1] |= msg1_scs_from_prach_cfg_idx_r16_present;
   group_flags[2] |= msg1_scs_from_prach_cfg_idx_cfra_r16_present;
@@ -18344,7 +18344,7 @@ uint8_t ra_info_common_r16_s::nrof_msg_a_po_fdm_r17_opts::to_number() const
 // RA-Report-r16 ::= SEQUENCE
 OCUDUASN_CODE ra_report_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sp_cell_id_r17.is_present();
   group_flags[1] |= sdt_failed_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), ra_info_common_r16_present}));
@@ -18720,7 +18720,7 @@ OCUDUASN_CODE rlf_report_r16_c::unpack(cbit_ref& bref)
 
 OCUDUASN_CODE rlf_report_r16_c::nr_rlf_report_r16_s_::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= csi_rs_rlm_cfg_bitmap_v1650_present;
   group_flags[1] |= last_ho_type_r17_present;
   group_flags[1] |= time_conn_source_daps_fail_r17_present;
@@ -20204,7 +20204,7 @@ uint16_t rlf_report_r16_c::nr_rlf_report_r16_s_::scg_fail_cause_r18_opts::to_num
 
 OCUDUASN_CODE rlf_report_r16_c::eutra_rlf_report_r16_s_::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= meas_result_rlf_report_eutra_v1690.size() > 0;
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -20295,7 +20295,7 @@ void ul_tx_direct_current_bwp_s::to_json(json_writer& j) const
 // UplinkTxDirectCurrentCell ::= SEQUENCE
 OCUDUASN_CODE ul_tx_direct_current_cell_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ul_direct_current_bwp_sul.is_present();
   HANDLE_CODE(bref.pack(group_flags.any(), 1));
 
@@ -20360,7 +20360,7 @@ void ul_tx_direct_current_cell_s::to_json(json_writer& j) const
 // UE-MeasurementsAvailable-r16 ::= SEQUENCE
 OCUDUASN_CODE ue_meass_available_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= success_ho_info_available_r17_present;
   group_flags[0] |= sig_log_meas_cfg_available_r17_present;
   group_flags[1] |= success_pscell_info_available_r18_present;
@@ -24066,7 +24066,7 @@ void sl_per_slrb_qos_info_r18_s::to_json(json_writer& j) const
 // SL-PosTxResourceReq-r18 ::= SEQUENCE
 OCUDUASN_CODE sl_pos_tx_res_req_r18_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_pos_tx_interested_freq_list2_r18.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -24648,7 +24648,7 @@ const char* sl_tx_res_req_r16_s::sl_cast_type_r16_opts::to_string() const
 // SL-TxResourceReq-v1700 ::= SEQUENCE
 OCUDUASN_CODE sl_tx_res_req_v1700_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_qos_info_list_v1800.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), sl_drx_info_from_rx_list_r17.size() > 0, sl_drx_ind_r17_present}));
 
@@ -24991,7 +24991,7 @@ void sl_tx_res_req_comm_relay_info_r17_s::to_json(json_writer& j) const
 // SL-TxResourceReqDisc-r17 ::= SEQUENCE
 OCUDUASN_CODE sl_tx_res_req_disc_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= ue_type_u2_u_r18_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), sl_source_id_relay_ue_r17_present}));
 
@@ -26185,7 +26185,7 @@ const char* sidelink_ue_info_nr_r16_s::crit_exts_c_::types_opts::to_string() con
 // SuccessHO-Report-r17 ::= SEQUENCE
 OCUDUASN_CODE success_ho_report_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= target_cell_pci_arfcn_r17.is_present();
   group_flags[1] |= eutra_target_cell_info_r18.is_present();
   group_flags[1] |= meas_result_serv_cell_rssi_r18_present;

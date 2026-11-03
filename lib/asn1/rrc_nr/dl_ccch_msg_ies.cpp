@@ -674,7 +674,7 @@ void sl_cg_max_trans_num_r16_s::to_json(json_writer& j) const
 // SL-ConfiguredGrantConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_cfg_grant_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sl_n1_pucch_an_type2_r16_present;
   group_flags[1] |= sl_start_r_bset_cg_type1_r18_present;
   HANDLE_CODE(pack_bits(bref,
@@ -1117,7 +1117,7 @@ void sl_cfg_grant_cfg_ded_sl_prs_rp_list_r18_s::to_json(json_writer& j) const
 // SL-ScheduledConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_sched_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sl_dci_to_sl_trans_r16.is_present();
   group_flags[1] |= sl_cfg_grant_cfg_ded_sl_prs_rp_list_r18.is_present();
   group_flags[1] |= sl_prs_rnti_r18_present;
@@ -1429,7 +1429,7 @@ const char* sl_min_max_mcs_cfg_r16_s::sl_mcs_table_r16_opts::to_string() const
 // SL-PSSCH-TxConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_pssch_tx_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_params_above_thres_v1650.is_present();
   group_flags[0] |= sl_params_below_thres_v1650.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), sl_type_tx_sync_r16_present}));
@@ -1745,7 +1745,7 @@ void sl_cbr_common_tx_ded_sl_prs_rp_list_r18_s::to_json(json_writer& j) const
 // SL-UE-SelectedConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_ue_sel_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_cbr_common_tx_ded_sl_prs_rp_list_r18.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -1898,7 +1898,7 @@ uint8_t sl_ue_sel_cfg_r16_s::sl_reselect_after_r16_opts::to_number() const
 // SL-PSBCH-Config-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_ps_bch_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dl_p0_ps_bch_r17_present;
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), dl_p0_ps_bch_r16_present, dl_alpha_ps_bch_r16_present}));
 
@@ -2340,7 +2340,7 @@ uint8_t sl_unlicensed_r18_s::sl_s_ssb_pwr_offset_of_anchor_rb_set_r18_opts::to_n
 // SL-BWP-Generic-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_bwp_generic_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_unlicensed_r18.is_present();
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -3163,7 +3163,7 @@ void sl_prio_tx_cfg_idx_v1650_s::to_json(json_writer& j) const
 // SL-UE-SelectedConfigRP-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_ue_sel_cfg_rp_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sl_cbr_prio_tx_cfg_list_v1650.is_present();
   group_flags[1] |= sl_nr_pssch_eutra_thres_rsrp_list_r18.is_present();
   group_flags[1] |= sl_nr_psfch_eutra_thres_rsrp_list_r18.is_present();
@@ -3524,7 +3524,7 @@ uint8_t filt_coef_opts::to_number() const
 // SL-PowerControl-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_pwr_ctrl_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= dl_p0_pssch_pscch_r17_present;
   group_flags[0] |= sl_p0_pssch_pscch_r17_present;
   group_flags[0] |= dl_p0_psfch_r17_present;
@@ -4188,7 +4188,7 @@ const char* sl_inter_ue_coordination_scheme1_r17_s::sl_determine_res_type_r17_op
 // SL-InterUE-CoordinationScheme2-r17 ::= SEQUENCE
 OCUDUASN_CODE sl_inter_ue_coordination_scheme2_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_delta_rsrp_thresh_v1720_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -4558,7 +4558,7 @@ uint8_t sl_prs_res_shared_sl_prs_rp_r18_s::sl_prs_comb_size_n_and_re_offset_r18_
 // SL-ResourcePool-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_res_pool_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(3);
   group_flags[0] |= sl_time_res_r16_present;
   group_flags[1] |= sl_pbps_cp_s_cfg_r17.is_present();
   group_flags[1] |= sl_inter_ue_coordination_cfg_r17.is_present();
@@ -5589,7 +5589,7 @@ void sl_bwp_disc_pool_cfg_r17_s::to_json(json_writer& j) const
 // SL-PSCCH-ConfigDedicatedSL-PRS-RP-r18 ::= SEQUENCE
 OCUDUASN_CODE sl_pscch_cfg_ded_sl_prs_rp_r18_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_dmrs_scramble_id_ded_sl_prs_rp_r18_present;
   HANDLE_CODE(pack_bits(
       bref,
@@ -6778,7 +6778,7 @@ void sl_bwp_prs_pool_cfg_r18_s::to_json(json_writer& j) const
 // SL-BWP-Config-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_bwp_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(2);
   group_flags[0] |= sl_bwp_pool_cfg_ps_r17.is_present();
   group_flags[0] |= sl_bwp_disc_pool_cfg_r17.is_present();
   group_flags[1] |= sl_bwp_pool_cfg_a2_x_r18.is_present();
@@ -7447,7 +7447,7 @@ const char* sl_rlc_cfg_r16_c::types_opts::to_string() const
 // SL-LogicalChannelConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_lc_ch_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_ch_access_prio_r18_present;
   group_flags[0] |= sl_allowed_carriers_r18.is_present();
   HANDLE_CODE(pack_bits(bref,
@@ -7679,7 +7679,7 @@ const char* sl_lc_ch_cfg_r16_s::sl_max_pusch_dur_r16_opts::to_string() const
 // SL-RLC-BearerConfig-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_rlc_bearer_cfg_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_rlc_bearer_cfg_idx_v1800_present;
   HANDLE_CODE(pack_bits(
       bref,
@@ -10718,7 +10718,7 @@ void sl_freq_sel_cfg_r18_s::to_json(json_writer& j) const
 // SL-FreqConfigExt-v1800 ::= SEQUENCE
 OCUDUASN_CODE sl_freq_cfg_ext_v1800_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= add_spec_emission_v1860_present;
   HANDLE_CODE(pack_bits(bref,
                         {group_flags.any(),
@@ -10991,7 +10991,7 @@ void sl_s_cch_carrier_set_cfg_r18_s::to_json(json_writer& j) const
 // SL-PHY-MAC-RLC-Config-v1700 ::= SEQUENCE
 OCUDUASN_CODE sl_phy_mac_rlc_cfg_v1700_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_rlc_bearer_to_add_mod_list_size_ext_v1800.is_present();
   group_flags[0] |= sl_rlc_bearer_to_release_list_size_ext_v1800.is_present();
   group_flags[0] |= sl_freq_info_to_add_mod_list_ext_v1800.is_present();
@@ -11711,7 +11711,7 @@ void sl_disc_cfg_v1840_s::to_json(json_writer& j) const
 // SL-ConfigDedicatedNR-r16 ::= SEQUENCE
 OCUDUASN_CODE sl_cfg_ded_nr_r16_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(4);
   group_flags[0] |= sl_phy_mac_rlc_cfg_v1700.is_present();
   group_flags[0] |= sl_disc_cfg_r17.is_present();
   group_flags[1] |= sl_disc_cfg_v1800.is_present();
@@ -12338,7 +12338,7 @@ void sl_u2_u_relay_ue_cfg_r18_s::to_json(json_writer& j) const
 // SL-L2RemoteUE-Config-r17 ::= SEQUENCE
 OCUDUASN_CODE sl_l2_remote_ue_cfg_r17_s::pack(bit_ref& bref) const
 {
-  ext_groups_packer_guard group_flags;
+  ext_groups_packer_guard group_flags(1);
   group_flags[0] |= sl_u2_u_relay_ue_to_add_mod_list_r18.is_present();
   group_flags[0] |= sl_u2_u_relay_ue_to_release_list_r18.is_present();
   HANDLE_CODE(pack_bits(bref, {group_flags.any(), sl_srap_cfg_remote_r17_present, sl_ue_id_remote_r17_present}));
