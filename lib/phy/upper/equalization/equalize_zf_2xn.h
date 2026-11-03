@@ -134,10 +134,10 @@ void equalize_zf_2xn(span<cf_t>                            eq_symbols,
     // variances and zero, NAN or INF channel estimation coefficients.
     {
       // Detect abnormal computation parameters. This detects whenever the channel estimate is zero or NaN.
-      simd_sel_t isnormal_mask = ocudu_simd_f_max(d_pinv, zero_simd);
+      simd_sel_t isnormal_mask = ocudu_simd_f_gt(d_pinv, zero_simd);
 
       // Detect abnormal computation parameters. This detects whenever the channel estimate is infinity.
-      isnormal_mask = ocudu_simd_sel_and(isnormal_mask, ocudu_simd_f_max(infinity_simd, d_pinv));
+      isnormal_mask = ocudu_simd_sel_and(isnormal_mask, ocudu_simd_f_gt(infinity_simd, d_pinv));
 
       symbols_out_l0   = ocudu_simd_cf_select(ocudu_simd_cf_zero(), symbols_out_l0, isnormal_mask);
       symbols_out_l1   = ocudu_simd_cf_select(ocudu_simd_cf_zero(), symbols_out_l1, isnormal_mask);

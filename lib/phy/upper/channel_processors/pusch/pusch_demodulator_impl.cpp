@@ -223,7 +223,7 @@ static float filter_infinite_and_accumulate(unsigned& count, span<const float> i
       simd_f_t in = ocudu_simd_f_loadu(&input[i]);
 
       simd_sel_t isnormal_mask =
-          ocudu_simd_sel_and(ocudu_simd_f_max(simd_infinity, in), ocudu_simd_f_min(simd_neg_infinity, in));
+          ocudu_simd_sel_and(ocudu_simd_f_gt(simd_infinity, in), ocudu_simd_f_lt(simd_neg_infinity, in));
 
       simd_sum   = ocudu_simd_f_select(simd_sum, ocudu_simd_f_add(simd_sum, in), isnormal_mask);
       simd_count = ocudu_simd_i_select(simd_count, ocudu_simd_i_add(simd_count, simd_one), isnormal_mask);

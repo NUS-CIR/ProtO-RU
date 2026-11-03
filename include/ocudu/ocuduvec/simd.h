@@ -1236,6 +1236,20 @@ inline simd_cf_t ocudu_simd_cf_zero()
   return ret;
 }
 
+/// Creates a complex vector from its real and imaginary parts. The imaginary part is zero by default.
+inline simd_cf_t ocudu_simd_cf_make(simd_f_t re, simd_f_t im = ocudu_simd_f_zero())
+{
+  simd_cf_t ret;
+#ifdef __ARM_NEON
+  ret.val[0] = re;
+  ret.val[1] = im;
+#else  /* __ARM_NEON */
+  ret.re = re;
+  ret.im = im;
+#endif /* __ARM_NEON */
+  return ret;
+}
+
 inline simd_cf_t ocudu_simd_cf_interleave_low(simd_cf_t a, simd_cf_t b)
 {
   simd_cf_t ret;
@@ -1603,7 +1617,8 @@ inline simd_sel_t ocudu_simd_sel_and(simd_sel_t a, simd_sel_t b)
 #endif /* __AVX512F__ */
 }
 
-inline simd_sel_t ocudu_simd_f_max(simd_f_t a, simd_f_t b)
+/// Returns a mask of the lanes where \c a is greater than \c b. Lanes with NaN are false.
+inline simd_sel_t ocudu_simd_f_gt(simd_f_t a, simd_f_t b)
 {
 #ifdef __AVX512F__
   return _mm512_cmp_ps_mask(a, b, _CMP_GT_OS);
@@ -1622,7 +1637,8 @@ inline simd_sel_t ocudu_simd_f_max(simd_f_t a, simd_f_t b)
 #endif /* __AVX512F__ */
 }
 
-inline simd_sel_t ocudu_simd_f_min(simd_f_t a, simd_f_t b)
+/// Returns a mask of the lanes where \c a is less than \c b. Lanes with NaN are false.
+inline simd_sel_t ocudu_simd_f_lt(simd_f_t a, simd_f_t b)
 {
 #ifdef __AVX512F__
   return _mm512_cmp_ps_mask(a, b, _CMP_LT_OS);

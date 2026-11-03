@@ -70,7 +70,7 @@ void equalize_zf_1xn(span<cf_t>                            symbols_out,
       simd_f_t port_noise_var_est = ocudu_simd_f_set1(noise_var_est[i_port]);
 
       // Detect an abnormal computation parameter. This detects whether the channel estimate is NaN or infinite.
-      simd_sel_t isnormal_mask = ocudu_simd_f_max(infinity, ch_est_norm);
+      simd_sel_t isnormal_mask = ocudu_simd_f_gt(infinity, ch_est_norm);
 
       // Compute the channel square norm, by accumulating the channel square absolute values.
       ch_mod_sq = ocudu_simd_f_add_sel(ch_mod_sq, ch_est_norm, isnormal_mask);
@@ -89,10 +89,10 @@ void equalize_zf_1xn(span<cf_t>                            symbols_out,
     simd_f_t d_pinv_rcp = ocudu_simd_f_rcp(d_pinv);
 
     // Detect abnormal computation parameters. This detects whenever the channel estimate is zero or NaN.
-    simd_sel_t isnormal_mask = ocudu_simd_f_max(d_pinv, zero);
+    simd_sel_t isnormal_mask = ocudu_simd_f_gt(d_pinv, zero);
 
     // Detect abnormal computation parameters. This detects whenever the channel estimate is infinity.
-    isnormal_mask = ocudu_simd_sel_and(isnormal_mask, ocudu_simd_f_max(infinity, d_pinv));
+    isnormal_mask = ocudu_simd_sel_and(isnormal_mask, ocudu_simd_f_gt(infinity, d_pinv));
 
     // Calculate noise variances.
     simd_f_t vars_out = ocudu_simd_f_mul(nvar_acc, ocudu_simd_f_mul(d_pinv_rcp, d_pinv_rcp));

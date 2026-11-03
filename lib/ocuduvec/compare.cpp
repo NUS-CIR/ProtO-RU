@@ -104,7 +104,7 @@ std::pair<unsigned, float> ocudu::ocuduvec::max_abs_element(span<const cf_t> x)
     simd_f_t simd_abs2 = ocudu_simd_f_hadd(simd_mul1, simd_mul2);
 
     // Get SIMD selector mask.
-    simd_sel_t res = ocudu_simd_f_max(simd_abs2, simd_max_values);
+    simd_sel_t res = ocudu_simd_f_gt(simd_abs2, simd_max_values);
 
     // Select the indexes and values for the maximum.
     simd_max_indexes = ocudu_simd_i_select(simd_max_indexes, simd_indexes, res);
@@ -214,7 +214,7 @@ std::pair<unsigned, float> ocudu::ocuduvec::max_element(span<const float> x)
     simd_f_t simd_x = ocudu_simd_f_loadu(reinterpret_cast<const float*>(x.data() + i));
 
     // Get SIMD selector mask.
-    simd_sel_t res = ocudu_simd_f_max(simd_x, simd_max_values);
+    simd_sel_t res = ocudu_simd_f_gt(simd_x, simd_max_values);
 
     // Select the indexes and values for the maximum.
     simd_max_indexes = ocudu_simd_i_select(simd_max_indexes, simd_indexes, res);

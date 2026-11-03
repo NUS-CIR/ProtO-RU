@@ -23,7 +23,7 @@ struct squared_matrix_inverse_s {
 
     // Calculate pivot squared norm and determine if it is possible to invert.
     simd_f_t   pivot_norm    = ocudu_simd_cf_norm_sq(pivot);
-    simd_sel_t isnormal_mask = ocudu_simd_f_max(pivot_norm, zero_simd);
+    simd_sel_t isnormal_mask = ocudu_simd_f_gt(pivot_norm, zero_simd);
 
     // Invert pivot.
     simd_cf_t pivot_inv = ocudu_simd_cf_mul(ocudu_simd_cf_conj(pivot), ocudu_simd_f_precise_rcp(pivot_norm));

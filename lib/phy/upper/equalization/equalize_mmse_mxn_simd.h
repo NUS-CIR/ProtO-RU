@@ -31,7 +31,7 @@ void equalize_mmse_mxn_simd(simd_cf_t eq_symbols[NofLayers],
   simd_sel_t isnormal_mask = ocudu_simd_sel_set_ones();
   for (unsigned i_layer = 0; i_layer != NofLayers; ++i_layer) {
     isnormal_mask =
-        ocudu_simd_sel_and(isnormal_mask, ocudu_simd_f_max(ocudu_simd_cf_re(h_gram[i_layer][i_layer]), real_zero));
+        ocudu_simd_sel_and(isnormal_mask, ocudu_simd_f_gt(ocudu_simd_cf_re(h_gram[i_layer][i_layer]), real_zero));
     h_gram[i_layer][i_layer] += noise_var_simd;
   }
 
