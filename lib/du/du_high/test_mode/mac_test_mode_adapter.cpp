@@ -166,22 +166,22 @@ mac_test_mode_cell_adapter::mac_test_mode_cell_adapter(const du_test_mode_config
                                                        mac_pdu_handler&                                pdu_handler_,
                                                        mac_cell_slot_handler&                          slot_handler_,
                                                        mac_cell_result_notifier&                       result_notifier_,
-                                                       std::function<void(rnti_t)>                     dl_bs_notifier_,
+                                                       std::function<void(du_ue_index_t)>              dl_bs_notifier_,
                                                        mac_test_mode_event_notifier&                   ev_notifier_,
-                                                       mac_test_mode_event_handler&                    event_handler_,
-                                                       mac_test_mode_ue_repository&                    ue_info_mgr_) :
+                                                       mac_test_mode_event_handler&                    event_handler_) :
   cell_index(cell_cfg.cell_index),
   test_ue_cfg(test_ue_cfg_),
   adapted(adapted_),
   pdu_handler(pdu_handler_),
   slot_handler(slot_handler_),
   result_notifier(result_notifier_),
+  test_rnti_start(to_rnti(static_cast<unsigned>(test_ue_cfg_.rnti) + cell_cfg.cell_index * test_ue_cfg_.nof_ues)),
+  test_rnti_end(to_rnti(static_cast<unsigned>(test_rnti_start) + test_ue_cfg_.nof_ues)),
   dl_bs_notifier(std::move(dl_bs_notifier_)),
   ev_notifier(ev_notifier_),
   logger(ocudulog::fetch_basic_logger("MAC")),
   history(cell_cfg),
-  event_handler(event_handler_),
-  ue_info_mgr(ue_info_mgr_)
+  event_handler(event_handler_)
 {
 }
 
@@ -268,7 +268,7 @@ void mac_test_mode_cell_adapter::handle_crc(const mac_crc_indication_message& ms
     if (entry != nullptr) {
       // Forward CRC to MAC, but remove the UCI for the test mode UE.
       for (mac_crc_pdu& crc : msg_copy.crcs) {
-        if (ue_info_mgr.is_cell_test_ue(cell_index, crc.rnti)) {
+        if (is_test_ue(crc.rnti)) {
           // test mode UE case.
 
           // Find respective PUSCH PDU that was previously scheduled.
@@ -296,11 +296,10 @@ void mac_test_mode_cell_adapter::handle_crc(const mac_crc_indication_message& ms
     }
   } else {
     // In case of auto-ACK mode, test mode UEs are removed from CRC.
-    msg_copy.crcs.erase(
-        std::remove_if(msg_copy.crcs.begin(),
-                       msg_copy.crcs.end(),
-                       [this](const auto& crc) { return ue_info_mgr.is_cell_test_ue(cell_index, crc.rnti); }),
-        msg_copy.crcs.end());
+    msg_copy.crcs.erase(std::remove_if(msg_copy.crcs.begin(),
+                                       msg_copy.crcs.end(),
+                                       [this](const auto& crc) { return is_test_ue(crc.rnti); }),
+                        msg_copy.crcs.end());
   }
 
   // Forward resulting CRC indication to real MAC.
@@ -331,7 +330,7 @@ void mac_test_mode_cell_adapter::forward_crc_ind_to_mac(const mac_crc_indication
   }
 
   for (const mac_crc_pdu& pdu : crc_msg.crcs) {
-    if (not ue_info_mgr.is_cell_test_ue(cell_index, pdu.rnti)) {
+    if (not is_test_ue(pdu.rnti)) {
       continue;
     }
 
@@ -354,7 +353,7 @@ void mac_test_mode_cell_adapter::handle_uci(const mac_uci_indication_message& ms
     if (entry != nullptr) {
       // Forward UCI to MAC, but alter the UCI for the test mode UE.
       for (mac_uci_pdu& test_uci : msg_copy.ucis) {
-        if (ue_info_mgr.is_cell_test_ue(cell_index, test_uci.rnti)) {
+        if (is_test_ue(test_uci.rnti)) {
           bool entry_found = false;
           if (std::holds_alternative<mac_uci_pdu::pusch_type>(test_uci.pdu)) {
             for (const ul_sched_info& pusch : entry->puschs) {
@@ -391,11 +390,10 @@ void mac_test_mode_cell_adapter::handle_uci(const mac_uci_indication_message& ms
     }
   } else {
     // In case of auto-ACK mode, test mode UEs are removed from UCI.
-    msg_copy.ucis.erase(
-        std::remove_if(msg_copy.ucis.begin(),
-                       msg_copy.ucis.end(),
-                       [this](const auto& u) { return ue_info_mgr.is_cell_test_ue(cell_index, u.rnti); }),
-        msg_copy.ucis.end());
+    msg_copy.ucis.erase(std::remove_if(msg_copy.ucis.begin(),
+                                       msg_copy.ucis.end(),
+                                       [this](const auto& u) { return is_test_ue(u.rnti); }),
+                        msg_copy.ucis.end());
   }
 
   // Forward UCI indication to real MAC.
@@ -417,46 +415,48 @@ void mac_test_mode_cell_adapter::on_new_downlink_scheduler_results(const mac_dl_
   }
 
   for (const dl_msg_alloc& grant : dl_res.dl_res.ue_grants()) {
-    rnti_t crnti = grant.pdsch_cfg.rnti;
-    if (not ue_info_mgr.is_cell_test_ue(cell_index, crnti) or ue_info_mgr.is_msg4_rxed(crnti)) {
-      // UE is not test mode or it has already received Msg4.
+    if (not is_test_ue(grant.pdsch_cfg.rnti) or not grant.pdsch_cfg.codewords[0].new_data) {
       continue;
     }
 
-    // In case of SRB PDU received, we assume that the Msg4 is received. At this point, we update the test UE with
-    // positive DL buffer states and BSR.
+    // Only the Msg4 carries the RRCSetup on SRB0, so its first transmission is the Msg4 of a new test UE.
     const auto& lchs = grant.tb_list[0].lc_chs_to_sched;
-    if (std::any_of(
-            lchs.begin(), lchs.end(), [](const auto& lc) { return lc.lcid.is_sdu() and is_srb(lc.lcid.to_lcid()); })) {
-      if (test_ue_cfg.pdsch_active) {
-        // Update DL buffer state automatically.
-        dl_bs_notifier(crnti);
-      }
-
-      if (test_ue_cfg.pusch_active) {
-        auto rx_pdu = create_test_pdu_with_bsr(cell_index, dl_res.slot, crnti, to_harq_id(0));
-        if (not rx_pdu.has_value()) {
-          logger.warning("TEST_MODE c-rnti={}: Unable to create test PDU with BSR", crnti);
-          continue;
-        }
-        // In case of PUSCH test mode is enabled, push a BSR to trigger the first PUSCH.
-        pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
-      }
-
-      // Mark Msg4 received for the UE.
-      if (ue_info_mgr.msg4_rxed(crnti, true)) {
-        // Notify test mode controller about the UE establishment.
-        ev_notifier.on_con_res_completed(cell_index, crnti);
-      }
-
-      // Push an UL PDU that will serve as rrcSetupComplete and get the UE out of fallback mode.
-      auto rx_pdu = create_test_pdu_with_rrc_setup_complete(cell_index, dl_res.slot, crnti, to_harq_id(0));
-      pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
+    if (std::any_of(lchs.begin(), lchs.end(), [](const auto& lc) {
+          return lc.lcid.is_sdu() and lc.lcid.to_lcid() == LCID_SRB0;
+        })) {
+      handle_msg4(grant, dl_res.slot);
     }
   }
 
   // Dispatch result to lower layers.
   result_notifier.on_new_downlink_scheduler_results(dl_res);
+}
+
+void mac_test_mode_cell_adapter::handle_msg4(const dl_msg_alloc& grant, slot_point sl_tx)
+{
+  const rnti_t crnti = grant.pdsch_cfg.rnti;
+
+  if (test_ue_cfg.pdsch_active) {
+    // Update DL buffer state automatically.
+    dl_bs_notifier(grant.context.ue_index);
+  }
+
+  if (test_ue_cfg.pusch_active) {
+    auto rx_pdu = create_test_pdu_with_bsr(cell_index, sl_tx, crnti, to_harq_id(0));
+    if (not rx_pdu.has_value()) {
+      logger.warning("TEST_MODE c-rnti={}: Unable to create test PDU with BSR", crnti);
+      return;
+    }
+    // In case of PUSCH test mode is enabled, push a BSR to trigger the first PUSCH.
+    pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
+  }
+
+  // Notify test mode controller about the UE establishment.
+  ev_notifier.on_con_res_completed(cell_index, crnti);
+
+  // Push an UL PDU that will serve as rrcSetupComplete and get the UE out of fallback mode.
+  auto rx_pdu = create_test_pdu_with_rrc_setup_complete(cell_index, sl_tx, crnti, to_harq_id(0));
+  pdu_handler.handle_rx_data_indication(std::move(rx_pdu.value()));
 }
 
 // Intercepts the UL results coming from the MAC.
@@ -474,12 +474,12 @@ void mac_test_mode_cell_adapter::on_new_uplink_scheduler_results(const mac_ul_sc
     if (entry != nullptr) {
       // Fill the ring element with the scheduler decisions.
       for (const pucch_info& pucch : ul_res.ul_res.pucchs()) {
-        if (ue_info_mgr.is_cell_test_ue(cell_index, pucch.crnti)) {
+        if (is_test_ue(pucch.crnti)) {
           entry->pucchs.push_back(pucch);
         }
       }
       for (const ul_sched_info& pusch : ul_res.ul_res.puschs()) {
-        if (ue_info_mgr.is_cell_test_ue(cell_index, pusch.pusch_cfg.rnti)) {
+        if (is_test_ue(pusch.pusch_cfg.rnti)) {
           entry->puschs.push_back(pusch);
         }
       }
@@ -540,16 +540,23 @@ void phy_test_mode_adapter::phy_cell::on_cell_results_completion(slot_point slot
 mac_test_mode_adapter::mac_test_mode_adapter(const du_test_mode_config::test_mode_ue_config& test_ue_cfg_,
                                              mac_result_notifier&                            phy_notifier_,
                                              std::unique_ptr<mac_test_mode_event_notifier>   ev_notifier_,
-                                             unsigned                                        nof_cells) :
+                                             unsigned                                        nof_cells_) :
   test_ue(test_ue_cfg_),
+  nof_cells(nof_cells_),
   ev_notifier(std::move(ev_notifier_)),
   event_handler(nof_cells),
-  ue_info_mgr(event_handler, test_ue.rnti, test_ue.nof_ues, nof_cells),
   phy_notifier(std::make_unique<phy_test_mode_adapter>(phy_notifier_))
 {
 }
 
 mac_test_mode_adapter::~mac_test_mode_adapter() = default;
+
+bool mac_test_mode_adapter::is_test_ue(rnti_t rnti) const
+{
+  const unsigned rnti_start = static_cast<unsigned>(test_ue.rnti);
+  const unsigned rnti_val   = static_cast<unsigned>(rnti);
+  return rnti_val >= rnti_start and rnti_val < rnti_start + test_ue.nof_ues * nof_cells;
+}
 
 std::unique_ptr<mac_interface> mac_test_mode_adapter::decorate(std::unique_ptr<mac_interface> mac_ptr)
 {
@@ -572,9 +579,8 @@ mac_cell_controller& mac_test_mode_adapter::add_cell(const mac_cell_creation_req
   mac_cell_controller& cell = mac_adapted->get_cell_manager().add_cell(cell_cfg);
 
   // Create the cell in the MAC test mode.
-  auto func_dl_bs_push = [this](rnti_t rnti) {
-    handle_dl_buffer_state_update(
-        {ue_info_mgr.rnti_to_du_ue_idx(rnti), lcid_t::LCID_SRB1, TEST_UE_DL_BUFFER_STATE_UPDATE_SIZE});
+  auto func_dl_bs_push = [this](du_ue_index_t ue_index) {
+    handle_dl_buffer_state_update({ue_index, lcid_t::LCID_SRB1, TEST_UE_DL_BUFFER_STATE_UPDATE_SIZE});
   };
 
   auto new_cell =
@@ -586,8 +592,7 @@ mac_cell_controller& mac_test_mode_adapter::add_cell(const mac_cell_creation_req
                                                    phy_notifier->adapted_phy.get_cell(cell_cfg.cell_index),
                                                    func_dl_bs_push,
                                                    *ev_notifier,
-                                                   event_handler,
-                                                   ue_info_mgr);
+                                                   event_handler);
 
   if (cell_info_handler.size() <= cell_cfg.cell_index) {
     cell_info_handler.resize(cell_cfg.cell_index + 1);
@@ -613,7 +618,7 @@ void mac_test_mode_adapter::remove_cell(du_cell_index_t cell_index)
 void mac_test_mode_adapter::handle_dl_buffer_state_update(const mac_dl_buffer_state_indication_message& dl_bs)
 {
   mac_dl_buffer_state_indication_message dl_bs_copy = dl_bs;
-  if (ue_info_mgr.is_test_ue(dl_bs.ue_index) and test_ue.pdsch_active and dl_bs.lcid != LCID_SRB0) {
+  if (is_test_ue(dl_bs.ue_index) and test_ue.pdsch_active and dl_bs.lcid != LCID_SRB0) {
     // It is the test UE. Set a positive DL buffer state if PDSCH is set to "activated".
     dl_bs_copy.bs = TEST_UE_DL_BUFFER_STATE_UPDATE_SIZE;
   }
@@ -639,13 +644,10 @@ mac_test_mode_adapter::adapt_bearers(const std::vector<mac_logical_channel_confi
 
 async_task<mac_ue_create_response> mac_test_mode_adapter::handle_ue_create_request(const mac_ue_create_request& cfg)
 {
-  if (ue_info_mgr.is_test_ue(cfg.crnti)) {
+  if (is_test_ue(cfg.crnti)) {
     // It is the test UE.
     mac_ue_create_request cfg_copy = cfg;
     cfg_copy.initial_fallback      = true;
-
-    // Save UE index and configuration of test mode UE.
-    ue_info_mgr.add_ue(cfg.crnti, cfg_copy.ue_index, cfg_copy.sched_cfg);
 
     // Add adapters to the UE config bearers before passing it to MAC.
     cfg_copy.bearers = adapt_bearers(cfg.bearers);
@@ -661,7 +663,7 @@ async_task<mac_ue_create_response> mac_test_mode_adapter::handle_ue_create_reque
 async_task<mac_ue_reconfiguration_response>
 mac_test_mode_adapter::handle_ue_reconfiguration_request(const mac_ue_reconfiguration_request& cfg)
 {
-  if (ue_info_mgr.is_test_ue(cfg.crnti)) {
+  if (is_test_ue(cfg.crnti)) {
     // If it is the test UE.
     auto cfg_adapted = cfg;
 
@@ -677,17 +679,5 @@ mac_test_mode_adapter::handle_ue_reconfiguration_request(const mac_ue_reconfigur
 
 async_task<mac_ue_delete_response> mac_test_mode_adapter::handle_ue_delete_request(const mac_ue_delete_request& cfg)
 {
-  return launch_async([this, cfg](coro_context<async_task<mac_ue_delete_response>>& ctx) {
-    CORO_BEGIN(ctx);
-
-    // Await MAC UE removal.
-    CORO_AWAIT_VALUE(auto resp, mac_adapted->get_ue_configurator().handle_ue_delete_request(cfg));
-
-    // Update test mode adapter state.
-    if (ue_info_mgr.is_test_ue(cfg.rnti)) {
-      ue_info_mgr.remove_ue(cfg.rnti);
-    }
-
-    CORO_RETURN(resp);
-  });
+  return mac_adapted->get_ue_configurator().handle_ue_delete_request(cfg);
 }

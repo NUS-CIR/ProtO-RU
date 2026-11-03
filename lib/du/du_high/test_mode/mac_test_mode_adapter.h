@@ -6,7 +6,7 @@
 #pragma once
 
 #include "mac_test_mode_decision_history.h"
-#include "mac_test_mode_ue_repository.h"
+#include "mac_test_mode_event_handler.h"
 #include "ocudu/du/du_high/du_test_mode_config.h"
 #include "ocudu/mac/mac.h"
 #include "ocudu/mac/mac_cell_manager.h"
@@ -70,10 +70,9 @@ public:
                              mac_pdu_handler&                                     pdu_handler_,
                              mac_cell_slot_handler&                               slot_handler_,
                              mac_cell_result_notifier&                            result_notifier_,
-                             std::function<void(rnti_t)>                          dl_bs_notifier_,
+                             std::function<void(du_ue_index_t)>                   dl_bs_notifier_,
                              mac_test_mode_event_notifier&                        ev_notifier_,
-                             mac_test_mode_event_handler&                         event_handler_,
-                             mac_test_mode_ue_repository&                         ue_info_mgr_);
+                             mac_test_mode_event_handler&                         event_handler_);
 
   void on_new_downlink_scheduler_results(const mac_dl_sched_result& dl_res) override;
 
@@ -100,21 +99,30 @@ private:
   void forward_uci_ind_to_mac(const mac_uci_indication_message& uci_msg);
   void forward_crc_ind_to_mac(const mac_crc_indication_message& crc_msg);
 
+  /// Returns true if the RNTI belongs to a test UE of this cell.
+  bool is_test_ue(rnti_t rnti) const { return rnti >= test_rnti_start and rnti < test_rnti_end; }
+
+  /// Reacts to the Msg4 of a test UE.
+  void handle_msg4(const dl_msg_alloc& grant, slot_point sl_tx);
+
   const du_cell_index_t                           cell_index;
   const du_test_mode_config::test_mode_ue_config& test_ue_cfg;
   mac_cell_control_information_handler&           adapted;
   mac_pdu_handler&                                pdu_handler;
   mac_cell_slot_handler&                          slot_handler;
   mac_cell_result_notifier&                       result_notifier;
-  std::function<void(rnti_t)>                     dl_bs_notifier;
-  mac_test_mode_event_notifier&                   ev_notifier;
-  ocudulog::basic_logger&                         logger;
+  /// First RNTI of the test UEs of this cell.
+  const rnti_t test_rnti_start;
+  /// RNTI after the last test UE of this cell.
+  const rnti_t                       test_rnti_end;
+  std::function<void(du_ue_index_t)> dl_bs_notifier;
+  mac_test_mode_event_notifier&      ev_notifier;
+  ocudulog::basic_logger&            logger;
 
   /// Ring buffer of slot decision history.
   mac_test_mode_cell_decision_history history;
 
   mac_test_mode_event_handler& event_handler;
-  mac_test_mode_ue_repository& ue_info_mgr;
 
   slot_point last_slot_ind;
 };
@@ -126,7 +134,7 @@ public:
   explicit mac_test_mode_adapter(const du_test_mode_config::test_mode_ue_config& test_ue_cfg,
                                  mac_result_notifier&                            phy_notifier_,
                                  std::unique_ptr<mac_test_mode_event_notifier>   ev_notifier_,
-                                 unsigned                                        nof_cells);
+                                 unsigned                                        nof_cells_);
   ~mac_test_mode_adapter();
 
   /// Gets notifier that will be intercepting the MAC results.
@@ -150,17 +158,22 @@ private:
   async_task<mac_ue_delete_response> handle_ue_delete_request(const mac_ue_delete_request& cfg);
   void                               handle_dl_buffer_state_update(const mac_dl_buffer_state_indication_message& dl_bs);
 
+  /// Returns true if the RNTI belongs to a test UE of any cell.
+  bool is_test_ue(rnti_t rnti) const;
+
+  /// Returns true if the UE index belongs to a test UE of any cell.
+  bool is_test_ue(du_ue_index_t ue_index) const { return ue_index < test_ue.nof_ues * nof_cells; }
+
   std::vector<mac_logical_channel_config>
   adapt_bearers(const std::vector<mac_logical_channel_config>& orig_bearers) const;
 
   du_test_mode_config::test_mode_ue_config      test_ue;
+  const unsigned                                nof_cells;
   std::unique_ptr<mac_test_mode_event_notifier> ev_notifier;
 
   std::unique_ptr<mac_interface> mac_adapted;
 
   mac_test_mode_event_handler event_handler;
-
-  mac_test_mode_ue_repository ue_info_mgr;
 
   std::unique_ptr<phy_test_mode_adapter> phy_notifier;
 
