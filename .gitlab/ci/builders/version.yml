@@ -3,4 +3,4 @@
 # SPDX-License-Identifier: BSD-3-Clause-Open-MPI
 
 variables:
-  DOCKER_BUILDER_VERSION: 2026.10.26
+  DOCKER_BUILDER_VERSION: 2026.11.03
