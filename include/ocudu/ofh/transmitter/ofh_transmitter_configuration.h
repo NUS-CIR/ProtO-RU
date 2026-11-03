@@ -81,10 +81,6 @@ struct transmitter_config {
   std::optional<unsigned> dl_fs_offset;
   /// C-Plane PRACH FFT size (to be used in Type 3 messages).
   cplane_fft_size c_plane_prach_fft_len;
-  /// Downlink processing time in microseconds.
-  std::chrono::microseconds dl_processing_time;
-  /// Uplink request processing time in microseconds.
-  std::chrono::microseconds ul_processing_time;
   /// Optional TDD configuration.
   std::optional<tdd_ul_dl_config_common> tdd_config;
   /// Indicates if DPDK should be used by the underlying implementation.

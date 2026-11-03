@@ -7,6 +7,7 @@
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/ofh/timing/ofh_ota_symbol_boundary_notifier.h"
 #include <atomic>
+#include <string_view>
 
 namespace ocudu {
 namespace ofh {
@@ -15,11 +16,17 @@ namespace ofh {
 class tx_window_checker : public ota_symbol_boundary_notifier
 {
 public:
+  /// \param[in] direction_ Name of the checked request type used in log messages, e.g. "downlink" or "uplink".
   tx_window_checker(ocudulog::basic_logger& logger_,
                     unsigned                sector_id_,
+                    std::string_view        direction_,
                     uint32_t                advance_time_in_symbols_,
                     uint32_t                nof_symbols_) :
-    logger(logger_), sector_id(sector_id_), advance_time_in_symbols(advance_time_in_symbols_), nof_symbols(nof_symbols_)
+    logger(logger_),
+    sector_id(sector_id_),
+    direction(direction_),
+    advance_time_in_symbols(advance_time_in_symbols_),
+    nof_symbols(nof_symbols_)
   {
   }
 
@@ -45,9 +52,10 @@ public:
     }
 
     if (OCUDU_UNLIKELY(logger.debug.enabled())) {
-      logger.debug("Sector#{}: a late upper-PHY downlink request arrived to OFH in slot '{}_{}' with current "
-                   "ota_slot='{}_{}', OFH processing time requires a minimum of '{}' symbols",
+      logger.debug("Sector#{}: {} request for slot '{}_{}' arrived after the transmission window closed, current "
+                   "ota_slot='{}_{}', the request must arrive at least '{}' symbols before this slot",
                    sector_id,
+                   direction,
                    slot,
                    0,
                    ota_symbol_point.get_slot(),
@@ -64,6 +72,7 @@ public:
 private:
   ocudulog::basic_logger& logger;
   const unsigned          sector_id;
+  const std::string_view  direction;
   const uint32_t          advance_time_in_symbols;
   const uint32_t          nof_symbols;
   std::atomic<uint32_t>   count_val{0};

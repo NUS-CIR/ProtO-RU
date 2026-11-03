@@ -35,8 +35,6 @@ struct uplink_request_handler_impl_config {
   cyclic_prefix cp;
   /// Subcarrier spacing.
   subcarrier_spacing scs;
-  /// Uplink request processing time in microseconds.
-  std::chrono::microseconds ul_processing_time;
   /// Transmission window timing parameters for delay management.
   tx_window_timing_parameters tx_timing_params;
   /// If set to true, logs late events as warnings, otherwise as info.

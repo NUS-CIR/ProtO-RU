@@ -472,12 +472,13 @@ public:
           }
         }
         if (nof_lates) {
-          logger.info("Sector #{}: Detected {} late {} {} message(s) in the transmitter queue for slot '{}'",
-                      sector,
-                      nof_lates,
-                      pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
-                      pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
-                      late_slot);
+          logger.info(
+              "Sector #{}: dropped {} {} {} message(s) that were not serialized or transmitted in time for slot '{}'",
+              sector,
+              nof_lates,
+              pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
+              pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
+              late_slot);
         }
       }
     }
@@ -510,12 +511,13 @@ public:
           }
         }
         if (nof_lates) {
-          logger.info("Sector #{}: Detected {} late {} {} message(s) in the transmitter queue for slot '{}'",
-                      sector,
-                      nof_lates,
-                      pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
-                      pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
-                      late_slot);
+          logger.info(
+              "Sector #{}: dropped {} {} {} message(s) that were not serialized or transmitted in time for slot '{}'",
+              sector,
+              nof_lates,
+              pool_frames_data_direction == ofh::data_direction::downlink ? "downlink" : "uplink",
+              pool_frames_type == ofh::message_type::control_plane ? "C-Plane" : "U-Plane",
+              late_slot);
         }
       }
     }

@@ -34,8 +34,6 @@ struct downlink_handler_impl_config {
   cyclic_prefix cp;
   /// Subcarrier spacing.
   subcarrier_spacing scs;
-  /// Downlink processing time in microseconds.
-  std::chrono::microseconds dl_processing_time;
   /// Transmission window timing parameters for delay management.
   tx_window_timing_parameters tx_timing_params;
   /// If set to true, logs late events as warnings, otherwise as info.

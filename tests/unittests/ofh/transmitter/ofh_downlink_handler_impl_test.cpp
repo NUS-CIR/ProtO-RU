@@ -104,7 +104,6 @@ static downlink_handler_impl_config generate_default_config()
   config.sector                        = 0;
   config.cp                            = cyclic_prefix::NORMAL;
   config.scs                           = subcarrier_spacing::kHz30;
-  config.dl_processing_time            = std::chrono::milliseconds(400);
   config.enable_log_warnings_for_lates = true;
   config.is_cat_b_enabled              = false;
   // Transmission timing parameters corresponding to:
@@ -139,7 +138,7 @@ generate_dependencies(error_notifier&                                           
 /// Returns the number of symbols that a resource grid must precede its slot by to be transmitted in time.
 static unsigned get_nof_symbols_before_ota(const downlink_handler_impl_config& config)
 {
-  return calculate_nof_symbols_before_ota(config.cp, config.scs, config.dl_processing_time, config.tx_timing_params);
+  return get_biggest_min_tx_parameter(config.tx_timing_params);
 }
 
 /// Notifies the given handler an OTA time that precedes the given slot by the given number of symbols.

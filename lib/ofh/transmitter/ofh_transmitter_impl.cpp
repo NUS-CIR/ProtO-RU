@@ -21,7 +21,6 @@ static uplink_request_handler_impl_config generate_uplink_request_handler_config
   config.cp                            = tx_config.cp;
   config.scs                           = tx_config.scs;
   config.tx_timing_params              = tx_config.tx_timing_params;
-  config.ul_processing_time            = tx_config.ul_processing_time;
   config.enable_log_warnings_for_lates = tx_config.enable_log_warnings_for_lates;
 
   return config;
@@ -50,7 +49,6 @@ static downlink_handler_impl_config generate_downlink_handler_config(const trans
   out_cfg.tdd_config                    = tx_config.tdd_config;
   out_cfg.cp                            = tx_config.cp;
   out_cfg.scs                           = tx_config.scs;
-  out_cfg.dl_processing_time            = tx_config.dl_processing_time;
   out_cfg.tx_timing_params              = tx_config.tx_timing_params;
   out_cfg.enable_log_warnings_for_lates = tx_config.enable_log_warnings_for_lates;
   out_cfg.is_cat_b_enabled              = tx_config.beamforming.has_value();

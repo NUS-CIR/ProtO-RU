@@ -229,10 +229,6 @@ struct ru_ofh_unit_config {
   unsigned gps_Alpha = 0;
   /// GPS Beta - Valid value range: [-32768, 32767].
   int gps_Beta = 0;
-  /// Downlink processing time in microseconds.
-  unsigned dl_processing_time = 400U;
-  /// Uplink request processing time in microseconds.
-  unsigned ul_processing_time = 30U;
   /// Loggers.
   ru_ofh_unit_logger_config loggers;
   /// \brief Individual Open Fronthaul cells configurations.

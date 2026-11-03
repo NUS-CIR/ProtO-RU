@@ -96,8 +96,6 @@ static transmitter_config generate_transmitter_config(const sector_configuration
   tx_config.is_uplink_static_compr_hdr_enabled   = sector_cfg.is_uplink_static_compr_hdr_enabled;
   tx_config.iq_scaling                           = sector_cfg.iq_scaling;
   tx_config.dl_fs_offset                         = sector_cfg.dl_fs_offset;
-  tx_config.dl_processing_time                   = sector_cfg.dl_processing_time;
-  tx_config.ul_processing_time                   = sector_cfg.ul_processing_time;
   tx_config.tdd_config                           = sector_cfg.tdd_config;
   tx_config.uses_dpdk                            = sector_cfg.uses_dpdk;
   tx_config.are_metrics_enabled                  = sector_cfg.are_metrics_enabled;

@@ -1008,12 +1008,8 @@ struct worker_manager {
 static void configure_ofh_sector(ofh::sector_configuration& sector_cfg)
 {
   // Default IQ data scaling to be applied prior to downlink data compression.
-  const float iq_scaling = 0.9f;
-  // Downlink processing time in microseconds.
-  const std::chrono::microseconds dl_processing_time = 400us;
-
+  const float iq_scaling                = 0.9f;
   sector_cfg.max_processing_delay_slots = processing_delay_slots;
-  sector_cfg.dl_processing_time         = dl_processing_time;
   sector_cfg.uses_dpdk                  = false;
   sector_cfg.are_metrics_enabled        = true;
   sector_cfg.sector_id                  = 0;
