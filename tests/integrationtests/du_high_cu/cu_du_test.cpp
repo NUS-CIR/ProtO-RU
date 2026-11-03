@@ -86,6 +86,8 @@ protected:
     du_cfg.ran.cells       = {config_helpers::make_default_du_cell_config()};
     du_cfg.ran.sched_cfg   = config_helpers::make_default_scheduler_expert_config();
     du_cfg.ran.gnb_du_name = "test_du";
+    // Real-time timers expire before the CU-CP responds when the test runs under valgrind.
+    du_cfg.f1ap.f1_setup_response_timeout = std::chrono::seconds{60};
 
     du_high_dependencies du_dependencies;
     du_dependencies.exec_mapper             = workers.exec_mapper.get();

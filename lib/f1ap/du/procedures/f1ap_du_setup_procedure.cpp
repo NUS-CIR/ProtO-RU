@@ -17,8 +17,6 @@ using namespace ocudu;
 using namespace ocudu::odu;
 using namespace asn1::f1ap;
 
-static constexpr std::chrono::milliseconds f1_setup_response_timeout{3000};
-
 f1ap_du_setup_procedure::f1ap_du_setup_procedure(const f1_setup_request_message& request_,
                                                  f1ap_message_notifier&          cu_notif_,
                                                  f1ap_event_manager&             ev_mng_,
@@ -35,7 +33,7 @@ void f1ap_du_setup_procedure::operator()(coro_context<async_task<f1_setup_result
 {
   CORO_BEGIN(ctx);
 
-  transaction = ev_mng.transactions.create_transaction(f1_setup_response_timeout);
+  transaction = ev_mng.transactions.create_transaction(request.response_timeout);
   if (not transaction.valid()) {
     CORO_EARLY_RETURN(create_f1_setup_result());
   }

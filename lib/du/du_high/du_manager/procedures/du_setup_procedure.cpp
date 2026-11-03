@@ -276,9 +276,10 @@ async_task<f1_setup_result> du_setup_procedure::start_f1_setup_request()
   // Prepare request to send to F1.
   f1_setup_request_message req = {};
 
-  req.gnb_du_id   = ctxt.params.ran.gnb_du_id;
-  req.gnb_du_name = ctxt.params.ran.gnb_du_name;
-  req.rrc_version = ctxt.params.ran.rrc_version;
+  req.gnb_du_id        = ctxt.params.ran.gnb_du_id;
+  req.gnb_du_name      = ctxt.params.ran.gnb_du_name;
+  req.rrc_version      = ctxt.params.ran.rrc_version;
+  req.response_timeout = ctxt.params.f1ap.f1_setup_response_timeout;
 
   const bool log_si_info = ctxt.logger.info.enabled();
 

@@ -64,6 +64,8 @@ struct du_manager_params {
     /// Whether a failed F1-C TNL connection is retried indefinitely on startup, instead of closing the application
     /// after a single attempt. The reconnection that follows a lost F1-C connection is retried either way.
     bool retry_tnl_connection = false;
+    /// Time to wait for the CU-CP response to an F1 Setup Request.
+    std::chrono::milliseconds f1_setup_response_timeout{3000};
   };
 
   struct f1u_config_params {

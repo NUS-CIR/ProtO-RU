@@ -71,6 +71,8 @@ struct f1_setup_request_message {
   std::string                       gnb_du_name;
   uint8_t                           rrc_version;
   std::vector<f1_cell_setup_params> served_cells;
+  /// Time to wait for the CU-CP response before the procedure fails.
+  std::chrono::milliseconds response_timeout{3000};
 };
 
 /// Outcome of the F1 Setup procedure.

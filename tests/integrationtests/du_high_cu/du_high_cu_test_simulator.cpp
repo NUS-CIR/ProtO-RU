@@ -149,6 +149,8 @@ void du_high_cu_test_simulator::start_dus()
     du_hi_cfg.ran.gnb_du_id               = static_cast<gnb_du_id_t>(du_idx + 1);
     du_hi_cfg.ran.cells                   = cfg.dus[du_idx];
     du_hi_cfg.ran.sched_cfg               = config_helpers::make_default_scheduler_expert_config();
+    // Real-time timers expire before the CU-CP responds when the test runs under valgrind.
+    du_hi_cfg.f1ap.f1_setup_response_timeout = std::chrono::seconds{60};
 
     odu::du_high_dependencies du_dependencies;
     du_dependencies.exec_mapper        = &workers.dus[du_idx]->get_exec_mapper();

@@ -71,6 +71,8 @@ struct du_high_configuration {
     /// CU-CP to be reachable when it is started. When disabled, the DU makes a single attempt and closes the
     /// application if it fails. The reconnection that follows a lost F1-C connection is retried either way.
     bool retry_tnl_connection = false;
+    /// Time to wait for the CU-CP response to an F1 Setup Request.
+    std::chrono::milliseconds f1_setup_response_timeout{3000};
   };
 
   struct metrics_config {
