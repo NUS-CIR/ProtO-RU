@@ -821,6 +821,29 @@ TEST(asn1_enumerated, pack_unpack)
   test_spy->reset_counters();
 }
 
+TEST(asn1_enumerated, bit_width_is_ceil_log2_of_nof_root_values)
+{
+  // {number of root values, bits of the value}.
+  const std::vector<std::pair<uint32_t, int>> cases = {
+      {1, 0}, {2, 1}, {3, 2}, {4, 2}, {5, 3}, {8, 3}, {9, 4}, {256, 8}, {257, 9}};
+  for (const auto& [nof_values, nof_bits] : cases) {
+    for (bool has_ext : {false, true}) {
+      uint32_t           nof_exts  = has_ext ? 2 : 0;
+      uint32_t           nof_types = nof_values + nof_exts;
+      ocudu::byte_buffer buffer;
+      bit_ref            bref(buffer);
+      ASSERT_EQ(OCUDUASN_SUCCESS, pack_enum(bref, nof_values - 1, nof_types, nof_exts, has_ext));
+      ASSERT_EQ(nof_bits + (has_ext ? 1 : 0), bref.distance()) << nof_values << " values, has_ext=" << has_ext;
+
+      cbit_ref   bref2(buffer);
+      ValOrError ret = unpack_enum(nof_types, nof_exts, has_ext, bref2);
+      ASSERT_EQ(OCUDUASN_SUCCESS, ret.code);
+      ASSERT_EQ(nof_values - 1, ret.val);
+      ASSERT_EQ(bref.distance(), bref2.distance());
+    }
+  }
+}
+
 class EnumBoolTest
 {
 public:

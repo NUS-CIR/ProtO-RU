@@ -535,6 +535,18 @@ OCUDUASN_CODE unpack_unsupported_ext_flag(bool& ext, cbit_ref& bref)
   return ret;
 }
 
+/// Number of bits needed to represent an unsigned value.
+static uint32_t bit_width(uint64_t v)
+{
+  return v == 0 ? 0 : 64 - static_cast<uint32_t>(__builtin_clzll(v));
+}
+
+/// Number of bits needed to encode one of n values, i.e. ceil(log2(n)).
+static uint32_t ceil_log2(uint64_t n)
+{
+  return n <= 1 ? 0 : bit_width(n - 1);
+}
+
 /************************
       enum packing
 ************************/
@@ -568,10 +580,10 @@ OCUDUASN_CODE pack_enum(bit_ref& bref, uint32_t e, uint32_t nof_types, uint32_t 
   }
   OCUDUASN_CODE ret;
   if (has_ext) {
-    uint32_t nof_bits = (uint32_t)std::ceil(std::log2(nof_types - nof_exts));
+    uint32_t nof_bits = ceil_log2(nof_types - nof_exts);
     ret               = pack_enum(bref, e, nof_bits, nof_types - nof_exts);
   } else {
-    uint32_t nof_bits = (uint32_t)std::ceil(std::log2(nof_types));
+    uint32_t nof_bits = ceil_log2(nof_types);
     ret               = pack_enum(bref, e, nof_bits);
   }
   return ret;
@@ -581,7 +593,7 @@ ValOrError unpack_enum(uint32_t nof_types, uint32_t nof_exts, bool has_ext, cbit
 {
   ValOrError ret;
   if (has_ext) {
-    uint32_t nof_bits = (uint32_t)std::ceil(std::log2(nof_types - nof_exts));
+    uint32_t nof_bits = ceil_log2(nof_types - nof_exts);
     bool     ext;
     ret.code = bref.unpack(ext, 1);
     if (ret.code != OCUDUASN_SUCCESS) {
@@ -594,7 +606,7 @@ ValOrError unpack_enum(uint32_t nof_types, uint32_t nof_exts, bool has_ext, cbit
       ret.val += nof_types - nof_exts;
     }
   } else {
-    uint32_t nof_bits = (uint32_t)std::ceil(std::log2(nof_types));
+    uint32_t nof_bits = ceil_log2(nof_types);
     ret.code          = bref.unpack(ret.val, nof_bits);
   }
   if (ret.val >= nof_types) {
@@ -620,16 +632,6 @@ ValOrError unpack_enum(uint32_t nof_types, uint32_t nof_exts, bool has_ext, cbit
  * @param ub upper bound
  * @return success or failure
  */
-/// Number of bits needed to represent an unsigned value.
-static uint32_t bit_width(uint64_t v)
-{
-  uint32_t n = 0;
-  for (; v != 0; v >>= 1) {
-    ++n;
-  }
-  return n;
-}
-
 template <class IntType>
 OCUDUASN_CODE pack_constrained_whole_number(bit_ref& bref, IntType n, IntType lb, IntType ub, bool aligned)
 {
@@ -1602,9 +1604,10 @@ namespace asn_string_utils {
 static size_t get_nof_bits_per_char(size_t lb, size_t ub, bool aligned)
 {
   size_t N = ub - lb + 1;
-  auto   b = (size_t)std::ceil(std::log2(N)); // B
-  if (aligned) {
-    b = (size_t)std::pow(2, std::ceil(std::log2(b))); // B2
+  size_t b = ceil_log2(N); // B
+  // A single-character alphabet takes no bits, aligned or not.
+  if (aligned and b != 0) {
+    b = size_t{1} << ceil_log2(b); // B2
   }
   return b;
 }
