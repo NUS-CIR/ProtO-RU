@@ -184,12 +184,13 @@ inline bool is_inside_meas_gap(const meas_gap_config& gap, slot_point sl)
   return slot_mod < length_slots;
 }
 
-/// \brief Determines whether an uplink transmission the gNB receives in \c ul_slot falls inside the UE measurement gap.
+/// \brief Determines whether an uplink transmission the UE sends in \c ul_slot falls inside its measurement gap.
 ///
 /// The gap is anchored to the UE downlink timing (see \ref is_inside_meas_gap), while its uplink runs T_TA ahead of it
 /// (TS 38.211, Section 4.3.1), so the position to test is <tt>ul_slot - T_TA</tt>. T_TA is negligible in a terrestrial
 /// cell but reaches tens of slots in an NTN one.
 ///
+/// \param ul_slot Slot in the UE uplink frame numbering, not the numbering the gNB receives the transmission in.
 /// \param ul_ta T_TA applied by the UE. Absent when not tracked, in which case the window is neither shifted nor
 /// guarded.
 inline bool

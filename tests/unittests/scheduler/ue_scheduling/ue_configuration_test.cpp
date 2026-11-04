@@ -301,6 +301,30 @@ TEST_F(ue_ul_meas_gap_test, when_the_cell_does_not_track_the_timing_advance_then
   ASSERT_FALSE(ue_cfg.is_ul_enabled(slot_at_gap_phase(14), report));
 }
 
+TEST_F(ue_ul_meas_gap_test, when_the_cell_configures_k_mac_then_the_window_follows_the_gnb_clock)
+{
+  OCUDU_TEST_REQUIREMENTS("DU-NTN-MOB-1");
+
+  // The slot tested is the one the grant occupies on the gNB downlink clock, which the UE transmission reaches k_mac
+  // slots after the UE sends it, while the gap stays anchored to the UE downlink timing. A T_TA of 14 slots on its own
+  // blocks the phases 13..21, and a k_mac of 20 slots carries that window to the phases 33..41. The cell configures no
+  // Koffset, which the UE applies itself and which therefore leaves the window where it is.
+  //
+  // k_mac displaces the window modulo the gap period, so a larger value does not make the test stricter: the two
+  // windows only stay apart for a k_mac of 9..71 slots, and a multiple of the 80 slot period puts the window back
+  // where a cell without k_mac has it.
+  msg.ran.ntn_params.emplace();
+  msg.ran.ntn_params->ntn_cfg.k_mac = std::chrono::milliseconds{20};
+  ue_cell_configuration ue_cfg      = make_ue_cfg(std::chrono::microseconds{14600});
+  ASSERT_EQ(ue_cfg.cell_cfg_common.ntn_k_mac_slots, 20U) << "the phases below assume a k_mac of 20 slots";
+
+  ASSERT_TRUE(ue_cfg.is_ul_enabled(slot_at_gap_phase(14), no_report))
+      << "the window must not stay where T_TA alone puts it";
+  ASSERT_FALSE(ue_cfg.is_ul_enabled(slot_at_gap_phase(34), no_report));
+  ASSERT_TRUE(ue_cfg.is_ul_enabled(slot_at_gap_phase(0), no_report))
+      << "the window must not travel towards the gNB clock instead";
+}
+
 TEST_F(ue_configuration_test, search_spaces_pdcch_candidate_lists_does_not_surpass_limit)
 {
   cell_config_builder_params params{};

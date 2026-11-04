@@ -688,9 +688,10 @@ bool ue_cell_configuration::is_ul_enabled(slot_point                            
     return false;
   }
   if (meas_gap_cfg.has_value()) {
-    // The UE uplink is advanced by T_TA with respect to the downlink timing the gap is anchored to, so the gap has to
-    // be tested at the shifted position. In an NTN cell the shift is tens of slots; ignoring it makes us grant in
-    // slots where the UE drops the transmission (TS 38.321, Sections 5.4.2.2 and 5.4.4).
+    // The gap is anchored to the UE downlink timing (TS 38.133, Section 9.1.2), while the UE uplink runs T_TA ahead of
+    // it (TS 38.211, Section 4.3.1) and reaches the gNB k_mac later still. The grant is placed on the gNB DL clock, so
+    // it is converted back to the slot the UE transmits in before the gap is tested. In an NTN cell both terms are tens
+    // of slots; ignoring either grants in slots where the UE drops the transmission (TS 38.321, Section 5.14).
     //
     // The cell reference location estimate is preferred, as it is recomputed as the satellite moves. A UE report only
     // refreshes while tar-Config is configured (TS 38.321, Section 5.4.8); without it the UE reports once at random
@@ -698,7 +699,7 @@ bool ue_cell_configuration::is_ul_enabled(slot_point                            
     // cell that has no estimate at all, i.e. one with no reference location.
     const std::optional<std::chrono::microseconds> ul_ta =
         cell_cfg_common.ntn_ref_location_ul_ta.has_value() ? cell_cfg_common.ntn_ref_location_ul_ta : reported_ul_ta;
-    if (is_inside_ul_meas_gap(meas_gap_cfg.value(), ul_slot, ul_ta)) {
+    if (is_inside_ul_meas_gap(meas_gap_cfg.value(), cell_cfg_common.dl_to_ue_ul_slot(ul_slot), ul_ta)) {
       return false;
     }
   }

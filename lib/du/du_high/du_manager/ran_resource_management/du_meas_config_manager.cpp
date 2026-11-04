@@ -307,12 +307,13 @@ void du_meas_config_manager::update_ssb_meas_gap(du_ue_resource_config&         
 
   const auto ul_occasions = collect_ul_occasions(pcell_ue_cfg, pcell_common);
 
-  // The periodic UL occasions are expressed in the slot numbering the gNB receives them in, while the gap is
-  // anchored to the UE downlink timing, so the UEs' uplink timing advance is needed to compare the two.
+  // The periodic UL occasions are expressed in the UE uplink frame numbering (TS 38.213, Section 9.2.4 and
+  // TS 38.214, Section 5.2.1.4), while the gap is anchored to the UE downlink timing, so the UEs' uplink timing
+  // advance is needed to compare the two.
   const std::optional<std::chrono::microseconds> ul_ta = get_ref_location_ul_ta(pcell_common.ran.ntn_params);
   if (not ul_ta.has_value() and pcell_common.ran.ntn_params.has_value() and pcell_common.ran.ntn_params->is_enabled()) {
-    // With no T_TA the offset is placed as if it were zero, i.e. against the gNB receive timeline rather than the UE
-    // transmit one. Correctness holds - is_ul_enabled() re-tests the window per slot - but in GEO, where T_TA barely
+    // With no T_TA the offset is placed as if it were zero, i.e. against the UE downlink timeline rather than its
+    // uplink one. Correctness holds - is_ul_enabled() re-tests the window per slot - but in GEO, where T_TA barely
     // moves, a gap landing on an SR or CSI occasion shadows it for the whole connection.
     //
     // TODO: place the offset against the range of T_TA the cell will see, sourced from the NTN configuration manager.
