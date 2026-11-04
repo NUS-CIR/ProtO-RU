@@ -419,7 +419,8 @@ void mac_test_mode_cell_adapter::on_new_downlink_scheduler_results(const mac_dl_
       continue;
     }
 
-    // First new tx of an SRB0 SDU marks the RRCSetup of a new test UE.
+    // A new tx carrying an SRB0 SDU marks the RRCSetup of a test UE. SRB0 is only used for the RRCSetup, so this fires
+    // once per UE attach.
     const auto& lchs = grant.tb_list[0].lc_chs_to_sched;
     if (std::any_of(lchs.begin(), lchs.end(), [](const auto& lc) {
           return lc.lcid.is_sdu() and lc.lcid.to_lcid() == LCID_SRB0;
