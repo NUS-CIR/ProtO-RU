@@ -11,6 +11,7 @@
 #include "ocudu/e1ap/gateways/e1_local_connector_factory.h"
 #include "ocudu/pcap/dlt_pcap.h"
 #include "ocudu/support/executors/inline_task_executor.h"
+#include "ocudu/support/executors/task_worker.h"
 #include "ocudu/support/io/io_broker_factory.h"
 #include <future>
 #include <gtest/gtest.h>
@@ -79,7 +80,7 @@ public:
   std::unique_ptr<e1ap_message_notifier>
   handle_new_cu_up_connection(std::unique_ptr<e1ap_message_notifier> e1ap_tx_pdu_notifier) override
   {
-    // Note: May be called from io broker thread.
+    // Note: For an SCTP link, this is called from the control executor of the SCTP server.
     cu_cp_tx_pdu_notifier = std::move(e1ap_tx_pdu_notifier);
     std::promise<void> eof_signal;
     cu_cp_gw_assoc_close_signaled = eof_signal.get_future();
@@ -90,8 +91,11 @@ public:
     return std::make_unique<rx_pdu_notifier>("CU-CP", cu_rx_pdus, std::move(eof_signal));
   }
 
-  inline_task_executor                rx_executor;
-  inline_task_executor                ctrl_executor;
+  inline_task_executor rx_executor;
+  // The SCTP server changes its association state on this executor. An inline executor would let the io_broker
+  // thread and the thread that stops the server change that state at the same time.
+  task_worker                         ctrl_worker{"e1_gw_ctrl", 128};
+  task_worker_executor                ctrl_executor{ctrl_worker};
   std::unique_ptr<io_broker>          broker;
   dummy_dlt_pcap                      pcap;
   std::unique_ptr<e1_local_connector> connector;
