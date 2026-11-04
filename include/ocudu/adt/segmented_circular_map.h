@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ocudu/adt/expected.h"
+#include "ocudu/adt/mpmc_queue.h"
 #include "ocudu/adt/span.h"
 #include "ocudu/support/ocudu_assert.h"
 #include <algorithm>
@@ -61,6 +62,7 @@ struct segment_entry {
 /// get_segment() returns a span over an initialised optional slot array, or an empty span
 /// when the pool is exhausted. return_segment() must only be called
 /// with a span previously returned by get_segment() on the same pool.
+/// Implementations may be thread-safe; see shared_map_segment_pool for details.
 template <typename K, typename V>
 class map_segment_pool_interface
 {
@@ -96,6 +98,10 @@ public:
 /// The pool is non-copyable and non-movable; construct it in a stable location (heap or
 /// class member) before handing out interface references.
 ///
+/// Thread-safety: get_segment() and return_segment() are safe to call concurrently from
+/// multiple threads. The number of concurrent producers (callers of return_segment()) must
+/// not exceed the nof_prereserved_producers value passed to the constructor.
+///
 /// \tparam K                  Key type.
 /// \tparam ForcePower2SegSize If true, the constructor asserts that segment_size is a power of 2.
 /// \tparam Vs                 Value types sharing this pool (non-empty, pairwise distinct).
@@ -128,11 +134,10 @@ class shared_map_segment_pool
 
     span<opt_t> get_segment() override
     {
-      if (parent.free_list.empty()) {
+      void* raw = nullptr;
+      if (!parent.free_list.try_pop(raw)) {
         return {};
       }
-      void* raw = parent.free_list.back();
-      parent.free_list.pop_back();
 
       auto* elem_ptr = static_cast<opt_t*>(raw);
       for (size_t i = 0; i != parent.seg_size; ++i) {
@@ -146,30 +151,34 @@ class shared_map_segment_pool
       for (size_t i = 0, e = seg.size(); i != e; ++i) {
         std::destroy_at(&seg[i]);
       }
-      parent.free_list.push_back(seg.data());
+      [[maybe_unused]] bool ok = parent.free_list.try_push(seg.data());
+      ocudu_assert(ok, "shared_map_segment_pool: failed to return segment to free list");
     }
 
   private:
     shared_map_segment_pool& parent;
   };
 
-  std::vector<elem_slot>           elem_slots;
-  std::vector<void*>               free_list;
-  size_t                           seg_size;
-  std::tuple<typed_adapter<Vs>...> adapters;
+  std::vector<elem_slot> elem_slots;
+  concurrent_queue<void*, concurrent_queue_policy::lockfree_mpmc, concurrent_queue_wait_policy::non_blocking> free_list;
+  size_t                                                                                                      seg_size;
+  std::tuple<typed_adapter<Vs>...>                                                                            adapters;
 
 public:
   explicit shared_map_segment_pool(size_t num_slots, size_t segment_size) :
-    elem_slots(num_slots * segment_size), seg_size(segment_size), adapters(typed_adapter<Vs>(*this)...)
+    elem_slots(num_slots * segment_size),
+    free_list(num_slots),
+    seg_size(segment_size),
+    adapters(typed_adapter<Vs>(*this)...)
   {
     if constexpr (ForcePower2SegSize) {
       report_fatal_error_if_not((segment_size & (segment_size - 1)) == 0,
                                 "segment_size should be a power of 2, but a value of '{}' was used",
                                 segment_size);
     }
-    free_list.reserve(num_slots);
     for (size_t i = 0; i != num_slots; ++i) {
-      free_list.push_back(&elem_slots[i * segment_size]);
+      [[maybe_unused]] bool ok = free_list.try_push(&elem_slots[i * segment_size]);
+      ocudu_assert(ok, "shared_map_segment_pool: failed to populate free list at construction");
     }
   }
 
