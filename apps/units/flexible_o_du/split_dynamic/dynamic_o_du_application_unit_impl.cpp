@@ -4,7 +4,7 @@
 // Portions of this file may implement 3GPP specifications, which may be subject to additional licensing requirements.
 
 #include "dynamic_o_du_application_unit_impl.h"
-#include "apps/units/flexible_o_du/split_helpers/fapi_dummy_o_du_factory.h"
+#include "apps/units/flexible_o_du/split_helpers/fapi_dummy/fapi_dummy_o_du_factory.h"
 #include "dynamic_o_du_factory.h"
 #include "dynamic_o_du_translators.h"
 #include "dynamic_o_du_unit_cli11_schema.h"

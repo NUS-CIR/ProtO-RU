@@ -9,7 +9,7 @@
 #include "apps/units/flexible_o_du/o_du_low/du_low_config.h"
 #include "apps/units/flexible_o_du/split_7_2/helpers/ru_ofh_config.h"
 #include "apps/units/flexible_o_du/split_8/helpers/ru_sdr_config.h"
-#include "apps/units/flexible_o_du/split_helpers/fapi_dummy_unit_config.h"
+#include "apps/units/flexible_o_du/split_helpers/fapi_dummy/fapi_dummy_unit_config.h"
 #include <optional>
 #include <variant>
 

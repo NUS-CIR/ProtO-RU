@@ -6,8 +6,8 @@
 add_subdirectory(metrics)
 
 set(SOURCES
-        fapi_dummy_o_du_factory.cpp
-        fapi_dummy_o_du_impl.cpp
+        fapi_dummy/fapi_dummy_o_du_factory.cpp
+        fapi_dummy/fapi_dummy_o_du_impl.cpp
         flexible_o_du_factory.cpp
         flexible_o_du_impl.cpp
         flexible_o_du_metrics_aggregator.cpp
