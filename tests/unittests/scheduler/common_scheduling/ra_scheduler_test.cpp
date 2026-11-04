@@ -1735,6 +1735,25 @@ TEST_F(ra_scheduler_cfra_no_msg3_retx_test, when_cfra_preamble_is_retransmitted_
   ASSERT_EQ(tracker.nof_msg3_retxs(), 0);
 }
 
+/// Verify that a retransmitted CFRA preamble is discarded while the Msg3 of the previous attempt awaits its CRC.
+TEST_F(ra_scheduler_cfra_no_msg3_retx_test, when_cfra_preamble_is_retransmitted_before_msg3_crc_then_it_is_discarded)
+{
+  const rnti_t tc_rnti = cfra_crnti;
+  handle_rach_indication(create_cfra_rach_indication(tc_rnti));
+  for (unsigned i = 0, max_slots = 1000; i < max_slots and tracker.nof_msg3_newtxs() == 0; ++i) {
+    run_slot();
+  }
+  ASSERT_EQ(tracker.nof_msg3_newtxs(), 1) << "Msg3 new-tx was not scheduled";
+
+  // No CRC is reported for the Msg3, so its HARQ keeps awaiting it.
+  handle_rach_indication(create_cfra_rach_indication(tc_rnti));
+  // Outlasts the longest ra-ResponseWindow (sl80).
+  for (unsigned i = 0, max_slots = 100; i != max_slots; ++i) {
+    run_slot();
+  }
+  ASSERT_EQ(tracker.nof_rars(), 1) << "A RAR was scheduled while the previous Msg3 was awaiting its CRC";
+}
+
 /// Verify that a CRC carrying a UE index is filtered when its RNTI does not belong to a UE undergoing a CFRA.
 ///
 /// This is the CBRA UE that has already completed RA: its C-RNTI is the TC-RNTI that the RA scheduler still holds

@@ -823,12 +823,15 @@ void test_helper::ra_scheduler_tracker::on_new_rach_ind(const rach_indication_me
         ctxt.ra_rnti  = ra_helper::get_ra_rnti(slot_idx, occ.start_symbol, occ.frequency_index);
         ctxt.preamble = preamb;
         ctxt.rar_win  = rar_window;
-        // A retransmitted contention-free preamble carries the C-RNTI of the attempt that the UE abandoned.
-        pending_preambles.erase(
-            std::remove_if(pending_preambles.begin(),
-                           pending_preambles.end(),
-                           [&preamb](const preamble_context& prev) { return prev.preamble.tc_rnti == preamb.tc_rnti; }),
-            pending_preambles.end());
+        if (ra_helper::is_msg1_cf_preamble(rach_cfg, preamb.preamble_id)) {
+          // A retransmitted contention-free preamble carries the C-RNTI of the attempt that the UE abandoned.
+          pending_preambles.erase(std::remove_if(pending_preambles.begin(),
+                                                 pending_preambles.end(),
+                                                 [&preamb](const preamble_context& prev) {
+                                                   return prev.preamble.tc_rnti == preamb.tc_rnti;
+                                                 }),
+                                  pending_preambles.end());
+        }
         pending_preambles.push_back(ctxt);
       }
     }

@@ -110,15 +110,17 @@ public:
   }
 
   /// \brief Restarts the RA attempt of the Msg3-tracking entry of \c preamble's TC-RNTI with the new preamble.
-  /// \return Pointer to the restarted entry; \c nullptr if no Msg3-tracking entry exists for this exact TC-RNTI.
+  /// \return Pointer to the restarted entry; \c nullptr if no Msg3-tracking entry exists for this exact TC-RNTI, or if
+  /// its Msg3 HARQ is still awaiting CRC.
   ra_ue_context*
   restart(const rach_indication_message::preamble& preamble, slot_point prach_slot_rx, ssb_id_t ssb_index)
   {
     iterator it = find(preamble.tc_rnti);
-    if (it == end() or it->is_msgb_success_rar()) {
+    if (it == end() or it->is_msgb_success_rar() or it->harq_ent.find_ul_harq_waiting_ack().has_value()) {
       return nullptr;
     }
-    // The UE abandoned the previous attempt, so its Msg3 must not be retransmitted.
+    // The UE abandoned the previous attempt, so its pending Msg3 reTx is released, leaving the HARQ free for the new
+    // attempt.
     it->harq_ent.cancel_retxs();
     it->preamble        = preamble;
     it->prach_slot_rx   = prach_slot_rx;
