@@ -17,12 +17,18 @@ namespace ocudu {
 inline void register_dynamic_o_du_loggers(const dynamic_o_du_unit_config& config)
 {
   register_o_du_high_loggers(config.odu_high_cfg);
-  register_du_low_loggers(config.du_low_cfg.loggers);
 
-  if (std::holds_alternative<ru_sdr_unit_config>(config.ru_cfg)) {
-    register_ru_sdr_logs(std::get<ru_sdr_unit_config>(config.ru_cfg).loggers);
-  } else if (std::holds_alternative<ru_ofh_unit_parsed_config>(config.ru_cfg)) {
-    register_ru_ofh_loggers(std::get<ru_ofh_unit_parsed_config>(config.ru_cfg).config.loggers);
+  const auto* odu_low = std::get_if<dynamic_o_du_low>(&config.odu_low_cfg);
+  if (odu_low == nullptr) {
+    return;
+  }
+
+  register_du_low_loggers(odu_low->du_low_cfg.loggers);
+
+  if (const auto* ru_sdr = std::get_if<ru_sdr_unit_config>(&odu_low->ru_cfg)) {
+    register_ru_sdr_logs(ru_sdr->loggers);
+  } else if (const auto* ru_ofh = std::get_if<ru_ofh_unit_parsed_config>(&odu_low->ru_cfg)) {
+    register_ru_ofh_loggers(ru_ofh->config.loggers);
   }
 }
 

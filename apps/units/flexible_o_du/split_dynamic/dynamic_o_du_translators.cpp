@@ -62,12 +62,10 @@ static void fill_dummy_worker_manager_config(worker_manager_config& config, cons
   }
 }
 
-static void fill_fapi_dummy_worker_manager_config(worker_manager_config&          config,
-                                                  const dynamic_o_du_unit_config& unit_cfg)
+static void fill_fapi_dummy_worker_manager_config(worker_manager_config&        config,
+                                                  const o_du_high_unit_config&  odu_high_cfg,
+                                                  const fapi_dummy_unit_config& fapi_dummy_cfg)
 {
-  const fapi_dummy_unit_config& fapi_dummy_cfg = *unit_cfg.fapi_dummy_cfg;
-  const o_du_high_unit_config&  odu_high_cfg   = unit_cfg.odu_high_cfg;
-
   // A free running clock runs the DU high in blocking mode, so that tasks wait instead of being dropped.
   bool is_blocking_mode_enable =
       fapi_dummy_cfg.clock_mode == fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::free_running;
@@ -76,28 +74,24 @@ static void fill_fapi_dummy_worker_manager_config(worker_manager_config&        
   const unsigned nof_cells = odu_high_cfg.du_high_cfg.config.cells_cfg.size();
   config.fapi_dummy_cfg.emplace(worker_manager_config::fapi_dummy_config{.nof_cells = nof_cells});
 
-  // The clock worker uses the Radio Unit affinity of the expert execution cell affinities, when given.
   ocudu_assert(config.config_affinities.size() == nof_cells, "Invalid number of cell affinities");
-  const auto* ru_dummy = std::get_if<ru_dummy_unit_config>(&unit_cfg.ru_cfg);
-  for (unsigned i_cell = 0; i_cell != nof_cells; ++i_cell) {
-    config.config_affinities[i_cell].push_back(ru_dummy != nullptr && i_cell < ru_dummy->cell_affinities.size()
-                                                   ? ru_dummy->cell_affinities[i_cell].ru_cpu_cfg
-                                                   : ru_dummy_cpu_affinities_cell_unit_config{}.ru_cpu_cfg);
+  for (auto& cell_affinities : config.config_affinities) {
+    cell_affinities.push_back(fapi_dummy_cfg.clock_cpu_cfg);
   }
 }
 
 void ocudu::fill_dynamic_du_worker_manager_config(worker_manager_config&          config,
                                                   const dynamic_o_du_unit_config& unit_cfg)
 {
-  // The FAPI dummy replaces the DU low and the Radio Unit.
-  if (unit_cfg.fapi_dummy_cfg.has_value()) {
-    fill_fapi_dummy_worker_manager_config(config, unit_cfg);
+  if (const auto* fapi_dummy_cfg = std::get_if<fapi_dummy_unit_config>(&unit_cfg.odu_low_cfg)) {
+    fill_fapi_dummy_worker_manager_config(config, unit_cfg.odu_high_cfg, *fapi_dummy_cfg);
     return;
   }
 
-  bool is_blocking_mode_enable = false;
-  if (std::holds_alternative<ru_sdr_unit_config>(unit_cfg.ru_cfg)) {
-    const auto& driver      = std::get<ru_sdr_unit_config>(unit_cfg.ru_cfg).device_driver;
+  const dynamic_o_du_low& odu_low                 = std::get<dynamic_o_du_low>(unit_cfg.odu_low_cfg);
+  bool                    is_blocking_mode_enable = false;
+  if (std::holds_alternative<ru_sdr_unit_config>(odu_low.ru_cfg)) {
+    const auto& driver      = std::get<ru_sdr_unit_config>(odu_low.ru_cfg).device_driver;
     is_blocking_mode_enable = (driver == "zmq");
   }
   fill_o_du_high_worker_manager_config(config, unit_cfg.odu_high_cfg, is_blocking_mode_enable);
@@ -115,13 +109,13 @@ void ocudu::fill_dynamic_du_worker_manager_config(worker_manager_config&        
         .ul_ratio = derive_ul_ratio(cell.cell.tdd_ul_dl_cfg),
     });
   }
-  fill_du_low_worker_manager_config(config, unit_cfg.du_low_cfg, is_blocking_mode_enable, cell_params);
+  fill_du_low_worker_manager_config(config, odu_low.du_low_cfg, is_blocking_mode_enable, cell_params);
 
-  if (const auto* ru_sdr = std::get_if<ru_sdr_unit_config>(&unit_cfg.ru_cfg)) {
+  if (const auto* ru_sdr = std::get_if<ru_sdr_unit_config>(&odu_low.ru_cfg)) {
     fill_sdr_worker_manager_config(config, *ru_sdr);
-  } else if (const auto* ru_ofh = std::get_if<ru_ofh_unit_parsed_config>(&unit_cfg.ru_cfg)) {
+  } else if (const auto* ru_ofh = std::get_if<ru_ofh_unit_parsed_config>(&odu_low.ru_cfg)) {
     fill_ofh_worker_manager_config(config, ru_ofh->config);
-  } else if (const auto* ru_dummy = std::get_if<ru_dummy_unit_config>(&unit_cfg.ru_cfg)) {
+  } else if (const auto* ru_dummy = std::get_if<ru_dummy_unit_config>(&odu_low.ru_cfg)) {
     fill_dummy_worker_manager_config(config, *ru_dummy);
   }
 }

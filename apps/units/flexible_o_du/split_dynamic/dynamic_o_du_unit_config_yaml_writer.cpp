@@ -58,24 +58,29 @@ static void fill_fapi_dummy_config_in_yaml_schema(YAML::Node& node, const fapi_d
       (config.clock_mode == fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime) ? "realtime" : "free_running";
   fapi_dummy_node["ul_indication_delay_slots"]  = config.ul_indication_delay_slots;
   fapi_dummy_node["max_processing_delay_slots"] = config.max_processing_delay_slots;
+  if (config.clock_cpu_cfg.mask.any()) {
+    fapi_dummy_node["clock_cpus"] = fmt::format("{:n}", span<const size_t>(config.clock_cpu_cfg.mask.get_cpu_ids()));
+  }
+  fapi_dummy_node["clock_pinning"] = to_string(config.clock_cpu_cfg.pinning_policy);
 }
 
 void ocudu::fill_dynamic_o_du_unit_config_in_yaml_schema(YAML::Node& node, const dynamic_o_du_unit_config& config)
 {
   fill_o_du_high_config_in_yaml_schema(node, config.odu_high_cfg);
 
-  if (config.fapi_dummy_cfg.has_value()) {
-    fill_fapi_dummy_config_in_yaml_schema(node, *config.fapi_dummy_cfg);
+  if (const auto* fapi_dummy_cfg = std::get_if<fapi_dummy_unit_config>(&config.odu_low_cfg)) {
+    fill_fapi_dummy_config_in_yaml_schema(node, *fapi_dummy_cfg);
     return;
   }
 
-  fill_du_low_config_in_yaml_schema(node, config.du_low_cfg);
+  const dynamic_o_du_low& odu_low = std::get<dynamic_o_du_low>(config.odu_low_cfg);
+  fill_du_low_config_in_yaml_schema(node, odu_low.du_low_cfg);
 
-  if (std::holds_alternative<ru_dummy_unit_config>(config.ru_cfg)) {
-    fill_ru_dummy_config(node, std::get<ru_dummy_unit_config>(config.ru_cfg));
-  } else if (std::holds_alternative<ru_ofh_unit_parsed_config>(config.ru_cfg)) {
-    fill_ru_ofh_config_in_yaml_schema(node, std::get<ru_ofh_unit_parsed_config>(config.ru_cfg).config);
-  } else if (std::holds_alternative<ru_sdr_unit_config>(config.ru_cfg)) {
-    fill_ru_sdr_config_in_yaml_schema(node, std::get<ru_sdr_unit_config>(config.ru_cfg));
+  if (const auto* ru_dummy = std::get_if<ru_dummy_unit_config>(&odu_low.ru_cfg)) {
+    fill_ru_dummy_config(node, *ru_dummy);
+  } else if (const auto* ru_ofh = std::get_if<ru_ofh_unit_parsed_config>(&odu_low.ru_cfg)) {
+    fill_ru_ofh_config_in_yaml_schema(node, ru_ofh->config);
+  } else if (const auto* ru_sdr = std::get_if<ru_sdr_unit_config>(&odu_low.ru_cfg)) {
+    fill_ru_sdr_config_in_yaml_schema(node, *ru_sdr);
   }
 }

@@ -13,10 +13,10 @@ namespace ocudu {
 /// Dynamic O-RAN DU factory.
 class dynamic_o_du_factory : public flexible_o_du_factory
 {
-  const dynamic_o_du_unit_config& unit_config;
+  const dynamic_o_du_low& odu_low_cfg;
 
 public:
-  explicit dynamic_o_du_factory(const dynamic_o_du_unit_config& config_);
+  dynamic_o_du_factory(const o_du_high_unit_config& odu_high_cfg, const dynamic_o_du_low& odu_low_cfg_);
 
 private:
   std::unique_ptr<radio_unit> create_radio_unit(const flexible_o_du_ru_config&       ru_config,

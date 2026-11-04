@@ -22,20 +22,28 @@ void dynamic_o_du_application_unit_impl::on_loggers_registration()
 
 bool dynamic_o_du_application_unit_impl::are_metrics_enabled() const
 {
-  if (unit_cfg.odu_high_cfg.du_high_cfg.config.metrics.layers_cfg.are_metrics_enabled() ||
-      unit_cfg.du_low_cfg.metrics_cfg.enable_du_low) {
+  if (unit_cfg.odu_high_cfg.du_high_cfg.config.metrics.layers_cfg.are_metrics_enabled()) {
     return true;
   }
 
-  if (auto* ru = std::get_if<ru_sdr_unit_config>(&unit_cfg.ru_cfg)) {
+  const auto* odu_low = std::get_if<dynamic_o_du_low>(&unit_cfg.odu_low_cfg);
+  if (odu_low == nullptr) {
+    return false;
+  }
+
+  if (odu_low->du_low_cfg.metrics_cfg.enable_du_low) {
+    return true;
+  }
+
+  if (auto* ru = std::get_if<ru_sdr_unit_config>(&odu_low->ru_cfg)) {
     return ru->metrics_cfg.enable_ru_metrics;
   }
 
-  if (auto* ru = std::get_if<ru_ofh_unit_parsed_config>(&unit_cfg.ru_cfg)) {
+  if (auto* ru = std::get_if<ru_ofh_unit_parsed_config>(&odu_low->ru_cfg)) {
     return ru->config.metrics_cfg.enable_ru_metrics;
   }
 
-  if (auto* ru = std::get_if<ru_dummy_unit_config>(&unit_cfg.ru_cfg)) {
+  if (auto* ru = std::get_if<ru_dummy_unit_config>(&odu_low->ru_cfg)) {
     return ru->metrics_cfg.enable_ru_metrics;
   }
 
@@ -68,10 +76,11 @@ void dynamic_o_du_application_unit_impl::on_parsing_configuration_registration(C
 
 o_du_unit dynamic_o_du_application_unit_impl::create_flexible_o_du_unit(const o_du_unit_dependencies& dependencies)
 {
-  if (unit_cfg.fapi_dummy_cfg.has_value()) {
-    return create_fapi_dummy_o_du(unit_cfg.odu_high_cfg, *unit_cfg.fapi_dummy_cfg, dependencies);
+  if (const auto* fapi_dummy_cfg = std::get_if<fapi_dummy_unit_config>(&unit_cfg.odu_low_cfg)) {
+    return create_fapi_dummy_o_du(unit_cfg.odu_high_cfg, *fapi_dummy_cfg, dependencies);
   }
-  return dynamic_o_du_factory(unit_cfg).create_flexible_o_du(dependencies);
+  return dynamic_o_du_factory(unit_cfg.odu_high_cfg, std::get<dynamic_o_du_low>(unit_cfg.odu_low_cfg))
+      .create_flexible_o_du(dependencies);
 }
 
 std::unique_ptr<flexible_o_du_application_unit> ocudu::create_flexible_o_du_application_unit(std::string_view app_name)

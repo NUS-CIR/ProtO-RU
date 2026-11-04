@@ -37,11 +37,12 @@ generate_ru_config(const std::variant<ru_sdr_unit_config, ru_ofh_unit_parsed_con
   return {};
 }
 
-dynamic_o_du_factory::dynamic_o_du_factory(const dynamic_o_du_unit_config& config_) :
-  flexible_o_du_factory(flexible_o_du_unit_config{.odu_high_cfg = config_.odu_high_cfg,
-                                                  .du_low_cfg   = config_.du_low_cfg,
-                                                  .ru_cfg       = generate_ru_config(config_.ru_cfg)}),
-  unit_config(config_)
+dynamic_o_du_factory::dynamic_o_du_factory(const o_du_high_unit_config& odu_high_cfg,
+                                           const dynamic_o_du_low&      odu_low_cfg_) :
+  flexible_o_du_factory(flexible_o_du_unit_config{.odu_high_cfg = odu_high_cfg,
+                                                  .du_low_cfg   = odu_low_cfg_.du_low_cfg,
+                                                  .ru_cfg       = generate_ru_config(odu_low_cfg_.ru_cfg)}),
+  odu_low_cfg(odu_low_cfg_)
 {
 }
 
@@ -65,10 +66,10 @@ std::unique_ptr<radio_unit>
 dynamic_o_du_factory::create_radio_unit(const flexible_o_du_ru_config&       ru_config,
                                         const flexible_o_du_ru_dependencies& ru_dependencies)
 {
-  const auto& ru_cfg = unit_config.ru_cfg;
+  const auto& ru_cfg = odu_low_cfg.ru_cfg;
   if (const auto* cfg = std::get_if<ru_ofh_unit_parsed_config>(&ru_cfg)) {
     return create_ofh_radio_unit(
-        cfg->config, ru_config, ru_dependencies, unit_config.du_low_cfg.hal_config.has_value());
+        cfg->config, ru_config, ru_dependencies, odu_low_cfg.du_low_cfg.hal_config.has_value());
   }
 
   if (const auto* cfg = std::get_if<ru_sdr_unit_config>(&ru_cfg)) {

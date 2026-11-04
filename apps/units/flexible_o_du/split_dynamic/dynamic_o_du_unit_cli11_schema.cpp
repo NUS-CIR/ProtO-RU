@@ -21,6 +21,7 @@ static ru_ofh_unit_parsed_config ofh_cfg;
 static ru_sdr_unit_config        sdr_cfg;
 static ru_dummy_unit_config      dummy_cfg;
 static fapi_dummy_unit_config    fapi_dummy_parsed_cfg;
+static du_low_unit_config        du_low_parsed_cfg;
 
 static void configure_cli11_fapi_dummy_args(CLI::App& app, fapi_dummy_unit_config& config)
 {
@@ -42,6 +43,21 @@ static void configure_cli11_fapi_dummy_args(CLI::App& app, fapi_dummy_unit_confi
              "Number of slots a slot indication is notified in advance of the transmission time")
       ->capture_default_str()
       ->check(CLI::Range(1, 30));
+  add_option_function<std::string>(
+      app,
+      "--clock_cpus",
+      [&config](const std::string& value) { parse_affinity_mask(config.clock_cpu_cfg.mask, value, "clock_cpus"); },
+      "CPUs used for the slot clock thread");
+  add_option_function<std::string>(
+      app,
+      "--clock_pinning",
+      [&config](const std::string& value) {
+        config.clock_cpu_cfg.pinning_policy = to_affinity_mask_policy(value);
+        if (config.clock_cpu_cfg.pinning_policy == sched_affinity_mask_policy::last) {
+          report_error("Incorrect value={} used in {} property", value, "clock_pinning");
+        }
+      },
+      "Policy used for assigning CPU cores to the slot clock thread");
 }
 
 static void configure_cli11_ru_dummy_args(CLI::App& app, ru_dummy_unit_config& config)
@@ -97,7 +113,7 @@ static void configure_cli11_metrics_args(CLI::App& app, ru_dummy_unit_metrics_co
 void ocudu::configure_cli11_with_dynamic_o_du_unit_config_schema(CLI::App& app, dynamic_o_du_unit_config& parsed_cfg)
 {
   configure_cli11_with_o_du_high_config_schema(app, parsed_cfg.odu_high_cfg);
-  configure_cli11_with_du_low_config_schema(app, parsed_cfg.du_low_cfg);
+  configure_cli11_with_du_low_config_schema(app, du_low_parsed_cfg);
   configure_cli11_with_ru_ofh_config_schema(app, ofh_cfg);
   configure_cli11_with_ru_sdr_config_schema(app, sdr_cfg);
 
@@ -119,7 +135,7 @@ void ocudu::configure_cli11_with_dynamic_o_du_unit_config_schema(CLI::App& app, 
   configure_cli11_expert_execution_args(*expert_subcmd, dummy_cfg);
 }
 
-static void manage_ru(CLI::App& app, dynamic_o_du_unit_config& parsed_cfg)
+static void manage_ru(CLI::App& app, dynamic_o_du_low& parsed_cfg)
 {
   // Manage the RU optionals
   auto     ofh_subcmd        = app.get_subcommand("ru_ofh");
@@ -160,14 +176,10 @@ static void manage_ru(CLI::App& app, dynamic_o_du_unit_config& parsed_cfg)
   ofh_subcmd->disabled();
 }
 
-/// Sets the FAPI dummy configuration if its section is present, and warns about the ignored sections.
+/// Sets the FAPI dummy as the O-DU low, warning about the ignored sections.
 static void manage_fapi_dummy(CLI::App& app, dynamic_o_du_unit_config& parsed_cfg)
 {
-  if (app.get_subcommand("fapi_dummy")->count_all() == 0) {
-    return;
-  }
-
-  parsed_cfg.fapi_dummy_cfg = fapi_dummy_parsed_cfg;
+  parsed_cfg.odu_low_cfg = fapi_dummy_parsed_cfg;
 
   // The sections that configure the PHY or the Radio Unit, which the FAPI dummy replaces.
   for (const char* section : {"ru_ofh", "ru_sdr", "ru_dummy", "expert_phy", "hal", "power_calibration"}) {
@@ -182,11 +194,11 @@ static void manage_fapi_dummy(CLI::App& app, dynamic_o_du_unit_config& parsed_cf
 
 static bool get_is_rt_mode_enabled(const dynamic_o_du_unit_config& parsed_cfg)
 {
-  if (parsed_cfg.fapi_dummy_cfg.has_value()) {
-    return parsed_cfg.fapi_dummy_cfg->clock_mode == fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime;
+  if (const auto* fapi_dummy = std::get_if<fapi_dummy_unit_config>(&parsed_cfg.odu_low_cfg)) {
+    return fapi_dummy->clock_mode == fapi_adaptor::phy_dummy_fapi_adaptor_clock_mode::realtime;
   }
 
-  const auto& ru_cfg = parsed_cfg.ru_cfg;
+  const auto& ru_cfg = std::get<dynamic_o_du_low>(parsed_cfg.odu_low_cfg).ru_cfg;
   if (std::holds_alternative<ru_dummy_unit_config>(ru_cfg)) {
     return true;
   }
@@ -204,22 +216,27 @@ void ocudu::autoderive_dynamic_o_du_parameters_after_parsing(CLI::App& app, dyna
   // Auto derive SDR parameters.
   autoderive_ru_sdr_parameters_after_parsing(app, sdr_cfg, nof_cells);
 
-  // Set the parsed RU.
-  manage_ru(app, parsed_cfg);
-  manage_fapi_dummy(app, parsed_cfg);
-
-  if (std::holds_alternative<ru_dummy_unit_config>(parsed_cfg.ru_cfg)) {
-    auto& dummy = std::get<ru_dummy_unit_config>(parsed_cfg.ru_cfg);
-    if (dummy.cell_affinities.size() < nof_cells) {
-      dummy.cell_affinities.resize(nof_cells);
+  // Set the parsed O-DU low.
+  if (app.get_subcommand("fapi_dummy")->count_all() != 0) {
+    manage_fapi_dummy(app, parsed_cfg);
+  } else {
+    dynamic_o_du_low odu_low{.du_low_cfg = du_low_parsed_cfg};
+    manage_ru(app, odu_low);
+    if (auto* dummy = std::get_if<ru_dummy_unit_config>(&odu_low.ru_cfg)) {
+      if (dummy->cell_affinities.size() < nof_cells) {
+        dummy->cell_affinities.resize(nof_cells);
+      }
     }
+    parsed_cfg.odu_low_cfg = std::move(odu_low);
   }
 
   // Derive the O-DU high parameters.
   autoderive_o_du_high_parameters_after_parsing(app, parsed_cfg.odu_high_cfg, get_is_rt_mode_enabled(parsed_cfg));
 
   // Auto derive DU low parameters.
-  const auto&   cell = parsed_cfg.odu_high_cfg.du_high_cfg.config.cells_cfg.front().cell;
-  const nr_band band = cell.band ? cell.band.value() : band_helper::get_band_from_dl_arfcn(cell.dl_f_ref_arfcn);
-  autoderive_du_low_parameters_after_parsing(app, parsed_cfg.du_low_cfg, band_helper::get_duplex_mode(band));
+  if (auto* odu_low = std::get_if<dynamic_o_du_low>(&parsed_cfg.odu_low_cfg)) {
+    const auto&   cell = parsed_cfg.odu_high_cfg.du_high_cfg.config.cells_cfg.front().cell;
+    const nr_band band = cell.band ? cell.band.value() : band_helper::get_band_from_dl_arfcn(cell.dl_f_ref_arfcn);
+    autoderive_du_low_parameters_after_parsing(app, odu_low->du_low_cfg, band_helper::get_duplex_mode(band));
+  }
 }

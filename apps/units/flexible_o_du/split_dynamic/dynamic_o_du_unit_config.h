@@ -10,7 +10,6 @@
 #include "apps/units/flexible_o_du/split_7_2/helpers/ru_ofh_config.h"
 #include "apps/units/flexible_o_du/split_8/helpers/ru_sdr_config.h"
 #include "apps/units/flexible_o_du/split_helpers/fapi_dummy/fapi_dummy_unit_config.h"
-#include <optional>
 #include <variant>
 
 namespace ocudu {
@@ -54,16 +53,20 @@ struct ru_dummy_unit_config {
   ru_dummy_unit_metrics_config metrics_cfg;
 };
 
-/// Dynamic O-RAN DU unit configuration.
-struct dynamic_o_du_unit_config {
-  /// O-DU high configuration.
-  o_du_high_unit_config odu_high_cfg;
+/// Dynamic O-RAN DU low and Radio Unit configuration.
+struct dynamic_o_du_low {
   /// DU low configuration.
   du_low_unit_config du_low_cfg;
   /// Radio Unit configuration.
   std::variant<ru_sdr_unit_config, ru_ofh_unit_parsed_config, ru_dummy_unit_config> ru_cfg = {ru_sdr_unit_config{}};
-  /// FAPI dummy configuration. When present, it replaces the DU low and the Radio Unit.
-  std::optional<fapi_dummy_unit_config> fapi_dummy_cfg;
+};
+
+/// Dynamic O-RAN DU unit configuration.
+struct dynamic_o_du_unit_config {
+  /// O-DU high configuration.
+  o_du_high_unit_config odu_high_cfg;
+  /// O-DU low configuration, either the DU low with its Radio Unit or the FAPI dummy that replaces them.
+  std::variant<dynamic_o_du_low, fapi_dummy_unit_config> odu_low_cfg = {dynamic_o_du_low{}};
 };
 
 } // namespace ocudu

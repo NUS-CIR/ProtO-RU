@@ -123,22 +123,22 @@ bool ocudu::validate_dynamic_o_du_unit_config(const dynamic_o_du_unit_config& co
     return false;
   }
 
-  // The FAPI dummy replaces the DU low and the Radio Unit, so their configurations are not validated.
-  if (config.fapi_dummy_cfg.has_value()) {
+  if (std::holds_alternative<fapi_dummy_unit_config>(config.odu_low_cfg)) {
     return validate_fapi_dummy_config(config.odu_high_cfg.du_high_cfg.config);
   }
 
-  auto du_low_dependencies = get_du_low_validation_dependencies(config.odu_high_cfg.du_high_cfg.config);
-  if (!validate_du_low_config(config.du_low_cfg, du_low_dependencies)) {
+  const dynamic_o_du_low& odu_low = std::get<dynamic_o_du_low>(config.odu_low_cfg);
+  auto du_low_dependencies        = get_du_low_validation_dependencies(config.odu_high_cfg.du_high_cfg.config);
+  if (!validate_du_low_config(odu_low.du_low_cfg, du_low_dependencies)) {
     return false;
   }
 
-  if (auto* ru_ofh = std::get_if<ru_ofh_unit_parsed_config>(&config.ru_cfg)) {
+  if (auto* ru_ofh = std::get_if<ru_ofh_unit_parsed_config>(&odu_low.ru_cfg)) {
     auto ru_ofh_dependencies = get_ru_ofh_validation_dependencies(config.odu_high_cfg.du_high_cfg.config);
     return validate_ru_ofh_config(ru_ofh->config, ru_ofh_dependencies);
   }
 
-  if (auto* ru_sdr = std::get_if<ru_sdr_unit_config>(&config.ru_cfg)) {
+  if (auto* ru_sdr = std::get_if<ru_sdr_unit_config>(&odu_low.ru_cfg)) {
     auto ru_sdr_dependencies = get_ru_sdr_validation_dependencies(config.odu_high_cfg.du_high_cfg.config);
     return validate_ru_sdr_config(*ru_sdr, ru_sdr_dependencies);
   }
