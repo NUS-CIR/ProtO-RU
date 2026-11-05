@@ -91,7 +91,7 @@ struct worker_manager {
   /// Returns the executor that runs the FAPI dummy clock loop.
   task_executor& get_fapi_dummy_clock_executor() const
   {
-    ocudu_assert(fapi_dummy_clock_exec, "FAPI dummy clock executor is not available.");
+    ocudu_assert(fapi_dummy_clock_exec != nullptr, "FAPI dummy clock executor is not available.");
     return *fapi_dummy_clock_exec;
   }
 
