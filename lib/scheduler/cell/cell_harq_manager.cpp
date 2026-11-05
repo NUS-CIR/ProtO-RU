@@ -179,10 +179,7 @@ cell_harq_repository<IsDl>::cell_harq_repository(unsigned                max_nof
   logger(logger_),
   // Reserve space in advance for the HARQs of each entity, so that no allocation is needed to add a UE.
   ue_entity_pool(max_nof_ue_contexts,
-                 [max_harqs_per_ue_](ue_harq_entity_impl& u) {
-                   u.free_harq_ids.reserve(max_harqs_per_ue_);
-                   u.harqs.reserve(max_harqs_per_ue_);
-                 }),
+                 [max_harqs_per_ue_](ue_harq_entity_impl& u) { u.harqs.reserve(max_harqs_per_ue_); }),
   ntn_ul_alloc_delay_slots(ntn_ul_alloc_delay_slots_),
   alloc_hist(ntn_ul_alloc_delay_slots_ > 0 and harq_mode_b_
                  ? std::make_unique<harq_alloc_history>(*this, ntn_ul_alloc_delay_slots_)
@@ -276,6 +273,13 @@ void cell_harq_repository<IsDl>::handle_harq_ack_timeout(harq_type& h, slot_poin
   dealloc_harq(h);
 }
 
+/// Returns the processes of the entity that are free and operate in the given mode.
+template <typename UeHarqEntity>
+static fixed_size_bitset<MAX_NOF_HARQS> free_harq_mask(const UeHarqEntity& ue, harq_mode_t mode)
+{
+  return mode == harq_mode_t::normal ? ue.free_harqs & ue.harq_mode_mask : ue.free_harqs & ~ue.harq_mode_mask;
+}
+
 template <bool IsDl>
 typename cell_harq_repository<IsDl>::harq_type*
 cell_harq_repository<IsDl>::alloc_harq(du_ue_index_t                       ue_idx,
@@ -290,7 +294,7 @@ cell_harq_repository<IsDl>::alloc_harq(du_ue_index_t                       ue_id
 {
   ocudu_sanity_check(ue_idx < ues.size() and ues[ue_idx] != nullptr, "Invalid UE index");
   ue_harq_entity_impl& ue_harq_entity = *ues[ue_idx];
-  if (ue_harq_entity.free_harq_ids.empty()) {
+  if (ue_harq_entity.free_harqs.none()) {
     return nullptr;
   }
 
@@ -304,48 +308,45 @@ cell_harq_repository<IsDl>::alloc_harq(du_ue_index_t                       ue_id
   ocudu_assert(not cg_params.has_value() or cg_params->cg_harq_timeout != 0,
                "If a CG HARQ is requested, the HARQ timeout needs to be non-zero");
 
-  // Allocation of free HARQ-id for the UE.
-  if (ntn_ul_alloc_delay_slots > 0 && ue_harq_entity.feedback_disabled_or_mode_b_harq_present) {
-    auto rit = std::find_if(ue_harq_entity.free_harq_ids.rbegin(),
-                            ue_harq_entity.free_harq_ids.rend(),
-                            [&](const harq_id_t& h_id) { return ue_harq_entity.harqs[h_id].mode == mode; });
-
-    if (rit == ue_harq_entity.free_harq_ids.rend()) {
-      return nullptr;
-    }
-    std::iter_swap(rit, ue_harq_entity.free_harq_ids.rbegin());
-  }
-  // TODO: review this once feedback disabled / mode B HARQ will be compatible with reserved HARQ for CG.
+  // Allocation of free HARQ-id for the UE. The lowest free process is taken, and the cases below differ only in how
+  // they narrow the set it is taken from.
+  harq_id_t h_id = INVALID_HARQ_ID;
   if (cg_params.has_value()) {
+    // A Configured Grant rides the process its configuration names, which the UE holds to, so the request for it
+    // comes before any narrowing by mode.
+    // TODO: review this once feedback disabled / mode B HARQ will be compatible with reserved HARQ for CG.
     const harq_id_t cg_h_id = cg_params->harq_id;
     if (cg_h_id >= ue_harq_entity.first_non_reserved_harq_id) {
       logger.warning("Requested HARQ-ID from non reserved set");
       return nullptr;
     }
-    auto rit = std::find(ue_harq_entity.free_harq_ids.rbegin(), ue_harq_entity.free_harq_ids.rend(), cg_h_id);
-    if (rit == ue_harq_entity.free_harq_ids.rend()) {
+    if (not ue_harq_entity.free_harqs.test(cg_h_id)) {
       // With a CG-specific HARQ timeout (configured_grant_timer × periodicity), the HARQ should have been
       // freed by the timeout wheel before the next CG occasion. If this fires, the timeout is misconfigured.
       logger.warning("rnti={} h_id={}: CG HARQ forced reuse — timeout did not release the process in time",
                      ue_harq_entity.harqs[cg_h_id].rnti,
                      cg_h_id);
       dealloc_harq(ue_harq_entity.harqs[cg_h_id]);
-      rit = ue_harq_entity.free_harq_ids.rbegin();
     }
-    std::iter_swap(rit, ue_harq_entity.free_harq_ids.rbegin());
-  } else {
-    auto rit = std::find_if(ue_harq_entity.free_harq_ids.rbegin(),
-                            ue_harq_entity.free_harq_ids.rend(),
-                            [first_usable_h_if = ue_harq_entity.first_non_reserved_harq_id](const harq_id_t& h_id) {
-                              return h_id >= first_usable_h_if;
-                            });
-    if (rit == ue_harq_entity.free_harq_ids.rend()) {
+    h_id = cg_h_id;
+  } else if (ntn_ul_alloc_delay_slots > 0 && ue_harq_entity.feedback_disabled_or_mode_b_harq_present) {
+    // The set is narrowed by the mode and, as in the branch below, by the processes held for Configured Grant use.
+    const int lowest = free_harq_mask(ue_harq_entity, mode)
+                           .find_lowest(ue_harq_entity.first_non_reserved_harq_id, ue_harq_entity.free_harqs.size());
+    if (lowest < 0) {
       return nullptr;
     }
-    std::iter_swap(rit, ue_harq_entity.free_harq_ids.rbegin());
+    h_id = to_harq_id(lowest);
+  } else {
+    // The processes below the first non-reserved one are held for Configured Grant use.
+    const int lowest = ue_harq_entity.free_harqs.find_lowest(ue_harq_entity.first_non_reserved_harq_id,
+                                                             ue_harq_entity.free_harqs.size());
+    if (lowest < 0) {
+      return nullptr;
+    }
+    h_id = to_harq_id(lowest);
   }
-  const harq_id_t h_id = ue_harq_entity.free_harq_ids.back();
-  ue_harq_entity.free_harq_ids.pop_back();
+  ue_harq_entity.free_harqs.reset(h_id);
   harq_type& h = ue_harq_entity.harqs[h_id];
   ocudu_sanity_check(h.ue_idx == ue_idx and h.h_id == h_id, "Invalid state of HARQ");
 
@@ -423,7 +424,7 @@ void cell_harq_repository<IsDl>::dealloc_harq(harq_type& h)
   }
 
   // Mark HARQ as available again.
-  ue_harq_entity.free_harq_ids.push_back(h.h_id);
+  ue_harq_entity.free_harqs.set(h.h_id);
 }
 
 template <bool IsDl>
@@ -535,15 +536,18 @@ void cell_harq_repository<IsDl>::reserve_ue_harqs(du_ue_index_t ue_idx, rnti_t r
 
   ue_harq_entity_impl& ue_harqs = *ues[ue_idx];
   ue_harqs.harqs.resize(nof_harqs);
-  ue_harqs.free_harq_ids.resize(nof_harqs);
+  // Every process starts free and in the normal mode, which reconfigure() narrows afterwards.
+  ue_harqs.free_harqs.reset();
+  ue_harqs.free_harqs.fill(0, nof_harqs);
+  ue_harqs.harq_mode_mask.reset();
+  ue_harqs.harq_mode_mask.fill(0, nof_harqs);
   for (unsigned count = 0; count != nof_harqs; ++count) {
-    harq_id_t h_id                                = to_harq_id(count);
-    ue_harqs.free_harq_ids[nof_harqs - count - 1] = h_id; // add in reverse order.
-    ue_harqs.harqs[h_id].ue_idx                   = ue_idx;
-    ue_harqs.harqs[h_id].rnti                     = rnti;
-    ue_harqs.harqs[h_id].h_id                     = h_id;
-    ue_harqs.harqs[h_id].ndi                      = false;
-    ue_harqs.harqs[h_id].mode                     = harq_mode_t::normal;
+    harq_id_t h_id              = to_harq_id(count);
+    ue_harqs.harqs[h_id].ue_idx = ue_idx;
+    ue_harqs.harqs[h_id].rnti   = rnti;
+    ue_harqs.harqs[h_id].h_id   = h_id;
+    ue_harqs.harqs[h_id].ndi    = false;
+    ue_harqs.harqs[h_id].mode   = harq_mode_t::normal;
   }
 }
 
@@ -570,10 +574,9 @@ void cell_harq_repository<IsDl>::extend_ue_harqs(du_ue_index_t ue_idx, rnti_t rn
     ue_harqs.harqs[h_id].mode   = harq_mode_t::normal;
   }
 
-  // Add new HARQ IDs to free list in reverse order (so lower IDs are allocated first).
-  for (unsigned count = new_nof_harqs; count != current_nof_harqs; --count) {
-    ue_harqs.free_harq_ids.push_back(to_harq_id(count - 1));
-  }
+  // The processes added above are free and in the normal mode, as reserve_ue_harqs() left the original ones.
+  ue_harqs.free_harqs.fill(current_nof_harqs, new_nof_harqs);
+  ue_harqs.harq_mode_mask.fill(current_nof_harqs, new_nof_harqs);
 
   logger.debug("ue={} rnti={}: Extended {} HARQs from {} to {}",
                ue_idx,
@@ -1051,6 +1054,8 @@ void unique_ue_harq_entity::reconfigure(unsigned                              ne
       } else {
         h.mode = harq_mode_t::normal;
       }
+      // Mirrored so that the free processes of a mode are found without walking them.
+      get_dl_ue().harq_mode_mask.set(h.h_id, h.mode == harq_mode_t::normal);
     }
   }
 
@@ -1066,52 +1071,51 @@ void unique_ue_harq_entity::reconfigure(unsigned                              ne
       } else {
         h.mode = harq_mode_t::feedback_disabled_or_mode_b;
       }
+      // Mirrored, as in the DL.
+      get_ul_ue().harq_mode_mask.set(h.h_id, h.mode == harq_mode_t::normal);
     }
   }
 }
 
 bool unique_ue_harq_entity::has_empty_dl_harqs(std::optional<harq_mode_t> mode) const
 {
-  if (mode.has_value() and is_dl_harq_mode_selective()) {
-    return std::any_of(get_dl_ue().free_harq_ids.begin(), get_dl_ue().free_harq_ids.end(), [&](auto h_id) {
-      return (get_dl_ue().harqs[h_id].mode == *mode and get_dl_ue().harqs[h_id].status == harq_state_t::empty);
-    });
+  const auto& ue = get_dl_ue();
+  // An entity that is not mode-selective takes any free process, so the list answers without consulting the modes.
+  if (not mode.has_value() or not is_dl_harq_mode_selective()) {
+    return ue.free_harqs.any();
   }
-  return not get_dl_ue().free_harq_ids.empty();
+  return free_harq_mask(ue, *mode).any();
 }
 
 bool unique_ue_harq_entity::has_empty_ul_harqs(std::optional<harq_mode_t> mode) const
 {
-  if (mode.has_value() and is_ul_harq_mode_selective()) {
-    return std::any_of(get_ul_ue().free_harq_ids.begin(), get_ul_ue().free_harq_ids.end(), [&](auto h_id) {
-      return h_id >= first_non_reserved_harq_id and get_ul_ue().harqs[h_id].mode == *mode and
-             get_ul_ue().harqs[h_id].status == harq_state_t::empty;
-    });
+  const auto& ue = get_ul_ue();
+  // The processes below the first non-reserved one are held for configured grants and are not up for allocation.
+  if (not mode.has_value() or not is_ul_harq_mode_selective()) {
+    return ue.free_harqs.any(first_non_reserved_harq_id, ue.free_harqs.size());
   }
-  return std::any_of(get_ul_ue().free_harq_ids.begin(), get_ul_ue().free_harq_ids.end(), [&](auto h_id) {
-    return h_id >= first_non_reserved_harq_id and get_ul_ue().harqs[h_id].status == harq_state_t::empty;
-  });
+  return free_harq_mask(ue, *mode).any(first_non_reserved_harq_id, ue.free_harqs.size());
 }
 
 size_t unique_ue_harq_entity::nof_empty_dl_harqs(std::optional<harq_mode_t> mode) const
 {
-  if (mode.has_value() and is_dl_harq_mode_selective()) {
-    return std::count_if(get_dl_ue().free_harq_ids.begin(), get_dl_ue().free_harq_ids.end(), [&](auto h_id) {
-      return (get_dl_ue().harqs[h_id].mode == *mode and get_dl_ue().harqs[h_id].status == harq_state_t::empty);
-    });
+  const auto& ue = get_dl_ue();
+  if (not mode.has_value() or not is_dl_harq_mode_selective()) {
+    return ue.free_harqs.count();
   }
-  return get_dl_ue().free_harq_ids.size();
+  return free_harq_mask(ue, *mode).count();
 }
 
 size_t unique_ue_harq_entity::nof_empty_ul_harqs(std::optional<harq_mode_t> mode) const
 {
-  if (mode.has_value() and is_ul_harq_mode_selective()) {
-    return std::count_if(get_ul_ue().free_harq_ids.begin(), get_ul_ue().free_harq_ids.end(), [&](auto h_id) {
-      return h_id >= first_non_reserved_harq_id and get_ul_ue().harqs[h_id].mode == *mode and
-             get_ul_ue().harqs[h_id].status == harq_state_t::empty;
-    });
+  const auto& ue = get_ul_ue();
+  if (not mode.has_value() or not is_ul_harq_mode_selective()) {
+    return ue.free_harqs.count();
   }
-  return get_ul_ue().free_harq_ids.size();
+  // The processes held for configured grants are dropped before the count, which takes no range of its own.
+  fixed_size_bitset<MAX_NOF_HARQS> candidates = free_harq_mask(ue, *mode);
+  candidates.fill(0, first_non_reserved_harq_id, false);
+  return candidates.count();
 }
 
 void unique_ue_harq_entity::reset()

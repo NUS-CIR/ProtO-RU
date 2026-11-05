@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../slicing/ran_slice_id.h"
+#include "ocudu/adt/fixed_bitset.h"
 #include "ocudu/adt/intrusive_list.h"
 #include "ocudu/ocudulog/ocudulog.h"
 #include "ocudu/ran/csi_report/csi_report_data.h"
@@ -194,9 +195,12 @@ struct cell_harq_repository {
 
   struct ue_harq_entity_impl {
     std::vector<harq_type> harqs;
-    std::vector<harq_id_t> free_harq_ids;
-    slot_point             last_slot_tx;
-    slot_point             last_slot_ack;
+    /// Processes that are free.
+    fixed_size_bitset<MAX_NOF_HARQS> free_harqs;
+    /// Mode of each process, a set bit standing for \c harq_mode_t::normal.
+    fixed_size_bitset<MAX_NOF_HARQS> harq_mode_mask;
+    slot_point                       last_slot_tx;
+    slot_point                       last_slot_ack;
     /// NTN helper variable indicating the presence of HARQ process with feedback disabled or mode B.
     bool feedback_disabled_or_mode_b_harq_present = false;
     /// First HARQ-id that is not reserved for Configured Grant use.
@@ -206,7 +210,8 @@ struct cell_harq_repository {
     void clear()
     {
       harqs.clear();
-      free_harq_ids.clear();
+      free_harqs.reset();
+      harq_mode_mask.reset();
       last_slot_tx                             = slot_point{};
       last_slot_ack                            = slot_point{};
       feedback_disabled_or_mode_b_harq_present = false;
