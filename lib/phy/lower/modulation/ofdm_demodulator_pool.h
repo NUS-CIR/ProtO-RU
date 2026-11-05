@@ -9,6 +9,7 @@
 #include "ocudu/ocuduvec/zero.h"
 #include "ocudu/phy/lower/modulation/ofdm_demodulator.h"
 #include "ocudu/phy/support/resource_grid_writer.h"
+#include "ocudu/ran/cyclic_prefix.h"
 #include "ocudu/support/memory_pool/bounded_object_pool.h"
 
 namespace ocudu {
@@ -23,9 +24,14 @@ public:
   /// \brief Constructs an OFDM symbol demodulator concurrent pool.
   /// \param[in] base_         Base instance for getting the symbol size.
   /// \param[in] demodulators_ Shared pool of OFDM demodulators.
+  /// \param[in] cp            Cyclic prefix type.
   ofdm_symbol_demodulator_pool(std::unique_ptr<ofdm_symbol_demodulator> base_,
-                               std::shared_ptr<demodulator_pool>        demodulators_) :
-    logger(ocudulog::fetch_basic_logger("PHY")), base(std::move(base_)), demodulators(std::move(demodulators_))
+                               std::shared_ptr<demodulator_pool>        demodulators_,
+                               cyclic_prefix                            cp) :
+    logger(ocudulog::fetch_basic_logger("PHY")),
+    base(std::move(base_)),
+    demodulators(std::move(demodulators_)),
+    nof_symbols_per_slot(get_nsymb_per_slot(cp))
   {
   }
 
@@ -44,7 +50,8 @@ public:
   {
     auto demodulator = demodulators->get();
     if (!demodulator) {
-      ocuduvec::zero(grid.get_view(port_index, symbol_index));
+      // The symbol index is relative to the subframe, while the grid only holds the symbols of one slot.
+      ocuduvec::zero(grid.get_view(port_index, symbol_index % nof_symbols_per_slot));
       logger.error("Insufficient number of OFDM demodulator instances.");
       return;
     }
@@ -62,6 +69,8 @@ private:
   ocudulog::basic_logger&                  logger;
   std::unique_ptr<ofdm_symbol_demodulator> base;
   std::shared_ptr<demodulator_pool>        demodulators;
+  /// Number of OFDM symbols per slot.
+  unsigned nof_symbols_per_slot;
 };
 
 } // namespace ocudu

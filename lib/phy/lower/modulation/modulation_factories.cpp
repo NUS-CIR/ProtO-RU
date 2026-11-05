@@ -97,8 +97,8 @@ public:
     std::shared_ptr<ofdm_symbol_demodulator_pool::demodulator_pool> demodulators =
         std::make_shared<ofdm_symbol_demodulator_pool::demodulator_pool>(instances);
 
-    return std::make_unique<ofdm_symbol_demodulator_pool>(base->create_ofdm_symbol_demodulator(config),
-                                                          std::move(demodulators));
+    return std::make_unique<ofdm_symbol_demodulator_pool>(
+        base->create_ofdm_symbol_demodulator(config), std::move(demodulators), config.cp);
   }
 
   std::unique_ptr<ofdm_slot_demodulator>
