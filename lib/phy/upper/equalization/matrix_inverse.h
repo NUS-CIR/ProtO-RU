@@ -75,16 +75,19 @@ simd_sel_t hpd_matrix_inverse(simd_cf_t out[N][N], const simd_cf_t in[N][N])
     }
   }
 
-  // in^-1 = W^H D^-1 W: out(i, j) = sum_{k >= i} conj(W(k, i)) W(k, j) / d(k) for i >= j, with W(k, k) = 1. The upper
-  // triangle is the conjugate of the lower one, and the diagonal is real.
+  // Compute out = in^-1 = W^H D^-1 W: start by the diagonal, which is real valued.
   for (unsigned i = 0; i != N; ++i) {
     simd_f_t diag = d_inv[i];
     for (unsigned k = i + 1; k != N; ++k) {
       diag += ocudu_simd_cf_norm_sq(w[k][i]) * d_inv[k];
     }
     out[i][i] = ocudu_simd_cf_make(diag);
+  }
 
-    for (unsigned j = 0; j != i; ++j) {
+  // Next, compute out(i, j) = sum_{k >= i} conj(W(k, i)) W(k, j) / d(k) for i >= j, with W(k, k) = 1. The upper
+  // triangle is the conjugate of the lower one.
+  for (unsigned j = 0; j != N; ++j) {
+    for (unsigned i = j + 1; i != N; ++i) {
       out[i][j] = w[i][j] * d_inv[i];
       for (unsigned k = i + 1; k != N; ++k) {
         out[i][j] += ocudu_simd_cf_conjprod(w[k][j], w[k][i]) * d_inv[k];
