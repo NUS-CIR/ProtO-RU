@@ -46,11 +46,7 @@
 /lib/ran/
 /include/ocudu/ran/
 /tests/*/ran/
-/apps/
 /CMakeLists.txt
-
-[CLI][1] @fmaroszek
-/apps/**/*cli11*
 
 [Fronthaul][1] @faluco @AleaLC @sauka @jc.gonzalez1
 /lib/ofh/
