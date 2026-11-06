@@ -177,5 +177,5 @@
 /tests/*/e2/
 /tests/integrationtests/e2ap/
 
-[CODEOWNERS file][3] @ismael.gomez1 @andrepuschmann @frankist @xarteaga @palvarez @faluco @asaezper
+[CODEOWNERS file][1] @ismael.gomez1 @andrepuschmann @frankist @xarteaga @palvarez @faluco @asaezper
 /.gitlab/CODEOWNERS
