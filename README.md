@@ -13,6 +13,7 @@ ZMQ operation is not supported in this release.
 ProtO-RU is intended for research and development where a customizable software O-RU is preferable to a fixed-function commercial radio.
 It can run on x86 and ARM hosts supported by OCUDU and UHD.
 
+- Paper: [IEEE Xplore](https://ieeexplore.ieee.org/abstract/document/11711945) 🏆 Best Paper Award at IEEE PIMRC
 - Technical report: [arXiv](https://arxiv.org/abs/2512.02398)
 - ACM Open AI-RAN 2025 invited demo: [poster](https://drive.google.com/file/d/10YtGOLr3b2fomS6cWCzG7gJtb5P75KzK/view?usp=sharing), [video](https://www.youtube.com/watch?v=KSdTqXCAuGs)
 - Summer 2026 OAI Workshop demo: [video](https://youtu.be/LIG8f8c_5q4)
@@ -69,14 +70,13 @@ Apply the range adjustment described in the [integration notes](./proto-ru/INTEG
 ## Citation
 
 ```bibtex
-@techreport{zhou2025protoru,
+@inproceedings{zhou2026protoru,
+  author={Zhou, Zhiyu and Khooi, Xin Zhe and Permal, Satis Kumar and Chan, Mun Choon},
+  booktitle={2026 IEEE 37th International Symposium on Personal, Indoor and Mobile Radio Communications (PIMRC)},
   title={ProtO-RU: An O-RAN Split-7.2 Radio Unit using SDRs},
-  author={Zhiyu Zhou and Xin Zhe Khooi and Satis Kumar Permal and Mun Choon Chan},
-  year={2025},
-  eprint={2512.02398},
-  archivePrefix={arXiv},
-  primaryClass={cs.NI},
-  url={https://arxiv.org/abs/2512.02398},
+  year={2026},
+  pages={1-7},
+  doi={10.1109/PIMRC69400.2026.11711945}
 }
 ```
 
