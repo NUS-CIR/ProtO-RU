@@ -94,3 +94,14 @@ target_include_directories(ru_emulator_sdr_worker_manager_test PRIVATE ${CMAKE_S
 target_link_libraries(ru_emulator_sdr_worker_manager_test ocudu_ru_sdr ocudu_support ocudulog
         GTest::gtest GTest::gtest_main)
 gtest_discover_tests(ru_emulator_sdr_worker_manager_test)
+
+add_executable(ru_emulator_example_configs_test ru_emulator_example_configs_test.cpp
+        ${CMAKE_SOURCE_DIR}/apps/examples/ofh/ru_emulator_cli11_schema.cpp)
+target_include_directories(ru_emulator_example_configs_test PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/external)
+# The schema check parses DPDK settings without starting a DPDK runtime.
+target_compile_definitions(ru_emulator_example_configs_test PRIVATE
+        OCUDU_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+        DPDK_FOUND)
+target_link_libraries(ru_emulator_example_configs_test ocudulog ocudu_ran ocudu_support ocudu_yaml_util
+        GTest::gtest GTest::gtest_main)
+gtest_discover_tests(ru_emulator_example_configs_test)
